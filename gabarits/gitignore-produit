@@ -101,6 +101,21 @@ forge/**/*motdepasse*
 *.log
 .claude/hooks-journal.jsonl
 .ops-journal.jsonl
+# TF-2126 (04/11/2026) : verrou transitoire de la fenêtre de mutation de forge-tests (TF-2091). Posé puis
+# retiré pendant l'audit ; survivant, il signale une mutation inachevée. Il ne se commite jamais.
+.forge-tests-mutation-en-cours
+# TF-2084 (04/11/2026) : registre transitoire des gestes distants ouverts par les sessions du produit. Il
+# change à chaque geste et vaut 15 minutes ; les gestes DÉCIDÉS sont dans gestes-approuves.jsonl, ignoré lui aussi plus bas (TF-2213).
+forge/gestes-en-cours.jsonl
+# TF-2150 (04/11/2026) : journaux de session des leçons, les rappels servis au geste (hook lecons) et les frictions
+# du tour (TF-2141) ; `scripts/lecons.mjs --recidives` du pilot les croise. Ils ne se commitent jamais.
+forge/lecons-rappels.jsonl
+forge/frictions.jsonl
+# TF-2213 et TF-2215 (06/11/2026) : le lot de gestes distants approuvés. Valable 24 h au plus, il porte les commandes et les cibles du lot, dont
+# un chemin d'abonnement cloud ; non ignoré, le contrôle d'hygiène d'un produit (E-082 chez Produit-86) l'a lu comme un secret. La décision
+# elle-même reste au ledger (reponse_humain) et à la restitution. Les quatre journaux des hooks de la factory sont nommés dans la clé
+# `journaux_de_hooks` de gabarits\HERITAGE.json : un balayage de secrets du produit les exclut par cette liste.
+forge/gestes-approuves.jsonl
 
 # ---- CE QUI N'EST PAS ICI, ET C'EST UNE DÉCISION ------------------------------------------------
 # `old\` N'EST PAS EXCLU. L'arbitrage C1, amendé par décision humaine du 13/08/2026 (TF-0150), le

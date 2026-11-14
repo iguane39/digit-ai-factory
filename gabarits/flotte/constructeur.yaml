@@ -1,6 +1,7 @@
 # Flotte d'agents de la Factory (D-19 (a) du 18/10/2026, étude output/03-etudes/20261018-etude-opportunite-flotte-d-agents.md).
 # Construction complexe : Opus. L'effort suit la table effort_par_classe de references/MODELES-EN-SERVICE.json, classe
 # « construction-complexe » : max, classe non rejouée. À n'employer que sur complexité manifeste ou escalade consignée.
+# scan-agentdef CAP-1 : WebFetch et WebSearch restent déclarés avec l'écriture et la lecture parce que le rôle les emploie. Relevé du 13/11/2026 sur les transcriptions des deux profils du poste (30 jours, 57 sous-agents constructeur) : 190 appels WebFetch et 22 WebSearch, pour lire la documentation officielle d'un outil ou d'un service pendant la construction (supabase.com, docs.github.com, raw.githubusercontent.com, postgresql.org, docs.docker.com). Retirer l'un ou l'autre priverait l'agent de sa source. Les deux outils ne font que lire : le contrat d'agent interdit toute API tierce payante et toute lecture d'un .env.
 id: constructeur
 mandat: "Construction complexe — architecture, code neuf d'ampleur, maquette complète, réparation qui a résisté à un agent de campagne — dans UN dépôt cible, sous le contrat d'agent de campagne du pilot (gabarits/AGENT-CAMPAGNE.md de digit-ai-factory) ; sur complexité manifeste ou escalade consignée seulement"
 outils: [Read, Grep, Glob, Bash, PowerShell, Edit, Write, Skill, WebFetch, WebSearch]

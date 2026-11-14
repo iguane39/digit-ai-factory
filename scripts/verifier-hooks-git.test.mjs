@@ -13,9 +13,10 @@
  */
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { delimiter, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { resoudreInterprete } from "../oracles/consommateurs-skills.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const OUTIL = join(ICI, "verifier-hooks-git.mjs");
@@ -221,9 +222,29 @@ check("vert (TF-1400) — dépôt qui ne suit pas le rejeu : aucune ligne H4", (
 // section PROPRE VERSIONNÉE pour de bon, suivie d'une sonde qui lit l'entrée comme la section TF-1555 la lit. VERT : la
 // sonde reçoit la ligne envoyée par git. ROUGE : la même section sans sa ligne `exec <` (l'état d'avant le 20/10) laisse
 // la sonde sans rien.
+//
+// TF-2066 (02/11/2026) — `sh` SE RÉSOUT, il ne se suppose pas dans le PATH. Lancé depuis un lanceur Windows qui n'a pas Git
+// dans son PATH, le cas se déclarait « NON JOUÉ : sh absent » alors que Git pour Windows fournit `sh.exe`, et le cliquet des
+// recettes baissait. `trouverSh` suit `resoudreInterprete` de `oracles\consommateurs-skills.mjs` : la variable FORGE_SH d'abord,
+// les chemins candidats ensuite, le PATH en dernier. Sans `sh` nulle part, le cas reste déclaré non joué.
+const INTERPRETE_SH = { nom: "sh", variable: "FORGE_SH", candidats: [
+  "%ProgramFiles%/Git/usr/bin/sh.exe", "%ProgramFiles%/Git/bin/sh.exe", "%LOCALAPPDATA%/Programs/Git/usr/bin/sh.exe", "/usr/bin/sh", "/bin/sh"] };
+const shRepond = (sh) => { try { return spawnSync(sh, ["-c", "echo ok"], { encoding: "utf8" }).status === 0; } catch { return false; } };
+const trouverSh = ({ env = process.env, existe = existsSync, repond = shRepond } = {}) => {
+  const r = resoudreInterprete(INTERPRETE_SH, { env, existe });
+  if (r.chemin && repond(r.chemin)) return r.chemin;
+  return repond("sh") ? "sh" : null;
+};
+check("résolution de sh (TF-2066) — la variable passe avant les candidats, un candidat avant le PATH, et sans sh nulle part rien n'est rendu", () => {
+  const toujours = () => true;
+  if (trouverSh({ env: { FORGE_SH: "/vu/sh", ProgramFiles: "/pf" }, existe: (p) => p === "/vu/sh" || p === "/pf/Git/usr/bin/sh.exe", repond: toujours }) !== "/vu/sh") throw new Error("la variable ne passe pas avant les candidats");
+  if (trouverSh({ env: { ProgramFiles: "/pf" }, existe: (p) => p === "/pf/Git/usr/bin/sh.exe", repond: (s) => s !== "sh" }) !== "/pf/Git/usr/bin/sh.exe") throw new Error("le candidat Git n'est pas résolu quand le PATH n'a pas sh");
+  if (trouverSh({ env: {}, existe: () => false, repond: (s) => s === "sh" }) !== "sh") throw new Error("le PATH n'est pas le dernier recours");
+  if (trouverSh({ env: {}, existe: () => false, repond: () => false }) !== null) throw new Error("sans sh nulle part, le cas doit rester non joué");
+});
 {
-  const shell = spawnSync("sh", ["-c", "echo ok"], { encoding: "utf8" });
-  if (shell.status !== 0) console.log("[NON JOUÉ] 1 cas — TF-1952 entrée de git rendue aux sections suivantes : sh absent de ce poste");
+  const SH = trouverSh();
+  if (!SH) console.log("[NON JOUÉ] 1 cas — TF-1952 entrée de git rendue aux sections suivantes : sh absent de ce poste (ni FORGE_SH, ni Git pour Windows, ni PATH)");
   else {
     const SECTION_PROPRE = readFileSync(join(ICI, "hooks-git", "pre-push-prolongement-local"), "utf8").replace(/\r\n/g, "\n");
     const SHA = "1".repeat(40), ZERO = "0".repeat(40);
@@ -235,7 +256,10 @@ check("vert (TF-1400) — dépôt qui ne suit pas le rejeu : aucune ligne H4", (
       writeFileSync(join(D, "scripts", "rejouer-verdicts-cites.mjs"), "process.exit(0);\n", "utf8");
       const script = join(D, "hook.sh");
       writeFileSync(script, texteSection + "\nread -r REF_SONDE SHA_SONDE SUITE_SONDE\nprintf 'SONDE:%s\\n' \"$SHA_SONDE\"\n", "utf8");
-      const r = spawnSync("sh", [script.replace(/\\/g, "/")], { cwd: D, input: `refs/heads/main ${SHA} refs/heads/main ${ZERO}\n`, encoding: "utf8", timeout: 60000 });
+      // Un `sh.exe` de Git pour Windows lancé hors de Git Bash ne met pas ses outils (`cat`, `read`…) dans le PATH : on les y pose.
+      const dirSh = SH === "sh" ? [] : [dirname(SH), join(dirname(SH), "..", "usr", "bin")];
+      const env = { ...process.env, PATH: [...dirSh, process.env.PATH || ""].join(delimiter) };
+      const r = spawnSync(SH, [script.replace(/\\/g, "/")], { cwd: D, env, input: `refs/heads/main ${SHA} refs/heads/main ${ZERO}\n`, encoding: "utf8", timeout: 60000 });
       rmSync(D, { recursive: true, force: true });
       return { code: r.status, sortie: (r.stdout || "") + (r.stderr || "") };
     };

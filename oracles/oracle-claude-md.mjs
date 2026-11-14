@@ -9,6 +9,8 @@
  *      plafond, sept références restaient orphelines et le contrôle rouge finissait par être ignoré) ;
  *      une citation transitive ne vaut que si le document citant est lui-même atteint depuis le
  *      noyau. N2 vaut aussi pour les entrées de l'index : un document cité et absent est un défaut.
+ *      Depuis le 05/11/2026 (TF-2157), « fichier » s'entend des .md ET des référentiels .json ; le sidecar généré
+ *      d'un .md (`X.md.oracles.json`, `X.md.oracles-cache.json`) se juge par sa source.
  *  N4  AUCUN QUANTIFICATEUR NE DISPARAÎT du noyau entre sa version COMMISE et sa version de
  *      travail (TF-1010, 10/09/2026). Le 10/09, pour faire tenir une ligne dans le plafond N1, le
  *      mot « seulement » a été retiré de « Livrable accepté sur verdict d'oracle exécuté
@@ -135,7 +137,9 @@ function juger(racine, precedent = undefined) {
   const refDir = join(racine, "references");
   // Une citation est `references\X.md` en tête de chemin : `skills\…\references\X.md` désigne le
   // dossier d'un AUTRE dépôt (trouvé le 03/09 dans ETAPES-RUN.md dès la première lecture transitive).
-  const RE_CITATION = /(?<![\\/\w])references\\([\w-]+\.md)/g;
+  const RE_CITATION = /(?<![\\/\w])references\\([\w-]+\.(?:md|json))/g;
+  // Un `<X>.md.oracles.json` ou `<X>.md.oracles-cache.json` est le sidecar GÉNÉRÉ de son document `<X>.md` (81 suivis au 05/11/2026) : il se juge par sa source, jamais orphelin à part.
+  const SIDECAR_ORACLES = /\.md\.oracles(?:-cache)?\.json$/;
   const citer = (contenu) => new Set([...contenu.matchAll(RE_CITATION)].map((m) => m[1]));
   // Clôture des citations depuis le noyau (D-3 (b), 03/09/2026) : un document atteint est lu à son
   // tour, et ce qu'il cite devient atteint — l'index n'est pas un cas spécial, c'est une référence
@@ -146,7 +150,7 @@ function juger(racine, precedent = undefined) {
   while (aLire.length) {
     const f = aLire.shift();
     const chemin = join(refDir, f);
-    if (!existsSync(chemin)) continue;
+    if (!existsSync(chemin) || !f.endsWith(".md")) continue;   // un référentiel .json est atteint, il ne cite rien (TF-2157)
     for (const g of citer(readFileSync(chemin, "utf8")))
       if (!citees.has(g)) { citees.add(g); parQui.set(g, `references\\${f}`); aLire.push(g); }
   }
@@ -155,7 +159,7 @@ function juger(racine, precedent = undefined) {
       ? ok("N2", `references\\${f} cité par ${parQui.get(f)} et présent`)
       : ko("N2", `references\\${f} cité par ${parQui.get(f)} mais ABSENT`);
   if (existsSync(refDir))
-    for (const f of readdirSync(refDir).filter((n) => n.endsWith(".md")))
+    for (const f of readdirSync(refDir).filter((n) => /\.(?:md|json)$/.test(n) && !SIDECAR_ORACLES.test(n)))
       if (!citees.has(f)) ko("N3", `references\\${f} existe mais n'est cité ni par le noyau ni par un document qu'il cite (orphelin)`);
   if (!findings.some((x) => x.regle === "N3")) ok("N3", "aucune référence orpheline");
   return findings;
@@ -201,6 +205,18 @@ function selfTest() {
   cas.push(["rouge N3 — index non cité par le noyau : lui et ce qu'il cite restent orphelins", echoue(indexOrphelin, "N3")]);
   const entreeMorte = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\FANTOME.md`" }));
   cas.push(["rouge N2 — entrée d'index vers un fichier absent", echoue(entreeMorte, "N2")]);
+
+  // N3 et les référentiels .json (TF-2157, 05/11/2026) : la règle disait « chaque fichier de references\ » et ne parcourait que les .md ;
+  // `references\LECONS.json` aurait passé sans entrée à l'index. Un .json sans citation est orphelin, un .json cité par l'index est atteint,
+  // un .json cité et absent tombe sous N2, et le sidecar généré d'un .md (`X.md.oracles.json`) ne compte pas comme un référentiel à part.
+  const jsonOrphelin = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\ACCUEIL.md`", "ACCUEIL.md": "x", "LECONS.json": "{}" }));
+  cas.push(["rouge N3 — référentiel .json absent de l'index : orphelin", echoue(jsonOrphelin, "N3")]);
+  const jsonParIndex = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\ACCUEIL.md` et `references\\LECONS.json`", "ACCUEIL.md": "x", "LECONS.json": "{}" }));
+  cas.push(["N3  — référentiel .json cité par l'index (le remède joué) : atteint, aucun défaut", !echoue(jsonParIndex, "N3") && !echoue(jsonParIndex, "N2")]);
+  const jsonAbsent = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\FANTOME.json`" }));
+  cas.push(["rouge N2 — entrée d'index vers un référentiel .json absent", echoue(jsonAbsent, "N2")]);
+  const sidecar = juger(monter("cite `references\\INDEX.md`.\n", { "INDEX.md": "cite `references\\ACCUEIL.md`", "ACCUEIL.md": "x", "ACCUEIL.md.oracles.json": "{}", "ACCUEIL.md.oracles-cache.json": "{}" }));
+  cas.push(["N3  — sidecar généré d'un .md : jugé par sa source, jamais orphelin à part", !echoue(sidecar, "N3")]);
 
   // N4 (TF-1010) — dans ses TROIS sens, sans git : le texte commis est passé directement.
   const regle = "- Livrable accepté sur verdict d'oracle exécuté seulement ; jamais de réponse inventée.\n";

@@ -41,7 +41,15 @@ export const MOTIF_HOOK_OUVERTURE = /forge\/hooks\/factory\.mjs"?\s+ouverture\b/
  * jamais ajouté. Comme la commande y est écrite en toutes lettres, le motif exigé par le contrat
  * d'héritage (`gabarits/HERITAGE.json`) est tenu : un écart DÉCLARÉ n'est pas un oubli.
  *
- * Retour : { etat: "absent" | "illisible" | "gabarit_illisible" | "deja" | "corrige", ajoutes: [noms], exclus: [noms] }.
+ * TF-2185 (05/11/2026) — UNE ENTRÉE PRÉSENTE DONT LE GABARIT A ÉLARGI LE `matcher` S'ÉLARGIT AUSSI. Mesuré
+ * le 05/11 : `lecons` passé à `…|Agent|Task` au gabarit (TF-1947) restait sur l'ancien matcher chez le seul
+ * produit du poste qui le portait, et sa leçon L-006 n'y était jamais servie. Seul un élargissement est
+ * joué : chaque alternative du produit figure au gabarit et il en manque au moins une. Un matcher que le
+ * produit a rendu plus large ou différent est le sien, intact. Le groupe prend le matcher du gabarit s'il
+ * ne porte que cette entrée ; sinon l'entrée seule passe au groupe du matcher du gabarit, et les hooks du
+ * produit gardent leur matcher.
+ *
+ * Retour : { etat: "absent" | "illisible" | "gabarit_illisible" | "deja" | "corrige", ajoutes: [noms], elargis: [noms], exclus: [noms] }.
  */
 export const MOTIF_COMMANDE_FACTORY = /forge\/hooks\/factory\.mjs"?\s+([\w-]+)/;
 
@@ -93,16 +101,25 @@ export function nomsExclus(j) {
     .filter(Boolean);
 }
 
+const alternatives = (m) => (typeof m === "string" ? m.split("|").map((x) => x.trim()).filter(Boolean) : []);
+const nomFactory = (h) => (String(h?.command || "").match(MOTIF_COMMANDE_FACTORY) || [])[1];
+
+// Vrai si le matcher du gabarit élargit strictement celui du produit (TF-2185).
+export function matcherElargi(matcherProduit, matcherGabarit) {
+  const p = alternatives(matcherProduit), g = alternatives(matcherGabarit);
+  return p.length > 0 && p.every((x) => g.includes(x)) && g.some((x) => !p.includes(x));
+}
+
 export function fusionnerHooksDuGabarit(chemin, cheminGabarit) {
-  if (!existsSync(chemin)) return { etat: "absent", ajoutes: [], exclus: [] };
+  if (!existsSync(chemin)) return { etat: "absent", ajoutes: [], elargis: [], exclus: [] };
   let gabarit;
-  try { gabarit = JSON.parse(readFileSync(cheminGabarit, "utf8").replace(/^﻿/, "")); } catch (e) { return { etat: "gabarit_illisible", detail: e.message, ajoutes: [], exclus: [] }; }
+  try { gabarit = JSON.parse(readFileSync(cheminGabarit, "utf8").replace(/^﻿/, "")); } catch (e) { return { etat: "gabarit_illisible", detail: e.message, ajoutes: [], elargis: [], exclus: [] }; }
   const brut = readFileSync(chemin, "utf8");
   let j;
-  try { j = JSON.parse(brut.replace(/^﻿/, "")); } catch (e) { return { etat: "illisible", detail: e.message, ajoutes: [], exclus: [] }; }
-  if (!j || typeof j !== "object" || Array.isArray(j)) return { etat: "illisible", detail: "racine non objet", ajoutes: [], exclus: [] };
+  try { j = JSON.parse(brut.replace(/^﻿/, "")); } catch (e) { return { etat: "illisible", detail: e.message, ajoutes: [], elargis: [], exclus: [] }; }
+  if (!j || typeof j !== "object" || Array.isArray(j)) return { etat: "illisible", detail: "racine non objet", ajoutes: [], elargis: [], exclus: [] };
   const exclus = nomsExclus(j);
-  const ajoutes = [];
+  const ajoutes = [], elargis = [];
   for (const [evenement, groupesG] of Object.entries(gabarit.hooks || {})) {
     for (const gG of groupesG || []) {
       for (const hG of gG.hooks || []) {
@@ -110,8 +127,20 @@ export function fusionnerHooksDuGabarit(chemin, cheminGabarit) {
         if (!nom || exclus.includes(nom)) continue;
         j.hooks = j.hooks && typeof j.hooks === "object" ? j.hooks : {};
         const groupesP = Array.isArray(j.hooks[evenement]) ? j.hooks[evenement] : (j.hooks[evenement] = []);
-        const present = groupesP.some((g) => (g?.hooks || []).some((h) => (String(h?.command || "").match(MOTIF_COMMANDE_FACTORY) || [])[1] === nom));
-        if (present) continue;
+        const porteur = groupesP.find((g) => (g?.hooks || []).some((h) => nomFactory(h) === nom));
+        if (porteur) {
+          if (!matcherElargi(porteur.matcher, gG.matcher)) continue;
+          if (porteur.hooks.every((h) => nomFactory(h) === nom)) porteur.matcher = gG.matcher;
+          else {
+            const i = porteur.hooks.findIndex((h) => nomFactory(h) === nom);
+            const [entree] = porteur.hooks.splice(i, 1);
+            let cible = groupesP.find((g) => g !== porteur && (g?.matcher ?? null) === gG.matcher && Array.isArray(g?.hooks));
+            if (!cible) { cible = { matcher: gG.matcher, hooks: [] }; groupesP.push(cible); }
+            cible.hooks.push(entree);
+          }
+          elargis.push(nom);
+          continue;
+        }
         let cible = groupesP.find((g) => (g?.matcher ?? null) === (gG.matcher ?? null) && Array.isArray(g?.hooks));
         if (!cible) { cible = { ...(gG.matcher !== undefined ? { matcher: gG.matcher } : {}), hooks: [] }; groupesP.push(cible); }
         cible.hooks.push({ ...hG });
@@ -119,13 +148,13 @@ export function fusionnerHooksDuGabarit(chemin, cheminGabarit) {
       }
     }
   }
-  if (!ajoutes.length) return { etat: "deja", ajoutes, exclus };
+  if (!ajoutes.length && !elargis.length) return { etat: "deja", ajoutes, elargis, exclus };
   const eol = brut.includes("\r\n") ? "\r\n" : "\n";
   const indent = (brut.match(/\n([ \t]+)"/) || [, "  "])[1];
   let sortie = JSON.stringify(j, null, indent).replace(/\n/g, eol);
   if (/\r?\n$/.test(brut)) sortie += eol;
   writeFileSync(chemin, (brut.startsWith("﻿") ? "﻿" : "") + sortie);
-  return { etat: "corrige", ajoutes, exclus };
+  return { etat: "corrige", ajoutes, elargis, exclus };
 }
 
 export function passerOuvertureEnAsync(chemin) {

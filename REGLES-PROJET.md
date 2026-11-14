@@ -41,9 +41,9 @@ Comment un fichier s'appelle, et **ce que son nom promet**. Chaque ligne porte s
 
 | n° | Règle | Source | Périmètre | Mécanisme | Coût | Recommandation |
 |---|---|---|---|---|---|---|
-| 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
+| 4 | Tout livrable documentaire est nommé `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` — **le nom du PROJET prime sur l'émetteur** (Q3-bis tranchée par l'humain le 09/08 : « Produit-02 - Audit SEO - … », plus jamais « Digit-AI - … » en tête). Les fichiers historiques ne sont pas renommés. **Alinéa RV-2 (Produit-10, 13/08)** : quand un ENTRANT exige un autre nommage pour le livrable, le nommage du pilot **prime** ; la correspondance entre le nom exigé et le nom produit est consignée au ledger (champ `note_nommage`) — jamais d'arbitrage silencieux. **Alinéas D-192 (a) du 10/11/2026** : un indice peut être partagé par un **lot déclaré** (`forge\lots-livrables.jsonl`), et un produit dont le porteur a décidé le nommage le **déclare** (`forge\NOMMAGE.json`, lu par R-25) — voir « Alinéa DÉCLARATIONS DE NOMMAGE » | convention historique observée avec préfixe émetteur ; **décision humaine du 09/08** la corrige ; alinéa : retour Produit-10 RV-2 (conflit vécu, arbitré au ledger seq 1) | **livrables uniquement** (input\, output\, docs\) — JAMAIS le code (conflit C3) | S+O | faible | **défaut** |
 | 5 | L'indice est une lettre (a, b, c…) par itération du même jour ; une nouvelle version = un **nouveau fichier daté**, jamais d'écrasement — **CÂBLÉE depuis le 23/08** : `node scripts\verifier-jugement.mjs <dossier>` compare l'empreinte d'un livrable à celle de son sceau, et refuse une modification à indice inchangé (TF-0523) | observée (`20260721b` → `20260721d`, `revue.md`/`revue-v2`), **et reproduite le 23/08 : le même fichier écrasé 4 fois, une heure après avoir signalé le même défaut ailleurs** | livrables uniquement | S+O | faible | **défaut** |
-| 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL. **Alinéa TF-1713 (15/10/2026)** : un nom qui suit un type de nom déclaré par une famille du catalogue du pilot (`gabaritsdocumentscatalogue.jsonl`, champ `types_de_nom`, préfixe entier) passe en AVERTISSEMENT nommant la famille, l'ajout au registre d'organization restant dû | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
+| 25 | Le `<Type>` du nom de tout livrable daté (2ᵉ segment, 1ᵉʳ mot) **figure au registre des types** (`registre-types.json` d'organization, comparaison insensible casse/accents) — un type nouveau s'ajoute au registre dans un commit motivé (D-04), jamais improvisé dans un nom. Registre lu en dépôt frère ; poste non équipé → non jugeable, pas FAIL. **Alinéa TF-1713 (15/10/2026)** : un nom qui suit un type de nom déclaré par une famille du catalogue du pilot (`gabaritsdocumentscatalogue.jsonl`, champ `types_de_nom`, préfixe entier) passe en AVERTISSEMENT nommant la famille, l'ajout au registre d'organization restant dû. **Alinéa D-192 (a) (TF-2347)** : un produit qui déclare le nommage décidé par le porteur (`forge\NOMMAGE.json`, décision citée) voit son type lu au segment déclaré au lieu du 2ᵉ | **D-04 organization (décidée 08/08), encodée 11/08 (TF-0084)** — registre 1.1.0, 29 types, complété sur usage réel | produits, nouveaux + rattrapage | O | nul | **défaut** |
 
 **Alinéa LONGUEUR DE CHEMIN (D-11/D-12 exécutées, décision TF-1015 du 11/09/2026 ; constante du
 sidecar corrigée le 01/10/2026, TF-1500).** La règle 4
@@ -68,6 +68,36 @@ d'un produit, avec une fixture à double sens 116/117, soit 150/151 avec le side
 Les fichiers antérieurs au-dessus de la borne ne sont pas renommés : ils sont **nommés** par
 l'oracle, un renommage cassant les liens déjà restitués. Le passage de 26 à 34 nomme de la même
 façon la bande de 117 à 124 caractères, que la constante erronée laissait passer.
+
+**Alinéa DÉCLARATIONS DE NOMMAGE (D-192 (a) du 10/11/2026, TF-2341 et TF-2347 ; décision humaine
+« 191a, 192a, 193a »).** La règle 4 imposait un indice distinct par livrable et par jour, et R-25 lisait
+toujours le type au 2ᵉ segment. Deux cas réels ont montré le coût : un kit de 11 fiches produites en un seul
+traitement portait 11 indices, de a à k, qui comptaient des fichiers et ne disaient aucune version ; et le
+produit marketing, dont le porteur a décidé le 30/09/2026 le nommage « Digit-AI - <Client> - <Type> <Objet> -
+AAAAMMJJ<indice> », voyait R-25 prendre le nom du client pour le type (125 refus de R-25 mesurés le 10/11/2026,
+dont 124 sur des noms à ce préfixe). Deux assouplissements, **tous deux déclarés, aucun par défaut** :
+
+1. **Lot déclaré à indice commun (R-4).** Des livrables produits en un seul traitement partagent un indice
+   quand une ligne de `forge\lots-livrables.jsonl` déclare le lot :
+   `{"ts":"<horodatage ISO relevé à l'écriture>","dossier":"output/<…>","indice":"AAAAMMJJ<i>","traitement":"<le traitement unique, 20 caractères au moins>"}`.
+   La déclaration couvre un dossier et un indice, rien d'autre. Un indice partagé sans déclaration reste refusé
+   (TF-0750) ; une ligne incomplète, au modèle non rempli ou datée du futur est refusée par un FAIL qui la nomme.
+2. **Nommage décidé par le porteur (R-25).** Un produit déclare dans `forge\NOMMAGE.json` son préfixe et le rang du
+   segment Type : `{"prefixe":"Digit-AI","rang_type":3,"decision":{"date":"AAAA-MM-JJ","source":"<la décision humaine citée>"}}`.
+   Un nom qui ouvre sur ce préfixe et compte au moins `rang_type` segments + la date voit son type lu à ce rang ;
+   les autres noms, dont le nom sans client à 3 segments, gardent la lecture au 2ᵉ. La déclaration **cite la
+   décision humaine** (date réelle non future, source d'au moins 10 caractères) : sans elle, elle est refusée par un
+   FAIL et ignorée, donc le comportement d'avant s'applique. Elle déplace la lecture, jamais le registre : le type lu
+   doit toujours figurer au registre des types (règle 25).
+
+**Câblé** : `oracle-conformite-projet` (R-4 lit les lots, R-25 lit le nommage ; formes dans son en-tête et dans les
+messages de refus), recette `oracles\self-test.mjs` (cas D-192, dont le remède du message joué). La déclaration est
+l'affaire du **produit** : elle n'est pas un artefact hérité (`gabarits\HERITAGE.json`), parce qu'imposer un fichier de
+déclaration à tous les produits en ferait une dérogation par défaut ; le gabarit `gabarits\NOMMAGE-PRODUIT.json` en donne le
+modèle (refusé tant qu'il n'est pas rempli) et les messages de refus de l'oracle en citent la forme. Le gabarit
+`CLAUDE-PRODUIT.md`, à 7 octets de son plafond de 6 144 (TF-1949), ne la porte pas. **Non jugé** : la VÉRITÉ des
+déclarations — l'oracle ne vérifie ni qu'un lot est réellement un seul traitement, ni que la décision citée existe ;
+il refuse l'absence de citation et la rend lisible au diff (fichier suivi, daté).
 
 **Alinéa paramétrage (TF-0322, décidé le 17/08 — étude 20260817f, verdict O1 : refus
 instruit d'un système de paramètres).** 3 classes de conventions ne se négocient pas,
@@ -231,7 +261,7 @@ Ce qu'on remet, sous quel nom, et ce qu'on garde. Le tableau se lit du livrable 
 |---|---|---|---|---|---|---|
 | 16 | Les rapports finaux destinés à l'humain (DOSSIER-MEP, PV, revues) sont **copiés** dans `output\` au nommage daté (n° 4) — l'original de travail reste sous `forge\etapes\` | cohérence avec `digit-ai-forge-agents/output/` | produits | S | faible | **défaut** |
 | 17 | Les journaux d'oracles (`*.oracles.json`, `*.oracles-historique.jsonl`) sont versionnés dans `forge\` (ce sont des preuves), ignorés partout ailleurs | observée : présents dans Produit-12/forge/ | produits | P0 (.gitignore) | nul | option (conflit C4) |
-| 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `<projet> - RETOURS - <AAAAMMJJ><indice>.md` (+ sidecar `.tf.jsonl` homonyme) — **le préfixe projet est obligatoire** (décision 13/08 : les lots de tous les projets cohabitent chez le pilot, le nom dit qui retourne quoi), un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; remise = copie dans le sas `input\00-retours\_arrivee\` du pilot, jamais à sa racine (LOT-SAS, TF-1054) — `accueillir-lot.mjs` l'y déplace ; après ingestion, la paire part en `old\` | **mandat humain du 06/08**, préfixe + famille 00-retours **13/08** ; format éprouvé (Produit-12, Produit-10) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décisions 06/08 et 13/08) |
+| 18 | `forge\retours\` existe (gabarit inclus) ; chaque lot de retours forges est un fichier `<projet> - RETOURS - <AAAAMMJJ><indice>.md` (+ sidecar `.tf.jsonl` homonyme) — **le préfixe projet est obligatoire** (décision 13/08 : les lots de tous les projets cohabitent chez le pilot, le nom dit qui retourne quoi), un fichier par lot, ids en séquence continue par produit, **jamais modifié après remise** ; **le lot part dans le tour où le retour est écrit, pas à la clôture du run** (D-191 (a), TF-2329 : le hook de fin de tour du produit, contrôle LOT de `oracles\hook-restitution.mjs`, refuse un tour qui a écrit un retour qu'aucun lot ne cite) ; remise = copie dans le sas `input\00-retours\_arrivee\` du pilot, jamais à sa racine (LOT-SAS, TF-1054) — `accueillir-lot.mjs` l'y déplace ; après ingestion, la paire part en `old\` | **mandat humain du 06/08**, préfixe + famille 00-retours **13/08** ; format éprouvé (Produit-12, Produit-10) | produits, nouveaux + rattrapage | P0+S+O | faible | **adoptée** (décisions 06/08 et 13/08) |
 
 ## G. Circuit des conventions (D-13) — traçabilité organization → pilot
 
@@ -583,7 +613,7 @@ Deux corollaires opposables :
 
 1. **À l'ouverture de tout run**, `node oracles\self-tests.mjs`, `node
    oracles\oracle-boite-entree.mjs` et `node oracles\oracle-skills.mjs` sont joués et leurs
-   verdicts portés au ledger en `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`). Un
+   verdicts portés au ledger en `oracles_verdict` (pas 1 de `references\ETAPES-RUN.md`) — au ledger d'un produit, le compte seul : `oracle-boite-entree --pour-ledger`, sans nom de fichier (TF-2339). Un
    échec **suspend l'ouverture** : des oracles qui ne savent plus refuser ne peuvent rien juger
    de ce qui suit, un lot non pris fausse tout ce qu'on croit savoir du reste-à-faire, et un
    skill — ou un hook (K6-K8, TF-0290/0297/0305 : intégrité, câblage, existence du fichier
@@ -732,7 +762,9 @@ exactement le défaut**. Étude : `output\03-etudes\2026-08\20260817-etude-oppor
    (`digit-ai-factory`) se poussent sans GO humain par envoi : la session déclare
    `FORGE_PUSH_GO="D-53 (b) du 03/10"` (forge) ou `"D-54 (b) du 03/10"` (pilot), et la
    garde pre-push du dépôt juge seule. Restent exigés : la garde rend PASS (porte des noms
-   comprise), et seul part ce qui est déjà committé — le travail non committé d'une autre
+   comprise), l'envoi part sous le seul compte de `references\IDENTITE-PUBLICATION.json`
+   (décision humaine D-175 du 05/11/2026, mot pour mot : « Seule l'identité de l'utilisateur de la
+   Factory […] peut publier pour la Factory et les forges, personne d'autre. »), et seul part ce qui est déjà committé — le travail non committé d'une autre
    session ne se committe pas pour pousser. Hors de ce paragraphe, inchangés : le canal
    `_confidentiel`, `digit-ai-queue` et les produits (GO par envoi) ; le §1 (services
    hébergés). *Pourquoi* : le 03/10, une demande humaine « synchronise avec github » a été
@@ -864,6 +896,17 @@ verdict consigné et non bloquant.
 pas encore — c'est le patron de la règle dormante que R-35 dénonce. Borne : à la revue du
 **2026-11-17**, si aucun des trois invariants n'a servi à trancher une question réelle, ils se
 **retirent** plutôt que de dormir.
+
+**12/11/2026, première instance en service, sur demande humaine.** Demande, mot pour mot :
+« Relance le projet digit-ai-queue initié pour l'appliquer sur ce projet », pour un produit où
+Claude Code et Codex échangeaient par textes recopiés à la main (Produit-79). Une instance de la
+file vit désormais DANS ce produit (`queue/`), posée par `scripts/installer-instance.mjs` de
+`digit-ai-queue` (commit 34b05dd), qui en mesure aussi la dérive (`--verifier`). Les deux agents
+partagent le même arbre de travail local, donc il n'y a ni transport, ni dossier écouté, ni push
+requis. Le pilot ne câble rien chez lui, et aucun agent n'est lancé par un autre. Les 3
+invariants servent donc un usage réel, ce qui répond à la question (2) de la revue du
+2026-11-17. Garde de claim corrigée le même jour : sous Windows, elle laissait éditer un ticket
+non réclamé.
 
 ## V. L'intégrité du ledger se juge là où le ledger s'ouvre (règle 42 — 20/08, TF-0411)
 
@@ -1638,6 +1681,14 @@ que R-55 rendait déjà automatiques, 2 corrections du pilot réversibles et san
 4. **Ce que R-58 n'ouvre PAS** : elle ne lève ni R-38 (publication), ni R-29 (dépenses et gates), ni
    la règle des produits autonomes ; elle ne change pas les décisions déjà rendues ; l'humain revient
    sur toute décision prise sans lui, et sa réponse prime.
+5. **Une consigne du porteur est déjà une décision** (décision humaine D-176 (b) du 05/11/2026, TF-2159).
+   Elle s'applique telle quelle, citée mot pour mot, et ne se transforme pas en options, même quand
+   elle touche une doctrine. Une reformulation ne se demande que si 2 lectures de la consigne changent
+   le livrable, en une question fermée d'une ligne. Le fait : le 03/11/2026, une consigne lue comme
+   interdisant le Docker local a été posée en 2 décisions à options, et le porteur a dû la rappeler le
+   04/11. Non mécanisable : distinguer une consigne d'un avis demande de lire l'échange ; la relecture
+   d'intention (`references\RELECTURE-INTENTION.md`) classe déjà en `choix_humain` une décision humaine
+   reposée.
 
 Contrôle exécutable : `todo\revue-hebdo.mjs`, tri par le champ `ressort` (recette `--self-test`, à
 double sens : une proposition hors du ressort humain n'est pas posée, une fiche sans ressort est
@@ -1846,12 +1897,19 @@ critique pour le travail des développeurs, leur efficacité, résilience. »
    une fois par produit. Sans lui, la restauration joue seule.
 4. **Un secret ne transite jamais par le canal**, dans aucun sens et quelle que soit la liste du
    manifeste (garde-fou « les .env ne transitent jamais ») : il se ressaisit sur chaque poste.
+   **Exception écrite (D-208 (a) du porteur, 12/11/2026, TF-2440)** : la sauvegarde qu'un développeur
+   fait de SES PROPRES fichiers de secrets, hors du canal de reprise, est permise. Elle passe par
+   `forge\fusionner-env.mjs` (copie conforme de `scripts\fusionner-env.mjs`), qui fusionne clé par clé,
+   refuse toute copie qui perdrait une clé, refuse un conflit de valeur sans choix explicite, exige un
+   fichier de poste ignoré par git et n'imprime jamais une valeur. Le canal de reprise lui-même reste
+   fermé aux secrets : RP2 d'`oracle-reprise` les refuse toujours au manifeste.
 5. **Une action de transport entre postes ne se laisse pas à l'humain** quand un canal est déclaré :
    ce qui lui reste, c'est le feu vert, pas la copie.
 
 Contrôles exécutables : `oracles\oracle-reprise.mjs` (RP1 manifeste valide, RP2 aucun secret déclaré,
 RP3 canal joignable sur ce poste, RP4 aucun écart non restauré, RP5 envoi actif sous feu vert
-consigné ; recette `oracle-reprise.test.mjs`, 8 cas, dont le cas du 14/10 rejoué) ; `oracles\hook-reprise.mjs`,
+consigné, RP6 rien de ce que le canal poserait n'est commitable : un dossier ignoré puis renommé garde son
+ancien chemin dans `.gitignore`, TF-2441 ; recette `oracle-reprise.test.mjs`, 11 cas, dont le cas du 14/10 rejoué) ; `oracles\hook-reprise.mjs`,
 câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.json` 1.26.0, et ajouté par le hook d'ouverture du produit depuis le gabarit (recette
 `gabarits\hooks-factory.test.mjs`, cas 12) ; la règle S77 d'`oracles\oracle-synthese.mjs` (point 5).
 Non jugé : une suppression ne se propage pas ; deux écritures du même fichier entre deux
@@ -1895,3 +1953,93 @@ l'extrait selon une déclaration `forge-data/masquage@1`, et `oracles\oracle-ano
 corrélation, l-diversité et t-closeness, texte libre, intégrité référentielle). Non jugé : la
 réidentification par croisement avec une source externe au produit ; le k-anonymat mesuré sur le profil
 d'une personne à travers plusieurs tables.
+
+## AU. R-66 — un réglage admissible s'applique à la création, se vérifie à chaque livraison, et son exception se décide (loi transverse n° 8 — D-178 (a), 06/11/2026, TF-2225 à TF-2233)
+
+Le fait. L'étude du 06/11/2026 (« Sécurité par défaut de bout en bout », indice 20261106a) a croisé 8
+réglages de sécurité standard de Supabase, GitHub et Cloudflare avec les 7 étapes de la chaîne : sur 56
+cases, 17 où une forge connaît le réglage, 9 où elle le contrôle, aucune où elle l'écrit. Dans l'audit du
+cas témoin, 7 écarts sur 30 sont une option gratuite laissée à sa valeur d'origine. La décision humaine
+D-178 (a), réponse « A10a » du 06/11/2026, adopte le principe en loi transverse pour toute la chaîne, sans
+essai préalable sur un seul produit.
+
+**R-66.**
+1. **Admissible veut dire classé `defaut` au registre.** `references\REGLAGES-SURS-PAR-DEFAUT.json`
+   classe chaque réglage en `defaut` (les cinq critères sont tenus : source, coût nul, aucun flux nominal
+   cassé, retour arrière par commande, lecture comparable à un attendu) ou en `decision` (un critère
+   échoue). Aucune forge ne tient sa propre liste : elle lit celle-là, et un réglage absent du registre
+   n'est pas admissible d'office.
+2. **Appliqué à la création.** La forge qui crée un projet joue la commande de pose du registre, puis sa
+   commande de lecture, et consigne l'état lu. Le cadrage pose une exigence vérifiable par réglage
+   `defaut`, et une question de conception avec ses options et leur coût par réglage `decision`.
+3. **Vérifié à chaque livraison.** La campagne de tests, le plan de forge-ops avant la MEP, le dossier de
+   MEP (`ETAPE-MEP.md` § 3 quaterdecies) et l'audit relisent chaque réglage contre l'attendu du registre.
+   Un réglage non lu est un réglage non vérifié, et la porte « prêt » le refuse.
+4. **L'exception se décide.** Un réglage `decision`, ou un réglage `defaut` que le produit veut garder à
+   sa valeur d'origine, ne reste jamais un écart nu : le choix est consigné avec son motif et sa date, et
+   chaque livraison vérifie l'écart accepté tel que décidé. Le choix du produit, la dépense et
+   l'irréversible restent au porteur (R-29, R-58).
+5. **Un écart d'audit sur un réglage `defaut` rouvre un retour vers la forge qui crée.** Le corriger chez
+   le produit referme l'écart pour ce produit, et le produit suivant le rouvre. `node
+   scripts\ouvrir-retour-reglage.mjs --reglage <adresse> --ecart <identifiant> --produit <pseudonyme>`
+   rend la candidature à ingérer par `todo\ingerer-lot.mjs`. Un écart sur un réglage `decision` renvoie à
+   sa décision, que l'appelant nomme (`--decision D-nn`) ; sans décision nommée, le script le refuse.
+6. **Le registre est une donnée** (loi n° 4) : daté, sourcé à la page de l'éditeur lue le jour dit, secrets
+   écrits `$NOM`. Une page relue qui contredit une entrée la met à jour, datée, jamais en silence.
+
+Contrôles exécutables. `node oracles\oracle-reglages-surs.mjs` juge le registre : RS-1 à RS-7, clés
+exactes, `defaut` seulement si c1 à c5 sont tenus, secrets en `$NOM`, citations retrouvées dans les pages
+de l'éditeur avec `--pages`. Pièces au pilot : TF-2225 (registre et oracle), TF-2232 (aiguillage de
+l'écart), TF-2233 (rubrique du dossier de MEP). Pièces chez les forges, suivies chacune à son TF :
+cadrage TF-2226, corpus TF-2227, création TF-2228, tests TF-2229, déploiement TF-2230, audit TF-2231.
+
+Non jugé. Que chaque forge ait livré sa pièce : la loi est écrite ici, les pièces se livrent forge par
+forge. La disponibilité d'un réglage selon l'offre du client : l'API de Supabase rend un champ à lire avant
+d'appliquer la restriction des adresses. Le critère de fonctionnement c3 est mesuré sur un seul produit de
+référence : un produit qui migre par connexion directe depuis un exécuteur de GitHub casserait sous la
+restriction des adresses de Supabase.
+
+## AV. R-67 — une séance datée nomme sa revue de préparation à J-5, et l'engagement d'un document remis a son livrable (D-193 (a), 10/11/2026, TF-2330, TF-2333)
+
+Le fait. Chez le produit marketing, la séance de formation du 13/11/2026 n'était inscrite dans aucun
+calendrier : son seul fichier d'échéances tient les appels d'offres. Sa revue de fond n'a eu lieu que sur
+demande humaine, le 09/11, et elle a relevé 9 défauts à 4 jours de la séance. Les documents de la même
+formation, écrits les 27 et 28/10, avaient promis un QCM et un questionnaire de satisfaction en formulaires
+en ligne, et une skill installée par le formateur. Aucune de ces pièces n'existait le 09/11 ; 3 ont été
+produites dans l'urgence (lot du 09/11/2026, RP-07 et RP-10). La décision humaine D-193 (a), réponse
+« 193a » du 10/11/2026, ajoute ces 2 processus chez tous les produits.
+
+**R-67.**
+1. **Une séance datée s'inscrit au calendrier du produit.** Formation, atelier, comité, soutenance,
+   démonstration ou séminaire : dès que sa date est connue, elle entre dans `forge\CALENDRIER.md`. Sa
+   ligne porte sa source, ses documents et l'état de sa revue. Le fichier naît à l'ouverture du produit, de
+   son modèle `gabarits\CALENDRIER-PRODUIT.md`, daté et sourcé (loi n° 4). Les dates de remise et les appels
+   d'offres n'y entrent pas : la décision vise les séances.
+2. **De J-5 à J-0, l'ouverture du produit nomme la revue de préparation de la séance.** La revue couvre les
+   engagements des documents de la séance, le matériel de celui qui anime et son minutage. Elle couvre aussi
+   la cohérence des pièces entre elles, les mentions restées ouvertes et le jugement de chaque pièce par
+   l'oracle de son domaine. L'ouverture donne la commande qui juge les engagements ; la revue se joue par un
+   agent `verificateur`. Une séance passée ou à plus de 5 jours ne dit rien. Une revue jouée se déclare
+   « faite le AAAA-MM-JJ » au calendrier et ne se rappelle plus.
+3. **Chaque engagement d'un document remis a son livrable ou son action nommée.** Une pièce, un temps ou un
+   outil promis au client s'inscrit dans `forge\ENGAGEMENTS.md`, dans le tour où le document s'écrit. Il est
+   tenu par un livrable présent, ou par une action qui nomme son porteur et son échéance. Le registre naît à
+   l'ouverture, de son modèle `gabarits\ENGAGEMENTS-PRODUIT.md`.
+4. **L'engagement se juge à la production suivante de la chaîne.** À chaque livrable écrit sous `output\`,
+   le registre est jugé et le livrable est lu : un engagement non tenu, ou un document qui promet sans
+   figurer au registre, est nommé. L'ouverture redit ce qui n'est pas tenu, une action échue comprise.
+
+Contrôles exécutables. `node oracles\oracle-engagements.mjs <racine du produit> --documents <dossier>` juge
+le registre et les documents. EN1 juge la forme, EN2 la tenue (livrable présent, repère lu, action non
+échue), EN3 le document qui promet sans figurer au registre ; la recette est `--self-test`.
+`oracles\hook-ecriture.mjs` l'appelle à chaque livrable écrit, au pilot comme chez le produit, et juge le
+calendrier quand il s'écrit. `oracles\hook-ouverture.mjs` fait naître les 2 fichiers et lit le calendrier par
+`oracles\lib-calendrier.mjs`. Il nomme la revue de J-5 à J-0 et redit les engagements non tenus ; sa recette
+est `oracles\hook-ouverture.test.mjs`, sections 2330 et 2333. Les 2 modèles sont déclarés dans
+`gabarits\HERITAGE.json`, en mode `presence` avec `naissance: si_absent`.
+
+Non jugé. La justesse de la date d'une séance, et l'inscription de toutes les séances. La complétude des
+engagements d'un document cité au registre : ses lignes font foi. Une promesse écrite hors du vocabulaire
+fermé d'EN3, et le texte d'un PDF. Le contenu de la revue jouée : la mention « faite le » se lit, la revue ne
+se juge pas. Un document produit par un script n'est jugé qu'à l'écriture suivante, à l'ouverture du produit
+et dans la revue de sa séance.

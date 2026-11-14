@@ -31,12 +31,21 @@ const PROJET = join(T, "monprojet");
 mkdirSync(PROJET, { recursive: true });
 const slug = PROJET.replace(/[^A-Za-z0-9]/g, "-");
 
+// TF-2146 : le registre est un journal PUBLIC ; --consigner le pseudonymise par les tables du canal. La recette pose ses TABLES JETABLES
+// (jamais les tables réelles), noms inventés : un client, deux produits dont un nom de dossier.
+const TABLES = join(T, "tables");
+mkdirSync(TABLES, { recursive: true });
+writeFileSync(join(TABLES, "noms-interdits.json"), JSON.stringify({ noms: ["Zorglub"], pseudonymes: { Zorglub: "Client-A" } }), "utf8");
+writeFileSync(join(TABLES, "produits-pseudonymes.json"), JSON.stringify({ produits: { AtelierZetaPrive: "Produit-90", "Mon Produit Fictif": "Produit-91" } }), "utf8");
+process.env.FORGE_NOMS_INTERDITS = join(TABLES, "noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "produits-pseudonymes.json");
+
 // ---- la transcription synthétique -----------------------------------------------------------------------------------
 const H1 = "Étudie « l'opportunité » d'un relecteur,\navec deux lignes et des accents : œ, é, à — mot pour mot.";
 const H2 = "pour chaque liste, pas seulement les longues";
 const H3 = "23a + b";
 const humain = (texte, extra = {}) => JSON.stringify({ type: "user", origin: { kind: "human" }, timestamp: "2026-10-18T10:00:00Z", message: { role: "user", content: [{ type: "text", text: texte }] }, ...extra });
-const assistant = (blocs) => JSON.stringify({ type: "assistant", timestamp: "2026-10-18T10:00:05Z", message: { id: `m${Math.random()}`, role: "assistant", content: blocs } });
+const assistant = (blocs, ts = "2026-10-18T10:00:05Z") => JSON.stringify({ type: "assistant", timestamp: ts, message: { id: `m${Math.random()}`, role: "assistant", content: blocs } });
 const texte = (t) => ({ type: "text", text: t });
 const outil = (name, input) => ({ type: "tool_use", id: `t${Math.random()}`, name, input });
 
@@ -150,7 +159,7 @@ try {
   });
   check("vert — le référentiel recopie la consigne stricte, la forme JSON, les dates de l'essai et le seuil", () => {
     const ref = readFileSync(join(RACINE, "references", "RELECTURE-INTENTION.md"), "utf8");
-    for (const m of [STRICTE, FORME_JSON, FORME_JSON_V1, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, "2026-10-18", "2026-11-01", "2026-11-08", "4 000 000 de jetons", "`verificateur`", "alerte"])
+    for (const m of [STRICTE, FORME_JSON, FORME_JSON_V1, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, "2026-10-18", "2026-11-01", "2026-11-08", "6 000 000 de jetons", "`verificateur`", "alerte"])
       if (!ref.includes(m)) throw new Error(`référentiel sans « ${m.slice(0, 60)} »`);
   });
   check("vert — --preparer consigne : la consigne de délégation est le livrable, la demande reste celle de la transcription", () => {
@@ -161,6 +170,20 @@ try {
     if (!readFileSync(join(d, "livrables.md"), "utf8").includes("Corrige les listes dès 8 lignes.")) throw new Error("consigne absente de livrables.md");
     if (!readFileSync(join(d, "demande.txt"), "utf8").includes(`2. « ${H2} »`)) throw new Error("demande absente");
     if (!/Le LIVRABLE est la consigne que l'on s'apprête à passer à un agent/.test(r.sortie)) throw new Error("la consigne du relecteur ne dit pas que le livrable est une consigne");
+  });
+  check("TF-1972 rouge — une consigne qui nomme une règle sans son texte déclenche l'alerte, écrite en tête de la sortie", () => {
+    const c = join(T, "consigne-regle.md"); writeFileSync(c, "Applique la règle XYZ0202-R05 au plan de cartes, et la règle R-38 aussi.\n");
+    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-regle")], {}, new Date(), CTX);
+    egal(r.code, 0, "l'alerte ne bloque pas");
+    if (!/^ALERTE \(D-116 \(b\), TF-1972\) : cette consigne nomme 2 règle\(s\)/.test(r.sortie) || !/XYZ0202-R05 \(l\.1\)/.test(r.sortie)) throw new Error(`sortie : ${r.sortie.slice(0, 200)}`);
+  });
+  check("TF-1972 vert — la même règle avec son texte cité, ou aucune règle nommée : pas d'alerte ; ISO27001 et SHA256 ne sont pas des règles", () => {
+    const c = join(T, "consigne-texte.md"); writeFileSync(c, "Applique la règle XYZ0202-R05 : « une carte ne porte jamais plus de deux montants affichés » au plan.\nConforme à ISO27001 et SHA256.\n");
+    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-texte")], {}, new Date(), CTX);
+    if (/ALERTE \(D-116/.test(r.sortie)) throw new Error(`alerte à tort : ${r.sortie.slice(0, 200)}`);
+    const l = join(T, "consigne-citee.md"); writeFileSync(l, "Applique ADR0501.\n> Toute décision d'architecture porte sa date.\n");
+    const q = executer(["--preparer", "consigne", "--fichier", l, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-citee")], {}, new Date(), CTX);
+    if (/ALERTE \(D-116/.test(q.sortie)) throw new Error("une ligne citée en dessous ne compte pas");
   });
   check("rouge — --preparer consigne sans --fichier, ou avec un fichier absent : 2", () => {
     egal(executer(["--preparer", "consigne", "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "sans fichier");
@@ -218,6 +241,45 @@ try {
       [verdict({ verdict: "sert", gravite: "aucune" }), "fin-de-tour", "poème", "type inconnu"], [join(T, "absent.json"), "fin-de-tour", "etude", "fichier absent"]])
       egal(consigner(v, p, t).code, 2, quoi);
     egal(readFileSync(REG, "utf8"), avant, "registre modifié par un refus");
+  });
+  // ---- TF-2146 : le journal public ne reçoit ni le nom réel du dossier ni les noms cités ----------------------------------------
+  const PRODUIT_REEL = join(T, "AtelierZetaPrive");
+  mkdirSync(PRODUIT_REEL, { recursive: true });
+  const dirCite = { cwd: PRODUIT_REEL, maison: MAISON };
+  const REGP = join(T, "registre-pseudonymes.jsonl");
+  const ecartsNommes = [{ la_demande_dit: "Livre le rapport de Zorglub pour AtelierZetaPrive", le_livrable_fait: "Le rapport de Mon Produit Fictif est vide", pourquoi: "Zorglub n'est pas cité dans la section 2 de atelier zeta prive", nature: "hors_demande" }];
+  check("rouge → vert — TF-2146 : --consigner pseudonyme le champ projet et les demandes citées (client, produit, graphie espacée) avant d'écrire le journal public", () => {
+    const r = executer(["--consigner", verdict({ verdict: "derive", gravite: "majeure", ecarts: ecartsNommes, confiance: "moyenne" }), "--point", "fin-de-tour", "--type", "etude", "--registre", REGP, "--session", "sess-p"], {}, new Date("2026-10-18T12:00:00Z"), dirCite);
+    egal(r.code, 0, "exit");
+    const brut = readFileSync(REGP, "utf8");
+    for (const nom of ["AtelierZetaPrive", "Zorglub", "Mon Produit Fictif", "atelier zeta prive"]) if (brut.toLowerCase().includes(nom.toLowerCase())) throw new Error(`« ${nom} » écrit tel quel dans le journal : ${brut.slice(0, 300)}`);
+    const l = JSON.parse(brut.trim().split("\n").pop());
+    egal(l.projet, "Produit-90", "projet pseudonymisé");
+    const e = l.detail_ecarts[0];
+    egal(e.la_demande_dit, "Livre le rapport de Client-A pour Produit-90", "la_demande_dit");
+    egal(e.le_livrable_fait, "Le rapport de Produit-91 est vide", "le_livrable_fait");
+    egal(e.pourquoi, "Client-A n'est pas cité dans la section 2 de Produit-90", "pourquoi");
+    egal(l.ecarts, 1, "le nombre d'écarts est inchangé"); egal(l.natures.hors_demande, 1, "la nature est inchangée"); egal(l.alerte, true, "l'alerte est inchangée");
+  });
+  check("vert — TF-2146 : un nom sans rien à cacher traverse tel quel (projet « monprojet », texte ordinaire) ; la chaîne et les relevés lisent le texte pseudonymisé", () => {
+    const r = executer(["--consigner", verdict({ verdict: "derive", gravite: "majeure", ecarts: [{ la_demande_dit: "pour chaque liste", le_livrable_fait: "dès 8 lignes", pourquoi: "seuil ajouté", nature: "hors_demande" }], confiance: "elevee" }), "--point", "consigne", "--type", "code", "--registre", REGP, "--session", "sess-p"], {}, new Date("2026-10-18T12:05:00Z"), CTX);
+    egal(r.code, 0, "exit");
+    const l = JSON.parse(readFileSync(REGP, "utf8").trim().split("\n").pop());
+    egal(l.projet, "monprojet", "projet ordinaire"); egal(l.detail_ecarts[0].la_demande_dit, "pour chaque liste", "citation ordinaire");
+    const boucle = executer(["--boucle", "RI-20261018-01", "--registre", REGP, "--json"], {}, new Date(), CTX);
+    egal(boucle.code, 0, "exit --boucle");
+    if (/AtelierZetaPrive|Zorglub|Mon Produit Fictif/i.test(JSON.stringify(boucle))) throw new Error("--boucle relit un nom réel");
+  });
+  check("rouge — TF-2146 : tables de pseudonymes introuvables → 2, le refus le dit, et RIEN n'est écrit au journal (un anonymiseur qui ne peut pas anonymiser arrête le convoi)", () => {
+    const avant = readFileSync(REGP, "utf8");
+    const noms = process.env.FORGE_NOMS_INTERDITS;
+    process.env.FORGE_NOMS_INTERDITS = join(T, "tables-absentes", "noms.json");
+    try {
+      const r = executer(["--consigner", verdict({ verdict: "sert", gravite: "aucune", ecarts: [], confiance: "elevee" }), "--point", "fin-de-tour", "--type", "etude", "--registre", REGP], {}, new Date("2026-10-18T12:10:00Z"), dirCite);
+      egal(r.code, 2, "exit");
+      if (!/pseudonym|table/i.test(r.sortie) || !/rien n'est consigné/i.test(r.sortie)) throw new Error(r.sortie);
+    } finally { process.env.FORGE_NOMS_INTERDITS = noms; }
+    egal(readFileSync(REGP, "utf8"), avant, "journal modifié malgré le refus");
   });
   check("vert — --confirmer : la réponse humaine à une alerte est consignée (oui / non), la dernière fait foi", () => {
     const r = executer(["--confirmer", "RI-20261018-02", "oui", "--registre", REG], {}, new Date("2026-10-18T13:00:00Z"), CTX);
@@ -467,6 +529,88 @@ try {
     const soeur = verifierSources(ref({ fichier: "../forge-absente/SKILL.md", ligne: 1, ancre: "x" }), rac);
     egal(soeur.erreurs.length, 0, "forge sœur : erreurs"); egal(soeur.avertissements.length, 1, "forge sœur : avertissements");
   });
+  // ----- TF-2481 : --actualiser recale le numéro de ligne d'une source sur son ancre (13/11/2026) -----
+  const refActualiser = (sources) => ({ schema: "pilot/relecture-intention-regles@1", version: "1.0.0", date: "2026-11-13",
+    types: Object.fromEntries(["tous", ...TYPES].map((t) => [t, t === "page" ? sources.map((source, i) => ({ id: `P${i + 1}`, regle: "x".repeat(30), source, fait: "y".repeat(30) })) : []])) });
+  const poserActualiser = (nom, sources, doctrine, eol = "\n") => {
+    const rac = join(T, `actualiser-${nom}`); mkdirSync(rac, { recursive: true });
+    writeFileSync(join(rac, "d.md"), doctrine);
+    const f = join(rac, "regles.json");
+    writeFileSync(f, JSON.stringify(refActualiser(sources), null, 2).replace(/\n/g, eol));
+    return { rac, f, avant: readFileSync(f, "utf8") };
+  };
+  const sansNumeros = (t) => t.replace(/"ligne": \d+/g, "\"ligne\": N");
+  check("rouge → vert — TF-2481 : --actualiser recale une ligne glissée sur son ancre, seuls les numéros changent (octet pour octet, fins de ligne CRLF comprises), la recette passe de 1 avertissement à 0, et un second passage ne change rien", () => {
+    const doctrine = "un\ndeux\ntrois\nla première règle\nla seconde règle\nsix\n";
+    const sources = [{ fichier: "d.md", ligne: 1, ancre: "la première règle" }, { fichier: "d.md", ligne: 5, ancre: "la seconde règle" }, { fichier: "d.md", ligne: 2, ancre: "deux" }];
+    for (const eol of ["\n", "\r\n"]) {
+      const { rac, f, avant } = poserActualiser(`vert-${eol.length}`, sources, doctrine);
+      if (eol === "\r\n") writeFileSync(f, avant.replace(/\n/g, "\r\n"));
+      const texteAvant = readFileSync(f, "utf8");
+      const rouge = verifierSources(JSON.parse(texteAvant), rac);
+      egal(rouge.avertissements.length, 1, "avant : une ligne glissée (la première règle, ligne 1 citée pour la ligne 4)");
+      const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+      egal(r.code, 0, "exit"); egal(r.actualiser.corrections.length, 1, "corrections"); egal(r.actualiser.justes, 2, "déjà justes");
+      if (!/recalée\s+P1 : d\.md ligne 1 → 4/.test(r.sortie)) throw new Error(`la sortie ne nomme pas la source recalée : ${r.sortie}`);
+      const texteApres = readFileSync(f, "utf8");
+      egal(sansNumeros(texteApres), sansNumeros(texteAvant), "tout le reste du fichier, octet pour octet");
+      egal(texteApres.includes("\r\n"), eol === "\r\n", "fins de ligne conservées");
+      const ref = JSON.parse(texteApres);
+      egal(ref.types.page[0].source.ligne, 4, "ligne recalée"); egal(ref.types.page[1].source.ligne, 5, "ligne juste intacte"); egal(ref.types.page[2].source.ligne, 2, "ligne juste intacte (bis)");
+      const vert = verifierSources(ref, rac);
+      egal(vert.erreurs.length + vert.avertissements.length, 0, "après : plus aucun avertissement");
+      const encore = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+      egal(encore.code, 0, "second passage : exit"); egal(encore.actualiser.corrections.length, 0, "second passage : rien à recaler"); egal(readFileSync(f, "utf8"), texteApres, "second passage : fichier inchangé");
+    }
+  });
+  check("rouge — TF-2481 : une ancre disparue n'est PAS recalée (ligne laissée à l'octet près, exit 1, source nommée, l'erreur de la recette reste), et les autres sources du même fichier sont recalées quand même", () => {
+    const { rac, f, avant } = poserActualiser("disparue", [{ fichier: "d.md", ligne: 1, ancre: "une règle qui a disparu" }, { fichier: "d.md", ligne: 1, ancre: "la seconde règle" }], "un\ndeux\nla seconde règle\n");
+    const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.code, 1, "exit"); egal(r.actualiser.disparues.length, 1, "disparues"); egal(r.actualiser.corrections.length, 1, "l'autre source est recalée");
+    if (!/ANCRE DISPARUE\s+P1/.test(r.sortie)) throw new Error(`la sortie ne nomme pas l'ancre disparue : ${r.sortie}`);
+    const ref = JSON.parse(readFileSync(f, "utf8"));
+    egal(ref.types.page[0].source.ligne, 1, "ligne de l'ancre disparue laissée"); egal(ref.types.page[1].source.ligne, 3, "l'autre ligne recalée");
+    egal(sansNumeros(readFileSync(f, "utf8")), sansNumeros(avant), "le reste du fichier, octet pour octet");
+    egal(verifierSources(ref, rac).erreurs.length, 1, "la recette garde l'erreur de l'ancre disparue");
+    // le fichier laissé tel quel quand rien n'est recalable
+    const seul = poserActualiser("disparue-seule", [{ fichier: "d.md", ligne: 1, ancre: "une règle qui a disparu" }], "un\ndeux\n");
+    executer(["--actualiser", "--regles", seul.f, "--racine", seul.rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(readFileSync(seul.f, "utf8"), seul.avant, "aucune écriture quand rien n'est recalable");
+  });
+  check("rouge → vert — TF-2481 : une ancre présente plusieurs fois se recale sur l'occurrence la plus proche de la ligne citée ; un fichier de source absent est nommé (exit 1) et une forge sœur absente n'est pas rejouée (exit 0)", () => {
+    const doctrine = "la règle\nb\nc\nd\ne\nf\ng\nh\nla règle\nj\nk\nl\nm\nla règle\n";   // lignes 1, 9 et 14
+    const { rac, f } = poserActualiser("multiple", [{ fichier: "d.md", ligne: 12, ancre: "la règle" }, { fichier: "d.md", ligne: 3, ancre: "la règle" }], doctrine);
+    const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.code, 0, "exit");
+    const ref = JSON.parse(readFileSync(f, "utf8"));
+    egal(ref.types.page[0].source.ligne, 14, "12 → 14 (14 est à 2, 9 est à 3)"); egal(ref.types.page[1].source.ligne, 1, "3 → 1 (1 est à 2, 9 est à 6)");
+    if (!/ancre présente 3 fois/.test(r.sortie)) throw new Error(`la sortie ne dit pas l'ancre multiple : ${r.sortie}`);
+    const abs = poserActualiser("absent", [{ fichier: "absent.md", ligne: 1, ancre: "x" }, { fichier: "../forge-absente/SKILL.md", ligne: 1, ancre: "x" }], "un\n");
+    const ra = executer(["--actualiser", "--regles", abs.f, "--racine", abs.rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(ra.code, 1, "exit : fichier absent"); egal(ra.actualiser.absentes.length, 1, "absentes"); egal(ra.actualiser.nonRejouees.length, 1, "forge sœur non rejouée");
+    egal(readFileSync(abs.f, "utf8"), abs.avant, "aucune écriture");
+  });
+  check("rouge — TF-2481 : un référentiel invalide ou illisible rend 2 sans rien réécrire", () => {
+    const { rac, f } = poserActualiser("invalide", [{ fichier: "d.md", ligne: 1, ancre: "deux" }], "un\ndeux\n");
+    const ref = JSON.parse(readFileSync(f, "utf8")); delete ref.types.page[0].fait; writeFileSync(f, JSON.stringify(ref, null, 2));
+    const avant = readFileSync(f, "utf8");
+    const r = executer(["--actualiser", "--regles", f, "--racine", rac], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.code, 2, "exit référentiel invalide"); egal(readFileSync(f, "utf8"), avant, "fichier intact");
+    egal(executer(["--actualiser", "--regles", join(rac, "absent.json"), "--racine", rac], {}, new Date("2026-11-13T12:00:00Z")).code, 2, "exit référentiel illisible");
+  });
+  check("vert — TF-2481 : sur le référentiel RÉEL dont toutes les lignes sont décalées de 7, --actualiser les recale sur leurs ancres : plus un avertissement de ligne glissée, les erreurs de la recette inchangées (rejouée sur une copie, le fichier du dépôt n'est pas touché)", () => {
+    const copie = JSON.parse(JSON.stringify(REGLES_REEL));
+    for (const t of Object.values(copie.types)) for (const r of t) r.source.ligne += 7;
+    const f = join(T, "regles-reel-decalees.json"); writeFileSync(f, JSON.stringify(copie, null, 2));
+    const avant = verifierSources(copie, RACINE);
+    const decalees = avant.avertissements.filter((x) => /citée, ancre trouvée/.test(x)).length;
+    if (decalees < 30) throw new Error(`le décalage de 7 devait glisser au moins 30 sources, mesuré ${decalees}`);
+    const r = executer(["--actualiser", "--regles", f, "--racine", RACINE], {}, new Date("2026-11-13T12:00:00Z"));
+    egal(r.actualiser.corrections.length, decalees, "une correction par source glissée");
+    const apres = verifierSources(JSON.parse(readFileSync(f, "utf8")), RACINE);
+    egal(apres.avertissements.filter((x) => /citée, ancre trouvée/.test(x)).length, 0, "après : plus de ligne glissée");
+    egal(apres.erreurs.length, avant.erreurs.length, "les erreurs de la recette sont inchangées");
+  });
   const preparerType = (type, nom, extra = []) => {
     const d = join(T, `sortie-${nom}`);
     const r = executer(["--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", d, ...(type ? ["--type", type] : []), ...extra], {}, new Date("2026-10-18T12:00:00Z"), CTX);
@@ -537,7 +681,10 @@ try {
   const HORS = join(T, "hors-depot"); mkdirSync(HORS, { recursive: true });
   const S0 = join(HORS, "s0.md"), S1 = join(HORS, "s1.md");
   writeFileSync(S0, "CONTENU-S0-ECRIT-AVANT-LE-MESSAGE\n"); writeFileSync(S1, "CONTENU-SOUS-AGENT-S1\n");
-  writeFileSync(TR2, [humain("Mets en place X.", { timestamp: T0 }), assistant([outil("Write", { file_path: join(REPO, "a.txt"), content: "x" })]), assistant([texte("Fini.")])].join("\n") + "\n");
+  // TF-2103 : la session lance une commande de 10:10 à 10:45 (fenêtre) ; les fichiers du dépôt modifiés dans cet intervalle (c, d, n, .env, 10:15–10:40)
+  // lui sont attribués comme écritures de programme, a.txt l'est comme Write (cheminsConnus). Sans cette fenêtre, ils seraient tenus pour une autre session.
+  writeFileSync(TR2, [humain("Mets en place X.", { timestamp: T0 }), assistant([outil("Write", { file_path: join(REPO, "a.txt"), content: "x" })]),
+    assistant([outil("Bash", { command: "node genere.mjs" })], "2026-10-18T10:10:00Z"), assistant([texte("Fini.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
   const SA = join(SESSION2, "session2", "subagents"); mkdirSync(SA, { recursive: true });
   const rec = (ts, blocs) => JSON.stringify({ type: "assistant", isSidechain: true, timestamp: ts, message: { role: "assistant", content: blocs } });
   writeFileSync(join(SA, "agent-aaa.jsonl"), [rec("2026-10-18T09:30:00Z", [outil("Write", { file_path: S0, content: "x" })]), rec("2026-10-18T10:20:00Z", [outil("Write", { file_path: S1, content: "x" })]),
@@ -583,12 +730,35 @@ try {
     const { d: R2, g: g2 } = mkRepo("depot-borne");
     g2(["commit", "-q", "--allow-empty", "-m", "base"], "2026-10-18T09:00:00Z");
     for (let i = 0; i < 45; i++) ecrireA(join(R2, `f${String(i).padStart(2, "0")}.txt`), `contenu ${i}\n`, date("10:30"));
-    const tr = join(T, "borne-depot.jsonl"); writeFileSync(tr, humain("Mets en place Y.", { timestamp: T0 }) + "\n");
+    // TF-2103 : une commande (fenêtre 10:10–10:45) attribue au tour les 45 fichiers modifiés à 10:30.
+    const tr = join(T, "borne-depot.jsonl"); writeFileSync(tr, [humain("Mets en place Y.", { timestamp: T0 }),
+      assistant([outil("Bash", { command: "node genere.mjs" })], "2026-10-18T10:10:00Z"), assistant([texte("Fini.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
     const d = join(T, "sortie-borne-depot"); executer(["--preparer", "fin-de-tour", "--transcript", tr, "--sortie", d], {}, new Date(), { cwd: R2, maison: MAISON });
     const l = readFileSync(join(d, "livrables.md"), "utf8");
     if (!/\[BORNE : 5 fichier\(s\) du dépôt cité\(s\) par leur seul chemin, contenu omis \(borne 40 fichiers et 80000 caractères\)/.test(l)) throw new Error("borne non dite : " + (l.match(/\[BORNE[^\]]*/) || ["aucune"])[0].slice(0, 200));
     egal((l.match(/^### f\d\d\.txt/gm) || []).length, 40, "fichiers cités avec contenu");
     if (!/45 fichier\(s\) retenu\(s\)/.test(l)) throw new Error("total non dit");
+  });
+
+  // ==== TF-2103 (03/11/2026) : la relecture n'attribue au tour que les fichiers de la session courante ====
+  check("vert/rouge — TF-2103 : un fichier modifié PENDANT une commande du tour est attribué ; un fichier écrit par une AUTRE session du même arbre, hors de toute fenêtre de commande, ne l'est pas (et l'exclusion est dite)", () => {
+    const { d: R3, g: g3 } = mkRepo("depot-2103");
+    ecrireA(join(R3, "notre.txt"), "base\n", date("08:00"));
+    ecrireA(join(R3, "autre.txt"), "base\n", date("08:00"));
+    g3(["add", "-A"]); g3(["commit", "-q", "-m", "base"], "2026-10-18T09:00:00Z");
+    ecrireA(join(R3, "notre.txt"), "ecrit-par-notre-programme\n", date("10:30"));     // dans la fenêtre de commande 10:10–10:45
+    ecrireA(join(R3, "autre.txt"), "ecrit-par-une-AUTRE-session\n", date("10:50"));   // après la dernière activité du tour : une autre session
+    const tr = join(T, "tr-2103.jsonl");
+    writeFileSync(tr, [humain("Mets à jour notre.txt.", { timestamp: T0 }),
+      assistant([outil("Bash", { command: "node maj.mjs" })], "2026-10-18T10:10:00Z"),
+      assistant([texte("Fait.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
+    const d = join(T, "sortie-2103");
+    executer(["--preparer", "fin-de-tour", "--transcript", tr, "--sortie", d], {}, new Date(), { cwd: R3, maison: MAISON });
+    const l = readFileSync(join(d, "livrables.md"), "utf8");
+    const sec = l.slice(l.indexOf("## Fichiers du dépôt"), l.indexOf("## Commits du dépôt relu"));
+    if (!/### notre\.txt/.test(sec) || !sec.includes("ecrit-par-notre-programme")) throw new Error("le fichier modifié pendant une commande du tour n'est pas attribué : " + sec.slice(0, 600));
+    if (/### autre\.txt/.test(sec) || sec.includes("ecrit-par-une-AUTRE-session")) throw new Error("un fichier écrit par une AUTRE session (hors fenêtre de commande) est attribué au tour : " + sec.slice(0, 600));
+    if (!/1 fichier\(s\) modifié\(s\) hors d'une commande de cette session — écrit\(s\) par une AUTRE session du même arbre, non attribué\(s\) à ce tour \(TF-2103\)/.test(sec)) throw new Error("l'exclusion de l'autre session n'est pas DITE : " + sec.slice(0, 600));
   });
 
   // ==== D-26 (a), point 7 : la reconnaissance des réponses de décision dans --preparer ====
@@ -772,6 +942,100 @@ try {
     const r3 = executer(["--preparer", "fin-de-tour", "--transcript", join(dQ, "sess-produit.jsonl"), "--sortie", join(T, "sortie-cwd-ok")], {}, new Date(), { cwd: PRODUIT, maison: MAISON });
     egal(r3.code, 0, "la MÊME transcription lue depuis son dépôt");
     if (!/même dépôt que/.test(r3.sortie)) throw new Error("la correspondance n'est pas dite : " + r3.sortie.slice(0, 300));
+  });
+  // ==== TF-2160 : la préparation n'embarque ni un fichier ignoré par git, ni var/, secrets/, *.cle, et caviarde les motifs de secret ====
+  // Les « secrets » sont fabriqués à l'exécution (aucun motif de secret ne figure en clair dans ce fichier suivi).
+  const JETON_ANT = "sk-" + "ant-api03-" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefgh";
+  const JETON_GH = "ghp_" + "0123456789abcdefghijklmnopqrstuvwxyz";
+  const PEM = ["-----BEGIN " + "RSA PRIVATE KEY-----", "MIIEowIBAAKCAQEA-CORPS-DE-CLE-A-NE-JAMAIS-CITER", "-----END " + "RSA PRIVATE KEY-----"].join("\n");
+  const { d: REPO2, g: gitS } = mkRepo("depot-secrets");
+  writeFileSync(join(REPO2, ".gitignore"), "ignore-par-git.txt\n");
+  writeFileSync(join(REPO2, "base.txt"), "base\n");
+  gitS(["add", "-A"]); gitS(["commit", "-q", "-m", "base"], "2026-10-18T09:00:00Z");
+  const F2 = { ignore: join(REPO2, "ignore-par-git.txt"), sousVar: join(REPO2, "var", "secrets", "pentest_cle.txt"), sousSecrets: join(REPO2, "secrets", "a.txt"), cle: join(REPO2, "docs", "serveur.cle"),
+    notes: join(REPO2, "notes.md"), ordinaire: join(REPO2, "ordinaire.txt"), neufVar: join(REPO2, "var", "etat.txt") };
+  ecrireA(F2.ignore, "VALEUR-IGNOREE-PAR-GIT\n", date("10:20")); ecrireA(F2.sousVar, "VALEUR-SOUS-VAR\n", date("10:20")); ecrireA(F2.sousSecrets, "VALEUR-SOUS-SECRETS\n", date("10:20"));
+  ecrireA(F2.cle, "VALEUR-FICHIER-CLE\n", date("10:20")); ecrireA(F2.ordinaire, "VALEUR-ORDINAIRE-CONSERVEE\n", date("10:20")); ecrireA(F2.neufVar, "VALEUR-NEUF-SOUS-VAR\n", date("10:20"));
+  ecrireA(F2.notes, `Notes du tour. VALEUR-NOTES-CONSERVEE\n${PEM}\nclé : ${JETON_ANT}\npassword = "Tr0ub4dor-et-trois-mots"\nAuthorization: Bearer ${JETON_GH}\nle token est géré par le coffre, aucune valeur ici\n`, date("10:20"));
+  const TRSEC = join(T, "session-secrets.jsonl");
+  writeFileSync(TRSEC, [humain(`Prépare la relève. Mon jeton : ${JETON_GH}, ne le recopie pas.`, { timestamp: T0 }),
+    assistant([...Object.values(F2).map((f) => outil("Write", { file_path: f, content: "x" })), outil("Bash", { command: `echo x > ${F2.sousSecrets}` })], "2026-10-18T10:10:00Z"),
+    assistant([texte("Fini.")], "2026-10-18T10:45:00Z")].join("\n") + "\n");
+  const finS = executer(["--preparer", "fin-de-tour", "--transcript", TRSEC, "--sortie", join(T, "sortie-secrets")], {}, new Date(), { cwd: REPO2, maison: MAISON });
+  const livS = existsSync(join(T, "sortie-secrets", "livrables.md")) ? readFileSync(join(T, "sortie-secrets", "livrables.md"), "utf8") : "";
+  const demS = existsSync(join(T, "sortie-secrets", "demande.txt")) ? readFileSync(join(T, "sortie-secrets", "demande.txt"), "utf8") : "";
+  const toutS = livS + "\n" + demS;
+  check("rouge → vert — TF-2160 : un fichier ignoré par git, sous var/ ou secrets/, ou en *.cle n'est jamais embarqué ; son chemin est cité, l'omission est dite", () => {
+    egal(finS.code, 0, "exit");
+    for (const v of ["VALEUR-IGNOREE-PAR-GIT", "VALEUR-SOUS-VAR", "VALEUR-SOUS-SECRETS", "VALEUR-FICHIER-CLE", "VALEUR-NEUF-SOUS-VAR"]) if (toutS.includes(v)) throw new Error(`« ${v} » embarqué dans la relève`);
+    for (const f of [F2.ignore, F2.sousVar, F2.sousSecrets, F2.cle]) if (!livS.includes(f)) throw new Error(`le chemin ${f} n'est pas cité`);
+    if (!/NON cité : fichier ignoré par git/.test(livS)) throw new Error("l'omission d'un fichier ignoré n'est pas dite");
+    if (!/NON cité : fichier de secret par son chemin/.test(livS)) throw new Error("l'omission d'un fichier de secret n'est pas dite");
+  });
+  check("vert — TF-2160 : un fichier ordinaire du même dépôt est embarqué comme avant (l'exclusion ne mord pas le reste)", () => {
+    if (!livS.includes("VALEUR-ORDINAIRE-CONSERVEE") || !livS.includes("VALEUR-NOTES-CONSERVEE")) throw new Error("un fichier ordinaire a disparu de la relève : " + livS.slice(0, 500));
+  });
+  check("rouge → vert — TF-2160 : les motifs de secret sont caviardés avant l'écriture, dans les livrables ET dans la demande citée mot pour mot ; le caviardage est DIT", () => {
+    for (const v of [JETON_ANT, JETON_GH, "CORPS-DE-CLE-A-NE-JAMAIS-CITER", "Tr0ub4dor-et-trois-mots", "BEGIN RSA PRIVATE"]) if (toutS.includes(v)) throw new Error(`motif de secret « ${v.slice(0, 20)}… » écrit en clair`);
+    if (!/CAVIARDÉ/.test(livS) || !/CAVIARDÉ/.test(demS)) throw new Error("le caviardage n'est pas marqué dans les deux fichiers");
+    if (!/motif\(s\) de secret caviardé\(s\)/.test(finS.sortie)) throw new Error("la sortie ne dit pas le caviardage : " + finS.sortie.slice(0, 400));
+    if (!livS.includes("le token est géré par le coffre, aucune valeur ici")) throw new Error("une phrase ordinaire sur un token a été caviardée à tort (faux positif)");
+  });
+  check("rouge — TF-2160 : --preparer consigne refuse (2) un fichier ignoré par git ou un *.cle désigné par --fichier, et n'écrit rien", () => {
+    for (const f of [F2.ignore, F2.cle, F2.sousSecrets]) {
+      const d = join(T, `sortie-refus-${Math.random().toString(36).slice(2)}`);
+      const r = executer(["--preparer", "consigne", "--fichier", f, "--transcript", TRSEC, "--sortie", d], {}, new Date(), { cwd: REPO2, maison: MAISON });
+      egal(r.code, 2, `exit pour ${f}`); if (!/n'est pas embarqué|ne transite jamais|ignoré par git|fichier de secret/.test(r.sortie)) throw new Error(r.sortie);
+      egal(existsSync(d), false, "dossier de sortie créé par un refus");
+    }
+  });
+  check("vert — TF-2160 : un *.cle reçu à la réception est cité par son chemin sans contenu ; une consigne ordinaire passe", () => {
+    const d = join(T, "sortie-reception-cle");
+    const r = executer(["--preparer", "reception", "--fichier", F2.cle, "--transcript", TRSEC, "--sortie", d], {}, new Date(), { cwd: REPO2, maison: MAISON });
+    // L'oracle de forme ne juge que les .md : le .cle passe à la préparation, et son contenu n'est pas cité.
+    egal(r.code, 0, "exit réception"); if (readFileSync(join(d, "livrables.md"), "utf8").includes("VALEUR-FICHIER-CLE")) throw new Error("le contenu d'un .cle est cité à la réception");
+    const c = executer(["--preparer", "consigne", "--fichier", F2.ordinaire, "--transcript", TRSEC, "--sortie", join(T, "sortie-consigne-ok")], {}, new Date(), { cwd: REPO2, maison: MAISON });
+    egal(c.code, 0, "exit consigne ordinaire");
+  });
+  // ==== TF-2235 : la demande d'ouverture d'une session non interactive est un message humain ; sans aucune demande, rien n'est préparé ====
+  // Forme relevée le 06/11/2026 dans la transcription d'une session ouverte avec son invite (de1103cb) : pas de champ `origin`, `turnOrigin` et
+  // `promptSource` à « sdk », `turnPosition.promptIndex` à 0, contenu en chaîne. Les quatre sessions du juge externe portent la même forme
+  // (« Rubrique figée ») : leur invite d'ouverture est la demande de LEUR session, et seule elle.
+  const OUVERTURE = "Lis en entier le fichier prompt-fictif.md, puis exécute tel quel le prompt contenu dans son bloc text.";
+  const ouvertureSdk = (texte, extra = {}) => JSON.stringify({ type: "user", isSidechain: false, promptSource: "sdk", turnOrigin: "sdk", turnPosition: { promptIndex: 0, turnIndex: 1 }, timestamp: "2026-11-06T10:05:22.854Z", message: { role: "user", content: texte }, cwd: PROJET, ...extra });
+  const TRSDK = join(T, "session-sdk.jsonl");
+  writeFileSync(TRSDK, [JSON.stringify({ type: "session-owner", sessionId: "s" }), ouvertureSdk(OUVERTURE),
+    JSON.stringify({ type: "user", isSidechain: false, turnOrigin: "sdk", timestamp: "2026-11-06T10:06:00.000Z", message: { role: "user", content: "# Rubrique figée SDK-EN-COURS-DE-SESSION-A-NE-PAS-CITER" } }),
+    assistant([texte("Je lis le fichier.")], "2026-11-06T10:05:30Z")].join("\n") + "\n");
+  const dSdk = join(T, "sortie-sdk");
+  const finSdk = executer(["--preparer", "fin-de-tour", "--transcript", TRSDK, "--sortie", dSdk], {}, new Date("2026-11-06T12:00:00Z"), CTX);
+  check("rouge → vert — TF-2235 : l'invite d'ouverture d'une session non interactive est citée mot pour mot comme la demande (exit 0, consigne imprimée)", () => {
+    egal(finSdk.code, 0, "exit");
+    const dm = existsSync(join(dSdk, "demande.txt")) ? readFileSync(join(dSdk, "demande.txt"), "utf8") : "";
+    if (!dm.includes(`1. « ${OUVERTURE} »`)) throw new Error("l'invite d'ouverture n'est pas citée : " + dm.slice(0, 300));
+    if (/aucun message humain/.test(dm) || !/1 message\(s\) humain\(s\) cité\(s\)/.test(finSdk.sortie)) throw new Error(finSdk.sortie.slice(0, 300));
+    if (!/CONSIGNE À PASSER À L'AGENT verificateur/.test(finSdk.sortie)) throw new Error("la consigne n'est pas imprimée");
+  });
+  check("rouge — TF-2235 : un message du SDK en cours de session, sans position d'ouverture, n'est toujours pas une demande", () => {
+    const dm = readFileSync(join(dSdk, "demande.txt"), "utf8");
+    if (dm.includes("SDK-EN-COURS-DE-SESSION")) throw new Error("un message du SDK en cours de session est cité comme demande");
+    egal(texteHumain(JSON.parse(ouvertureSdk("x", { turnPosition: { promptIndex: 3, turnIndex: 4 } }))), null, "promptIndex 3");
+    egal(texteHumain(JSON.parse(ouvertureSdk("x", { promptSource: "system" }))), null, "promptSource system");
+    egal(texteHumain(JSON.parse(ouvertureSdk("x", { isMeta: true }))), null, "méta");
+    egal(texteHumain(JSON.parse(ouvertureSdk("ma demande"))), "ma demande", "forme d'ouverture");
+  });
+  check("rouge → vert — TF-2235 : une transcription sans aucune demande retrouvée REFUSE (2) à chaque point, ne prépare aucune consigne et n'écrit rien", () => {
+    const TRVIDE = join(T, "session-sans-demande.jsonl");
+    writeFileSync(TRVIDE, [JSON.stringify({ type: "user", isMeta: true, timestamp: "2026-11-06T10:00:00Z", message: { role: "user", content: "<system-reminder>RAPPEL-SYSTEME</system-reminder>" } }),
+      assistant([texte("Rien à faire.")], "2026-11-06T10:00:05Z")].join("\n") + "\n");
+    const piece = join(T, "piece-vide.md"); writeFileSync(piece, "# Une pièce\n\nUn contenu.\n");
+    for (const [point, extra] of [["fin-de-tour", []], ["consigne", ["--fichier", piece]], ["coherence", ["--fichier", piece, "--fichier", PETIT]]]) {
+      const d = join(T, `sortie-vide-${point}`);
+      const r = executer(["--preparer", point, ...extra, "--transcript", TRVIDE, "--sortie", d], {}, new Date("2026-11-06T12:00:00Z"), CTX);
+      egal(r.code, 2, `exit au point ${point}`);
+      if (!/aucune demande|aucun message humain/.test(r.sortie) || /CONSIGNE À PASSER/.test(r.sortie)) throw new Error(`point ${point} : ${r.sortie.slice(0, 300)}`);
+      egal(existsSync(d), false, `dossier de sortie créé par un refus au point ${point}`);
+    }
   });
   check("borne — le registre du pilot n'a pas été touché par la recette", () => {
     const pilote = join(RACINE, "todo", "relectures-intention.jsonl");

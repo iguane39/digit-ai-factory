@@ -33,6 +33,11 @@ input/Tiktok/
 # TF-0980 — journal des substitutions faites au commit : etat MACHINE, propre a ce poste.
 .claude/anonymisation-au-commit.jsonl
 
+# TF-2141 (04/11/2026, D-172 (b)) — journal des FRICTIONS du tour (correction du porteur, refus de hook, echec d oracle), ecrit
+# par le hook de fin de tour : etat MACHINE, il cite les messages du porteur. Au pilot `.claude/`, chez un produit `forge/`.
+.claude/frictions.jsonl
+forge/frictions.jsonl
+
 # TF-0983 (D-4 (a), 16/09/2026) — UNE VUE GENEREE NE SE VERSIONNE PAS.
 # Les cinq fichiers ci-dessous sont DERIVES de `todo\TODO.jsonl` et `todo\TODO-ARCHIVE.jsonl`, et
 # regenerables en une commande. Les versionner coutait deux choses, mesurees le 16/09 :
@@ -69,3 +74,7 @@ __pycache__/
 
 # 29/10/2026 : worktrees des agents (isolation worktree), état machine fusionné dans main — ils faisaient tomber le relevé d ouverture en DEFAUT au-delà de 48 h.
 .claude/worktrees/
+
+# TF-2150 (04/11/2026) : journaux de session des leçons, état machine — les rappels servis au geste par
+# oracles/hook-lecons.mjs ; `scripts/lecons.mjs --recidives` les croise avec les frictions du tour, exclues plus haut (TF-2141).
+.claude/lecons-rappels.jsonl

@@ -27,6 +27,8 @@ import { join, dirname, resolve, relative, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { jugerRegistre, jugerDocuments, CHEMIN_REGISTRE, REMEDE } from "./oracle-engagements.mjs";
+import { lireCalendrier, seancesProches, jourLocal, CHEMIN_CALENDRIER, MODELE_CALENDRIER } from "./lib-calendrier.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const ORACLE = join(ICI, "oracle-ecriture.mjs");
@@ -200,6 +202,120 @@ export function jouerFiche(fichier, oracle = ORACLE_FAMILLES, racine = process.c
   if (fiche) return lignes;
   lignes.push(`${entete}, et aucune ne l'accompagne : ni fiche-conception*.md à côté du livrable ou sous forge\\ qui le nomme, ni ligne de déclaration — ${remede}. `
     + "Avertissement, non bloquant (TF-1907).");
+  return lignes;
+}
+
+// UN LIVRABLE DÉPOSÉ À LA RACINE D'UN `output\` RANGÉ EN FAMILLES NUMÉROTÉES (TF-2041, RT-141, 02/11/2026).
+//
+// LE FAIT. Le 30/10/2026, un produit a reçu 2 PDF à la racine de `output\`, qu'il range en 7 familles (D-15 al. a, R-4) :
+// `git ls-tree -d origin/main output/` en rendait 7, l'arbre local, en retard de 194 commits, aucune. La session a copié ce
+// qu'elle voyait, et rien n'a réagi : le nommage de `oracle-conformite-projet` a rendu PASS. L'humain : « Pourquoi ce n'est
+// pas dans un dossier à part dans output ? »
+//
+// CE QUE FAIT CE CONTRÔLE. Pour tout fichier écrit DIRECTEMENT dans un dossier `output\` (hors index régénérés et fichiers
+// cachés), il lit les familles de ce dossier — les sous-dossiers `NN-…` — sur l'arbre local, puis sur la référence distante
+// déjà présente dans le clone (`origin/HEAD`, `origin/main` ou `origin/master`) : si le clone est en retard, ce sont les familles
+// de la référence distante qui comptent. Une seule famille, d'un côté ou de l'autre, suffit à dire que le dossier est rangé : il
+// AVERTIT alors, en nommant les familles et d'où elles sont lues. Un `output\` sans aucune famille est plat à bon droit et reste muet.
+//
+// IL AVERTIT, IL NE BLOQUE PAS, comme tout ce hook. IL NE FAIT AUCUN `git fetch` (un hook d'écriture n'ouvre pas le réseau) : la
+// référence distante est celle du dernier fetch du clone, et la ligne le dit. Il ne voit que les écritures par outil (Write, Edit,
+// MultiEdit) : un `cp` ou un `mv` par commande vers la racine d'`output\` passe. La mécanisation de la structure interne d'`output\`
+// (unicité de la version courante, `old\`, `LISEZMOI.md`) reste celle de D-15, chez `oracle-conventions` d'organization ;
+// ce contrôle ne juge que l'endroit où le fichier se pose.
+const EST_FAMILLE = /^\d{2,}-[^\\/]+$/;
+const envSansGit = () => Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_/i.test(k)));
+const gitDans = (cwd, ...a) => {
+  const r = spawnSync("git", ["-C", cwd, ...a], { encoding: "utf8", timeout: 15000, env: envSansGit() });
+  return r.status === 0 ? r.stdout.trim() : null;
+};
+
+/** Les familles de `output\` : sur l'arbre local, et sur la référence distante du clone ; `ref` est null quand aucune n'existe. */
+export function famillesDeOutput(dossierOutput) {
+  const locales = [];
+  try { for (const e of readdirSync(dossierOutput, { withFileTypes: true })) if (e.isDirectory() && EST_FAMILLE.test(e.name)) locales.push(e.name); } catch { /* illisible */ }
+  const racineGit = gitDans(dossierOutput, "rev-parse", "--show-toplevel");
+  let ref = null, distantes = [], retard = 0;
+  if (racineGit) {
+    const symbolique = gitDans(racineGit, "symbolic-ref", "-q", "refs/remotes/origin/HEAD");
+    for (const c of [symbolique && symbolique.replace(/^refs\/remotes\//, ""), "origin/main", "origin/master"].filter(Boolean)) {
+      if (gitDans(racineGit, "rev-parse", "--verify", "-q", `refs/remotes/${c}`) !== null) { ref = c; break; }
+    }
+    if (ref) {
+      const rel = relative(racineGit, resolve(dossierOutput)).replace(/\\/g, "/");
+      const arbre = gitDans(racineGit, "ls-tree", "-d", "--name-only", `refs/remotes/${ref}`, `${rel}/`);
+      distantes = (arbre || "").split(/\r?\n/).map((l) => basename(l.trim())).filter((n) => EST_FAMILLE.test(n));
+      retard = Number(gitDans(racineGit, "rev-list", "--count", `HEAD..refs/remotes/${ref}`)) || 0;
+    }
+  }
+  return { locales: locales.sort(), distantes: distantes.sort(), ref, retard };
+}
+
+/** Joue le contrôle de rangement sur un fichier écrit ; rend les lignes à imprimer (vide : pas à la racine d'un `output\`, ou `output\` plat). */
+export function jouerRangement(fichier) {
+  const lignes = [];
+  if (!fichier) return lignes;
+  const chemin = resolve(fichier), nom = basename(chemin), dossier = dirname(chemin);
+  if (basename(dossier).toLowerCase() !== "output" || nom.startsWith(".") || INDEX_REGENERES.has(nom.toLowerCase())) return lignes;
+  if (IGNORES.some((re) => re.test(chemin.replace(/\\/g, "/")))) return lignes;
+  const { locales, distantes, ref, retard } = famillesDeOutput(dossier);
+  const familles = [...new Set([...locales, ...distantes])].sort();
+  if (!familles.length) return lignes;
+  const source = distantes.length && (retard > 0 || !locales.length)
+    ? `lues sur ${ref} (${retard} commit(s) de ce dépôt distant absent(s) de ce clone ; dernier fetch, non rejoué)${locales.length ? "" : ", l'arbre local n'en montre aucune"}`
+    : "lues sur l'arbre local";
+  lignes.push(`[rangement] ${nom} : déposé à la RACINE de output\\, que ce dépôt range en ${familles.length} famille(s) numérotée(s) (D-15 al. a) — ${source} : `
+    + `${familles.slice(0, 12).join(", ")}${familles.length > 12 ? `, … (${familles.length} au total)` : ""}. `
+    + "Déplacer le livrable dans la famille qui porte son objet (le nom du dossier dit son contenu), ou créer la famille au premier numéro libre. "
+    + "Avertissement, non bloquant (TF-2041).");
+  return lignes;
+}
+
+// UN ENGAGEMENT D'UN DOCUMENT REMIS SE JUGE À LA PRODUCTION SUIVANTE DE LA CHAÎNE (D-193 (a) du 10/11/2026, TF-2333, R-67).
+//
+// LE FAIT (lot du produit marketing du 09/11/2026, RP-10, ledger seq 694). Des documents d'une formation, écrits les 27 et 28/10, ont promis
+// un QCM et un questionnaire de satisfaction en formulaires en ligne et une skill installée par le formateur. Les documents suivants de la
+// chaîne se sont écrits sans que rien relise ces promesses, et aucune de ces pièces n'existait quatre jours avant la séance.
+//
+// CE QUE FAIT CE CONTRÔLE. Chez un produit qui porte `forge/ENGAGEMENTS.md` (né de son modèle à l'ouverture), à chaque livrable écrit sous
+// `output\` ou `livrables\` et à chaque écriture du registre, `oracle-engagements.mjs` juge le registre : un engagement dont le livrable
+// manque, dont le repère ne se lit pas ou dont l'action est échue est nommé. Le livrable écrit est lu à son tour : s'il promet une pièce ou
+// un outil sans figurer au registre, il est nommé avec ses extraits. Sans registre (le pilot), il se tait.
+//
+// IL AVERTIT, IL NE BLOQUE PAS, comme tout ce hook. Il ne voit que les écritures par outil : un document produit par un script (Word,
+// PowerPoint) se juge à l'écriture suivante, à l'ouverture du produit et dans la revue de préparation de sa séance.
+export function jouerEngagements(fichier, racine = process.cwd(), jour = jourLocal()) {
+  const lignes = [];
+  if (!fichier) return lignes;
+  const registre = join(racine, ...CHEMIN_REGISTRE.split("/"));
+  if (!existsSync(registre)) return lignes;
+  const chemin = resolve(fichier), norme = chemin.replace(/\\/g, "/");
+  const estRegistre = chemin.toLowerCase() === resolve(registre).toLowerCase();
+  const estLivrable = EST_LIVRABLE.test(norme) && !INDEX_REGENERES.has(basename(chemin).toLowerCase()) && !IGNORES.some((re) => re.test(norme));
+  if (!estRegistre && !estLivrable) return lignes;
+  const r = jugerRegistre(racine, { jour });
+  const ko = r.findings.filter((f) => f.statut === "FAIL");
+  for (const f of ko.slice(0, 6)) lignes.push(`[engagements] ${CHEMIN_REGISTRE}${f.ligne ? `:${f.ligne}` : ""} : ${f.regle} — ${f.message}`);
+  // Le chemin RÉSOLU de l'oracle : chez un produit, `node oracles/…` relatif n'existe pas (TF-2335).
+  if (ko.length > 6) lignes.push(`[engagements]   … et ${ko.length - 6} autre(s) : node "${join(ICI, "oracle-engagements.mjs").replace(/\\/g, "/")}" . les liste tous, depuis la racine du produit`);
+  if (estLivrable && existsSync(chemin)) {
+    for (const f of jugerDocuments(racine, [chemin], r.registre).filter((x) => x.statut === "FAIL")) lignes.push(`[engagements] ${basename(chemin)} : ${f.regle} — ${f.message}`);
+  }
+  if (lignes.length) lignes.push(`[engagements] Remède : ${REMEDE}. Avertissement, non bloquant (D-193 (a), TF-2333).`);
+  return lignes;
+}
+
+// LE CALENDRIER DES SÉANCES SE JUGE QUAND IL S'ÉCRIT (D-193 (a), TF-2330). Une ligne mal formée est une séance que l'ouverture ne lira pas, donc
+// une revue de préparation qu'elle ne rappellera pas : le dire à l'écriture coûte une ligne, le découvrir à J-1 coûte la revue.
+export function jouerCalendrier(fichier, racine = process.cwd(), jour = jourLocal()) {
+  const lignes = [];
+  const cal = join(racine, ...CHEMIN_CALENDRIER.split("/"));
+  if (!fichier || resolve(fichier).toLowerCase() !== resolve(cal).toLowerCase() || !existsSync(cal)) return lignes;
+  const c = lireCalendrier(readFileSync(cal, "utf8"));
+  for (const d of c.defauts.slice(0, 6)) lignes.push(`[calendrier] ${CHEMIN_CALENDRIER}${d.ligne ? `:${d.ligne}` : ""} : ${d.message}`);
+  const aFaire = seancesProches(c, jour).filter((s) => s.revue.etat !== "faite");
+  if (aFaire.length) lignes.push(`[calendrier] ${aFaire.length} séance(s) dans les 5 jours, revue de préparation à faire : ${aFaire.map((s) => `${s.date} (J-${s.j}) ${s.seance}`).join(" ; ")} — l'ouverture la nomme avec ce qu'elle couvre ; la jouer dès maintenant n'attend rien`);
+  if (c.defauts.length) lignes.push(`[calendrier] Forme attendue : ${MODELE_CALENDRIER} du pilot. Avertissement, non bloquant (D-193 (a), TF-2330).`);
   return lignes;
 }
 
@@ -438,10 +554,97 @@ function selfTest() {
     if (/\[fiche\]/.test(viaProduit().stdout || "")) casse.push("D8 : par le lanceur d'un produit, la fiche posée sous son forge\\ n'est pas vue");
   }
 
+  // RANGEMENT (TF-2041) — un livrable déposé à la racine d'un `output\` rangé en familles est signalé, y compris quand le clone est en retard
+  // et que seule la référence distante montre les familles (le cas du 30/10/2026) ; rangé dans sa famille, ou dans un `output\` plat, il ne l'est pas.
+  {
+    const git = (cwd, ...a) => spawnSync("git", ["-c", "user.name=banc", "-c", "user.email=banc@exemple.fr", "-C", cwd, ...a], { encoding: "utf8", env: envSansGit() });
+    const poser = (p, texte = "x\n") => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, texte, "utf8"); return p; };
+    const base = join(dir, "rangement"); mkdirSync(base, { recursive: true });
+    const distant = join(base, "distant.git"), c1 = join(base, "c1"), c2 = join(base, "c2");
+    if (git(base, "init", "-q", "--bare", "-b", "main", distant).status !== 0) casse.push("RANGEMENT : le banc n'a pas pu créer son dépôt distant (git init --bare -b main)");
+    else {
+      git(base, "init", "-q", "-b", "main", c1);
+      poser(join(c1, "output", "Digit-AI - Note plate - 20261001a.md"));
+      git(c1, "add", "-A"); git(c1, "commit", "-q", "-m", "etat plat");
+      git(c1, "remote", "add", "origin", distant); git(c1, "push", "-q", "-u", "origin", "main");
+      git(base, "clone", "-q", distant, c2);
+      poser(join(c1, "output", "01-etudes", "Digit-AI - Etude - 20261002a.md")); poser(join(c1, "output", "02-plans", "Digit-AI - Plan - 20261003a.md"));
+      git(c1, "add", "-A"); git(c1, "commit", "-q", "-m", "familles"); git(c1, "push", "-q", "origin", "main");
+      git(c2, "fetch", "-q", "origin");
+      const racineEnRetard = jouerRangement(poser(join(c2, "output", "Rapport-audit.pdf"), "%PDF-1.4\n"));
+      if (!racineEnRetard.some((l) => /\[rangement\] Rapport-audit\.pdf[^\n]*RACINE de output[^\n]*lues sur origin\/main \(1 commit\(s\)[^\n]*l'arbre local n'en montre aucune[^\n]*01-etudes, 02-plans/.test(l)))
+        casse.push(`RANGEMENT : un PDF déposé à la racine d'un output\\ dont seule la référence distante montre les familles (clone en retard, le cas du 30/10) n'est pas signalé (${racineEnRetard.join(" | ") || "aucune ligne"})`);
+      const racineAJour = jouerRangement(poser(join(c1, "output", "Rapport-audit.pdf"), "%PDF-1.4\n"));
+      if (!racineAJour.some((l) => /lues sur l'arbre local[^\n]*01-etudes, 02-plans/.test(l)))
+        casse.push(`RANGEMENT : un livrable déposé à la racine d'un output\\ rangé en familles, clone à jour, n'est pas signalé sur l'arbre local (${racineAJour.join(" | ") || "aucune ligne"})`);
+      // Le remède joué : le même livrable dans sa famille ne dit rien.
+      const rangeEnFamille = jouerRangement(poser(join(c2, "output", "01-etudes", "Rapport-audit.pdf"), "%PDF-1.4\n"));
+      if (rangeEnFamille.length) casse.push(`RANGEMENT : le livrable rangé dans sa famille avertit encore — le remède du message échoue (${rangeEnFamille.join(" | ")})`);
+      if (jouerRangement(poser(join(c1, "output", "README.md"))).length || jouerRangement(poser(join(c1, "output", "LISEZMOI.md"))).length)
+        casse.push("RANGEMENT : un index régénéré (README.md, LISEZMOI.md) à la racine d'output\\ est accusé");
+      if (jouerRangement(poser(join(c1, "docs", "Rapport-audit.pdf"))).length) casse.push("RANGEMENT : un fichier hors d'un dossier output\\ est accusé");
+    }
+    const plat = join(base, "plat"); git(base, "init", "-q", "-b", "main", plat);
+    if (jouerRangement(poser(join(plat, "output", "Digit-AI - Note - 20261004a.md"))).length)
+      casse.push("RANGEMENT : un output\\ plat, sans aucune famille ni localement ni à distance, est accusé — le hook deviendrait bavard");
+    const horsGit = join(base, "hors-git");
+    poser(join(horsGit, "output", "03-livrables", "x.md"));
+    if (!jouerRangement(poser(join(horsGit, "output", "Digit-AI - Note - 20261005a.md"))).some((l) => /lues sur l'arbre local[^\n]*03-livrables/.test(l)))
+      casse.push("RANGEMENT : hors de tout dépôt git, un output\\ rangé en familles ne signale pas le dépôt à sa racine");
+  }
+
+  // ENGAGEMENTS ET CALENDRIER (D-193 (a), TF-2333 et TF-2330) — à la production suivante, l'engagement non tenu est nommé ; le livrable écrit
+  // qui promet sans figurer au registre l'est aussi ; le remède joué (livrable produit, document cité) fait taire le hook ; au pilot, sans
+  // registre, rien. Le calendrier mal formé est dit à son écriture, et la séance proche annoncée. Le passage par la ligne de commande du hook
+  // (`--fichier`, répertoire courant = le produit) prouve le câblage, pas seulement la fonction.
+  {
+    const prod = join(dir, "produit-engagements");
+    const poser = (rel, texte) => { const p = join(prod, ...rel.split("/")); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, texte, "utf8"); return p; };
+    const JOUR = "2026-11-10";
+    const ne = (m) => readFileSync(join(ICI, "..", "gabarits", m), "utf8").replace(/^---[\s\S]*?\n---/, (fm) => fm.replace(/AAAA-MM-JJ/g, JOUR));
+    const ligneQcm = "| QCM final en ligne | pièce | `output/formation/Client-A - Programme - 20261028g.md` | livrable : `output/formation/Client-A - QCM - 20261109a.md` |";
+    const note = poser("output/formation/Client-A - Note - 20261110a.md", "# Note\n\nLa journée alterne apports et exercices.\n");
+    if (jouerEngagements(note, prod, JOUR).length) casse.push("ENGAGEMENTS : sans registre forge/ENGAGEMENTS.md (le pilot), le hook parle");
+    const registre = poser("forge/ENGAGEMENTS.md", ne("ENGAGEMENTS-PRODUIT.md").replace("| *(aucun)* | — | — | — |", ligneQcm));
+    const rouge = jouerEngagements(note, prod, JOUR);
+    if (!rouge.some((l) => /^\[engagements\] forge\/ENGAGEMENTS\.md:\d+ : EN2 — [^\n]*QCM - 20261109a\.md` n'existe pas/.test(l)))
+      casse.push(`ENGAGEMENTS : rouge non nommé — à l'écriture d'un livrable, l'engagement dont le livrable manque n'est pas dit (${rouge.join(" | ") || "aucune ligne"})`);
+    if (!jouerEngagements(registre, prod, JOUR).some((l) => /EN2/.test(l))) casse.push("ENGAGEMENTS : l'écriture du registre lui-même ne le juge pas");
+    if (jouerEngagements(poser("docs/note.md", "x\n"), prod, JOUR).length) casse.push("ENGAGEMENTS : un fichier hors des livrables et hors du registre fait parler le hook");
+    const viaCli = spawnSync(process.execPath, [fileURLToPath(import.meta.url), "--fichier", note], { encoding: "utf8", cwd: prod, timeout: 60000 });
+    if (!/\[engagements\][^\n]*EN2/.test(viaCli.stdout || "")) casse.push(`ENGAGEMENTS : par la ligne de commande du hook (--fichier, répertoire du produit), l'avertissement n'arrive pas — le contrôle n'est pas câblé (${String(viaCli.stdout).slice(0, 200)} / ${String(viaCli.stderr).slice(0, 200)})`);
+    poser("output/formation/Client-A - QCM - 20261109a.md", "# QCM\n");
+    if (jouerEngagements(note, prod, JOUR).length) casse.push("ENGAGEMENTS : le remède joué (livrable produit) laisse le hook parler");
+    const kit = poser("output/formation/Client-A - Kit - 20261110a.md", "# Kit\n\nUne skill de démonstration est installée par le formateur.\n");
+    if (!jouerEngagements(kit, prod, JOUR).some((l) => /^\[engagements\] Client-A - Kit - 20261110a\.md : EN3 — [^\n]*l\. 3 « Une skill de démonstration est installée par le formateur\. »/.test(l)))
+      casse.push(`ENGAGEMENTS : rouge non nommé — un livrable écrit qui promet un outil sans figurer au registre n'est pas dit (${jouerEngagements(kit, prod, JOUR).join(" | ") || "aucune ligne"})`);
+    writeFileSync(registre, readFileSync(registre, "utf8").replace(ligneQcm, `${ligneQcm}\n| Skill installée par le formateur | outil | \`output/formation/Client-A - Kit - 20261110a.md\` | action : installer la skill, porteur formateur, échéance 2026-11-12 |`), "utf8");
+    if (jouerEngagements(kit, prod, JOUR).length) casse.push("ENGAGEMENTS : le livrable cité au registre, son action ouverte, est encore accusé");
+    if (!jouerEngagements(kit, prod, "2026-11-13").some((l) => /ÉCHUE depuis le 2026-11-12/.test(l))) casse.push("ENGAGEMENTS : une action échue à la date de l'écriture suivante n'est pas nommée");
+    // Au-delà de 6 engagements non tenus, la ligne de reste prescrit une commande au chemin RÉSOLU, et cette commande marche depuis le produit.
+    const sept = Array.from({ length: 7 }, (_, i) => `| Pièce ${i + 1} | pièce | \`output/formation/Client-A - Programme - 20261028g.md\` | livrable : \`output/formation/absent-${i + 1}.md\` |`).join("\n");
+    writeFileSync(registre, readFileSync(registre, "utf8").replace(ligneQcm, `${ligneQcm}\n${sept}`), "utf8");
+    const reste = jouerEngagements(note, prod, JOUR).find((l) => /… et 1 autre\(s\) : node "/.test(l));
+    const cmd = reste && (/: (node "[^"]+oracle-engagements\.mjs" \.)/.exec(reste) || [])[1];
+    const rejoue = cmd ? spawnSync(cmd, { cwd: prod, shell: true, encoding: "utf8", timeout: 60000 }) : null;
+    if (!cmd || !rejoue || ![0, 1].includes(rejoue.status) || !/"oracle": "oracle-engagements"/.test(rejoue.stdout || ""))
+      casse.push(`ENGAGEMENTS : au-delà de 6 engagements non tenus, la commande de reste n'est pas au chemin résolu ou ne marche pas depuis le produit (${reste || "aucune ligne de reste"})`);
+    writeFileSync(registre, readFileSync(registre, "utf8").replace(`\n${sept}`, ""), "utf8");
+    const cal = poser("forge/CALENDRIER.md", ne("CALENDRIER-PRODUIT.md").replace("| *(aucune)* | — | — | — | — | — |", "| 13/11/2026 | Formation de prise en main | Client-A | — | à faire | convention |"));
+    if (!jouerCalendrier(cal, prod, JOUR).some((l) => /^\[calendrier\] forge\/CALENDRIER\.md:\d+ : date « 13\/11\/2026 » hors du format/.test(l)))
+      casse.push(`CALENDRIER : rouge non nommé — une date hors forme n'est pas dite à l'écriture du calendrier (${jouerCalendrier(cal, prod, JOUR).join(" | ") || "aucune ligne"})`);
+    writeFileSync(cal, readFileSync(cal, "utf8").replace("13/11/2026", "2026-11-13"), "utf8");
+    const calOk = jouerCalendrier(cal, prod, JOUR);
+    if (calOk.some((l) => /CALENDRIER\.md:\d+ :/.test(l)) || !calOk.some((l) => /1 séance\(s\) dans les 5 jours[^\n]*2026-11-13 \(J-3\) Formation de prise en main/.test(l)))
+      casse.push(`CALENDRIER : la date corrigée est encore accusée, ou la séance à J-3 n'est pas annoncée (${calOk.join(" | ") || "aucune ligne"})`);
+    if (jouerCalendrier(note, prod, JOUR).length) casse.push("CALENDRIER : un autre fichier que le calendrier le fait juger");
+  }
+
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test hook-ecriture : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test hook-ecriture : 14 cas d'avant + À REJOUER (TF-1960) PASS — courriel à un tiers de 90 mots rappelé avec son passage et sa passe 2 sur 3, jamais FAIL, le même réécrit PASS, courriel anglais rappelé puis PASS avec `langue: en` ; + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077))");
+    : "Self-test hook-ecriture : 14 cas d'avant + À REJOUER (TF-1960) PASS — courriel à un tiers de 90 mots rappelé avec son passage et sa passe 2 sur 3, jamais FAIL, le même réécrit PASS, courriel anglais rappelé puis PASS avec `langue: en` ; + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077)) ; + RANGEMENT (TF-2041) PASS — livrable à la racine d'un output\\ rangé en familles signalé sur la référence distante quand le clone est en retard et sur l'arbre local sinon, rangé dans sa famille, index régénérés, fichier hors output\\ et output\\ plat silencieux, hors dépôt git signalé sur l'arbre local"
+    + " ; + ENGAGEMENTS et CALENDRIER (D-193 (a), TF-2333 et TF-2330) PASS, à double sens — engagement au livrable absent nommé à l'écriture d'un livrable et du registre, et par la ligne de commande du hook, puis silencieux une fois le livrable produit ; livrable qui promet un outil hors registre nommé avec son extrait, silencieux une fois cité ; action échue nommée ; pilot sans registre et fichier hors livrable silencieux ; date de séance hors forme nommée à l'écriture du calendrier, corrigée puis séance à J-3 annoncée");
   return casse.length ? 1 : 0;
 }
 
@@ -466,7 +669,8 @@ if (lanceEnDirect) {
   // muet pour servir l'autre.
   const lignes = [];
   if (fichier && existsSync(resolve(fichier))) lignes.push(...jouer(resolve(fichier)), ...jouerFamille(resolve(fichier)), ...jouerFiche(resolve(fichier)));
-  if (brut && existsSync(resolve(brut))) lignes.push(...jouerControleMaison(resolve(brut)));
+  if (brut && existsSync(resolve(brut))) lignes.push(...jouerControleMaison(resolve(brut)), ...jouerRangement(resolve(brut)),
+    ...jouerEngagements(resolve(brut)), ...jouerCalendrier(resolve(brut)));
   if (!lignes.length) process.exit(0);
   if (lignes.length) console.log(lignes.join("\n"));
   process.exit(0);

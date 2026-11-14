@@ -1,0 +1,13 @@
+{
+  "_dit": "Parc jetable de la recette, sens vert : rien de ce qui est cité ici n'est un identifiant déprécié ou arrêté entier, ou alors c'est hors du code (tests, documentaire) ou le remède de MT1 (le remplaçant).",
+  "depot-a": {
+    "scripts/generer.mjs": "const REPLIS = [\"modele-a-nouveau\", \"alpha-4o-mini\", \"alpha-5.6\"];\nexport default REPLIS;\n",
+    "src/voisins.mjs": "const v = [\"modele-a-arrete-bis\", \"xalpha-5\", \"alpha-5-turbo\", \"alpha-4o-mini-2026\"];\nconst orbe3d = 1; // orbe3 sans guillemets : un mot isolé, jamais un modèle\nexport { v, orbe3d };\n",
+    "tests/cas.test.mjs": "check(\"modele-a-arrete\");\n",
+    "fixtures/donnees.json": "{ \"m\": \"modele-b-bientot\" }\n",
+    "docs/NOTE.md": "Le modele-a-arrete a ete retire, remplace par modele-a-nouveau.\n"
+  },
+  "depot-b": {
+    "config/fournisseurs.json": "{ \"modele\": \"modele-a-nouveau\", \"points\": \"/v1/nouveau-point\" }\n"
+  }
+}

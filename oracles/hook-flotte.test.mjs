@@ -137,6 +137,46 @@ check("lib — racineDuProjet : variable, puis .git (dossier ou fichier d'arbre 
   egal(un(join(projetGit, "src"), { CLAUDE_PROJECT_DIR: join(racine, "absent") }), projetGit, "variable périmée : repli");
 });
 
+// TF-2443 (12/11/2026) — UNE RACINE DE SESSION EN MINUSCULE FAIT REFUSER L'ISOLATION. Rejoué avec Claude Code 2.1.322 : `isolation: "worktree"` depuis `c:\…`
+// rend « Refusing to use … as an isolation worktree: git resolves its working tree to C:/… » ; depuis `C:\…`, l'agent démarre. Le hook le dit AVANT le refus.
+// ROUGE : l'appel avec isolation depuis une racine en minuscule (cwd, séparateur /, variable de projet, ancien nom Task). VERT : le REMÈDE joué (la même racine en
+// majuscule), l'absence d'isolation, un autre outil, un chemin qui ne commence pas par une lettre de lecteur.
+const ISOLE = { subagent_type: "general-purpose", model: "sonnet", effort: "medium", isolation: "worktree" };
+const racineMin = (cwd, ti = ISOLE, tool_name = "Agent", projetDir = null) => jouer({ tool_name, tool_input: { prompt: "x", description: "y", ...ti }, cwd }, projetDir);
+const ROUGES_RACINE = [
+  [() => racineMin("c:\\dev\\produit"), "cwd en minuscule", "C:\\dev\\produit"],
+  [() => racineMin("c:/dev/produit"), "cwd en minuscule avec séparateurs /", "C:/dev/produit"],
+  [() => racineMin("C:\\dev\\produit", ISOLE, "Agent", "d:\\dev\\produit"), "CLAUDE_PROJECT_DIR en minuscule, cwd en majuscule", "D:\\dev\\produit"],
+  [() => racineMin("c:\\dev\\produit", ISOLE, "Task"), "l'ancien nom d'outil Task", "C:\\dev\\produit"],
+];
+for (const [jouerCas, nom, canonique] of ROUGES_RACINE) {
+  check(`rouge — isolation depuis une racine en minuscule (${nom}) : avertit sans bloquer, nomme la racine canonique`, () => {
+    const r = jouerCas();
+    if (r.code !== 0) throw new Error(`exit ${r.code} : un avertissement ne bloque jamais`);
+    if (!/RACINE DE SESSION EN MINUSCULE \(TF-2443/.test(r.ctx)) throw new Error(`aucun avertissement : ${r.out.slice(0, 160)}`);
+    if (!r.ctx.includes(`« ${canonique} »`)) throw new Error(`la racine canonique ${canonique} n'est pas nommée : ${r.ctx.slice(0, 260)}`);
+    if (!/RELECTURE D'INTENTION/.test(r.ctx)) throw new Error("l'avertissement a remplacé le rappel de relecture au lieu de s'y ajouter");
+  });
+}
+check("vert — le remède joué : la même racine en majuscule ne reçoit aucun avertissement de racine", () => {
+  const r = racineMin("C:\\dev\\produit");
+  if (r.code !== 0 || /RACINE DE SESSION/.test(r.ctx)) throw new Error(`exit ${r.code}, avertissement encore émis : ${r.ctx.slice(0, 160)}`);
+});
+check("vert — racine en minuscule sans isolation : aucun avertissement de racine (le refus ne vise que l'isolation)", () => {
+  const r = racineMin("c:\\dev\\produit", { ...ISOLE, isolation: undefined });
+  if (/RACINE DE SESSION/.test(r.ctx)) throw new Error(r.ctx.slice(0, 160));
+});
+check("vert — isolation sans lettre de lecteur (chemin POSIX, UNC, relatif) : aucun avertissement de racine", () => {
+  for (const cwd of ["/home/u/produit", "\\\\hote\\partage\\produit", "dev\\produit"]) {
+    const r = racineMin(cwd);
+    if (/RACINE DE SESSION/.test(r.ctx)) throw new Error(`${cwd} : ${r.ctx.slice(0, 160)}`);
+  }
+});
+check("vert — un autre outil que l'agent, même avec isolation et racine en minuscule : silence", () => {
+  const r = racineMin("c:\\dev\\produit", ISOLE, "Bash");
+  if (r.code !== 0 || r.out.trim()) throw new Error(`exit ${r.code}, sortie « ${r.out.slice(0, 120)} »`);
+});
+
 rmSync(racine, { recursive: true, force: true });
 console.log(`\nhook-flotte : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

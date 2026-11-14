@@ -22,6 +22,7 @@ import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from "no
 import { tmpdir, hostname } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const hook = join(ICI, "hook-ouverture.mjs");
@@ -34,6 +35,24 @@ const TABLES = mkdtempSync(join(tmpdir(), "hook-ouverture-tables-"));
 process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
 process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
 const PILOT = join(ICI, "..");
+// D-135 (a) : l'ouverture du pilot lance, une fois par semaine, le rejeu de tous les consommateurs des skills (jusqu'à 50 minutes). Ce banc ne
+// doit JAMAIS déclencher le vrai : le lancement est coupé pour tous les passages ci-dessous, et seul le banc du rejeu (fin de fichier) le rétablit,
+// sur une table factice et une trace jetable.
+process.env.FORGE_SANS_REJEU_HEBDOMADAIRE = "1";
+// TF-2442 : l'ouverture du pilot lance aussi, en arrière-plan, le relevé des workflows hébergés des produits (`gh run list`, réseau). Ce banc ne doit JAMAIS
+// le déclencher en vrai : le lancement est coupé pour tous les passages ci-dessous, la trace désignée est jetable, et seul le banc dédié (fin de fichier) le
+// rétablit, sur un faux `gh` et des dépôts jetables.
+process.env.FORGE_SANS_RELEVE_WORKFLOWS = "1";
+process.env.FORGE_TRACE_WORKFLOWS = join(TABLES, "workflows-heberges.json");
+// TF-2067 : une recette n'écrit pas le registre du dépôt qui la joue. L'ouverture du pilot écrit, dans des fichiers SUIVIS, le passage
+// hebdomadaire des récidives (todo/observabilite/snapshots-recidives.jsonl et RECIDIVES.json, dès que le dernier relevé a 7 jours) et le journal
+// d'héritage (todo/HERITAGE-RELEVES.jsonl). Les deux sont coupés ici, une fois pour tout le fichier, et non appel par appel : le passage
+// des consommateurs (TF-2048) n'avait pas le drapeau et réécrivait ces fichiers à chaque recette jouée après 7 jours sans relevé.
+// L'observation est SAUTÉE plutôt que déroutée : son plan écrit par des chemins relatifs à la racine du pilot. Le journal d'héritage, lui,
+// est dérouté vers un fichier jetable, que le banc « TF-2067 » ci-dessous lit pour prouver que l'écriture a bien lieu — ailleurs.
+process.env.FORGE_SANS_OBSERVATION = "1";
+const HERITAGE_JETABLE = join(TABLES, "HERITAGE-RELEVES.jsonl");
+process.env.FORGE_HERITAGE_RELEVES = HERITAGE_JETABLE;
 
 const NL = String.fromCharCode(10);
 const EXEMPLE = [
@@ -47,12 +66,21 @@ const joue = (produit) => execFileSync(process.execPath, [hook, "--sans-bootstra
   { cwd: produit, encoding: "utf8", timeout: 120000 });
 
 let pass = 0, fail = 0;
-const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
+// TF-2256 (06/11/2026) : `FORGE_CAS_OUVERTURE=2214` (ou `1521,1214`, `1635-1642`) ne joue que les sections de ces numéros — le numéro du TF de
+// l'en-tête de la section, ou du D-N de la décision (D-23, D-135) ; voir `lib-filtre-cas.mjs`. Chaque section commence par `veut(<numéros>)` :
+// il pose la section courante, et `check` n'exécute que les contrôles d'une section voulue. Une section en bloc `{ }` est gardée par
+// `if (veut(…))`, qui épargne aussi son installation ; un relevé coûteux commun à plusieurs sections se garde par `voudrait(…)`.
+const filtre = creerFiltre("FORGE_CAS_OUVERTURE");
+let sectionVoulue = true;
+const veut = (...ids) => (sectionVoulue = filtre.veut(...ids));
+const voudrait = (...ids) => filtre.voudrait(...ids);
+const check = (nom, fn) => { if (!sectionVoulue) return; try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
 
+veut(869);
 // ---- SENS CRÉATION ---------------------------------------------------------------------------
 const neuf = mkdtempSync(join(tmpdir(), "hook-env-neuf-"));
 writeFileSync(join(neuf, ".env.example"), EXEMPLE);
-const sortieNeuf = joue(neuf);
+const sortieNeuf = sectionVoulue ? joue(neuf) : "";
 
 check("création : un .env.example sans .env fait naître le .env local", () => {
   if (!existsSync(join(neuf, ".env"))) throw new Error(".env non créé");
@@ -70,12 +98,13 @@ check("création : le compte rendu DIT le geste et où poser un secret", () => {
   if (!/TF-0869/.test(sortieNeuf)) throw new Error("le compte rendu ne cite pas l'item qui motive le geste");
 });
 
+veut(869);
 // ---- SENS GARDE ------------------------------------------------------------------------------
 const habite = mkdtempSync(join(tmpdir(), "hook-env-habite-"));
 writeFileSync(join(habite, ".env.example"), EXEMPLE);
 const DEJA = "PORT=9999" + NL + "CLE_TIERCE=valeur-que-seul-l-humain-connait" + NL;
 writeFileSync(join(habite, ".env"), DEJA);
-const sortieHabite = joue(habite);
+const sortieHabite = sectionVoulue ? joue(habite) : "";
 
 check("garde : un .env déjà présent n'est JAMAIS écrasé", () => {
   if (readFileSync(join(habite, ".env"), "utf8") !== DEJA) throw new Error(".env existant modifié — les valeurs locales sont irrécupérables");
@@ -85,6 +114,7 @@ check("garde : rien n'est annoncé quand rien n'a été fait", () => {
   if (/\.env — créé depuis/.test(sortieHabite)) throw new Error("le hook annonce une création qui n'a pas eu lieu");
 });
 
+veut(1521, 1214);
 // ---- TF-1521 : LE REJEU D'UN DÉPLACEMENT EN ATTENTE, À L'OUVERTURE DU PILOT ------------------
 //
 // La règle 7 bis (TF-1503) tolère qu'une version antérieure reste en place tant que le ledger du
@@ -111,7 +141,7 @@ writeFileSync(join(produitClos, "forge", "ledger.jsonl"), [
 
 const lancerOuverturePilot = () => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
   { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest } });
-const sortieOuverturePilot = lancerOuverturePilot();
+const sortieOuverturePilot = voudrait(1521, 1214, 1301, 2151, 1635) ? lancerOuverturePilot() : "";   // relevé lu par ces cinq sections
 
 check("TF-1521 — un déplacement EN ATTENTE est listé à l'ouverture, avec sa date et son motif", () => {
   if (!/Déplacements de version en attente/.test(sortieOuverturePilot))
@@ -133,9 +163,9 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
   if (!/AUTRE poste n'y est pas visible/.test(sortieOuverturePilot)) throw new Error("la limite (autre poste) n'est pas dite");
 });
 // D-23 (a) du 18/10/2026 — l'ouverture du pilot affiche, dans « Flotte d'agents », les relectures d'intention de l'essai et dit
-// si le seuil d'arrêt (plus de 4 000 000 de jetons de relecture par jour, D-25 du 18/10/2026) est franchi. Transcriptions SYNTHÉTIQUES d'un profil
+// si le seuil d'arrêt (plus de 6 000 000 de jetons de relecture par jour, D-165 (c) du 04/11/2026 ; 4 000 000 par D-25 du 18/10/2026) est franchi. Transcriptions SYNTHÉTIQUES d'un profil
 // jetable : ni le vrai poste (USERPROFILE/HOME vidés), ni le vrai relevé.
-{
+if (veut(23)) {
   const maisonVide = mkdtempSync(join(tmpdir(), "hook-ouverture-maison-"));
   const profilRelecture = (nom, n) => {
     const profil = mkdtempSync(join(tmpdir(), `hook-ouverture-${nom}-`));
@@ -152,28 +182,29 @@ check("TF-1214 — la boîte d'entrée dit le POSTE qui juge : un dépôt d'un a
   };
   const ouvrirAvec = (profil) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
     { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonVide, HOME: maisonVide } });
-  const sortieTenu = ouvrirAvec(profilRelecture("tenu", 2)), sortieFranchi = ouvrirAvec(profilRelecture("franchi", 3));
+  const sortieTenu = ouvrirAvec(profilRelecture("tenu", 2)), sortieFranchi = ouvrirAvec(profilRelecture("franchi", 5));
   check("D-23 vert — l'ouverture du pilot affiche les relectures d'intention (2 relectures, 2 800 460 jetons) et un seuil TENU", () => {
     // D-64 (a) du 21/10/2026 : l'alarme de l'essai vit dans la section « Œil critique », qui remplace « Flotte d'agents ».
     if (!/## Œil critique/.test(sortieTenu)) throw new Error("section « Œil critique » absente");
     if (/## Flotte d'agents|## Surveillance des récidives/.test(sortieTenu)) throw new Error("une section remplacée par « Œil critique » est encore affichée");
     if (!/poste [^\n]+ : (aucune exécution|dernière analyse jusqu'au)/.test(sortieTenu)) throw new Error("le repère du poste n'est pas dit");
-    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, prolongé en service par D-73 \(b\), revue le 2026-11-08.*2 relecture\(s\), 2 800 460 jetons.*seuil de 4 000 000 jetons par jour tenu/.test(sortieTenu))
+    if (!/relectures d'intention \(essai du 2026-10-18 au 2026-11-01, prolongé en service par D-73 \(b\), revue le 2026-11-08.*2 relecture\(s\), 2 800 460 jetons.*seuil de 6 000 000 jetons par jour tenu/.test(sortieTenu))
       throw new Error((sortieTenu.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
     if (/FRANCHI/.test(sortieTenu)) throw new Error("seuil dit franchi à 2 800 460 jetons");
   });
-  check("D-23 rouge — plus de 4 000 000 de jetons de relecture en un jour (3 relectures, 4 200 690) : l'ouverture dit FRANCHI et demande l'arrêt", () => {
-    if (!/3 relecture\(s\), 4 200 690 jetons.*\*\*FRANCHI : arrêter l'essai et demander à l'humain\*\*/.test(sortieFranchi))
+  check("D-23 rouge — plus de 6 000 000 de jetons de relecture en un jour (5 relectures, 7 001 150) : l'ouverture dit FRANCHI et demande l'arrêt", () => {
+    if (!/5 relecture\(s\), 7 001 150 jetons.*\*\*FRANCHI : arrêter l'essai et demander à l'humain\*\*/.test(sortieFranchi))
       throw new Error((sortieFranchi.match(/relectures d'intention[^\n]*/) || ["ligne absente"])[0]);
   });
 }
+veut(1301);
 // TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans classe (une mesure, jamais un blocage).
 check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans classe, par statut", () => {
   if (!/## Items ouverts sans classe \(TF-1301/.test(sortieOuverturePilot)) throw new Error("section absente de l'ouverture du pilot");
   if (!/item\(s\) ouvert\(s\) sans classe|aucun item ouvert sans classe/.test(sortieOuverturePilot)) throw new Error("ni compte ni constat d'absence de stock");
 });
 // TF-1576 — l'annonce des README dit l'état MESURÉ des crochets du projet ouvert.
-{
+if (veut(1576)) {
   const sansCrochet = mkdtempSync(join(tmpdir(), "hook-readme-sans-"));
   mkdirSync(join(sansCrochet, ".claude"), { recursive: true });
   writeFileSync(join(sansCrochet, ".claude", "settings.json"), JSON.stringify({ hooks: { SessionStart: [{ hooks: [] }], Stop: [{ hooks: [] }] } }), "utf8");
@@ -223,6 +254,7 @@ check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans cla
   });
 }
 
+veut(1635);
 // ---- 13/10/2026 : LA SORTIE JSON DU MODE ASYNCHRONE ------------------------------------------
 //
 // Le hook est déclaré `async` (l'extension VS Code coupe à 60 s une initialisation que ses gestes
@@ -231,7 +263,7 @@ check("TF-1301 — l'ouverture du pilot publie le stock d'items ouverts sans cla
 // sous `--contexte-json`, la sortie est UN objet JSON valide, l'événement est SessionStart, et le
 // contexte porte TOUT le relevé texte — rien de perdu au passage — précédé de l'en-tête qui dit
 // l'asynchronie. Sens rouge : une ligne du relevé absente du contexte, ou une sortie non JSON.
-const sortieJson = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--contexte-json"],
+const sortieJson = !voudrait(1635, 1636) ? "" : execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--contexte-json"],
   { cwd: PILOT, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest } });
 
 check("--contexte-json : la sortie est UN objet JSON SessionStart, sans texte autour", () => {
@@ -242,17 +274,35 @@ check("--contexte-json : la sortie est UN objet JSON SessionStart, sans texte au
   if (typeof h.additionalContext !== "string" || !h.additionalContext) throw new Error("additionalContext absent ou vide");
 });
 
+veut(2151);
+// Deux lancements successifs diffèrent par construction sur des valeurs VIVANTES seulement : l'horodatage du relevé précédent (le
+// premier lancement l'a écrit), une durée en millisecondes et, depuis TF-2151, les COMPTES que les lignes MS2 et le verdict d'
+// `oracle-modeles-en-service` lisent dans les transcripts du poste (« 229 réponse(s) lues », « sur 400 fichier(s) ») : d'autres
+// sessions les font grandir entre les deux lancements. Elles sont neutralisées, et rien d'autre : toute autre différence reste une perte.
+const neutreAvant = (t) => t.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g, "<horodatage>").replace(/\ben \d+ ms\b/g, "en <durée> ms");
+const neutre = (t) => neutreAvant(t).replace(/\b\d+( réponse\(s\))/g, "<n>$1").replace(/\b(lue\(s\) sur )\d+( fichier\(s\))/g, "$1<n>$2");
+
+check("TF-2151 rouge → vert — des comptes de transcripts qui ont grandi entre deux lancements ne comptent plus pour une perte du relevé", () => {
+  const grandi = sortieOuverturePilot.replace(/\b(\d+)( réponse\(s\))/g, (_, n, s) => `${Number(n) + 7}${s}`).replace(/(lue\(s\) sur )(\d+)( fichier\(s\))/g, (_, a, n, s) => `${a}${Number(n) + 3}${s}`);
+  if (grandi === sortieOuverturePilot) throw new Error("le relevé ne porte aucun compte de transcripts : le cas ne prouve rien (ligne MS2 absente ?)");
+  const perdues = (a, b, f) => f(a).split(NL).map((l) => l.trimEnd()).filter(Boolean).filter((l) => !f(b).includes(l));
+  if (!perdues(sortieOuverturePilot, grandi, neutreAvant).length) throw new Error("rouge perdu : l'ancienne neutralisation accepte déjà des comptes qui ont grandi");
+  const apres = perdues(sortieOuverturePilot, grandi, neutre);
+  if (apres.length) throw new Error(`${apres.length} ligne(s) encore perdue(s) après neutralisation, dont : ${apres[0].slice(0, 160)}`);
+  // La borne : une AUTRE différence (une version servie qui change de nom) reste une perte.
+  const autre = sortieOuverturePilot.replace(/claude-[a-z]+-\d+-\d+/, "claude-autre-9-9");
+  if (autre !== sortieOuverturePilot && !perdues(sortieOuverturePilot, autre, neutre).length) throw new Error("une version servie qui change de nom n'est plus vue comme une perte");
+});
+
+veut(1635);
 check("--contexte-json : le contexte porte TOUT le relevé texte, et l'en-tête d'asynchronie", () => {
-  // Deux lancements successifs diffèrent par construction sur DEUX valeurs seulement : l'horodatage
-  // du relevé précédent (le premier lancement l'a écrit) et une durée en millisecondes. Elles sont
-  // neutralisées, et rien d'autre : toute autre différence reste une perte.
-  const neutre = (t) => t.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g, "<horodatage>").replace(/\ben \d+ ms\b/g, "en <durée> ms");
   const ctx = neutre(JSON.parse(sortieJson).hookSpecificOutput.additionalContext);
   const manquantes = neutre(sortieOuverturePilot).split(NL).map((l) => l.trimEnd()).filter(Boolean).filter((l) => !ctx.includes(l));
   if (manquantes.length) throw new Error(`${manquantes.length} ligne(s) du relevé absente(s) du contexte, dont : ${manquantes[0].slice(0, 120)}`);
   if (!/hook SessionStart asynchrone/.test(ctx)) throw new Error("l'en-tête qui dit l'asynchronie manque");
 });
 
+veut(1635);
 // TF-1635 (13/10/2026) — UN PRODUIT DONT LE HOOK D'OUVERTURE EST SYNCHRONE SE RÉPARE À L'OUVERTURE.
 // Mesuré le 13/10 : 19 produits sur 19 portaient le hook synchrone à 240 s, que l'extension VS Code
 // coupe à 60 s. Le hook, lancé sous cette forme, passe l'entrée en `async` + `--contexte-json`, garde
@@ -303,6 +353,7 @@ check("TF-1635 — sens rouge et bords : réglage sans hook de la factory, illis
   if (avant.async === true) throw new Error("témoin rouge mal construit : déjà async");
 });
 
+veut(1755);
 // ---- TF-1755 (15/10/2026) : TOUTE ENTRÉE DU GABARIT QUI MANQUE AU PRODUIT S'Y AJOUTE À L'OUVERTURE --
 // Mesuré le 15/10 sur 21 produits : publication-hebergee câblé chez 2, droits-accordes chez 2. Vert : un
 // produit qui porte le lanceur reçoit chaque entrée absente du gabarit, sans perdre ses hooks, ses
@@ -347,6 +398,40 @@ check("TF-1755 — fusion : chaque entrée absente du gabarit ajoutée, rien de 
   if (fusionnerHooksDuGabarit(f, GABARIT_SETTINGS).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
 });
 
+veut(2185);
+// ---- TF-2185 (05/11/2026) : UNE ENTRÉE PRÉSENTE DONT LE GABARIT A ÉLARGI LE MATCHER S'ÉLARGIT -----------
+// Mesuré le 05/11 : `lecons` restait sur `Bash|PowerShell|Write|Edit|MultiEdit` chez le produit du poste qui
+// le portait, après que le gabarit l'a passé à `…|Agent|Task` (TF-1947). Vert : seule, l'entrée prend le
+// matcher du gabarit ; dans un groupe mêlé, elle seule en sort et le hook du produit garde son matcher.
+// Rouge : un matcher que le produit a rendu différent n'est pas touché ; une seconde passe n'ajoute rien.
+check("TF-2185 — fusion : matcher élargi par le gabarit porté à l'entrée présente, jamais rétréci ni dupliqué", () => {
+  const mG = JSON.parse(readFileSync(GABARIT_SETTINGS, "utf8")).hooks.PreToolUse
+    .find((g) => g.hooks.some((h) => /factory\.mjs"?\s+lecons\b/.test(h.command))).matcher;
+  const ANCIEN = "Bash|PowerShell|Write|Edit|MultiEdit";
+  if (!mG.split("|").includes("Agent") || mG === ANCIEN) throw new Error(`témoin mal construit : matcher du gabarit ${mG}`);
+  const lecons = { type: "command", command: 'node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" lecons', timeout: 10 };
+  const mien = { type: "command", command: "node scripts/mon-hook.mjs", timeout: 5 };
+  const joueCas = (groupes) => {
+    const f = join(mkdtempSync(join(tmpdir(), "ouverture-elargir-")), "settings.json");
+    writeFileSync(f, JSON.stringify({ hooks: { PreToolUse: groupes } }, null, 2), "utf8");
+    const r = fusionnerHooksDuGabarit(f, GABARIT_SETTINGS);
+    const gs = JSON.parse(readFileSync(f, "utf8")).hooks.PreToolUse;
+    const porteurs = gs.filter((g) => g.hooks.some((h) => /factory\.mjs"?\s+lecons\b/.test(h.command)));
+    if (porteurs.length !== 1 || porteurs[0].hooks.filter((h) => /lecons/.test(h.command)).length !== 1) throw new Error("lecons absent ou en double");
+    if (fusionnerHooksDuGabarit(f, GABARIT_SETTINGS).etat !== "deja") throw new Error("une seconde passe n'est pas idempotente");
+    return { r, gs, porteur: porteurs[0] };
+  };
+  const seul = joueCas([{ matcher: ANCIEN, hooks: [{ ...lecons }] }]);
+  if (seul.porteur.matcher !== mG || !(seul.r.elargis || []).includes("lecons")) throw new Error(`entrée seule : matcher ${seul.porteur.matcher}, élargies ${JSON.stringify(seul.r.elargis)}`);
+  const mele = joueCas([{ matcher: ANCIEN, hooks: [{ ...mien }, { ...lecons }] }]);
+  const groupeMien = mele.gs.find((g) => g.hooks.some((h) => h.command === mien.command));
+  if (mele.porteur.matcher !== mG || groupeMien?.matcher !== ANCIEN || groupeMien.hooks.length !== 1) throw new Error("groupe mêlé : le hook du produit a changé de matcher ou lecons n'en est pas sorti");
+  const PROPRE = "Bash|PowerShell|Write|Edit|MultiEdit|Read";
+  const propre = joueCas([{ matcher: PROPRE, hooks: [{ ...lecons }] }]);
+  if (propre.porteur.matcher !== PROPRE || (propre.r.elargis || []).length) throw new Error("un matcher propre au produit a été réécrit");
+});
+
+veut(1755);
 check("TF-1755 — par le hook d'ouverture : produit muni du lanceur complété et le geste DIT ; produit sans lanceur intact", () => {
   const avec = mkdtempSync(join(tmpdir(), "ouverture-fusion-hook-"));
   mkdirSync(join(avec, ".claude"), { recursive: true });
@@ -363,6 +448,7 @@ check("TF-1755 — par le hook d'ouverture : produit muni du lanceur complété 
   if (readFileSync(join(sans, ".claude", "settings.json"), "utf8") !== SETTINGS_ANCIEN || /TF-1755/.test(s2)) throw new Error("un produit sans lanceur a été touché");
 });
 
+veut(1903);
 // ---- TF-1903 (21/10/2026) : LA COMMANDE RELATIVE DU LANCEUR S'ANCRE EN PLACE À L'OUVERTURE ------------------
 // Rejoué le 21/10 dans une session réelle : après `cd sub`, `node forge/hooks/factory.mjs <nom>` ne se trouve plus
 // (MODULE_NOT_FOUND) et le hook se tait ; `node "${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs" <nom>` se déclenche.
@@ -426,6 +512,7 @@ check("TF-1903 — par le hook d'ouverture : l'ancrage est fait et DIT chez un p
   if (readFileSync(join(sans, ".claude", "settings.json"), "utf8") !== SETTINGS_ANCIEN || /TF-1903/.test(s2)) throw new Error("un produit sans lanceur a été touché");
 });
 
+veut(1942);
 // ---- TF-1942 (21/10/2026) : LES PERMISSIONS D'UN PRODUIT SURVIVENT À L'OUVERTURE, ET LE RELEVÉ LE DIT ---------
 // Le fait : la phrase « Si l'un d'eux portait une modification locale, elle a été écrasée » ne nommait pas ce
 // qu'elle visait ; Produit-73 a cru son `.claude/settings.json` écrasé et renoncé à poser la règle de sécurité
@@ -463,7 +550,7 @@ check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit inta
 // désignent le produit (par son pseudonyme, retrouvé par une table jetable) sont comptés, et la seconde
 // ouverture dit ce qui a été clos depuis la première. Rouge : un lot « remis le … » et un lot `a_remettre`
 // de moins de 24 h ne sont pas nommés ; aucun autre nom que le pseudonyme du produit n'est imprimé.
-{
+if (veut(1758, 1760)) {
   const { utimesSync } = await import("node:fs");
   const P = join(mkdtempSync(join(tmpdir(), "ouverture-retours-")), "ProduitJouetZZ");
   const retours = join(P, "forge", "retours");
@@ -509,7 +596,7 @@ check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit inta
 // dite inconnue quand le référentiel du pilot ne la porte pas. Rouge : une entrée citée par un lot (liste ou plage), une
 // entrée de moins de 24 h, une entrée qui n'est pas un retour, une entrée portant son lot ne sont pas nommées ; un lot qui
 // cite tout fait disparaître la section (le remède se joue).
-{
+if (veut(1988)) {
   const P = join(mkdtempSync(join(tmpdir(), "ouverture-ledger-")), "ProduitJouetYY");
   mkdirSync(join(P, "forge", "retours"), { recursive: true });
   execFileSync("git", ["init", "-q"], { cwd: P });
@@ -550,6 +637,168 @@ check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit inta
   });
 }
 
+// ---- TF-2260 (06/11/2026) : LE JOURNAL HORS RUN COMPTE AUSSI --------------------------------------------------------
+// Hors run, `ledger.py` inscrit un retour à `forge/hors-run.jsonl` (TF-2223) ; aucun contrôle de lot ne le lisait, la compilation restait à la session qui ferme un
+// run. Vert : un produit SANS ledger de run mais avec un journal hors run voit ses retours de plus de 24 h, non cités par un lot, nommés dans leur section
+// (« hors-run seq n ») ; un lot qui cite « forge/hors-run.jsonl seq 1 » les retire. Rouge : un seq cité pour le ledger ne retire pas le même numéro du journal
+// hors run (et inversement), une entrée récente, une entrée qui n'est pas un retour, une entrée portant son lot ne sont pas nommées ; rien n'est écrit chez le produit.
+{
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-hors-run-")), "ProduitJouetHR");
+  mkdirSync(join(P, "forge", "retours"), { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const il = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
+  const horsRun = [
+    { seq: 1, ts: il(9), type: "retour", hors_run: true, resume: "friction A hors run" },
+    { seq: 2, ts: il(9), type: "retour", hors_run: true, resume: "friction B hors run" },
+    { seq: 3, ts: il(9), type: "question_humain", hors_run: true, resume: "pas un retour" },
+    { seq: 4, ts: il(0.05), type: "retour", hors_run: true, resume: "friction C, de moins de 24 h" },
+    { seq: 5, ts: il(9), type: "retour", hors_run: true, lot: "ProduitJouetHR - RETOURS - 20261001a", resume: "friction D, qui porte son lot" },
+  ];
+  const brutHr = horsRun.map((e) => JSON.stringify(e)).join("\n") + "\n";
+  writeFileSync(join(P, "forge", "hors-run.jsonl"), brutHr, "utf8");
+  const lot = join(P, "forge", "retours", "ProduitJouetHR - RETOURS - 20261001a.md");
+  writeFileSync(lot, "# lot\n\n- **Références ledger** : `forge\\ledger.jsonl` seq 1 et 2 (entrées `type: retour`)\n- **Statut** : remis le 2026-10-02\n", "utf8");
+  const sectionHr = (s) => (s.split("## Retours du journal hors run restés sans lot, plus de")[1] || "").split("\n## ")[0];
+  const s1 = joue(P);
+  check("TF-2260 — sans ledger de run, les retours du journal hors run de plus de 24 h qu'aucun lot ne cite sont nommés (un lot qui cite « ledger seq 1 et 2 » ne les retire pas)", () => {
+    const l = sectionHr(s1);
+    if (!/2 entrée\(s\)/.test(l) || !/hors-run seq 1, 2 \(la plus ancienne : 9 j\)/.test(l)) throw new Error(`section : ${l.slice(0, 400) || "(absente)"}`);
+    if (/hors-run seq [^\n]*\b(3|4|5)\b/.test(l.split("\n")[1] || "")) throw new Error("une entrée récente, déjà compilée ou qui n'est pas un retour est nommée");
+  });
+  check("TF-2260 — la section du ledger ne dit rien des entrées hors run (deux journaux, deux numérotations)", () => {
+    if (/Retours du ledger restés sans lot/.test(s1)) throw new Error("la section du ledger du run est ouverte alors que ce produit n'a pas de ledger");
+  });
+  check("TF-2260 — le remède se joue : un lot qui cite « forge/hors-run.jsonl seq 1, 2 » fait disparaître la section, et ce segment ne retire rien au ledger", () => {
+    writeFileSync(lot, "# lot\n\n- **Références hors run** : `forge/hors-run.jsonl` seq 1, 2 (entrées `type: retour`)\n- **Statut** : remis le 2026-10-02\n", "utf8");
+    const s2 = joue(P);
+    if (/Retours du journal hors run restés sans lot/.test(s2)) throw new Error("la section persiste alors que le lot cite les deux entrées");
+    // Le même numéro côté ledger du run n'est pas cité : un ledger neuf qui porte un retour seq 2 doit rester nommé.
+    writeFileSync(join(P, "forge", "ledger.jsonl"), [{ seq: 1, ts: il(30), type: "run_open" }, { seq: 2, ts: il(9), type: "retour", resume: "friction ledger" }].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    const s3 = joue(P);
+    const l = (s3.split("## Retours du ledger restés sans lot, plus de")[1] || "").split("\n## ")[0];
+    if (!/1 entrée\(s\)/.test(l) || !/seq 2 \(la plus ancienne : 9 j\)/.test(l)) throw new Error(`le segment hors run a retiré le seq 2 du ledger du run : ${l.slice(0, 300) || "(section absente)"}`);
+  });
+  check("TF-2260 — rien n'est écrit chez le produit (lecture seule)", () => {
+    if (readFileSync(join(P, "forge", "hors-run.jsonl"), "utf8") !== brutHr) throw new Error("le journal hors run a été modifié");
+  });
+}
+
+// ---- TF-2214 (06/11/2026, RP-34 de Produit-86) : LES DÉCISIONS POSÉES SANS RÉPONSE SE SIGNALENT À L'OUVERTURE -----
+// D-48 (réseau vide facturé), posée le 03/11, est restée sans réponse ni rappel pendant deux jours. Vert : une D-N posée au ledger depuis 14 jours au plus, sans `reponse_humain`
+// postérieure qui la nomme, est NOMMÉE avec sa date et son seq ; une décision répondue, une décision de plus de 14 jours et un ledger sans décision ne sont pas nommés ; la réponse
+// consignée fait disparaître la section (le remède se joue) ; rien n'est écrit chez le produit.
+if (veut(2214)) {
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-decisions-")), "ProduitJouetZZ");
+  mkdirSync(join(P, "forge", "retours"), { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const il = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
+  const entrees = [
+    { seq: 1, ts: il(30), type: "run_open" },
+    { seq: 2, ts: il(2), type: "question_humain", decisions_posees: { "D-48": "Supprime-t-on le réseau vide créé en Europe du Nord ?" } },
+    { seq: 3, ts: il(2), type: "question_humain", decisions_posees: { "D-49": "Quel hébergement pour le poste ?" } },
+    { seq: 4, ts: il(1), type: "reponse_humain", decision: "D-49", reponse: "a" },
+    { seq: 5, ts: il(20), type: "question_humain", decisions_posees: { "D-12": "Question ancienne restée sans réponse ?" } },
+  ];
+  writeFileSync(join(P, "forge", "ledger.jsonl"), entrees.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  const section = (s) => (s.split("## Décisions posées sans réponse nommée (TF-2214)")[1] || "").split("\n## ")[0];
+  const s1 = joue(P);
+  check("TF-2214 — la décision posée il y a 2 jours sans réponse est nommée (date, seq, question), et elle seule", () => {
+    const l = section(s1);
+    if (!/1 décision\(s\)/.test(l) || !/D-48 \(posée le \d{4}-\d{2}-\d{2}, seq 2 — Supprime-t-on le réseau vide/.test(l)) throw new Error(`section : ${l.slice(0, 300) || "(absente)"}`);
+    if (/D-49|D-12/.test(l)) throw new Error("une décision répondue ou de plus de 14 jours est nommée");
+  });
+  check("TF-2214 — le remède se joue : la réponse consignée avec son numéro fait disparaître la section", () => {
+    writeFileSync(join(P, "forge", "ledger.jsonl"), entrees.concat([{ seq: 6, ts: il(0.5), type: "reponse_humain", decisions: { "D-48": "a" } }]).map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    if (/Décisions posées sans réponse nommée/.test(joue(P))) throw new Error("la section persiste alors que la réponse est consignée");
+  });
+}
+
+// ---- D-193 (a) du 10/11/2026, TF-2330 et TF-2333 (RP-07 et RP-10 du produit marketing) : LA SÉANCE DATÉE NOMME SA REVUE À 5 JOURS, ET UN
+// ENGAGEMENT NON TENU SE REDIT. La séance du 13/11/2026 n'était dans aucun calendrier et sa revue n'a eu lieu que sur demande humaine ; des
+// documents ont promis des pièces que personne n'a produites. Vert : le calendrier et le registre NAISSENT de leur modèle chez un produit qui
+// n'en a pas, en-tête daté du jour, et un fichier présent n'est jamais touché ; une séance à J-3 est nommée avec ce que sa revue couvre et une
+// commande qui MARCHE depuis le produit ; une revue faite se dit en une ligne. Rouge : une séance à J-10 et une séance passée sont muettes, une
+// date hors forme est dite avec sa ligne, un engagement dont le livrable manque est redit ; le remède joué (livrable produit) fait taire la section.
+if (veut(2330, 2333)) {
+  const P = join(mkdtempSync(join(tmpdir(), "ouverture-seances-")), "ProduitJouetSE");
+  mkdirSync(join(P, "forge", "retours"), { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: P });
+  const jourDans = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+  const AUJ = jourDans(0);
+  const calendrier = join(P, "forge", "CALENDRIER.md"), registre = join(P, "forge", "ENGAGEMENTS.md");
+  const sectionSeances = (s) => (s.split("## Séances datées dans les 5 jours")[1] || "").split("\n## ")[0];
+  const sectionMalFormee = (s) => (s.split("## Calendrier des séances mal formé")[1] || "").split("\n## ")[0];
+  const sectionEngagements = (s) => (s.split("## Engagements des documents remis, NON tenus")[1] || "").split("\n## ")[0];
+  const t0 = Date.now();
+  const s0 = joue(P);
+  const duree0 = Date.now() - t0;
+  check("TF-2330 vert — le calendrier et le registre NAISSENT de leur modèle chez un produit qui n'en a pas, en-tête daté du jour, et la naissance est dite", () => {
+    for (const f of [calendrier, registre]) {
+      if (!existsSync(f)) throw new Error(`${f} n'est pas né`);
+      if (!new RegExp(`^verifie_le: ${AUJ}\\r?$`, "m").test(readFileSync(f, "utf8"))) throw new Error(`en-tête de ${f} non daté du jour`);
+    }
+    if (!/2 fichier\(s\) NÉ\(S\) à l'instant[\s\S]*forge\/CALENDRIER\.md — né de gabarits\/CALENDRIER-PRODUIT\.md[\s\S]*forge\/ENGAGEMENTS\.md — né de gabarits\/ENGAGEMENTS-PRODUIT\.md/.test(s0)) throw new Error("naissance non dite au relevé");
+    if (/Séances datées|Calendrier des séances mal formé|Engagements des documents remis, NON tenus/.test(s0)) throw new Error("un calendrier et un registre vides font parler l'ouverture");
+  });
+  // Sur un hook qui ne les fait pas naître (l'état d'avant D-193), le banc pose lui-même les deux fichiers depuis leur modèle : chaque
+  // contrôle ci-dessous rend alors son propre rouge, au lieu d'un arrêt du banc sur un fichier absent.
+  for (const [f, m] of [[calendrier, "CALENDRIER-PRODUIT.md"], [registre, "ENGAGEMENTS-PRODUIT.md"]]) {
+    if (!existsSync(f)) writeFileSync(f, readFileSync(join(PILOT, "gabarits", m), "utf8").replace(/^---[\s\S]*?\n---/, (fm) => fm.replace(/AAAA-MM-JJ/g, AUJ)), "utf8");
+  }
+  const lignesSeances = [
+    `| ${jourDans(3)} | Formation de prise en main | Client-A | \`output/formation\` | à faire | convention du 2026-10-13 |`,
+    `| ${jourDans(10)} | Atelier lointain | Client-B | — | à faire | courriel du 2026-11-01 |`,
+    `| ${jourDans(-1)} | Comité d'hier | Client-C | — | à faire | ledger seq 12 |`,
+    `| ${jourDans(2)} | Démonstration déjà revue | Client-D | — | faite le ${AUJ} | ledger seq 40 |`,
+    "| 13/11/2026 | Séance mal datée | Client-E | — | à faire | courriel |",
+  ];
+  writeFileSync(calendrier, readFileSync(calendrier, "utf8").replace("| *(aucune)* | — | — | — | — | — |", lignesSeances.join("\n")), "utf8");
+  const avantGarde = readFileSync(calendrier, "utf8");
+  const s1 = joue(P);
+  check("TF-2330 garde — un calendrier présent n'est jamais réécrit par l'ouverture", () => {
+    if (readFileSync(calendrier, "utf8") !== avantGarde) throw new Error("le calendrier rempli a été modifié");
+    if (/NÉ\(S\) à l'instant/.test(s1)) throw new Error("une naissance est annoncée alors que les fichiers existent");
+  });
+  check("TF-2330 rouge → nommé — la séance à J-3 nomme sa revue À FAIRE, ce qu'elle couvre (5 points) et la commande de ses documents", () => {
+    const l = sectionSeances(s1);
+    if (!new RegExp(`Séance du ${jourDans(3)}, dans 3 jours \\(J-3\\) : Formation de prise en main — pour Client-A — revue de préparation À FAIRE`).test(l)) throw new Error(`section : ${l.slice(0, 400) || "(absente)"}`);
+    if (!/\(1\) chaque engagement[\s\S]*\(5\) chaque pièce jugée par l'oracle de son domaine/.test(l) || !/agent `verificateur`/.test(l)) throw new Error("couverture de la revue ou agent qui la joue absents");
+    if (!/oracle-engagements\.mjs" \. --documents "output\/formation"`/.test(l)) throw new Error("commande des engagements absente ou sans les documents de la séance");
+  });
+  check("TF-2330 vert — une séance à J-10 et une séance passée sont MUETTES, une revue faite se dit en une ligne sans rappel", () => {
+    const l = sectionSeances(s1);
+    if (/Atelier lointain|Comité d'hier/.test(l)) throw new Error("une séance lointaine ou passée est nommée");
+    if (!new RegExp(`Séance du ${jourDans(2)}, dans 2 jours \\(J-2\\) : Démonstration déjà revue — pour Client-D — revue de préparation faite le ${AUJ}\\.`).test(l)) throw new Error(`revue faite non dite : ${l.slice(0, 300)}`);
+    if (/Démonstration déjà revue[^\n]*À FAIRE/.test(l)) throw new Error("une revue faite est encore rappelée à faire");
+  });
+  check("TF-2330 rouge — un calendrier mal formé est DIT : la ligne de la date hors forme, et la forme attendue", () => {
+    const l = sectionMalFormee(s1);
+    if (!/ligne 24 : date « 13\/11\/2026 » hors du format AAAA-MM-JJ/.test(l) || !/gabarits\/CALENDRIER-PRODUIT\.md/.test(l)) throw new Error(`section : ${l.slice(0, 300) || "(absente)"}`);
+  });
+  check("TF-2330 remède joué (TF-1013) — la commande imprimée, jouée depuis le produit, rend le verdict JSON de l'oracle des engagements", () => {
+    const m = sectionSeances(s1).match(/`(node "[^`]+oracle-engagements\.mjs" \.[^`]*)`/);
+    if (!m) throw new Error("commande introuvable dans la section");
+    const r = spawnSync(m[1], { cwd: P, shell: true, encoding: "utf8" });
+    let j = null; try { j = JSON.parse(r.stdout); } catch { /* dit ci-dessous */ }
+    if (!j || j.oracle !== "oracle-engagements" || ![0, 1].includes(r.status)) throw new Error(`commande en échec (exit ${r.status}) : ${(r.stderr || r.stdout || "").slice(0, 200)}`);
+  });
+  writeFileSync(registre, readFileSync(registre, "utf8").replace("| *(aucun)* | — | — | — |",
+    "| QCM final en formulaire en ligne | pièce | `output/formation/Client-A - Programme - 20261028g.docx` | livrable : `output/formation/Client-A - QCM - 20261109a.md` |"), "utf8");
+  check("TF-2333 rouge — un engagement dont le livrable manque est redit à l'ouverture, avec sa ligne et le remède", () => {
+    const l = sectionEngagements(joue(P));
+    if (!/EN2 \(ligne 21\) : « QCM final en formulaire en ligne »[^\n]*Client-A - QCM - 20261109a\.md` n'existe pas/.test(l) || !/Remède : chaque engagement pointe un livrable présent/.test(l)) throw new Error(`section : ${l.slice(0, 400) || "(absente)"}`);
+  });
+  check("TF-2333 vert — le remède joué (livrable produit) fait taire la section", () => {
+    mkdirSync(join(P, "output", "formation"), { recursive: true });
+    writeFileSync(join(P, "output", "formation", "Client-A - QCM - 20261109a.md"), "# QCM final\n", "utf8");
+    if (/Engagements des documents remis, NON tenus/.test(joue(P))) throw new Error("la section persiste alors que le livrable existe");
+  });
+  check(`TF-2330 durée — le relevé d'un produit (sans le tirage réseau) reste sous 45 s, calendrier et registre compris (mesuré : ${duree0} ms)`, () => {
+    if (duree0 >= 45000) throw new Error(`${duree0} ms`);
+  });
+}
+
+veut(1635);
 // TF-1635 — LE DÉLAI DU CLIENT EST UNE BORNE, PAS UNE CONSIGNE. Tout hook SessionStart resté
 // synchrone, au pilot comme dans le gabarit des produits, porte un délai d'au plus 45 s : coupé à
 // ce délai, il ne peut plus faire dépasser les 60 s de l'extension VS Code. Sens rouge : le même
@@ -566,6 +815,7 @@ check(`TF-1635 — tout hook SessionStart synchrone du pilot et du gabarit produ
   if (rouge.length !== 1) throw new Error("sens rouge : un hook synchrone à 120 s n'est pas refusé");
 });
 
+veut(1636);
 // ---- TF-1636 (14/10/2026) : LES GATES EN TÊTE, ET UN BUDGET DE CONTEXTE MESURÉ ---------------
 // Le 13/10, le harnais a coupé le relevé à 2 Ko et les gates, en dernière section, n'ont pas atteint
 // l'assistant. Vert : dans le contexte réel du pilot, les gates précèdent toute section de taille
@@ -597,7 +847,7 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
 // session (chemin reçu sur son entrée) et déclare en tête les appels d'outil faits depuis son propre
 // démarrage, avec une trace locale dans les métadonnées git du dépôt ouvert. Rouge : un appel ANTÉRIEUR
 // au démarrage du relevé (session reprise) n'est pas déclaré ; une session sans geste ne reçoit rien.
-{
+if (veut(1635)) {
   const { gestesDansFenetre } = await import(new URL("./lib-gestes-avant-releve.mjs", import.meta.url));
   const P = mkdtempSync(join(tmpdir(), "ouverture-gestes-"));
   execFileSync("git", ["init", "-q"], { cwd: P });
@@ -645,7 +895,7 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
 // L'ordre réel des constats d'oracle-conformite-projet, relevé sur un parc jetable le 17/10 : alias
 // périmés (SANS_OBJET), hors histoire (SANS_OBJET), héritage (FAIL), secrets (PASS). Rouge : la lecture
 // d'avant (le premier constat) rend « sans objet » ; vert : le FAIL d'héritage est affiché.
-{
+if (veut(1829)) {
   const { constatR47 } = await import(new URL("./lib-resume-r47.mjs", import.meta.url));
   const RELEVE = [
     { regle: "R-46", statut: "PASS", message: "autre règle" },
@@ -667,7 +917,7 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
 }
 
 // ---- TF-1658 (14/10/2026) : LE SOCLE D'UN DÉPÔT TIERS JUGE LE TIERS À CHAQUE OUVERTURE --------
-{
+if (veut(1658)) {
   const T3 = mkdtempSync(join(tmpdir(), "ouverture-tiers-"));
   const tiers = join(T3, "tiers"), socle = join(T3, "socle");
   mkdirSync(tiers, { recursive: true }); mkdirSync(join(socle, "forge"), { recursive: true });
@@ -684,7 +934,7 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
 }
 
 // ---- TF-1642 (14/10/2026) : L'OUVERTURE D'UN PRODUIT MESURE SON PROPRE DÉPÔT CONTRE SON DISTANT --
-{
+if (veut(1642)) {
   const T4 = mkdtempSync(join(tmpdir(), "ouverture-fraicheur-"));
   const nu = join(T4, "d.git"), lue = join(T4, "produit"), autre = join(T4, "autre");
   const gx = (d, ...a) => execFileSync("git", ["-C", d, "-c", "user.email=t@t", "-c", "user.name=t", ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
@@ -706,7 +956,7 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
 }
 
 // ---- TF-1676 (14/10/2026) : LA RÈGLE DES NOMS ATTEINT CHAQUE PRODUIT, SELON LA VISIBILITÉ MESURÉE --
-{
+if (veut(1676)) {
   const sansDistant = joue(mkdtempSync(join(tmpdir(), "ouverture-noms-")));
   check("TF-1676 — sans visibilité mesurable, la règle du 01/10 est dite et la mesure demandée avant toute pseudonymisation", () => {
     if (!/## Noms réels dans ce dépôt \(TF-1676\)\n- Visibilité NON mesurée/.test(sansDistant)) throw new Error("la règle des noms n'atteint pas le produit");
@@ -747,5 +997,337 @@ check("TF-1636 rouge — un relevé gonflé au-delà du budget est borné : gate
   }
 }
 
-console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869) : ${pass} PASS, ${fail} FAIL`);
+// ---- TF-2048 (02/11/2026) : un rouge neuf de consommateur, laissé par une propagation, se relit à l'ouverture du pilot ----------------------
+if (veut(2048)) {
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-"));
+  const trace = join(dossier, "consommateurs-rouges.jsonl");
+  const ROUGE = { ts: "2026-10-21T08:00:00.000Z", evenement: "rouge-neuf", depot: "digit-ai-forge-design", regle: "C1", commande: "node oracles/self-test.mjs",
+    skills: ["digit-ai-page-html"], extrait: "[FAIL] V23 contenu sous 75 % de la fenetre" };
+  // Joué comme la session du pilot (sans --pilot) ou comme celle d'un produit (--pilot), la trace désignée par FORGE_TRACE_CONSOMMATEURS.
+  // TF-2179 (05/11/2026) : le parc est JETABLE (FORGE_ROOT), comme dans le banc D-135 plus bas et dans les bancs TF-1521. Sans lui, l'ouverture du pilot
+  // relevait l'héritage des produits RÉELS du poste : mesuré le 05/11/2026 sur 31 produits, `relever-heritage.mjs` prenait 92 s, l'ouverture entière
+  // 107 à 132 s pour une borne de 120 s, donc ETIMEDOUT dès que d'autres agents jouaient en même temps ; joué seul, le cas passait. Ce banc ne juge
+  // que la section des consommateurs : son verdict ne doit pas dépendre du nombre de produits du poste ni de sa charge.
+  const parc = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-parc-"));
+  mkdirSync(join(parc, "produit-factice", "forge"), { recursive: true });
+  writeFileSync(join(parc, "produit-factice", "forge", "ledger.jsonl"), "", "utf8");
+  const durees = [];
+  const jouerOuverture = (cwd, enProduit) => {
+    const t0 = Date.now();
+    try {
+      return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
+        { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_TRACE_CONSOMMATEURS: trace, FORGE_ROOT: parc } });
+    } finally { if (!enProduit) durees.push(Date.now() - t0); }
+  };
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-consommateurs-cwd-"));
+  const SECTION = "## Consommateurs des skills";
+  check("TF-2048 vert — sans trace, l'ouverture du pilot ne dit rien des consommateurs", () => {
+    if (jouerOuverture(cwd, false).includes(SECTION)) throw new Error("une trace absente fait parler l'ouverture");
+  });
+  writeFileSync(trace, JSON.stringify(ROUGE) + NL, "utf8");
+  const pilote = jouerOuverture(cwd, false);
+  check("TF-2048 rouge — un rouge neuf non levé est dit à l'ouverture du pilot : dépôt, commande, règle, remède", () => {
+    const l = pilote.split(SECTION)[1] || "";
+    if (!/1 rouge\(s\) neuf\(s\)/.test(pilote) || !/digit-ai-forge-design/.test(l) || !/node oracles\/self-test\.mjs/.test(l) || !/C1/.test(l) || !/--rejouer-consommateurs/.test(l))
+      throw new Error(`section absente ou incomplète : ${l.slice(0, 300)}`);
+  });
+  check("TF-2048 — chez un produit (--pilot), l'ouverture ne le dit pas : il ne propage rien et ne peut pas réparer un consommateur", () => {
+    if (jouerOuverture(cwd, true).includes(SECTION)) throw new Error("la section est imprimée chez un produit");
+  });
+  writeFileSync(trace, JSON.stringify(ROUGE) + NL + JSON.stringify({ ts: "2026-11-02T08:00:00.000Z", evenement: "leve", depot: "digit-ai-forge-design" }) + NL, "utf8");
+  check("TF-2048 remède joué — le rouge levé par un rejeu ne revient plus à l'ouverture", () => {
+    if (jouerOuverture(cwd, false).includes(SECTION)) throw new Error("un rouge levé est encore dit");
+  });
+  // TF-2179 : le sens rouge de l'isolement. Sur le parc réel du poste (31 produits le 05/11/2026) ce passage relevait 31 produits ; sur le parc jetable
+  // il n'en relève qu'un. La durée de chaque passage est DITE dans le nom du cas, pas bornée plus bas que le délai de 120 s de l'appel : une borne
+  // serrée remettrait le verdict sous la dépendance de la charge. Mesure avant : 107 à 132 s ; après : voir le nom du cas.
+  let dit = "", panne = null;
+  try { dit = jouerOuverture(cwd, false); } catch (e) { panne = e; }
+  check(`TF-2179 — le cas ouvre le pilot sur son parc jetable (1 produit relevé, pas les produits réels du poste) : ${durees.length} passages du pilot, de ${Math.min(...durees)} à ${Math.max(...durees)} ms, délai 120 000 ms`, () => {
+    if (panne) throw new Error(`l'ouverture du pilot n'a pas rendu la main : ${String(panne.message).slice(0, 160)}`);
+    if (!/- 1 produit\(s\) relevé\(s\)/.test(dit)) throw new Error(`le relevé d'héritage ne porte pas le seul produit factice : ${(dit.split("## Héritage des produits")[1] || "section absente").slice(0, 200)}`);
+  });
+}
+
+// ---- D-135 (a) du 02/11/2026 : le rejeu hebdomadaire part en arrière-plan, l'ouverture ne l'attend pas -------------------------------------
+// Un dépôt FACTICE dont la vérification ATTEND qu'on la libère (fichier `liberer`) : si l'ouverture attendait le rejeu, elle ne rendrait pas la main.
+// Table et trace sont jetables ; la vraie table (4 dépôts, 50 minutes au plus) n'est jamais jouée.
+if (veut(135)) {
+  const dormir = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+  const attendreQue = (cond, ms) => { const fin = Date.now() + ms; while (Date.now() < fin) { if (cond()) return true; dormir(250); } return cond(); };
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-rejeu-"));
+  const racine = join(dossier, "forges");
+  const depot = join(racine, "faux-depot-long");
+  mkdirSync(depot, { recursive: true });
+  // Un produit factice sous la racine : sans lui, le relevé d'héritage de l'ouverture est vide, et l'ouverture le JOURNALISE dans
+  // `todo/HERITAGE-RELEVES.jsonl` (suivi par git) ; avec lui, le référentiel de pseudonymes absent de la recette empêche toute écriture.
+  mkdirSync(join(racine, "produit-factice", "forge"), { recursive: true });
+  writeFileSync(join(racine, "produit-factice", "forge", "ledger.jsonl"), "", "utf8");
+  const liberer = join(dossier, "liberer");
+  // TF-2234 (06/11/2026) : le factice doit survivre aux 3 ouvertures jouées avant sa libération. À 120 s, il mourait sous la charge
+  // (une ouverture à 96 s le 06/11) : la vérification coupée n'écrivait aucun rouge, et 2 cas tombaient avec le minutage.
+  // Sa vie se dérive du délai d'une ouverture : seule une ouverture coupée, qui échoue sous son propre nom, peut encore l'épuiser.
+  const DELAI_OUVERTURE = 240000;
+  const VIE_FACTICE = 3 * DELAI_OUVERTURE + 60000;
+  writeFileSync(join(depot, "attendre.mjs"), [
+    'import { existsSync } from "node:fs";',
+    `const L = ${JSON.stringify(liberer)};`,
+    `const fin = Date.now() + ${VIE_FACTICE};`,
+    "while (!existsSync(L) && Date.now() < fin) await new Promise((r) => setTimeout(r, 200));",
+    'console.log(existsSync(L) ? "[FAIL] rouge-du-rejeu-factice" : "[FAIL] jamais-libere");',
+    "process.exit(1);",
+  ].join(NL) + NL, "utf8");
+  const tablePath = join(dossier, "table-recette.json");
+  writeFileSync(tablePath, JSON.stringify({ mesure_le: "2026-11-02", consommateurs: [{ depot: "faux-depot-long", skills: ["digit-ai-page-html"],
+    verification: { commande: ["node", "attendre.mjs"], delai_ms: VIE_FACTICE, extracteur: { nom: "banc", motif: "^\\s*\\[FAIL\\]\\s+(.+?)\\s*$", drapeaux: "gm", groupe: 1 } } }] }), "utf8");
+  const trace = join(dossier, "consommateurs-rouges.jsonl");
+  const etatPath = join(dossier, "rejeu-hebdomadaire.json");
+  const verrouPath = join(dossier, "rejeu-hebdomadaire.verrou");
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-rejeu-cwd-"));
+  const SECTION = "## Rejeu hebdomadaire des consommateurs des skills";
+  const lire = (p) => { try { return JSON.parse(readFileSync(p, "utf8")); } catch { return null; } };
+  const base = { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racine, FORGE_TRACE_CONSOMMATEURS: trace, FORGE_TABLE_CONSOMMATEURS: tablePath };
+  // `undefined` retire la variable du processus lancé : c'est ce qui rétablit le lancement.
+  const jouerRejeu = (extra = {}, enProduit = false) => {
+    const t0 = Date.now();
+    const out = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
+      { cwd, encoding: "utf8", timeout: DELAI_OUVERTURE, env: { ...base, ...extra } });
+    return { out, ms: Date.now() - t0 };
+  };
+  const LANCE = { FORGE_SANS_REJEU_HEBDOMADAIRE: undefined };
+  try {
+    const temoin = jouerRejeu({ FORGE_SANS_REJEU_HEBDOMADAIRE: "1" });
+    check("D-135 vert — FORGE_SANS_REJEU_HEBDOMADAIRE=1 : l'ouverture ne lance rien, n'écrit ni état ni verrou", () => {
+      if (temoin.out.includes(SECTION) || existsSync(etatPath) || existsSync(verrouPath)) throw new Error("un rejeu est lancé malgré le drapeau");
+    });
+
+    const lance = jouerRejeu(LANCE);
+    const apresRetour = attendreQue(() => lire(etatPath)?.dernier?.statut === "en-cours", 30000);
+    const verrou = lire(verrouPath);
+    check("D-135 rouge — l'ouverture lance le rejeu, REND LA MAIN sans l'attendre, et le rejeu lui survit (processus détaché, toujours en cours, verrou posé)", () => {
+      if (!lance.out.includes(SECTION) || !/lancé en arrière-plan/.test(lance.out)) throw new Error(`lancement non dit : ${lance.out.slice(lance.out.indexOf("## Rejeu") >= 0 ? lance.out.indexOf("## Rejeu") : 0, 400)}`);
+      if (existsSync(liberer)) throw new Error("le dépôt factice a été libéré avant la fin de l'ouverture");
+      if (!apresRetour || !verrou) throw new Error(`après le retour du hook : état ${JSON.stringify(lire(etatPath))}, verrou ${JSON.stringify(verrou)}`);
+      try { process.kill(verrou.pid, 0); } catch { throw new Error(`le processus du rejeu (pid ${verrou.pid}) n'a pas survécu à l'ouverture`); }
+    });
+    const msLancement = Number((/lancement en (\d+) ms/.exec(lance.out) || [])[1]);
+    console.log(`  (mesure : ouverture sans lancement ${temoin.ms} ms, avec lancement ${lance.ms} ms, appel de lancement ${msLancement} ms ; rejeu factice encore en cours au retour)`);
+    // TF-2234 (06/11/2026) : l'écart entre 2 ouvertures complètes mesurait la charge du poste, pas le lancement (96 s contre 47 s un passage,
+    // 40 s contre 52 s le suivant). Le coût se juge sur l'appel de lancement, mesuré dans le hook ; l'attente, sur le factice encore bloqué au retour
+    // (cas rouge ci-dessus) : une ouverture qui l'attendrait serait coupée à DELAI_OUVERTURE, bien avant VIE_FACTICE. L'écart reste affiché, pour information.
+    check("D-135 — 0 seconde de plus à attendre : le lancement lui-même prend moins de 2 s, mesuré dans le hook", () => {
+      if (!(msLancement < 2000)) throw new Error(`appel de lancement : ${msLancement} ms`);
+    });
+
+    const debut = lire(etatPath)?.dernier?.debut;
+    const seconde = jouerRejeu(LANCE);
+    check("D-135 — une seconde ouverture pendant que le rejeu tourne n'en lance pas un autre", () => {
+      if (/lancé en arrière-plan/.test(seconde.out)) throw new Error("un second rejeu est lancé");
+      if (lire(etatPath)?.dernier?.debut !== debut) throw new Error(`l'état a été réécrit : ${debut} -> ${lire(etatPath)?.dernier?.debut}`);
+    });
+
+    const autre = mkdtempSync(join(tmpdir(), "ouverture-rejeu-produit-"));
+    const produit = jouerRejeu({ ...LANCE, FORGE_TRACE_CONSOMMATEURS: join(autre, "consommateurs-rouges.jsonl") }, true);
+    check("D-135 — chez un produit (--pilot), l'ouverture ne lance aucun rejeu et n'écrit aucun état", () => {
+      if (produit.out.includes(SECTION) || existsSync(join(autre, "rejeu-hebdomadaire.json")) || existsSync(join(autre, "rejeu-hebdomadaire.verrou"))) throw new Error("un rejeu part d'un produit");
+    });
+    rmSync(autre, { recursive: true, force: true });
+
+    writeFileSync(liberer, "1", "utf8");
+    console.log(`  (mesure : rejeu factice libéré ${Date.now() - Date.parse(debut)} ms après son début, pour une vie de ${VIE_FACTICE} ms ; 120 000 ms avant TF-2234)`);
+    const fini =attendreQue(() => lire(etatPath)?.dernier?.statut === "termine", 60000);
+    const etat = lire(etatPath);
+    check("D-135 — le rejeu écrit sa date de début et de fin à côté de la trace, retire son verrou, et trace le rouge neuf avec son origine", () => {
+      if (!fini) throw new Error(`rejeu non terminé : ${JSON.stringify(etat)}`);
+      const c = etat.dernier_complet;
+      if (!c || !c.debut || !c.fin || Date.parse(c.fin) < Date.parse(c.debut) || c.debut !== debut) throw new Error(`dates : ${JSON.stringify(c)}`);
+      if (existsSync(verrouPath)) throw new Error("verrou non retiré");
+      const l = readFileSync(trace, "utf8").trim().split(NL).map((x) => JSON.parse(x));
+      if (l.length !== 1 || l[0].evenement !== "rouge-neuf" || l[0].depot !== "faux-depot-long" || l[0].origine !== "rejeu-hebdomadaire") throw new Error(`trace : ${JSON.stringify(l)}`);
+    });
+
+    const suivante = jouerRejeu(LANCE);
+    check("D-135 — à l'ouverture suivante, le rouge s'affiche (ligne « rejeu hebdomadaire », dépôt, commande, remède) et rien n'est relancé avant 7 jours", () => {
+      const l = suivante.out.split("## Consommateurs des skills")[1] || "";
+      if (!/rejeu hebdomadaire/.test(l) || !/faux-depot-long/.test(l) || !/node attendre\.mjs/.test(l) || !/--rejouer-consommateurs/.test(l)) throw new Error(`rouge non affiché : ${suivante.out.slice(0, 300)}`);
+      if (/lancé en arrière-plan/.test(suivante.out) || lire(etatPath)?.dernier?.debut !== debut) throw new Error("un rejeu a été relancé à moins de 7 jours");
+    });
+  } finally {
+    try { writeFileSync(liberer, "1", "utf8"); } catch { /* le dossier jetable est déjà retiré */ }
+    attendreQue(() => !existsSync(verrouPath), 15000);
+    rmSync(dossier, { recursive: true, force: true });
+    rmSync(cwd, { recursive: true, force: true });
+  }
+}
+
+// ---- TF-2067 : le journal d'héritage de l'ouverture du pilot s'écrit où FORGE_HERITAGE_RELEVES le désigne ------------------------------------
+// Tables de pseudonymes PRÉSENTES et produit connu d'elles : c'est le cas où l'ouverture journalise, donc le seul où une recette écrirait
+// `todo/HERITAGE-RELEVES.jsonl` si le déroutement manquait (jusqu'ici seule l'absence des tables l'en empêchait). Tout est jetable.
+if (veut(2067)) {
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-heritage-"));
+  const racine = join(dossier, "parc");
+  mkdirSync(join(racine, "produit-banc-heritage", "forge"), { recursive: true });
+  writeFileSync(join(racine, "produit-banc-heritage", "forge", "ledger.jsonl"), "", "utf8");
+  writeFileSync(join(dossier, "_noms-interdits.json"), JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+  writeFileSync(join(dossier, "_produits-pseudonymes.json"), JSON.stringify({ produits: { "produit-banc-heritage": "Produit-77" } }), "utf8");
+  const journal = join(dossier, "HERITAGE-RELEVES.jsonl");
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-heritage-cwd-"));
+  const jouer = (extra) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"],
+    { cwd, encoding: "utf8", timeout: 120000, env: { ...process.env, FORGE_ROOT: racine, FORGE_NOMS_INTERDITS: join(dossier, "_noms-interdits.json"),
+      FORGE_PRODUITS_PSEUDO: join(dossier, "_produits-pseudonymes.json"), FORGE_HERITAGE_RELEVES: journal, ...extra } });
+  try {
+    const sortie = jouer({});
+    check("TF-2067 vert — avec des tables présentes, le relevé d'héritage est journalisé dans le fichier désigné, sous pseudonyme", () => {
+      if (!existsSync(journal)) throw new Error(`rien écrit dans ${journal} (sortie : ${sortie.slice(0, 200)})`);
+      const lignes = readFileSync(journal, "utf8").split(NL).filter(Boolean);
+      if (lignes.length !== 1) throw new Error(`${lignes.length} lignes écrites, une attendue`);
+      const noms = (JSON.parse(lignes[0]).produits || []).map((p) => p.produit);
+      if (!noms.includes("Produit-77")) throw new Error(`pseudonyme absent du journal : ${noms.join(", ")}`);
+      if (/produit-banc-heritage/.test(lignes[0])) throw new Error("le nom réel du produit est entré dans le journal");
+    });
+  } finally {
+    rmSync(dossier, { recursive: true, force: true });
+    rmSync(cwd, { recursive: true, force: true });
+  }
+}
+
+veut(2335);
+// ---- TF-2335 (10/11/2026, RP-12 de Produit-84) : le remède prescrit à une collision d'indice est une commande qui MARCHE chez le produit.
+// Le message disait `node scripts/allouer-indice.mjs`, chemin relatif : chez un produit, ce script n'existe pas (il vit au pilot) et la
+// commande prescrite échouait. Le banc joue le hook d'un produit sans `scripts\` contre un pilot factice dont le contrôle d'unicité rend une
+// collision, puis EXÉCUTE la commande imprimée (le remède qu'on recommande se joue, TF-1013) : elle doit trouver son script.
+if (sectionVoulue) {
+  const pilotFactice = mkdtempSync(join(tmpdir(), "ouverture-indice-pilot-"));
+  const produitSansScripts = mkdtempSync(join(tmpdir(), "ouverture-indice-produit-"));
+  try {
+    const git = (...a) => execFileSync("git", ["-C", pilotFactice, "-c", "user.email=banc@example.invalid", "-c", "user.name=banc", ...a], { encoding: "utf8" });
+    git("init", "-q"); git("commit", "-q", "--allow-empty", "-m", "banc");
+    mkdirSync(join(pilotFactice, "scripts"), { recursive: true });
+    writeFileSync(join(pilotFactice, "scripts", "indices-uniques.mjs"), "console.log(JSON.stringify({ collisions: [{ ou: 'output/x.md', message: \"indice 'a' partagé : l'indice existe déjà\" }], passif: 0 }));" + NL);
+    writeFileSync(join(pilotFactice, "scripts", "allouer-indice.mjs"), "console.log('allouer-indice-joue');" + NL);
+    const sortie = execFileSync(process.execPath, [hook, "--sans-readme", "--pilot", pilotFactice], { cwd: produitSansScripts, encoding: "utf8", timeout: 120000 });
+    const m = sortie.match(/réindexer le plus récent : `(node [^`]+)`/);
+    check("TF-2335 vert — la collision d'indice est dite chez le produit avec une commande de réindexation", () => {
+      if (!m) throw new Error(`commande de réindexation absente de la sortie : ${sortie.slice(0, 300)}`);
+    });
+    check("TF-2335 vert — la commande imprimée porte le chemin RÉSOLU du pilot, pas un chemin relatif", () => {
+      const attendu = join(pilotFactice, "scripts", "allouer-indice.mjs").replace(/\\/g, "/");
+      if (!m || !m[1].includes(attendu)) throw new Error(`chemin du pilot absent de « ${m && m[1]} » (attendu : ${attendu})`);
+    });
+    check("TF-2335 vert — la commande imprimée, jouée depuis le produit, trouve son script", () => {
+      if (!m) throw new Error("pas de commande à jouer");
+      const r = spawnSync(m[1], { cwd: produitSansScripts, shell: true, encoding: "utf8" });
+      if (r.status !== 0 || !/allouer-indice-joue/.test(r.stdout || "")) throw new Error(`commande imprimée en échec (exit ${r.status}) : ${(r.stderr || "").slice(0, 200)}`);
+    });
+    check("TF-2335 rouge — l'ancien message (chemin relatif) échoue chez un produit sans scripts\\", () => {
+      const r = spawnSync("node scripts/allouer-indice.mjs", { cwd: produitSansScripts, shell: true, encoding: "utf8" });
+      if (r.status === 0) throw new Error("la commande relative réussit chez le produit : le banc ne distingue plus l'ancien message du nouveau");
+    });
+  } finally {
+    rmSync(pilotFactice, { recursive: true, force: true });
+    rmSync(produitSansScripts, { recursive: true, force: true });
+  }
+}
+
+// ---- TF-2442 (12/11/2026, RP-26) : un workflow hébergé en échec 2 fois de suite se dit à l'ouverture du pilot, relevé en arrière-plan -------------------
+// Le fait : le workflow de programmation des publications d'un produit a échoué 5 fois de suite du 03 au 12/11, 9 jours sans alerte. Un produit FICTIF (vrai
+// dépôt git, remote GitHub fictif jamais interrogé, un workflow local) et un FAUX `gh` qui ATTEND qu'on le libère : si l'ouverture attendait le relevé, elle ne
+// rendrait pas la main. Aucun réseau, aucun nom réel ; la trace et le parc sont jetables.
+if (veut(2442)) {
+  const dormir = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+  const attendreQue = (cond, ms) => { const fin = Date.now() + ms; while (Date.now() < fin) { if (cond()) return true; dormir(250); } return cond(); };
+  const dossier = mkdtempSync(join(tmpdir(), "ouverture-workflows-"));
+  const racine = join(dossier, "parc");
+  const produit = join(racine, "produit-fictif-a");
+  mkdirSync(join(produit, "forge"), { recursive: true });
+  writeFileSync(join(produit, "forge", "ledger.jsonl"), "", "utf8");
+  mkdirSync(join(produit, ".github", "workflows"), { recursive: true });
+  writeFileSync(join(produit, ".github", "workflows", "programmer.yml"), "name: programmer" + NL, "utf8");
+  spawnSync("git", ["init", "-q"], { cwd: produit });
+  spawnSync("git", ["remote", "add", "origin", "https://github.com/acme-fictif/depot-fictif.git"], { cwd: produit });
+  const liberer = join(dossier, "liberer"), appels = join(dossier, "appels-gh.txt"), trace = join(dossier, "workflows-heberges.json");
+  const DELAI_OUVERTURE = 240000;
+  const VIE_FACTICE = 3 * DELAI_OUVERTURE + 60000;
+  const runsFaux = [1, 2, 3, 4, 5].map((n) => ({ databaseId: n, workflowName: "programmer", status: "completed", conclusion: "failure", createdAt: `2026-11-0${n + 3}T06:00:00Z`, url: `https://exemple.invalid/runs/${n}` }));
+  const ghFaux = join(dossier, "gh-faux.mjs");
+  writeFileSync(ghFaux, [
+    'import { existsSync, appendFileSync } from "node:fs";',
+    `appendFileSync(${JSON.stringify(appels)}, process.argv.slice(2).join(" ") + ${JSON.stringify(NL)});`,
+    `const L = ${JSON.stringify(liberer)}; const fin = Date.now() + ${VIE_FACTICE};`,
+    "while (!existsSync(L) && Date.now() < fin) await new Promise((r) => setTimeout(r, 200));",
+    `console.log(${JSON.stringify(JSON.stringify(runsFaux))});`,
+  ].join(NL) + NL, "utf8");
+  const cwd = mkdtempSync(join(tmpdir(), "ouverture-workflows-cwd-"));
+  const SECTION = "## Workflows hébergés des produits";
+  const lire = (p) => { try { return JSON.parse(readFileSync(p, "utf8")); } catch { return null; } };
+  const base = { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racine, FORGE_TRACE_WORKFLOWS: trace, FORGE_GH_SCRIPT: ghFaux, FORGE_DELAI_GH_MS: String(VIE_FACTICE + 60000) };
+  const LANCE = { FORGE_SANS_RELEVE_WORKFLOWS: undefined };   // `undefined` retire la variable du processus lancé : c'est ce qui rétablit le lancement
+  const jouer = (extra = {}, enProduit = false) => {
+    const t0 = Date.now();
+    const out = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...(enProduit ? ["--pilot", PILOT] : [])],
+      { cwd, encoding: "utf8", timeout: DELAI_OUVERTURE, env: { ...base, ...extra } });
+    return { out, ms: Date.now() - t0 };
+  };
+  try {
+    const temoin = jouer({ FORGE_SANS_RELEVE_WORKFLOWS: "1" });
+    check("TF-2442 vert — FORGE_SANS_RELEVE_WORKFLOWS=1 : l'ouverture ne lance rien et ne dit rien des workflows", () => {
+      if (temoin.out.includes(SECTION) || existsSync(trace) || existsSync(`${trace}.verrou`) || existsSync(appels)) throw new Error("un relevé est lancé malgré le drapeau");
+    });
+
+    const premiere = jouer(LANCE);
+    const verrouPose = attendreQue(() => lire(`${trace}.verrou`) !== null, 30000);
+    const verrou = lire(`${trace}.verrou`);
+    check("TF-2442 rouge — l'ouverture lance le relevé, REND LA MAIN sans l'attendre, et le relevé lui survit (processus détaché, verrou posé, gh encore bloqué)", () => {
+      if (!premiere.out.includes(SECTION) || !/relevé relancé en arrière-plan/.test(premiere.out) || !/aucun relevé encore/.test(premiere.out)) throw new Error(`lancement non dit : ${premiere.out.slice(Math.max(0, premiere.out.indexOf("## Workflows")), 500)}`);
+      if (existsSync(liberer)) throw new Error("le faux gh a été libéré avant la fin de l'ouverture");
+      if (!verrouPose || !verrou) throw new Error(`après le retour du hook : verrou ${JSON.stringify(verrou)}`);
+      try { process.kill(verrou.pid, 0); } catch { throw new Error(`le processus du relevé (pid ${verrou.pid}) n'a pas survécu à l'ouverture`); }
+      if (existsSync(trace)) throw new Error("la trace existe avant que gh ait répondu : l'ouverture a attendu le relevé");
+    });
+    const msLancement = Number((/lancement en (\d+) ms/.exec(premiere.out) || [])[1]);
+    console.log(`  (mesure : ouverture sans lancement ${temoin.ms} ms, avec lancement ${premiere.ms} ms, appel de lancement ${msLancement} ms ; faux gh encore bloqué au retour)`);
+    check("TF-2442 — le hook reste synchrone et court : le lancement lui-même prend moins de 2 s, mesuré dans le hook (la coupure est à 60 s, la borne du hook à 45 s)", () => {
+      if (!(msLancement < 2000)) throw new Error(`appel de lancement : ${msLancement} ms`);
+    });
+
+    const pendant = jouer(LANCE);
+    check("TF-2442 — une seconde ouverture pendant que le relevé tourne n'en lance pas un autre", () => {
+      if (/relevé relancé en arrière-plan/.test(pendant.out)) throw new Error("un second relevé est lancé");
+      if ((readFileSync(appels, "utf8").match(/\n/g) || []).length !== 1) throw new Error(`gh appelé ${(readFileSync(appels, "utf8").match(/\n/g) || []).length} fois`);
+    });
+
+    const autre = mkdtempSync(join(tmpdir(), "ouverture-workflows-produit-"));
+    const enProduit = jouer({ ...LANCE, FORGE_TRACE_WORKFLOWS: join(autre, "t.json") }, true);
+    check("TF-2442 — chez un produit (--pilot), l'ouverture ne lance aucun relevé et n'écrit rien", () => {
+      if (enProduit.out.includes(SECTION) || existsSync(join(autre, "t.json")) || existsSync(join(autre, "t.json.verrou"))) throw new Error("un relevé part d'un produit");
+    });
+    rmSync(autre, { recursive: true, force: true });
+
+    writeFileSync(liberer, "1", "utf8");
+    const fini = attendreQue(() => lire(trace) !== null && !existsSync(`${trace}.verrou`), 60000);
+    check("TF-2442 — le relevé écrit sa trace (produit, workflow, 5 échecs de suite), retire son verrou, et n'a lancé que `gh run list`", () => {
+      const t = lire(trace);
+      if (!fini || !t) throw new Error(`relevé non terminé : trace ${JSON.stringify(t)}`);
+      const e = t.produits?.[0]?.en_echec?.[0];
+      if (t.produits.length !== 1 || t.produits[0].produit !== "produit-fictif-a" || e?.workflow !== "programmer" || e?.consecutifs !== 5) throw new Error(`trace : ${JSON.stringify(t.produits)}`);
+      const l = readFileSync(appels, "utf8").split(NL).filter(Boolean);
+      if (l.length !== 1 || !/^run list --repo acme-fictif\/depot-fictif /.test(l[0])) throw new Error(`appels à gh : ${JSON.stringify(l)}`);
+    });
+
+    const suivante = jouer(LANCE);
+    check("TF-2442 rouge — à l'ouverture suivante, le workflow en échec est NOMMÉ (produit, workflow, 5 fois de suite, depuis le 04/11, adresse) et rien n'est relancé avant 60 min", () => {
+      const l = suivante.out.split(SECTION)[1] || "";
+      if (!/produit-fictif-a/.test(l) || !/`programmer` en échec 5 fois de suite/.test(l) || !/depuis le 2026-11-04/.test(l) || !/exemple\.invalid\/runs\/5/.test(l) || !/1 en échec/.test(l)) throw new Error(`échec non affiché : ${suivante.out.slice(0, 400)}`);
+      if (/relevé relancé en arrière-plan/.test(suivante.out) || (readFileSync(appels, "utf8").match(/\n/g) || []).length !== 1) throw new Error("un relevé a été relancé à moins de 60 min");
+    });
+  } finally {
+    try { writeFileSync(liberer, "1", "utf8"); } catch { /* le dossier jetable est déjà retiré */ }
+    attendreQue(() => !existsSync(`${trace}.verrou`), 15000);
+    rmSync(dossier, { recursive: true, force: true });
+    rmSync(cwd, { recursive: true, force: true });
+  }
+}
+
+if (filtre.actif) { const c = conclureFiltre("hook-ouverture", filtre, fail ? [`${fail} contrôle(s) en échec (lignes [FAIL] ci-dessus)`] : []); (c.code === 0 ? console.log : console.error)(c.ligne); process.exit(c.code); }
+console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135 ; journal d'héritage, TF-2067 ; workflows hébergés en échec, TF-2442) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

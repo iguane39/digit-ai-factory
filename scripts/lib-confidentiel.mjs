@@ -33,3 +33,18 @@ export function cheminsTables(racine = racineParc()) {
   const origine = process.env.FORGE_NOMS_INTERDITS || process.env.FORGE_PRODUITS_PSEUDO ? "env" : existsSync(auCanal.produits) ? "canal" : "ancien";
   return { clients, produits, canal, origine };
 }
+
+// TF-2130 (04/11/2026) — UNE ENTRÉE DE LA TABLE DES PRODUITS PEUT ÊTRE UN OBJET. Un produit dont le
+// nom est aussi un mot courant s'inscrit `{ pseudo, formes }` : seules ses graphies déclarées sont
+// des mentions, à la casse exacte et en mot entier, comme la porte de publication les juge. Le
+// 05/11, l'accueil lisait encore la valeur comme une chaîne et aurait renommé trois lots
+// « [object Object] - RETOURS - … ». Tout lecteur de la table passe donc par ces deux fonctions.
+/** Le pseudonyme d'une entrée : la valeur elle-même, ou son champ `pseudo` ; sinon `null`. */
+export const pseudoDe = (v) => (typeof v === "string" ? v
+  : (v && typeof v === "object" && typeof v.pseudo === "string" ? v.pseudo : null));
+/** Les graphies déclarées d'une entrée objet, ou `null` : la clé nue vaut alors seule. */
+export const formesDe = (v) => {
+  if (!v || typeof v !== "object" || Array.isArray(v) || !Array.isArray(v.formes)) return null;
+  const f = v.formes.filter((x) => typeof x === "string" && x.trim());
+  return f.length ? f : null;
+};

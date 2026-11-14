@@ -21,7 +21,7 @@
 // réécriture sans retouche du script. Les tables ne sont jamais copiées dans le dépôt.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { cheminsTables } from "./lib-confidentiel.mjs";
+import { cheminsTables, pseudoDe, formesDe } from "./lib-confidentiel.mjs";
 
 const sortie = process.argv[2];
 if (!sortie) { console.error("usage : node scripts/generer-remplacements-historique.mjs <dossier-de-sortie>"); process.exit(2); }
@@ -41,8 +41,14 @@ for (const n of clients.noms || []) {
 }
 for (const i of clients.identifiants || []) { const c = clients.pseudonymes?.[i]; if (c) { lignes.push(`${i}==>${c}`); noms.push([i, c]); } }
 for (const g of clients.sigles || []) { const c = clients.pseudonymes?.[g]; if (c) lignes.push(`regex:(?i)(?<![A-Za-z0-9_])${esc(g)}(?![A-Za-z0-9_])==>${c}`); }
-for (const [k, v] of Object.entries(produits)) {
+for (const [k, entree] of Object.entries(produits)) {
   if (/^[A-Za-z]:[\\/]/.test(k)) continue;
+  const v = pseudoDe(entree);
+  if (!v) continue;
+  // TF-2130 : un produit homonyme d'un mot courant ne se remplace que dans ses graphies déclarées,
+  // à la casse exacte et en mot entier ; ni variante ni repli de casse.
+  const formes = formesDe(entree);
+  if (formes) { for (const f of formes) { lignes.push(`regex:(?<![A-Za-z0-9])${esc(f)}(?![A-Za-z0-9])==>${v}`); noms.push([f, v]); } continue; }
   // Un nom d'UN SEUL MOT (alias court, sigle de produit — 06/09/2026, TF-0826) se remplace MOT ENTIER et
   // insensible à la casse, comme la porte C5 le juge : un littéral toucherait l'intérieur d'un autre mot
   // (« Produit-09M », « escc ») et manquerait la graphie en minuscules d'un identifiant de run.

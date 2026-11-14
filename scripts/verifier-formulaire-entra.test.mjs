@@ -124,6 +124,13 @@ await check("PROPRIÉTÉ — l'option --user-agent remplace l'agent utilisateur"
 await check("ENTRÉE — sans adresse http(s), exit 2", async () => {
   const r = await lancer("pas-une-adresse");
   egal(r.code, 2, "code de sortie");
+  egal(r.j?.verdict, "NON_JUGEABLE", "verdict");
+});
+await check("VERROU — l'outil ne sort jamais de force et ferme chaque connexion (TF-2297 : 0xC0000409 sous Windows)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const code = readFileSync(OUTIL, "utf8").replace(/^\s*(\/\/|\*).*$/gm, "");
+  if (/process\.exit\s*\(/.test(code)) throw new Error("process.exit( est revenu dans l'outil");
+  if (!/["']Connection["']\s*:\s*["']close["']/.test(code)) throw new Error("l'en-tête Connection: close a disparu");
 });
 
 serveur.close();

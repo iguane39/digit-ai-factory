@@ -23,7 +23,7 @@ Delta : renommages du 11/08 stabilisés (produit `digit-ai-forge-audit` public M
 auditcore ; engagement `digit-ai-forge-audit_client-a` privé, pin submodule recalé). Forces :
 **séparation produit/tenant réalisée et vérifiée** (gate lint N0 : 0 mention tenant dans le
 produit ; 2 CI vertes, iso-parité produit/engagement) · référentiels riches (`core/` : 84
-ADRs, 184 contrôles, 18 dimensions, `invariants.json` = preuve bootstrap) · oracles présents
+ADRs, 185 contrôles, 18 dimensions, `invariants.json` = preuve bootstrap) · oracles présents
 (`oracles/smoke-parcours.mjs`, `verifier-couverture-fonctionnelle.mjs`) · sur mandat humain
 uniquement, jamais de déclenchement automatique. Faiblesses / dettes : **exploration
 exhaustive au standard des autres forges jamais menée** (entrées, sorties, contrat

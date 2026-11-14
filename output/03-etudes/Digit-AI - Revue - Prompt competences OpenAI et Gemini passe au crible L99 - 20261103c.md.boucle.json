@@ -1,0 +1,98 @@
+{
+  "schema": "l99-boucle@1",
+  "prompt": "Compétences OpenAI et Gemini dans la Factory",
+  "ouverture": "d'office : le prompt réécrit lance un run de conseil qui écrit, et l'analyse a relevé 2 bloquants sur le prompt d'origine",
+  "arbitre": {
+    "rubrique": "couches.md Ch1, 6 dimensions /100",
+    "arret": "0 bloquant et 0 majeur",
+    "seuil_score": null,
+    "gain_min": 3,
+    "borne": 3,
+    "garde_longueur": 0.15,
+    "retenue": "union_recomptee",
+    "verification_cloture": true,
+    "rejet_regression": true,
+    "score_de_passe": "le plus bas des 2 relecteurs, lecture à charge"
+  },
+  "passes": [
+    {
+      "n": 1,
+      "fichier": "prompt-p1.md",
+      "mots": 1361,
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": ["analyse", "passes précédentes", "journal de boucle", "fichiers OpenAI et Gemini sous output"]
+      },
+      "scores": { "A": 88, "B": 74 },
+      "score_mesure": 74,
+      "defauts": [
+        { "severite": "majeur", "defaut": "Prémisse invérifiable : skill claude-api sans chemin ni phrase exacte", "citation": "le skill `claude-api` couvre Claude seul, et dit de se taire dès qu'OpenAI ou Gemini est nommé", "vu_par": ["A", "B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes de la citation dans prompt-p1.md ; ls ~/.claude/skills | grep claude-api", "resultat": "citation présente ; aucun dossier claude-api, le skill est intégré à Claude Code" } },
+        { "severite": "majeur", "defaut": "Rien ne dit quoi faire si le rejeu diverge des chiffres cités", "citation": "Rejouer la mesure à l'ouverture. Si une adresse échoue, essayer WebFetch", "vu_par": ["A"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes de la citation dans prompt-p1.md", "resultat": "citation présente, aucune règle de divergence dans le fichier" } },
+        { "severite": "majeur", "defaut": "Pas de règle du tri au verdict, ni de verdict par fournisseur", "citation": "Une réponse en tête d'étude : « oui », « non » ou « pas encore »", "vu_par": ["A"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes de la citation dans prompt-p1.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "Critère de pertinence circulaire, unité non dite, besoins transverses écrasés", "citation": "Une compétence est **pertinente** si l'une de ces conditions est mesurée", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes de la citation dans prompt-p1.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "Jeu d'essai non reproductible, sans seuil, cas sans dépréciation non prévu", "citation": "3 lignes par catalogue tirées au hasard et rouvertes à leur adresse", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes de la citation dans prompt-p1.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "La règle « rien de mémoire » n'a pas de contrôle exécutable, aucun format de rendu des agents", "citation": "Aucune fonctionnalité, aucun nom de modèle, aucun prix ne s'écrit de mémoire", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes après normalisation des espaces et retrait du gras dans prompt-p1.md", "resultat": "citation présente sur deux lignes" } }
+      ],
+      "majeurs_clos": 0,
+      "rejetee": false,
+      "decision": "continuer"
+    },
+    {
+      "n": 2,
+      "fichier": "prompt-p2.md",
+      "mots": 1791,
+      "verification_cloture": { "agent": "verificateur neuf avec contexte", "note": false, "clotures": 5, "defauts_crees": 3, "detail": "défaut 3 partiellement fermé ; 3 défauts créés (colonne niveau absente, verdict inapplicable à la question 2, rangs pour n < 3), corrigés avant la relecture aveugle" },
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": ["analyse", "passes précédentes", "journal de boucle", "fichiers OpenAI et Gemini sous output"]
+      },
+      "scores": { "A": 88, "B": 84 },
+      "score_mesure": 84,
+      "defauts": [
+        { "severite": "majeur", "defaut": "Repli flou quand toutes les voies échouent, périmètre n indéfini", "citation": "Si une adresse échoue, essayer WebFetch, puis le dépôt de la", "vu_par": ["A"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes après normalisation des espaces dans prompt-p2.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "3 lignes contrôlées par catalogue, les autres extraits peuvent être inventés", "citation": "Les rangs en double se comptent une fois, et un catalogue de", "vu_par": ["A"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes après normalisation des espaces dans prompt-p2.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "Périmètre de mesure des couples non borné", "citation": "La doctrine ne l'interdit pas : c'est le produit qui paie ses appels, avec ses clés.", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p2.md ; recherche de « C:\\dev » dans le point 3", "resultat": "citation présente, aucun périmètre de dépôts écrit" } },
+        { "severite": "majeur", "defaut": "Le seuil de 100 % porte sur deux états du tableau", "citation": "100 % des lignes avec adresse, date de lecture, extrait, niveau et motif.", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes après normalisation des espaces dans prompt-p2.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "« Véhicule existant » non défini, claude-api ambigu", "citation": "Une compétence qui n'entre dans aucun véhicule le dit et propose le sien.", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes après normalisation des espaces dans prompt-p2.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "Ni longueur, ni plan, ni lecteur pour l'étude", "citation": "chiffres mesurés à l'appui, et si chaque « oui » nomme la compétence", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p2.md ; recherche de « mots au plus » et « Plan »", "resultat": "citation présente, aucune longueur ni plan" } }
+      ],
+      "majeurs_clos": 5,
+      "rejetee": false,
+      "decision": "continuer"
+    },
+    {
+      "n": 3,
+      "fichier": "prompt-p3.md",
+      "mots": 2019,
+      "verification_cloture": { "agent": "verificateur neuf avec contexte", "note": false, "clotures": 5, "defauts_crees": 3, "detail": "défaut 1 partiellement fermé ; 3 défauts créés (n à deux sens, script non nommé, colonnes et bibliothèques), corrigés avant la relecture aveugle" },
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": ["analyse", "passes précédentes", "journal de boucle", "fichiers OpenAI et Gemini sous output"]
+      },
+      "scores": { "A": 86, "B": 88 },
+      "score_mesure": 86,
+      "defauts": [
+        { "severite": "majeur", "defaut": "Un code 200 peut rendre une page vide ou un shell JavaScript", "citation": "Code 200 sur :", "vu_par": ["A"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p3.md ; recherche de « lisible »", "resultat": "citation présente, aucun critère de lisibilité" } },
+        { "severite": "majeur", "defaut": "Commande exacte des dépendances déclarées absente", "citation": "Relevé du 03/11/2026 à 14:55 :", "vu_par": ["A"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p3.md ; rejeu du relevé des dépendances à 15:09 avec un motif large", "resultat": "citation présente ; le rejeu trouve 1 dépôt et non 0 : prémisse fausse relevée par la session" } },
+        { "severite": "majeur", "defaut": "Dépôts publics non définis", "citation": "Les dépôts publics ne nomment un produit que par son pseudonyme.", "vu_par": ["A"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p3.md", "resultat": "citation présente, aucune liste de dépôts publics" } },
+        { "severite": "majeur", "defaut": "Aucune section nommée pour la question 1 dans le plan", "citation": "Les deux questions dans deux sections distinctes.", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p3.md ; lecture du plan du contrat de sortie", "resultat": "citation présente, le plan ne nomme pas la question 1" } },
+        { "severite": "majeur", "defaut": "Lignes relues par WebFetch sans preuve ni compteur", "citation": "Une page illisible sans JavaScript se relit par WebFetch, et la ligne le note.", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p3.md", "resultat": "citation présente" } },
+        { "severite": "majeur", "defaut": "Méthode de comptage de N_index absente", "citation": "`N_index` compte les entrées de la source lue", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p3.md", "resultat": "citation présente, aucune commande de comptage" } },
+        { "severite": "majeur", "defaut": "Format B ni cité par son chemin ni décrit", "citation": "La session la réserve par", "vu_par": ["B"], "statut": "retenu", "dementi": false, "recompte": { "commande": "String.includes dans prompt-p3.md ; recherche de « RESTITUTION.md » au point Décision", "resultat": "citation présente, chemin absent du point Décision" } }
+      ],
+      "majeurs_clos": 6,
+      "rejetee": false,
+      "decision": "arreter"
+    }
+  ],
+  "arret": { "passe": 3, "raison": "gain_insuffisant" },
+  "apres_arret": {
+    "version_remise": "output/04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md",
+    "mots": 2369,
+    "corrections": "7 majeurs de la passe 3 et la prémisse fausse des dépendances (0 dépôt devenu 1), fermés et vérifiés par un agent qui ne note pas (8 clôtures sur 8) ; 3 défauts créés signalés par lui, corrigés : mentions 27 devenues 31 au recompte de 15:14 (28 dépôts et 3 copies de travail), « besoin avéré » défini, rang du jeu d'essai pour n < 3 ; version non renotée"
+  },
+  "score_affiche": { "valeur": 86, "nature": "mesure" }
+}

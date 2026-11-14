@@ -151,46 +151,98 @@ export function classesDuPilot(pilot) {
   } catch { return null; }
 }
 
-/**
- * TF-1988 — les entrées `type: retour` du ledger COURANT du produit (`forge\ledger.jsonl`) qu'aucun lot de
- * `forge\retours\` ne cite par son seq, consignées depuis plus de `seuilH` heures. Pour chacune : `seq`, `jours`
- * (null si le `ts` est illisible), `classe` (champ `classe` de l'entrée, s'il existe) et `classeInconnue` (la classe
- * n'est pas au référentiel du pilot et n'est pas « classe-a-creer » ; `null` si l'entrée n'en porte pas ou si le
- * référentiel est illisible). Une entrée qui porte elle-même un champ `lot` est tenue pour compilée.
- * Rend `null` quand le produit n'a pas de ledger lisible : ce n'est pas « zéro retour », c'est « non relevé ».
- */
-export function retoursSansLot(produit, pilot, { maintenant = Date.now(), seuilH = SEUIL_H } = {}) {
+// ---- TF-2260 (06/11/2026) : LE JOURNAL HORS RUN COMPTE AUSSI -----------------------------------------------------------
+// Hors run, `ledger.py` inscrit un retour à `forge/hors-run.jsonl` (TF-2223), dont le `seq` repart de 1 comme celui du ledger du run : un lot
+// qui cite « seq 3 » ne dit pas lequel. Un lot cite donc un retour hors run par un segment qui nomme ce journal, terminé par « ; » ou la fin
+// de ligne : « Références hors run : forge/hors-run.jsonl seq 1, 2 ; ledger seq 11 ». Le segment hors run ne compte jamais pour le ledger.
+const SEGMENT_HORS_RUN = /hors[\s-]?run(?:\.jsonl)?[^;\n]*/gi;
+
+/** Les numéros de seq que le texte d'un lot cite pour le journal hors run (segments « hors-run … seq n »). */
+export function seqCitesHorsRun(texte) {
+  const cites = new Set();
+  for (const m of String(texte).matchAll(SEGMENT_HORS_RUN)) for (const s of seqCites(m[0])) cites.add(s);
+  return cites;
+}
+
+/** Le texte d'un lot sans ses segments hors run : ce qu'il cite du ledger du run, et rien d'autre. */
+export const sansCitationsHorsRun = (texte) => String(texte).replace(SEGMENT_HORS_RUN, " ");
+
+const retoursDe = (fichier) => {
   let brut;
-  try { brut = readFileSync(join(produit, "forge", "ledger.jsonl"), "utf8"); } catch { return null; }
+  try { brut = readFileSync(fichier, "utf8"); } catch { return null; }
   const retours = [];
   for (const l of brut.split(/\r?\n/)) {
     if (!l.trim()) continue;
     let e; try { e = JSON.parse(l); } catch { continue; }
     if (e && e.type === "retour" && Number.isInteger(e.seq)) retours.push(e);
   }
-  if (!retours.length) return [];
-  const citees = new Set();
+  return retours;
+};
+
+/**
+ * TF-1988 — les entrées `type: retour` du ledger COURANT du produit (`forge\ledger.jsonl`) qu'aucun lot de
+ * `forge\retours\` ne cite par son seq, consignées depuis plus de `seuilH` heures. Pour chacune : `seq`, `jours`
+ * (null si le `ts` est illisible), `classe` (champ `classe` de l'entrée, s'il existe) et `classeInconnue` (la classe
+ * n'est pas au référentiel du pilot et n'est pas « classe-a-creer » ; `null` si l'entrée n'en porte pas ou si le
+ * référentiel est illisible). Une entrée qui porte elle-même un champ `lot` est tenue pour compilée.
+ * TF-2260 : les entrées `type: retour` du journal hors run (`forge\hors-run.jsonl`, où `ledger.py` écrit quand aucun run
+ * n'est ouvert) entrent dans la même liste, marquées `horsRun: true`, et se comptent contre les segments « hors-run … seq n »
+ * des lots — leur `seq` n'est pas celui du ledger du run.
+ * Rend `null` quand le produit n'a ni ledger ni journal hors run lisible : ce n'est pas « zéro retour », c'est « non relevé ».
+ */
+export function retoursSansLot(produit, pilot, { maintenant = Date.now(), seuilH = SEUIL_H } = {}) {
+  const duRun = retoursDe(join(produit, "forge", "ledger.jsonl"));
+  const horsRun = retoursDe(join(produit, "forge", "hors-run.jsonl"));
+  if (duRun === null && horsRun === null) return null;
+  const aTraiter = [...(duRun || []).map((e) => ({ e, horsRun: false })), ...(horsRun || []).map((e) => ({ e, horsRun: true }))];
+  if (!aTraiter.length) return [];
+  const citees = new Set(), citeesHorsRun = new Set();
   const d = join(produit, "forge", "retours");
   let noms = [];
   try { noms = readdirSync(d); } catch { /* pas de dossier de lots : aucune seq citée */ }
   for (const n of noms) {
     if (!/\.(?:md|tf\.jsonl)$/i.test(n)) continue;
-    try { for (const s of seqCites(readFileSync(join(d, n), "utf8"))) citees.add(s); } catch { /* lot illisible */ }
+    try {
+      const texte = readFileSync(join(d, n), "utf8");
+      for (const s of seqCites(sansCitationsHorsRun(texte))) citees.add(s);
+      for (const s of seqCitesHorsRun(texte)) citeesHorsRun.add(s);
+    } catch { /* lot illisible */ }
   }
   const classes = classesDuPilot(pilot);
   const sortie = [];
-  for (const e of retours) {
-    if (citees.has(e.seq) || e.lot) continue;
+  for (const { e, horsRun: hr } of aTraiter) {
+    if ((hr ? citeesHorsRun : citees).has(e.seq) || e.lot) continue;
     const t = Date.parse(e.ts);
     const age = Number.isFinite(t) ? (maintenant - t) / 3600000 : Infinity;
     if (age <= seuilH) continue;
     const classe = typeof e.classe === "string" && e.classe.trim() ? e.classe.trim() : null;
     sortie.push({
-      seq: e.seq, jours: Number.isFinite(age) ? Math.floor(age / 24) : null, classe,
+      seq: e.seq, ts: typeof e.ts === "string" ? e.ts : null, jours: Number.isFinite(age) ? Math.floor(age / 24) : null, classe, horsRun: hr,
       classeInconnue: classe && classes ? (classe !== "classe-a-creer" && !classes.has(classe)) : null,
     });
   }
-  return sortie.sort((a, b) => a.seq - b.seq);
+  return sortie.sort((a, b) => (a.horsRun === b.horsRun ? a.seq - b.seq : (a.horsRun ? 1 : -1)));
+}
+
+// ---- TF-2329 (10/11/2026, décision humaine D-191 (a)) : LE LOT PART DANS LE TOUR OÙ LE RETOUR EST ÉCRIT -----------------------------
+// Le 09/11/2026, `retoursSansLot` rendait 104 entrées sans lot chez un produit, la plus ancienne de 59 jours ; l'alerte d'ouverture (TF-1988) s'affichait
+// à 7 sessions du jour, aucune n'a compilé de lot : le contrat disait « à la clôture du run », et ce produit comptait 2 `run_open` pour 0 clôture.
+// L'alerte informe, elle n'arrête rien. `retoursDuTourSansLot` en fait la matière d'une porte : parmi les retours sans lot, ceux dont le `ts` tombe
+// DEPUIS le début du tour. Le hook de fin de tour (`hook-restitution.mjs`, contrôle LOT) refuse alors le tour ; un retour écrit AVANT le tour reste
+// à l'alerte d'ouverture. Aucune lecture du ledger n'est recodée : c'est `retoursSansLot`, sans seuil d'âge, filtré par date.
+
+/**
+ * Les entrées `type: retour` du ledger du produit et du journal hors run écrites DEPUIS `depuis` (ISO, début du tour) et qu'aucun lot de
+ * `forge\retours\` ne cite. Chacune : { seq, ts, horsRun, classe, … } (voir `retoursSansLot`). `ts` du ledger est à la seconde, tronqué : la borne
+ * tolère 999 ms. Rend `null` quand le début du tour est illisible ou que le produit n'a ni ledger ni journal hors run : ce n'est pas « zéro », c'est
+ * « non relevé », et le contrôle n'accuse alors personne.
+ */
+export function retoursDuTourSansLot(produit, pilot, { depuis = null } = {}) {
+  const t0 = Date.parse(depuis);
+  if (!Number.isFinite(t0)) return null;
+  const sans = retoursSansLot(produit, pilot, { seuilH: -Infinity });
+  if (sans === null) return null;
+  return sans.filter((r) => { const t = Date.parse(r.ts); return Number.isFinite(t) && t + 999 >= t0; });
 }
 
 /**

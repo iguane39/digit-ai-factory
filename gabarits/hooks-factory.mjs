@@ -56,13 +56,37 @@ const [nom, ...options] = process.argv.slice(2);
 // une décision groupée pour tous les gestes destructifs distants du tour, jamais une confirmation par commande :
 // `az … delete`, `terraform destroy`, une attribution de droits, `gh repo delete`, `git push --force` sont refusés
 // tant qu'aucun lot approuvé valide (forge/gestes-approuves.jsonl, 24 h au plus) ne les couvre. Bloque. Le mode
-// `--poser` (écrire le lot approuvé) n'a pas non plus l'usage de l'entrée standard.
+// `--poser` (écrire le lot approuvé) n'a pas non plus l'usage de l'entrée standard. TF-2084 (04/11/2026) : le même hook,
+// en PreToolUse et en PostToolUse, tient le registre `forge/gestes-en-cours.jsonl` des gestes distants ouverts par les
+// sessions du produit et AVERTIT quand une autre session a un geste ouvert sur la même ressource ; `--ouvrir`, `--clore`
+// et `--lister` déclarent ou lisent un geste à la main (un banc), sans entrée standard non plus.
+// `mutation-en-cours` (04/11/2026, TF-2126) : hook PreToolUse sur Bash et PowerShell — la campagne de mutation de
+// forge-tests altère les sources EN PLACE et pose `.forge-tests-mutation-en-cours` (TF-2091) ; tant que ce verrou
+// existe, `git commit`, le `git add` d'un fichier muté et un déploiement sont refusés, avec les fichiers mutés
+// nommés et le remède d'un verrou orphelin (pid mort). Bloque.
+// `lecons` (04/11/2026, TF-2150, décision humaine D-172 (a)) : hook PreToolUse sur Bash, PowerShell, Write, Edit et
+// MultiEdit — la table des leçons du pilot (references/LECONS.json) et celle du produit (forge/LECONS.jsonl) sont lues
+// au moment du geste : la leçon dont le déclencheur correspond entre au contexte, citée comme une donnée (600 caractères
+// au plus, 3 leçons au plus), et chaque rappel servi s'écrit à forge/lecons-rappels.jsonl. Une leçon en barrière, qui
+// refuse le geste au pilot, AVERTIT seulement chez un produit en v1. Ne bloque jamais chez un produit.
+// `couts` (05/11/2026, TF-2181, GO humain « A1 », lecture de la charge D-177) : hook SessionEnd et SessionStart (asynchrone,
+// `--rattraper`) — la session qui se ferme est relevée par scripts/relever-couts.mjs du pilot et sa ligne s'écrit à
+// forge/couts-<poste>.jsonl : jetons, temps actif, charge en 3 indicateurs séparés, ventilation par run et par étape. Aucun montant
+// écrit ; ne bloque jamais.
+// `controles-produit` (06/11/2026, TF-2211, retour RP-31 de Produit-86) : hook PostToolUse sur Bash et PowerShell — la clé
+// `controles_produit` de forge/PROFIL.json désigne les contrôles PROPRES du produit (commande en tableau, `quand` : run_open, run_close) ;
+// la commande qui vient d'écrire un run_open ou un run_close au ledger les déclenche, et leur verdict entre au contexte de la session. Ne bloque jamais.
+// `suivi-agents` (12/11/2026, D-209 (a), prompt « Suivi des agents toutes les 15 minutes » 20261112g) : hook Stop en `asyncRewake`
+// (`--veille`) et hook PostToolUse — tant qu'un sous-agent de la session tourne, la session est réveillée toutes les 15 minutes, même
+// après la fin de son tour, et écrit un point « Suivi agents » : état de chaque agent jugé de l'extérieur (actif, silencieux, commande
+// longue, présumé arrêté, fini) avec l'âge mesuré, tâches faites et restantes lues à son fichier d'avancement. La veille attend jusqu'à
+// 19 min : le délai du lanceur est porté à 1 190 s pour elle seule. Ne bloque jamais un outil.
 // `fichiers-env` (29/10/2026, décision humaine D-106 (b)) : hook PreToolUse sur Read, Grep, Bash et PowerShell — « les .env
 // ne transitent jamais » se joue sur l'outil qui lit : Read et Grep d'un `.env*`, et les commandes qui en affichent le
 // contenu (cat, type, Get-Content, head, tail, less, more, grep, sed, awk, Select-String, copie vers la sortie standard)
 // sont refusés ; `.env.example`, `.env.sample` et `.env.template` passent. Voie permise : `scripts/env-masque.mjs` du
 // pilot (valeurs masquées, ou clés seules). Bloque.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "fichiers-env"]);
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents", "fichiers-env"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [
@@ -80,12 +104,13 @@ if (!pilot) {
 // la lire attendait sa fermeture, et un préjugement lancé avec une entrée ouverte n'a rien rendu en
 // 9 minutes le 14/10. Elle n'est donc pas lue en préjugement, ni quand elle est un terminal.
 let stdin = "";
-if (!options.includes("--prejuger") && !options.includes("--poser") && !process.stdin.isTTY) {
+if (!["--prejuger", "--poser", "--ouvrir", "--clore", "--lister"].some((o) => options.includes(o)) && !process.stdin.isTTY) {
   try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin (SessionStart) */ }
 }
 const argv = [join(pilot, "oracles", `hook-${nom}.mjs`), ...options];
 if (nom === "ouverture") argv.push("--pilot", pilot);
-const r = spawnSync(process.execPath, argv, { encoding: "utf8", input: stdin, cwd: PRODUIT, timeout: 230000 });
+const delai = nom === "suivi-agents" && options.includes("--veille") ? 1190000 : 230000;
+const r = spawnSync(process.execPath, argv, { encoding: "utf8", input: stdin, cwd: PRODUIT, timeout: delai });
 if (r.stdout) process.stdout.write(r.stdout);
 if (r.stderr) process.stderr.write(r.stderr);
 process.exit(r.status ?? 0);

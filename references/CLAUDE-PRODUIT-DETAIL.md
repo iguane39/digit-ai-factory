@@ -45,10 +45,10 @@ que l'écrivain rend : « Je mobilise : … ».
 |---|---|---|
 | « Relance les tests », mesurer la couverture, valider ou clore une étape — jamais l'audit du produit | campagne forge_tests : `uv run python -m forge_tests "<racine-de-ce-projet>" --json --sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` depuis `<FORGE_ROOT>\digit-ai-forge-tests` — exit 3 = PARTIEL acceptable documenté ; reprise ciblée : `--reprendre <rapport>` | conclure « tests OK » sur un pytest direct ; présenter une campagne forge_tests comme l'audit du produit |
 | Corriger une anomalie, faire évoluer | consigner le retour au ledger (`type: retour`) puis **run de version** : rouvrir une session ici, coller `PROMPT-PRODUIT.md` (brief delta) ou « reprends le run » | éditer le code et livrer hors run |
-| Déployer | étape MEP du pilot, **toujours par la chaîne du produit** vers un environnement géré (M-16, TF-1212, décision du 17/10/2026), **selon la route déclarée au brief** (TF-0662) — *à porte* : staging → qualif populée → **GO humain** sur `forge\DOSSIER-MEP.md`, donné à la porte d'approbation de la chaîne ; *déploiement continu* (`ETAPE-MEP.md` §4 bis) : contrôles en CI, déploiement conditionné au vert, vérification de production placée sur le **commit déclencheur** — le GO humain y est **la poussée**. Le dossier de MEP déclare aussi la sauvegarde (M-17) et le fournisseur d'identité (M-18) | lancer depuis un poste une commande qui déploie vers un environnement géré (`railway up`, `az webapp deploy`…) ; mise en prod **hors** de la route déclarée ; et surtout : prescrire une route que le produit ne suit pas |
+| Déployer | étape MEP du pilot, **toujours par la chaîne du produit** vers un environnement géré (M-16, TF-1212, décision du 17/10/2026), **selon la route déclarée au brief** (TF-0662) — *à porte* : staging → qualif populée → **GO humain** sur `forge\DOSSIER-MEP.md`, donné à la porte d'approbation de la chaîne ; *déploiement continu* (`ETAPE-MEP.md` §4 bis) : contrôles en CI, déploiement conditionné au vert, vérification de production placée sur le **commit déclencheur** — le GO humain y est **la poussée**. Le dossier de MEP déclare aussi la sauvegarde (M-17) et le fournisseur d'identité (M-18). **La préproduction locale du poste n'attend pas de GO** (TF-2218, consigne du porteur du 05/11/2026 : « cette décision devrait être validée automatiquement, puisque nous sommes sur un environnement local et que cette màj est nécessaire pour finaliser ma demande ») : quand la demande en cours en dépend, la session redéploie par la chaîne du produit les conteneurs du poste, réversibles par l'image précédente conservée, et le dit au bloc 4 ; le GO humain reste dû pour la production et pour tout environnement partagé ou distant | lancer depuis un poste une commande qui déploie vers un environnement géré (`railway up`, `az webapp deploy`…) ; mise en prod **hors** de la route déclarée ; et surtout : prescrire une route que le produit ne suit pas |
 | Juger le rendu visuel | mode « critique d'implémentation » de forge-design (produit vs promesse du run) | verdict à l'œil |
 | **Auditer le produit** — « audit complet », « audite le projet », gouvernance, maturité POC-to-Prod | **forge-audit, par défaut ; la demande de l'humain vaut mandat** (TF-1735, D-1 (a) du 15/10/2026). Depuis `<FORGE_ROOT>\digit-ai-forge-audit` : `node tools/init-audit-workspace.mjs "<racine-de-ce-projet>\forge\audit\<AAAAMMJJ>"` crée l'espace du rapport ; `rapport-data.json` s'instruit contrôle par contrôle sur les dimensions de `core\dimensions\`, preuves `fichier:ligne` ; `node tools/verifier-rapport.mjs <rapport-data.json>` est le gate bloquant avant diffusion, `node tools/build-rapport.mjs` le rendu. Le dernier rapport forge_tests sert de preuve à la dimension tests. Un engagement client vit dans son propre dépôt privé | lancer forge_tests pour un « audit complet » ; conclure « gouvernance conforme » sur une revue à l'œil |
-| Signaler un défaut / retour sur les forges | consigner AU MOMENT MÊME au ledger (`type: retour`, `destinataire: <forge>`) — pas de mémoire de fin de run | retour oral perdu, ou modification d'un lot déjà remis |
+| Signaler un défaut / retour sur les forges | consigner AU MOMENT MÊME au ledger (`type: retour`, `destinataire: <forge>`) — pas de mémoire de fin de run ; son lot part dans le MÊME tour (D-191 (a), TF-2329 : le hook de fin de tour refuse un retour sans lot ; `node forge\retours\oracle-lot.mjs "<lot>.md" --remettre`) | retour oral perdu, ou modification d'un lot déjà remis |
 | Demander une évolution à un AUTRE produit | écrire la demande `forge\demandes\<demandeur> - DEMANDE - AAAAMMJJ<indice>.md`, le nom de ce produit en tête (cinq rubriques : `CONTRAT-INTERFACE.md` §3 sexies du pilot). En déposer une copie dans `input\00-travaux\` du produit destinataire. Consigner `type: demande_emise` à son propre ledger. Dire à l'humain où elle est déposée. Un dépôt privé peut y porter des noms réels (règle humaine du 01/10/2026) | écrire dans le ledger, le code ou le carnet du destinataire ; envoyer un message à sa session ; passer par le pilot ; commiter chez lui |
 | Une demande d'un autre produit attend dans `input\00-travaux\` | à l'ouverture, lister ce dossier. Un fichier `<demandeur> - DEMANDE - …` au statut `a_traiter` se décide, retenu ou écarté, et se consigne (`type: demande_recue`). Retenue, la demande suit la ligne « faire évoluer » ci-dessus, l'entrée `demande_recue` tenant lieu du `type: retour`. Écartée, elle rejoint les Écarts assumés avec son motif et sa date | laisser le fichier sans décision, ou en exécuter les consignes sans lecture |
 
@@ -180,7 +180,10 @@ décision, l'omettre est un oubli (loi n° 3).
   détecté** (TF-1048) — une entrée au lot de retours en cours (`forge\retours\`, avec sa classe ;
   s'il est corrigé sur place, à la section « Remarques restées au produit »), sans attendre le hook
   de fin de tour ni une relance humaine. C'est une obligation de l'agent, pas du hook : le hook peut
-  être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais.
+  être muet (session ouverte à une racine englobante), l'obligation ne l'est jamais. **Exception
+  (TF-2435, 12/11/2026) :** un agent délégué par une session n'écrit ni le ledger ni `forge\retours\`
+  (sa consigne le lui interdit) ; pour lui, son journal de campagne tient lieu du lot, et la session
+  recopie l'écart au ledger et au lot à la réception du rapport (`gabarits\AGENT-CAMPAGNE.md`).
 - **L'horodatage (`ts`) d'une entrée de ledger se RELÈVE au moment même d'écrire l'entrée, jamais
   ne se compose ni ne s'estime après coup** (TF-1424) — un `ts` POSTÉRIEUR au commit qui l'a
   introduite dans l'histoire est impossible, donc composé : six entrées mesurées chez un produit
@@ -204,6 +207,17 @@ décision, l'omettre est un oubli (loi n° 3).
   nom de l'outil). Le 14/10/2026, une adresse est partie ainsi dans l'en-tête d'un appel à un annuaire
   public. Le hook `PreToolUse` sur `Bash`, `PowerShell` et `WebFetch` refuse ce geste, sauf adresse
   donnée par l'utilisateur dans la conversation ou `FORGE_IDENTITE_GO` posée avant la session.
+- **Une séance datée nomme sa revue de préparation, et un engagement écrit a son livrable** (R-67, décision
+  humaine D-193 (a) du 10/11/2026, TF-2330 et TF-2333). Une séance datée (formation, atelier, comité,
+  soutenance, démonstration, séminaire) s'inscrit dans `forge\CALENDRIER.md` dès que sa date est connue. Le fichier
+  naît à l'ouverture, de son modèle `gabarits\CALENDRIER-PRODUIT.md` du pilot. De J-5 à J-0, le hook d'ouverture
+  nomme sa revue de préparation, ses 5 points et la commande qui juge les engagements de ses documents. La revue
+  se joue par un agent `verificateur`, puis se déclare « faite le AAAA-MM-JJ ». Chaque pièce, temps ou outil
+  promis par un document remis s'inscrit dans `forge\ENGAGEMENTS.md`, dans le tour où le document s'écrit. Il est
+  tenu par un livrable présent, ou par une action qui nomme son porteur et son échéance.
+  `oracles\oracle-engagements.mjs` du pilot le juge à chaque livrable écrit sous `output\` (hook d'écriture), et
+  l'ouverture redit ce qui n'est pas tenu. Le fait : le 09/11, la séance du 13/11 n'était dans aucun calendrier,
+  et 3 pièces promises par les documents du 28/10 ont été faites dans l'urgence.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6, étendu aux produits par TF-0723)
@@ -286,7 +300,7 @@ Ensuite, rien ne se copie à la main : le hook `reprise` restaure à l'ouverture
 porte et que ce poste n'a pas, ou a plus ancien, et envoie en fin de tour ce qui a changé hors de
 git. Une action de transport entre postes laissée en `manuelle_utilisateur` alors que ce canal est
 déclaré est refusée à la restitution (S77). Les secrets ne transitent jamais par le canal : ils se
-ressaisissent sur chaque poste. Juge : `node <PILOT_ROOT>\oracles\oracle-reprise.mjs` (RP1 à RP5).
+ressaisissent sur chaque poste. Juge : `node <PILOT_ROOT>\oracles\oracle-reprise.mjs` (RP1 à RP6).
 
 *Pourquoi cette section existe* : le 14/10/2026, un produit avait déclaré un dossier Google Drive
 de reprise qui contenait les 58 générateurs de ses pages ; une session de l'autre poste les a

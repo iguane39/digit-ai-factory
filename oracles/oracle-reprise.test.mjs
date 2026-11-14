@@ -4,13 +4,15 @@
  *
  * Le cas fondateur se rejoue tel quel : un canal qui porte les générateurs, un poste qui ne les a
  * pas. RP4 doit le voir (FAIL), la restauration doit le lever (PASS), sans geste humain. Chaque
- * refus a son remède joué : un secret retiré du manifeste, un feu vert consigné.
+ * refus a son remède joué : un secret retiré du manifeste, un feu vert consigné, l'ancien chemin d'un
+ * dossier renommé gardé dans .gitignore (RP6, TF-2441).
  *
  * Joué par `oracles\self-tests.mjs` (I1 via DEDIES, I2 comme tout `*.test.mjs`).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, utimesSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { execFileSync } from "node:child_process";
 import { verifier, synchroniser, estExclu } from "./oracle-reprise.mjs";
 
 let pass = 0, fail = 0;
@@ -30,6 +32,18 @@ function banc({ envoi, elements = ["scripts/generateurs", "input"] } = {}) {
   mkdirSync(canal, { recursive: true });
   writeFileSync(join(produit, "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { fournisseur: "Google Drive", chemins: [join(d, "absent"), canal] }, elements, ...(envoi ? { envoi } : {}) }));
   return { produit, canal, opt: { etat } };
+}
+// Un banc dont le produit est un dépôt git : le .gitignore dit ce que git ignore (TF-2441).
+function bancGit(gitignore, suivis = {}) {
+  const b = banc({ elements: ["input"] });
+  const env = { ...process.env }; for (const k of ["GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"]) delete env[k];
+  const git = (...a) => execFileSync("git", a, { cwd: b.produit, env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  git("init", "-q"); git("config", "user.email", "t@t.t"); git("config", "user.name", "t");
+  writeFileSync(join(b.produit, ".gitignore"), gitignore, "utf8");
+  for (const [rel, contenu] of Object.entries(suivis)) ecrire(join(b.produit, rel), contenu);
+  git("add", "-A"); git("commit", "-q", "-m", "socle");
+  b.visibles = () => git("status", "--porcelain", "-uall").split("\n").filter((l) => l.startsWith("??")).map((l) => l.slice(3));
+  return b;
 }
 const GO = { actif: true, go_publication: { decision: "D-3 (b) du 15/10/2026", date: "2026-10-15", par: "humain" } };
 
@@ -122,5 +136,47 @@ check("manifeste invalide (chemin absolu, « .. ») : RP1 FAIL ; exclusions par 
   if (estExclu("scripts/generateurs/gen-1.py")) throw new Error("un générateur pris pour un exclu");
 });
 
-console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 6 cas rouges joués (RP1, RP2, RP3, RP4, RP5 et l'envoi refusé), chacun avec son remède vert`);
+check("dossier ignoré puis renommé (RT-150) : l'ancien nom revenu du canal est refusé, git ne voit rien ; RP6 FAIL nomme le dossier", () => {
+  const b = bancGit("input/03-tableaux/\n", { "forge/notes.md": "suivi" });
+  for (const d of ["03-tableaux", "Ancien tableau"]) ecrire(join(b.canal, "input", d, "classeur.xlsx"), "donnee fictive");
+  const v = verifier(b.produit, b.opt);
+  egal(statut(v, "RP6"), "FAIL", "RP6 avant restauration");
+  if (!/Ancien tableau/.test(v.findings.find((f) => f.regle === "RP6").message)) throw new Error("le constat ne nomme pas le dossier revenu sous son ancien nom");
+  const s = synchroniser(b.produit, "restaurer", b.opt);
+  egal(JSON.stringify(s.fait), JSON.stringify(["input/03-tableaux/classeur.xlsx"]), "seul le dossier encore ignoré est posé");
+  egal(s.refuses.length, 1, "fichiers refusés");
+  egal(s.refuses[0].rel, "input/Ancien tableau/classeur.xlsx", "fichier refusé");
+  if (existsSync(join(b.produit, "input", "Ancien tableau"))) throw new Error("le fichier refusé a été posé");
+  egal(b.visibles().length, 0, "fichiers non suivis visibles à git status");
+  const apres = verifier(b.produit, b.opt);
+  egal(statut(apres, "RP4"), "PASS", "RP4 après restauration : le refus n'est pas un écart à restaurer");
+  egal(statut(apres, "RP6"), "FAIL", "RP6 reste rouge tant que le chemin n'est pas couvert");
+});
+
+check("remède joué : l'ancien chemin gardé dans .gitignore, la restauration pose, RP6 PASS, git ne voit toujours rien", () => {
+  const b = bancGit("input/03-tableaux/\n");
+  ecrire(join(b.canal, "input", "Ancien tableau", "classeur.xlsx"), "donnee fictive");
+  egal(statut(verifier(b.produit, b.opt), "RP6"), "FAIL", "RP6 avant remède");
+  writeFileSync(join(b.produit, ".gitignore"), "input/03-tableaux/\ninput/Ancien tableau/\n", "utf8");
+  egal(statut(verifier(b.produit, b.opt), "RP6"), "PASS", "RP6 après remède");
+  const s = synchroniser(b.produit, "restaurer", b.opt);
+  egal(s.fait.length, 1, "fichier posé"); egal(s.refuses.length, 0, "refus");
+  egal(readFileSync(join(b.produit, "input", "Ancien tableau", "classeur.xlsx"), "utf8"), "donnee fictive", "contenu posé");
+  egal(b.visibles().length, 0, "fichiers non suivis visibles à git status");
+});
+
+check("un fichier déjà SUIVI par git se met à jour (aucune exposition nouvelle) ; hors dépôt git, rien n'est refusé", () => {
+  const b = bancGit("", { "input/suivi.txt": "v1" });
+  ecrire(join(b.canal, "input", "suivi.txt"), "v2-canal", new Date(Date.now() + 60000));
+  egal(statut(verifier(b.produit, b.opt), "RP6"), "PASS", "RP6 sur un fichier suivi");
+  egal(synchroniser(b.produit, "restaurer", b.opt).fait.length, 1, "fichier suivi mis à jour");
+  egal(readFileSync(join(b.produit, "input", "suivi.txt"), "utf8"), "v2-canal", "contenu");
+  const h = banc({ elements: ["input"] });
+  ecrire(join(h.canal, "input", "libre.txt"), "x");
+  const s = synchroniser(h.produit, "restaurer", h.opt);
+  egal(s.fait.length, 1, "hors git : fichier posé"); egal(s.refuses.length, 0, "hors git : refus");
+  if (!/hors dépôt git/.test(verifier(h.produit, h.opt).findings.find((f) => f.regle === "RP6").message)) throw new Error("RP6 ne dit pas qu'il ne juge pas un produit hors git");
+});
+
+console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 7 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6 et l'envoi refusé), chacun avec son remède vert`);
 process.exit(fail ? 1 : 0);

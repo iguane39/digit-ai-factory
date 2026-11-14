@@ -88,16 +88,16 @@
  * 28/09 (TF-1413), et les lots écrits jusque-là, sans elle, ne sont pas accusés (antériorité déclarée, comme en R-45).
  *
  * Usage :
- *   node oracle-lot-retours.mjs <lot.md> [--json]
+ *   node oracle-lot-retours.mjs <lot.md> [--json] [--remettre [<sas>]]   (TF-2314 : juge, puis copie au sas si le verdict n'est pas FAIL)
  *   node oracle-lot-retours.mjs --murs <racine-produit>   (liste les documents mûrs mesurés)
  * Exit : 0 = forme tenue (ou lot antérieur aux règles) · 1 = forme en défaut · 2 = lot illisible.
  */
-import { readFileSync, existsSync, readdirSync, realpathSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, realpathSync, copyFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.8.1"; // 1.8.1 (15/10/2026) : le lancement direct se reconnaît par le chemin réel, un chemin à nom court Windows ne rend plus le module muet · 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.9.0"; // 1.9.0 (10/11/2026) : `--remettre [<sas>]` lie la copie au sas au verdict du juge, TF-2314 · 1.8.1 (15/10/2026) : le lancement direct se reconnaît par le chemin réel, un chemin à nom court Windows ne rend plus le module muet · 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 /**
  * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
@@ -753,6 +753,33 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
   return { verdict: constats.some((c) => c.statut === "FAIL") ? "FAIL" : "PASS", date, constats, ...(refusPredit ? { refus_predit: true } : {}) };
 }
 
+// ---- TF-2314 (10/11/2026, RT-58 de Produit-84) · LA COPIE AU SAS SE LIE AU VERDICT DU JUGE ----------------------------
+// Le 09/11/2026 à 21:14, la copie d'un lot au sas a été jouée dans la même commande que ce juge, qui rendait FAIL (R-45, GFP-LOT, LOT-SIDECAR) : le lot est parti. Même enchaînement
+// le 04/11/2026. Aucun geste outillé ne liait la copie au verdict. `--remettre [<sas>]` est ce geste : il joue le juge, puis copie le lot et son sidecar au sas, et RIEN si le
+// verdict est FAIL. Le sas par défaut est celui du pilot qui porte ce module (`input\00-retours\_arrivee\`) ; un sas introuvable, un sidecar absent ou un fichier déjà au sas
+// avec un autre contenu sont refusés (R-49 : un lot remis ne se réécrit pas), jamais contournés. Un `cp` à la main reste possible : le verrouiller exigerait un hook câblé chez
+// chaque produit, hors de ce changement ; ce geste est l'unique voie prescrite (RETOURS-FORGES.md, ouverture des produits).
+/** Copie `cheminLot` et son sidecar `.tf.jsonl` dans `sas` si `verdict` n'est pas FAIL. Rend `{ remis, raison, copies }`. */
+export function remettreAuSas(cheminLot, verdict, sas) {
+  const sansEcriture = (raison) => ({ remis: false, raison, copies: [] });
+  if (verdict === "FAIL") return sansEcriture("verdict FAIL : le lot n'est pas copié au sas — corriger le lot, rejouer le juge, puis remettre");
+  const sidecar = String(cheminLot).replace(/\.md$/i, ".tf.jsonl");
+  if (!existsSync(cheminLot)) return sansEcriture(`lot introuvable : ${cheminLot}`);
+  if (!existsSync(sidecar)) return sansEcriture(`sidecar introuvable (${basename(sidecar)}) : un lot sans sidecar n'est ingérable par aucun canal, il n'est pas remis`);
+  if (!existsSync(sas)) return sansEcriture(`sas introuvable (${sas}) : il n'est pas créé ici, le dossier du pilot est celui qui le porte`);
+  const copies = [];
+  for (const source of [cheminLot, sidecar]) {
+    const destination = join(sas, basename(source));
+    if (existsSync(destination)) {
+      if (!readFileSync(destination).equals(readFileSync(source))) return sansEcriture(`${basename(source)} est déjà au sas avec un AUTRE contenu : un lot remis ne se réécrit pas (R-49), le remettre sous l'indice suivant`);
+      continue;
+    }
+    copyFileSync(source, destination);
+    copies.push(basename(source));
+  }
+  return { remis: true, raison: copies.length ? `copié au sas ${sas} : ${copies.join(", ")}` : `déjà au sas ${sas}, contenu identique`, copies };
+}
+
 // ---- CLI : le geste qui précède la remise ----------------------------------------------------
 // C'est CE geste que le gabarit de retours nomme. Il coûte une seconde au produit et lui évite
 // un refus à la porte du pilot — ou, pire, une dérogation qui lui épargne le refus ET la leçon.
@@ -767,7 +794,10 @@ const LANCE_DIRECTEMENT = (() => {
 if (LANCE_DIRECTEMENT || import.meta.url === `file://${process.argv[1]?.split("\\").join("/")}`
     || (process.argv[1] && import.meta.url.endsWith(encodeURI(process.argv[1].split("\\").join("/"))))) {
   const args = process.argv.slice(2);
-  const cible = args.find((a) => !a.startsWith("--"));
+  // TF-2314 : `--remettre [<sas>]` joue le juge PUIS copie le lot et son sidecar au sas, et ne copie qu'à un verdict sans FAIL.
+  const iRemettre = args.indexOf("--remettre");
+  const sasDonne = iRemettre >= 0 && args[iRemettre + 1] && !args[iRemettre + 1].startsWith("--") ? args[iRemettre + 1] : null;
+  const cible = args.find((a, i) => !a.startsWith("--") && !(iRemettre >= 0 && i === iRemettre + 1));
   const jsonSeul = args.includes("--json");
   if (args.includes("--murs")) {
     // R-57 : ce que le lot devra déclarer, mesuré AVANT de l'écrire.
@@ -779,7 +809,7 @@ if (LANCE_DIRECTEMENT || import.meta.url === `file://${process.argv[1]?.split("\
     process.exit(0);
   }
   if (!cible) {
-    console.error("usage : node oracle-lot-retours.mjs <lot.md> [--json]");
+    console.error("usage : node oracle-lot-retours.mjs <lot.md> [--json] [--remettre [<sas>]]");
     process.exit(2);
   }
   const r = verifier(cible);
@@ -793,6 +823,12 @@ if (LANCE_DIRECTEMENT || import.meta.url === `file://${process.argv[1]?.split("\
       if (c.remede) console.log(`      → ${c.remede}`);
     }
     if (r.verdict === "FAIL") console.log("\nCe lot serait REFUSÉ à l'ingestion. Le corriger ici coûte une minute ;\nle faire refuser à la porte coûte un aller-retour, et une dérogation coûte la leçon.");
+  }
+  if (iRemettre >= 0) {
+    const sas = sasDonne || join(dirname(fileURLToPath(import.meta.url)), "..", "input", "00-retours", "_arrivee");
+    const m = remettreAuSas(cible, r.verdict, sas);
+    console.error(`remise au sas : ${m.remis ? "FAITE" : "NON FAITE"} — ${m.raison}`);
+    process.exit(r.verdict === "FAIL" ? 1 : (m.remis ? 0 : 2));
   }
   process.exit(r.verdict === "FAIL" ? 1 : 0);
 }

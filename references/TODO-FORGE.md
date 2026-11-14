@@ -93,6 +93,17 @@ clôture qui n'en porte aucun — et `journaliser.mjs` annule alors l'écriture.
 dans le registre du pilot et nulle part chez le producteur n'est pas câblée* (loi n° 1). Les 600+
 clôtures antérieures restent de la prose : c'est déclaré, pas rattrapé.
 
+**Un écart d'audit sur un réglage de plateforme rouvre un retour vers la forge qui crée (R-66 point 5,
+D-178 (a) du 06/11/2026, TF-2232).** L'audit du cas témoin du 30/10/2026 comptait 7 écarts sur 30 qui étaient
+une option gratuite laissée à sa valeur d'origine ; les corriger chez le produit les referme pour lui, et le
+produit suivant les rouvre. À la réception d'un lot ou d'un rapport de campagne qui corrige un tel écart,
+`node scripts\ouvrir-retour-reglage.mjs --reglage <adresse> --ecart <identifiant> --produit <pseudonyme>`
+lit l'écart contre `references\REGLAGES-SURS-PAR-DEFAUT.json` : classé `defaut`, il rend la candidature vers
+`digit-ai-forge-development`, à ingérer par `todo\ingerer-lot.mjs` avec l'identifiant de l'écart ; classé
+`decision`, il renvoie à la décision nommée et n'ouvre rien. Le script rend la candidature, il ne l'écrit pas
+au registre : l'écrivain reste `ingerer-lot.mjs`. Non câblé à l'ingestion : un sidecar qui nomme un réglage n'y
+déclenche pas l'aiguillage tout seul, c'est un geste du pilot à la réception.
+
 **Un retour porte sa CLASSE, et une récidive se COMPTE — jamais refusée (R13, mandat du 03/09/2026).**
 Mesuré au pas 0 du mandat, sur les 788 items du registre : **50** déclaraient une récidive en toutes
 lettres (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine
@@ -347,6 +358,15 @@ et TF-0318 a été instruit dessus ; TF-0328). Le self-test
 Consulter le registre à l'ouverture de tout run. `BOUCLE-AMELIORATION.md` reste le journal
 narratif : il référence les ids TF, il ne duplique plus les listes.
 
+**Un gain de coût ou de durée se remesure en service (décision humaine D-118 (a) du 02/11/2026, TF-1954).** Une clôture peut porter
+`remesure` : `commande` et sa valeur visée (`duree_max_s` ou `sortie`), `avertissement` (l'expression d'un avertissement d'ouverture
+qui doit avoir disparu), `apres_jours` (7 par défaut). Le champ est facultatif ; **R18** refuse celui qui ne pourrait pas se rejouer.
+À sa date, `oracles\hook-ouverture.mjs` joue la commande par `todo\remesurer.mjs`, 2 au plus par ouverture, l'inscrit une fois au
+journal `todo\observabilite\remesures.jsonl`, et dit l'écart ; il nomme aussi l'avertissement que son relevé porte encore. Un écart
+se signale, il ne rouvre rien. *Le fait* : une correction du pre-push close le 13/10/2026 sur 36 s, 52 s et 41 s mesurées à blanc ;
+25 envois réels ont ensuite attendu jusqu'au 20/10, dont 9 coupés par le délai de 600 s. **Quand le poser** : toute correction dont
+le gain déclaré est une durée ou un coût ; un gain à blanc reste une présomption tant que sa remesure n'a pas parlé.
+
 ## Revue hebdomadaire accélérée (demande humaine du 01/10/2026)
 
 **Ce qui change pour le porteur** : les propositions ne lui arrivent plus une à une. Une fois par
@@ -380,7 +400,17 @@ une décision humaine.
    propositions prêtes par valeur décroissante, 7 au plus, reporte les suivantes, et liste « à
    instruire » celles dont la fiche est incomplète, avec les champs manquants. Le dossier se range
    dans `output\04-plans\` au nommage de la règle R-4 ; la correspondance D-N → TF-#### s'ajoute à
-   `todo\observabilite\revues-hebdo.jsonl`, qui date la revue.
+   `todo\observabilite\revues-hebdo.jsonl`, qui date la revue. **Depuis le 04/11/2026 (TF-2116)**, le
+   dossier ajoute une section « Modèles des fournisseurs tiers » : `oracles\oracle-modeles-tiers.mjs`
+   est joué ici (processus fils borné à 120 s ; 49 s mesurés le 03/11 sur 57 dépôts, trop long pour
+   l'ouverture, qui répond en moins de 45 s), et la section rend les identifiants arrêtés (MT1), ceux
+   qui s'arrêtent dans moins de 90 jours (MT2) et l'âge du référentiel (MT4). Quand MT4 avertit, elle
+   nomme le geste de session qui le rafraîchit (relire les pages des fournisseurs, redater
+   `references\MODELES-TIERS.json`) : la revue le nomme, elle ne le fait pas. Un contrôle qui ne s'est pas
+   joué est dit « non mesuré » avec sa raison. `--sans-modeles-tiers` saute la section. **Cadence
+   mensuelle depuis le 04/11/2026** (réponse humaine « A2 & A3 : Tous les mois suffit ») : l'oracle ne se
+   rejoue que si le dernier contrôle mesuré du journal a 30 jours ou plus ; sinon la section donne la date du
+   dernier contrôle et celle du prochain. `--modeles-tiers-forcer` le rejoue quand même.
 4. **L'affichage.** La restitution du tour reprend les décisions du dossier EN ENTIER à son bloc 3,
    comme toute décision : c'est là que le porteur les lit.
 5. **La réponse.** Chaque sélecteur reçu se consigne par `todo\journaliser.mjs` : (a) ou (b) font

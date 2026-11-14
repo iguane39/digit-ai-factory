@@ -26,6 +26,11 @@
  * Et quand l'appel vise un agent d'ÉCRITURE (`campagne`, `constructeur`, `redacteur`), il rappelle la relecture de la consigne de
  * l'essai du 18/10/2026 (D-23 (a), `references/RELECTURE-INTENTION.md`) : même sortie `additionalContext`, même exit 0.
  *
+ * Et quand l'appel demande `isolation: "worktree"` depuis une racine de session dont la lettre de lecteur est en minuscule
+ * (`c:\…`), il avertit que le harnais refusera l'isolation et nomme la racine canonique (TF-2443, voir `racineEnMinuscule`).
+ * NON JUGÉ de ce volet : une isolation posée par la définition d'un agent (`isolation: worktree` en tête de son `.md`), que
+ * l'entrée du hook ne porte pas.
+ *
  * Usage : node oracles\hook-flotte.mjs      (stdin : JSON du hook PreToolUse)
  * Exit : toujours 0 ; l'avertissement sort sur stdout en JSON `hookSpecificOutput.additionalContext`.
  */
@@ -53,8 +58,35 @@ export function agentsNommes(cwd, maison = homedir()) {
   return noms;
 }
 
+/**
+ * TF-2443 (12/11/2026) — UNE RACINE DE SESSION À LETTRE DE LECTEUR MINUSCULE FAIT REFUSER L'ISOLATION.
+ * Le fait, rejoué le 12/11/2026 avec Claude Code 2.1.322 depuis une racine `c:\…` puis `C:\…` : avec `isolation: "worktree"`,
+ * la racine en minuscule rend « Refusing to use c:\…\.claude\worktrees\agent-… as an isolation worktree: git resolves its
+ * working tree to C:/… » et laisse une copie vide verrouillée ; la même racine en majuscule réussit. Git résout toujours
+ * `C:/…`, et le harnais compare les deux chemins à la casse près. Ce refus ne vit dans aucun hook ni outil du parc : il est
+ * dans le harnais. Le remède est d'ouvrir la session sur la racine canonique ; ce rappel le dit AVANT le refus.
+ */
+export const LECTEUR_MINUSCULE = /^[a-z]:[\\/]/;
+export function racineEnMinuscule(entree, env = process.env) {
+  const ti = entree?.tool_input || {};
+  if (typeof ti.isolation !== "string" || ti.isolation.trim() !== "worktree") return null;
+  return [entree?.cwd, env?.CLAUDE_PROJECT_DIR].find((c) => typeof c === "string" && LECTEUR_MINUSCULE.test(c)) ?? null;
+}
+const messageRacine = (racine) => "RACINE DE SESSION EN MINUSCULE (TF-2443, 12/11/2026) — cet appel demande `isolation: \"worktree\"` depuis « " + racine
+  + " » : git résout « " + racine[0].toUpperCase() + racine.slice(1) + " », le harnais compare les deux chemins à la casse près et refuse l'isolation "
+  + "(« Refusing to use … as an isolation worktree: git resolves its working tree to C:/… »), en laissant une copie vide verrouillée sous `.claude/worktrees`. "
+  + "Rouvrir la session sur « " + racine[0].toUpperCase() + racine.slice(1) + " » (lettre de lecteur en majuscule), ou lancer l'agent sans `isolation` sur un arbre "
+  + "créé par `git worktree add` (consigne de campagne). Avertissement seulement : l'appel part tel quel.";
+
 /** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message } ou { decision: "rappelle", message }. */
-export function juger(entree, { maison } = {}) {
+export function juger(entree, options = {}) {
+  const v = jugerFlotte(entree, options);
+  const racine = OUTILS.has(entree?.tool_name) ? racineEnMinuscule(entree) : null;
+  if (!racine) return v;
+  return { decision: "avertit", message: messageRacine(racine) + (v.message ? "\n\n" + v.message : "") };
+}
+
+function jugerFlotte(entree, { maison } = {}) {
   if (!OUTILS.has(entree?.tool_name)) return { decision: "laisse" };
   const ti = entree?.tool_input || {};
   const type = typeof ti.subagent_type === "string" ? ti.subagent_type.trim() : "";
@@ -67,11 +99,14 @@ export function juger(entree, { maison } = {}) {
   // Rappel seulement — l'appel part tel quel.
   const description = typeof ti.description === "string" ? ti.description.trim() : "";
   if (/^Relecture d'intention/i.test(description)) return { decision: "laisse" };
-  const rappel = (cible) => "RELECTURE D'INTENTION (essai D-23 (a) du 18/10/2026, du 2026-10-18 au 2026-11-01) — cet appel vise « " + cible + " » : "
-    + "chaque consigne passée à un agent se relit AVANT le lancement. `node scripts/relecture-intention.mjs --preparer consigne --fichier <consigne.md>` "
-    + "(chez un produit : le script du pilot) écrit la demande humaine du tour, citée mot pour mot, et imprime la consigne à passer à un `verificateur` "
-    + "dont la description commence par « Relecture d'intention » ; un écart majeur se corrige dans la consigne ou se pose à l'humain avant l'appel. Une campagne dont les agents reçoivent le même gabarit se relit une fois, le gabarit et la liste des sujets ensemble (plusieurs --fichier), puis chaque livrable à sa réception (--preparer reception, D-47 (a) du 19/10/2026). "
-    + "Rappel seulement (alerte, jamais blocage) : l'appel part tel quel. `references/RELECTURE-INTENTION.md`.";
+  // L'essai a couru du 2026-10-18 au 2026-11-01, puis a été prolongé en service par D-73 (b) du 26/10/2026
+  // (references/RELECTURE-INTENTION.md) : le rappel ne le présente plus comme un essai en cours (œil critique du 10/11/2026).
+  // Œil critique du 10/11/2026 (A4) : le rappel tenait 894 caractères et se recopiait à chaque appel d'agent, 8 fois
+  // dans un même tour ; il garde la commande et la règle de campagne, le détail vit dans la référence.
+  const rappel = (cible) => "RELECTURE D'INTENTION (essai D-23 (a) du 18/10/2026, en service depuis le 2026-11-01 par D-73 (b)) — cet appel vise « " + cible + " » : "
+    + "relire la consigne avant le lancement, `node scripts/relecture-intention.mjs --preparer consigne --fichier <consigne.md>` (chez un produit, le script du pilot), "
+    + "puis la passer à un `verificateur` « Relecture d'intention » ; une campagne relit une fois son gabarit commun (D-47 (a)). "
+    + "Alerte, jamais blocage : l'appel part tel quel. `references/RELECTURE-INTENTION.md`.";
   if (type && !GENERIQUES.has(type)) return { decision: "rappelle", message: rappel(type) };
   const aModele = typeof ti.model === "string" && ti.model.trim() !== "";
   const aEffort = typeof ti.effort === "string" && ti.effort.trim() !== "";

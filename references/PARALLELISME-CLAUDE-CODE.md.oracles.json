@@ -1,7 +1,7 @@
 {
   "cible": "references/PARALLELISME-CLAUDE-CODE.md",
-  "date_iso": "2026-10-20T06:51:58.658Z",
-  "registre_version": "2.45.0",
+  "date_iso": "2026-11-12T12:40:17.713Z",
+  "registre_version": "2.59.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
   "verdict": "PASS",
@@ -77,9 +77,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\PARALLELISME-CLAUDE-CODE.md",
-    "ts": "2026-10-20T06:51:58.657Z",
+    "ts": "2026-11-12T12:40:17.712Z",
     "fichiers": {
-      "references\\PARALLELISME-CLAUDE-CODE.md": "bec2c5040230b405d9ca4233c88aea28cfb94065507c5005e5a8680b4ac693b4"
+      "references\\PARALLELISME-CLAUDE-CODE.md": "6233b5f2e42804ee9dc63634cf213860e70bbddf0780c4b0a0e20b2b2f553e20"
     }
   },
   "empreinte_motif": null,

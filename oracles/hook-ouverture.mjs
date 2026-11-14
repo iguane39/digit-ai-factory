@@ -24,6 +24,9 @@ import { passerOuvertureEnAsync, fusionnerHooksDuGabarit, ancrerCommandesFactory
 import { borner, BUDGET_CONTEXTE_ASYNC } from "./lib-budget-contexte.mjs";
 import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gestes-avant-releve.mjs";
 import { constatR47 } from "./lib-resume-r47.mjs";
+import { lancerRejeuHebdomadaire, lignesOuverture as lignesConsommateursRouges, lignesRejeuOuverture, traceRouges } from "./consommateurs-skills.mjs";
+import { skillsInstalles } from "../scripts/lib-config-installee.mjs";
+import { cheminTrace as cheminTraceWorkflows, lancerReleve as lancerReleveWorkflows, lignesOuverture as lignesWorkflowsHeberges } from "./releve-workflows-heberges.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -54,7 +57,8 @@ const lignesFusion = [];
 if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "hooks", "factory.mjs"))) {
   const fu = fusionnerHooksDuGabarit(join(process.cwd(), ".claude", "settings.json"), join(PILOT, "gabarits", "settings-produit.json"));
   if (fu.etat === "corrige") lignesFusion.push("## Câblage des hooks de la factory (TF-1755)",
-    `- \`.claude/settings.json\` : ${fu.ajoutes.length} entrée(s) du gabarit ajoutée(s) — ${fu.ajoutes.join(", ")} ; rien d'autre n'est touché. Actives à la prochaine session. Enregistrer ce changement avec le travail du produit ; pour en écarter une, la déclarer sous \`_hooks_factory_exclus\` avec son motif.`
+    `- \`.claude/settings.json\` : ${fu.ajoutes.length} entrée(s) du gabarit ajoutée(s)${fu.ajoutes.length ? ` — ${fu.ajoutes.join(", ")}` : ""}`
+      + (fu.elargis?.length ? `, ${fu.elargis.length} élargie(s) au matcher du gabarit — ${fu.elargis.join(", ")} (TF-2185)` : "") + ` ; rien d'autre n'est touché. Actives à la prochaine session. Enregistrer ce changement avec le travail du produit ; pour en écarter une, la déclarer sous \`_hooks_factory_exclus\` avec son motif.`
       + (fu.exclus.length ? ` Exclusion(s) déclarée(s) et respectée(s) : ${fu.exclus.join(", ")}.` : ""), "");
   else if (fu.etat === "illisible" || fu.etat === "gabarit_illisible") lignesFusion.push("## Câblage des hooks de la factory (TF-1755)", `- fusion NON jouée (${fu.etat} : ${fu.detail}) : les entrées neuves du gabarit n'atteignent pas ce produit.`, "");
   // TF-1903 (21/10/2026) — ET LA COMMANDE RELATIVE DU LANCEUR S'ANCRE EN PLACE sur la racine du projet : après un `cd`
@@ -94,6 +98,27 @@ if (!args.includes("--sans-bootstrap")) {
   indicesApresRapatriement();
 }
 
+// TF-2048 (02/11/2026) — UN ROUGE NEUF DE CONSOMMATEUR, LAISSÉ PAR UNE PROPAGATION, SE RELIT À L'OUVERTURE du pilot. Le 02/11, la
+// recette de forge-design rendait 2 échecs depuis 12 jours (V23, 21/10) : `oracle-skills --appliquer` le dit dans la sortie d'une
+// commande, lue ce jour-là ou jamais. La trace est écrite par `oracle-skills.mjs` (voir `consommateurs-skills.mjs`) ; ici, on la lit.
+// Chez le pilot seulement (sans `--pilot`) : un produit ne propage rien et ne peut pas réparer un consommateur. Aucun rejeu à
+// l'ouverture (les suites vont jusqu'à vingt minutes) : le rejeu est le geste nommé, `--rejouer-consommateurs`.
+// D-135 (a) du 02/11/2026 — SAUF UNE FOIS PAR SEMAINE, ET SANS L'ATTENDRE : l'ouverture lance le rejeu de TOUS les dépôts de la table
+// dans un processus DÉTACHÉ (`oracle-skills --rejouer-tous-consommateurs`) et poursuit ; un rouge s'affiche à l'ouverture suivante, avec
+// 7 jours de retard au plus. Pas de lancement si le dernier rejeu complet a moins de 7 jours ou si un rejeu tourne déjà. L'état se lit
+// d'abord (un rejeu coupé, un dépôt sans jugement, 14 jours sans abouti se disent), le lancement vient après. FORGE_SANS_REJEU_HEBDOMADAIRE=1 :
+// aucun rejeu n'est lancé (la recette du hook le pose par défaut ; seul son banc du rejeu l'ôte, sur une table factice et une trace jetable).
+if (iPilot < 0) {
+  try {
+    const trace = traceRouges(skillsInstalles().chemin);
+    lignes.push(...lignesConsommateursRouges(trace));
+    try {
+      const lancer = process.env.FORGE_SANS_REJEU_HEBDOMADAIRE === "1" ? null : () => lancerRejeuHebdomadaire({ trace, pilot: PILOT });
+      lignes.push(...lignesRejeuOuverture(trace, { lancer }));
+    } catch (e) { lignes.push("", `## Rejeu hebdomadaire des consommateurs : NON jugé (${String(e.message).slice(0, 120)}) — D-135 (a), TF-2048`); }
+  } catch (e) { lignes.push("", `## Consommateurs des skills : trace NON lue (${String(e.message).slice(0, 120)}) — TF-2048`); }
+}
+
 // TF-1359 (D-21 (b), 26/09/2026) — L'UNICITÉ DES INDICES SE REJOUE APRÈS TOUT CE QUI A PU AMENER UN
 // LIVRABLE : tirage de ce relevé, rebase ou fusion d'une session depuis l'ouverture précédente. Le
 // 23/09, deux synthèses ont pris l'indice « d » sur les deux postes, et seul un passage à la main de
@@ -117,7 +142,8 @@ function indicesApresRapatriement() {
   if (o.collisions.length) {
     lignes.push("", `## Indices des livrables (R-4, TF-1359) : DÉFAUT — ${o.collisions.length} indice(s) partagé(s) par un livrable arrivé depuis l'ouverture précédente`,
       ...o.collisions.map((c) => `- ${c.ou} ${String(c.message).split(" : l'indice existe")[0]}`),
-      "→ réindexer le plus récent : `node scripts/allouer-indice.mjs`, puis renommer ; la tête relevée n'avance pas avant.");
+      // TF-2335 (10/11/2026) : le chemin se résout depuis le pilot. Chez un produit, `scripts/allouer-indice.mjs` n'existe pas (ls : No such file).
+      `→ réindexer le plus récent : \`node "${enSlash(join(PILOT, "scripts", "allouer-indice.mjs"))}"\`, puis renommer ; la tête relevée n'avance pas avant.`);
     return;
   }
   lignes.push("", !precedente
@@ -169,6 +195,7 @@ if (iPilot >= 0) {
   const o = join(PILOT, "oracles", "oracle-conformite-projet.mjs");
   const PRODUIT = process.cwd();
   const recopies = [];
+  const nes = [];
   const refus = [];
   try {
     const manifeste = join(PILOT, "gabarits", "HERITAGE.json");
@@ -176,6 +203,21 @@ if (iPilot >= 0) {
       const h = JSON.parse(readFileSync(manifeste, "utf8"));
       const norme = (t) => t.replace(/\r\n/g, "\n");
       for (const a of (h.artefacts || [])) {
+        // D-193 (a) du 10/11/2026 (TF-2330, TF-2333) — UN FICHIER À REMPLIR NAÎT À L'OUVERTURE, UNE FOIS. Le calendrier des séances et le
+        // registre des engagements se personnalisent (mode `presence`) : ils ne se recopient jamais. Mais la place où inscrire une séance
+        // doit exister avant la première séance, comme le `.env` avant le premier secret (TF-0869). `naissance: "si_absent"` : absent, le
+        // fichier naît de son modèle, en-tête daté du jour (oracles/lib-calendrier.mjs) ; présent, il n'est jamais touché.
+        if (a.naissance === "si_absent" && a.mode !== "copie_conforme") {
+          const src = join(PILOT, a.source.replace(/\//g, sep));
+          const dst = join(PRODUIT, a.cible.replace(/\//g, sep));
+          if (existsSync(dst)) continue;
+          if (!existsSync(src)) { refus.push(`${a.source} — modèle absent du pilot, ${a.cible} ne naît pas`); continue; }
+          const { instancierNaissance, jourLocal } = await import(pathToFileURL(join(ICI, "lib-calendrier.mjs")).href);
+          mkdirSync(dirname(dst), { recursive: true });
+          writeFileSync(dst, instancierNaissance(readFileSync(src, "utf8"), jourLocal()), "utf8");
+          nes.push(`${a.cible} — né de ${a.source}`);
+          continue;
+        }
         if (a.mode !== "copie_conforme") continue;
         const src = join(PILOT, a.source.replace(/\//g, sep));
         const dst = join(PRODUIT, a.cible.replace(/\//g, sep));
@@ -233,6 +275,9 @@ if (iPilot >= 0) {
         (remplaces ? `  Une modification locale de l'un des ${remplaces} fichier(s) « remplacé » ci-dessus, et d'eux seuls, a été écrasée : c'est ce que leur mode déclare, et la version du pilot fait foi. ` : "  ")
           + "Rien d'autre n'est recopié : `.claude/settings.json` (permissions `allow`, `ask`, `deny`, `defaultMode`, serveurs MCP, hooks propres), `CLAUDE.md` et les autres fichiers que le produit personnalise ne le sont jamais — l'ouverture n'ajoute à `.claude/settings.json` que les entrées de hook manquantes du gabarit, et n'y réécrit que le chemin relatif du lanceur (TF-1903).");
     }
+    if (nes.length) lignes.push(`- **${nes.length} fichier(s) NÉ(S) à l'instant** de leur modèle du pilot (D-193 (a)) : ce produit les remplit, et ils ne seront jamais recopiés ni écrasés :`,
+      ...nes.map((r) => `  - ${r}`),
+      "  Les enregistrer avec le travail du produit. Une séance datée s'inscrit au calendrier, un engagement d'un document remis au registre.");
     for (const r of refus) lignes.push(`- non recopié : ${r}`);
     if (!f) lignes.push("- verdict ILLISIBLE — le contrôle n'a pas rendu de résultat exploitable ; ce n'est pas un constat sur ce produit.");
     else if (f.statut === "PASS") lignes.push(`- à jour — ${f.message}`);
@@ -265,7 +310,7 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "retours"))) {
     if (enAttente.length) {
       const jamais = enAttente.filter((l) => l.parvenu === false), parvenus = enAttente.filter((l) => l.parvenu === true);
       lignes.push("", `## Lots de retours restés « a_remettre » plus de ${SEUIL_H} h (TF-1758)`);
-      if (jamais.length) lignes.push(`- **${jamais.length} lot(s) JAMAIS parvenu(s) au pilot** — ${jamais.slice(0, 6).map((l) => `« ${l.nom} » (${l.jours} j)`).join(", ")}${jamais.length > 6 ? ", …" : ""} : jouer \`node forge/retours/oracle-lot.mjs "<lot>.md"\`, copier le lot et son sidecar dans \`${enSlash(join(PILOT, "input", "00-retours", "_arrivee"))}\`, puis passer la ligne de statut à « remis le <date> ».`);
+      if (jamais.length) lignes.push(`- **${jamais.length} lot(s) JAMAIS parvenu(s) au pilot** — ${jamais.slice(0, 6).map((l) => `« ${l.nom} » (${l.jours} j)`).join(", ")}${jamais.length > 6 ? ", …" : ""} : remettre par \`node forge/retours/oracle-lot.mjs "<lot>.md" --remettre\` (il joue le contrôle, puis copie le lot et son sidecar dans \`${enSlash(join(PILOT, "input", "00-retours", "_arrivee"))}\` à exit 0 seulement, TF-2314), puis passer la ligne de statut à « remis le <date> ».`);
       if (parvenus.length) lignes.push(`- ${parvenus.length} lot(s) déjà reçu(s) par le pilot dont la ligne de statut dit encore « a_remettre » : la passer à « remis le <date> » (seule édition permise d'un lot remis).`);
       const inconnus = enAttente.length - jamais.length - parvenus.length;
       if (inconnus) lignes.push(`- ${inconnus} lot(s) dont l'arrivée au pilot n'a pas pu être vérifiée (boîte du pilot illisible).`);
@@ -294,10 +339,20 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "retours"))) {
 // lot ; aucune ouverture ni fin de tour ne l'avait dit, et leurs cinq classes n'étaient pas au référentiel du pilot. Une
 // entrée qu'aucun lot de `forge/retours/` ne cite par son seq, vieille de plus de 24 h, est nommée ; une classe que le
 // référentiel du pilot ne connaît pas l'est aussi. Lecture seule : rien n'est écrit au ledger ni au lot.
-if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ledger.jsonl"))) {
+// TF-2260 (06/11/2026) : le journal hors run (`forge/hors-run.jsonl`, où `ledger.py` écrit quand aucun run n'est ouvert, TF-2223) compte aussi ; il a sa
+// section, parce que son `seq` repart de 1 et ne se confond pas avec celui du ledger du run.
+if (iPilot >= 0 && (existsSync(join(process.cwd(), "forge", "ledger.jsonl")) || existsSync(join(process.cwd(), "forge", "hors-run.jsonl")))) {
   try {
     const { retoursSansLot, SEUIL_H } = await import(pathToFileURL(join(ICI, "lib-retours-produit.mjs")).href);
-    const sans = retoursSansLot(process.cwd(), PILOT);
+    const tous = retoursSansLot(process.cwd(), PILOT);
+    const sans = tous ? tous.filter((r) => !r.horsRun) : tous;
+    const sansHorsRun = tous ? tous.filter((r) => r.horsRun) : [];
+    if (sansHorsRun.length) {
+      const plusVieuxHr = Math.max(0, ...sansHorsRun.map((r) => r.jours ?? 0));
+      lignes.push("", `## Retours du journal hors run restés sans lot, plus de ${SEUIL_H} h (TF-2260)`,
+        `- **${sansHorsRun.length} entrée(s) \`type: retour\`** de \`forge/hors-run.jsonl\` (inscrites hors run, TF-2223) qu'aucun lot de \`forge/retours/\` ne cite : hors-run seq ${sansHorsRun.slice(0, 12).map((r) => r.seq).join(", ")}${sansHorsRun.length > 12 ? ", …" : ""} (la plus ancienne : ${plusVieuxHr} j). `
+        + "Les compiler en lot `<projet> - RETOURS - …` avec son sidecar (gabarits/RETOURS-FORGES.md) et les y citer par un segment qui nomme le journal, terminé par « ; » : `forge/hors-run.jsonl seq 1, 2` (leur seq n'est pas celui du ledger du run).");
+    }
     if (sans && sans.length) {
       const inconnues = sans.filter((r) => r.classeInconnue);
       const plusVieux = Math.max(0, ...sans.map((r) => r.jours ?? 0));
@@ -307,6 +362,49 @@ if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ledger.jsonl"))) {
       if (inconnues.length) lignes.push(`- ${inconnues.length} d'entre elles portent une classe que le référentiel du pilot ne connaît pas (seq ${inconnues.slice(0, 12).map((r) => r.seq).join(", ")} : ${[...new Set(inconnues.map((r) => `« ${r.classe} »`))].slice(0, 6).join(", ")}) : une classe se crée au pilot, jamais au ledger ; au sidecar, \`classe: classe-a-creer\` et \`classe_proposee\` {cle, famille, libelle}.`);
     }
   } catch (e) { lignes.push("", `- retours du ledger sans lot : NON relevés (${String(e.message).slice(0, 160)})`); }
+}
+
+// TF-2214 (06/11/2026, RP-34 de Produit-86) — LES DÉCISIONS POSÉES SANS RÉPONSE SE SIGNALENT À L'OUVERTURE. D-48 (réseau vide facturé en Europe du Nord), posée le 03/11, est restée sans réponse ni
+// rappel ; les ressources qu'elle visait ont été facturées deux jours. Chaque D-N que `forge/ledger.jsonl` pose (`question_humain`) depuis 14 jours au plus, sans `reponse_humain` postérieure qui
+// la nomme, est dite ici ; le bloc 3 de la restitution suivante la rappelle (règle S93 d'oracle-synthese). Lecture seule. Une réponse non consignée avec son numéro compte comme absente : le relevé la dit « sans réponse nommée ».
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ledger.jsonl"))) {
+  try {
+    const { decisionsSansReponse } = await import(pathToFileURL(join(ICI, "lib-decisions.mjs")).href);
+    const ouvertes = decisionsSansReponse(process.cwd());
+    if (ouvertes.length)
+      lignes.push("", `## Décisions posées sans réponse nommée (TF-2214)`,
+        `- **${ouvertes.length} décision(s)** de \`forge/ledger.jsonl\`, posée(s) depuis 14 jours au plus : ${ouvertes.slice(0, 8).map((d) => `${d.n} (posée le ${String(d.ts).slice(0, 10)}${d.seq != null ? `, seq ${d.seq}` : ""}${d.question ? ` — ${d.question.slice(0, 70)}` : ""})`).join(" ; ")}${ouvertes.length > 8 ? " ; …" : ""}. `
+        + "Rappelle chacune en une ligne au bloc 3 de la prochaine restitution (S93), ou consigne sa réponse au ledger (`reponse_humain`, avec son numéro) : une décision sans réponse ni rappel laisse courir ce qu'elle devait arrêter.");
+  } catch (e) { lignes.push("", `- décisions sans réponse : NON relevées (${String(e.message).slice(0, 160)})`); }
+}
+
+// D-193 (a) du 10/11/2026, TF-2330 (RP-07 du produit marketing, lot 20261109b, ledger seq 693) — UNE SÉANCE DATÉE NOMME SA REVUE DE
+// PRÉPARATION, DE J-5 À J-0. La séance de formation du 13/11/2026 n'était inscrite dans aucun calendrier du produit, et sa revue de fond
+// n'a eu lieu que sur demande humaine, le 09/11 : neuf défauts relevés à quatre jours de la séance. Le calendrier `forge/CALENDRIER.md`
+// (né ci-dessus de son modèle) se lit ici : chaque séance proche nomme sa revue, ce qu'elle couvre et la commande qui la joue ; une séance
+// passée ou à plus de 5 jours ne dit rien ; une ligne mal formée est dite. Lecture seule (`oracles/lib-calendrier.mjs`, R-67).
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "CALENDRIER.md"))) {
+  try {
+    const { lireCalendrier, lignesSeances, jourLocal } = await import(pathToFileURL(join(ICI, "lib-calendrier.mjs")).href);
+    const cal = lireCalendrier(readFileSync(join(process.cwd(), "forge", "CALENDRIER.md"), "utf8"));
+    const l = lignesSeances(cal, jourLocal(), { oracleEngagements: enSlash(join(ICI, "oracle-engagements.mjs")), modele: enSlash(join(PILOT, "gabarits", "CALENDRIER-PRODUIT.md")) });
+    if (l.length) lignes.push("", ...l);
+  } catch (e) { lignes.push("", `- calendrier des séances : NON lu (${String(e.message).slice(0, 160)}) — D-193 (a), TF-2330`); }
+}
+
+// D-193 (a), TF-2333 (RP-10, ledger seq 694) — UN ENGAGEMENT NON TENU D'UN DOCUMENT REMIS SE REDIT À L'OUVERTURE. Des documents des 27
+// et 28/10/2026 ont promis un QCM et une satisfaction en formulaires et une skill installée par le formateur ; aucune pièce n'a été produite
+// avant que l'humain le voie, le 09/11. Le registre `forge/ENGAGEMENTS.md` est jugé à chaque livrable écrit (hook d'écriture) ; ici, ce qui
+// reste non tenu se redit, une action échue comprise : une échéance passe sans que rien ne s'écrive. Silencieux quand tout est tenu.
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge", "ENGAGEMENTS.md"))) {
+  try {
+    const { jugerRegistre, REMEDE } = await import(pathToFileURL(join(ICI, "oracle-engagements.mjs")).href);
+    const ko = jugerRegistre(process.cwd()).findings.filter((f) => f.statut === "FAIL");
+    if (ko.length) lignes.push("", "## Engagements des documents remis, NON tenus (D-193 (a), TF-2333 — forge/ENGAGEMENTS.md)",
+      ...ko.slice(0, 8).map((f) => `- ${f.regle}${f.ligne ? ` (ligne ${f.ligne})` : ""} : ${f.message}`),
+      ...(ko.length > 8 ? [`- … et ${ko.length - 8} autre(s)`] : []),
+      `- Remède : ${REMEDE}. Rejouer : \`node "${enSlash(join(ICI, "oracle-engagements.mjs"))}" .\``);
+  } catch (e) { lignes.push("", `- engagements des documents remis : NON jugés (${String(e.message).slice(0, 160)}) — D-193 (a), TF-2333`); }
 }
 
 // TF-1642 (14/10/2026) — LA FRAÎCHEUR NE SE JUGE PLUS SUR LES SEULS DÉPÔTS DE LA FACTORY. Le 12/10, un
@@ -409,7 +507,9 @@ if (iPilot < 0) {
       // le moindre mal. L'affichage à l'écran, lui, garde les chemins réels — il n'est pas suivi.
       try {
         const { pseudonymeProduit } = await import("../scripts/lib-pseudonyme-produit.mjs");
-        appendFileSync(join(PILOT, "todo", "HERITAGE-RELEVES.jsonl"), JSON.stringify({
+        // TF-2067 : FORGE_HERITAGE_RELEVES désigne un autre journal (la recette du hook le pose sous un dossier
+        // temporaire : une recette n'écrit pas le registre du dépôt qui la joue). Absent, le comportement est inchangé.
+        appendFileSync(process.env.FORGE_HERITAGE_RELEVES || join(PILOT, "todo", "HERITAGE-RELEVES.jsonl"), JSON.stringify({
           ts: new Date().toISOString(), contrat: j.contrat, produits: (j.lignes || []).map((l) => ({
             produit: pseudonymeProduit(l.produit), absents: l.absents, divergents: l.divergents, incomplets: l.incomplets, total: l.total,
             artefacts: (l.artefacts || []).map((a) => ({ cible: a.cible, etat: a.etat })),
@@ -453,12 +553,14 @@ if (iPilot < 0) {
         for (const l of j.lignes || []) {
           if (!l.dossier) continue;
           const s = retoursSansLot(l.dossier, PILOT);
-          if (s && s.length) parProduit.push({ produit: l.produit, n: s.length, inconnues: s.filter((x) => x.classeInconnue).length, plusVieux: Math.max(0, ...s.map((x) => x.jours ?? 0)) });
+          // TF-2260 : les retours du journal hors run (`forge/hors-run.jsonl`) se comptent avec ceux du ledger, et se disent à part.
+          if (s && s.length) parProduit.push({ produit: l.produit, n: s.length, horsRun: s.filter((x) => x.horsRun).length, inconnues: s.filter((x) => x.classeInconnue).length, plusVieux: Math.max(0, ...s.map((x) => x.jours ?? 0)) });
         }
         const total = parProduit.reduce((t, p) => t + p.n, 0);
+        const totalHr = parProduit.reduce((t, p) => t + p.horsRun, 0);
         lignes.push("", `## Retours du ledger restés sans lot chez les produits, plus de ${SEUIL_H} h (TF-1988)`,
-          !total ? "- aucun." : `- ${total} entrée(s) \`type: retour\` chez ${parProduit.length} produit(s), qu'aucun lot de leur \`forge/retours/\` ne cite.`,
-          ...parProduit.slice(0, 8).map((p) => `  - ${p.produit} : ${p.n} sans lot, la plus ancienne de ${p.plusVieux} j${p.inconnues ? `, dont ${p.inconnues} à classe inconnue du référentiel` : ""} — nommé à sa prochaine ouverture`));
+          !total ? "- aucun." : `- ${total} entrée(s) \`type: retour\` chez ${parProduit.length} produit(s)${totalHr ? ` (dont ${totalHr} du journal hors run, TF-2260)` : ""}, qu'aucun lot de leur \`forge/retours/\` ne cite.`,
+          ...parProduit.slice(0, 8).map((p) => `  - ${p.produit} : ${p.n} sans lot${p.horsRun ? ` (dont ${p.horsRun} hors run)` : ""}, la plus ancienne de ${p.plusVieux} j${p.inconnues ? `, dont ${p.inconnues} à classe inconnue du référentiel` : ""} — nommé à sa prochaine ouverture`));
       } catch (e) { lignes.push(`- retours du ledger sans lot chez les produits : NON comptés (${String(e.message).slice(0, 160)})`); }
 
       // TF-1521 (02/10/2026) — LE REJEU D'UN DÉPLACEMENT EN ATTENTE N'ÉTAIT CÂBLÉ NULLE PART. La
@@ -499,6 +601,19 @@ if (iPilot < 0) {
       }
     }
   }
+}
+
+// TF-2442 (12/11/2026, RP-26) — UN WORKFLOW HÉBERGÉ QUI ÉCHOUE SE DIT À L'OUVERTURE DU PILOT. Le fait : du 03 au 12/11, le workflow de programmation des
+// publications d'un produit a échoué 5 fois de suite ; 3 publications du client ne sont pas parties et personne ne l'a su pendant 9 jours. Le relevé des
+// exécutions (`gh run list`, lecture seule) se joue EN ARRIÈRE-PLAN par `releve-workflows-heberges.mjs`, détaché comme le rejeu hebdomadaire (D-135 (a)) : ce
+// hook synchrone ne lit qu'un fichier de trace locale et lance le relevé s'il est périmé ; son résultat se lit à l'ouverture suivante. Chez le pilot seulement.
+// FORGE_SANS_RELEVE_WORKFLOWS=1 : aucun relevé n'est lancé (la recette du hook le pose par défaut ; son banc dédié l'ôte, sur un faux `gh` et une trace jetable).
+if (iPilot < 0) {
+  try {
+    const trace = cheminTraceWorkflows(PILOT);
+    const lancer = process.env.FORGE_SANS_RELEVE_WORKFLOWS === "1" ? null : () => lancerReleveWorkflows({ trace, pilot: PILOT });
+    lignes.push(...lignesWorkflowsHeberges(trace, { lancer }));
+  } catch (e) { lignes.push("", `## Workflows hébergés des produits : NON jugés (${String(e.message).slice(0, 120)}) — TF-2442`); }
 }
 
 // TF-0788 (décision D-3 (a), 03/09/2026) — UNE MONTÉE DE VERSION D'UN SKILL SE LIT CHEZ QUI LE
@@ -560,7 +675,7 @@ if (iPilot < 0) {
     } else {
       lignes.push(`- **BLOQUANT — ${f8.message}**`,
         "- À TRAITER AVANT TOUT AUTRE TRAVAIL de cette session : un lot remonté qui n'entre pas au registre",
-        "  n'existe pour personne, et le producteur le croit pris. Détail : node oracles/oracle-boite-entree.mjs");
+        "  n'existe pour personne, et le producteur le croit pris. Détail : node oracles/oracle-boite-entree.mjs (au ledger d'un produit, suivi par git : `--pour-ledger`, des comptes et aucun nom de fichier, TF-2339).");
     }
     // B9 (TF-1198, 19/09/2026) — le sas d'arrivée se DIT à l'ouverture. Le 19/09, six lots y ont
     // attendu deux jours sous un « boîte à jour » : une règle que le relevé d'ouverture ne lit pas
@@ -876,7 +991,7 @@ const GATES = lignesGates().slice(1);
 lignes.unshift(...GATES, "");
 function lignesGates() { return ["",
   "## Gates actifs dans cette session (R-44)",
-  "- Tout message de fin de traitement — tour qui a ÉCRIT, verdict rendu, ou message de plus de 250 mots — suit gabarits\\RESTITUTION.md v2.56.0 (30/10) : le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Bloc 0 et blocs 1, 3, 4, 5, 8 et 9 toujours présents, un bloc vide dit en une ligne ; blocs 2, 6 et 7 seulement s'ils ont un contenu. Le bloc 0 se clôt, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif, espaces en %20>) », un lien par livrable (S87, avertissante). Le hook de fin de tour ne refuse que : un bloc toujours présent absent ; une décision sans ses options (au format B, sans son tableau) ; chez un produit, « livré », « complet » ou une clôture sans les livrables des forges mobilisées à la dernière demande de `forge/mobilisation.jsonl` (S85), ou sans cette trace dès le 2026-11-02 (S86) — à chaque demande, `node <pilot>/scripts/mobiliser.mjs` y écrit les 13 verdicts motivés et rend la ligne « Je mobilise : … » ; un verdict sans fait mesuré ; une exhaustivité sans « Mesuré sur : <source>, relue à HH:MM, périmètre <n> » ; un écran qui ne reprend pas la synthèse déposée ; une D-N nouvelle non réservée (`node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit le ledger) ; un fichier servi (HTML, CSS, JS) écrit sans le verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 : joue-la toi-même, ne la propose jamais à l'humain). Le reste avertit sous la réponse, dont l'heure du bloc 1 relevée par `date` (S84) et le lien du contenu dans une demande d'avis (S83). Un tour qui n'a rien écrit rend une réponse courte de 250 mots au plus, sans verdict ni D-N ou A-N posée, quel que soit le nombre de commandes de lecture (references\\NIVEAUX.md). Préjuge une restitution avant de l'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>`.",
+  "- Tout message de fin de traitement — tour qui a ÉCRIT, verdict rendu, ou message de plus de 250 mots — suit gabarits\\RESTITUTION.md v2.67.0 (12/11) : le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Bloc 0 et blocs 1, 3, 4, 5, 8 et 9 toujours présents, un bloc vide dit en une ligne ; blocs 2, 6 et 7 seulement s'ils ont un contenu. Le bloc 0 se clôt, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif, espaces en %20>) », un lien par livrable (S87, avertissante). Le hook de fin de tour ne refuse que : un bloc toujours présent absent ; une décision sans ses options (au format B, sans son tableau) ; chez un produit, « livré », « complet » ou une clôture sans les livrables des forges mobilisées à la dernière demande de la session dans `forge/mobilisation.jsonl` (S85), ou sans cette trace dès le 2026-11-02 (S86) — à chaque demande, `node <pilot>/scripts/mobiliser.mjs` y écrit les 13 verdicts motivés et rend la ligne « Je mobilise : … » ; un verdict sans fait mesuré ; une exhaustivité sans « Mesuré sur : <source>, relue à HH:MM, périmètre <n> » ; un écran qui ne reprend pas la synthèse déposée ; une D-N nouvelle non réservée (`node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit le ledger) ; un fichier servi (HTML, CSS, JS) écrit sans le verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 : joue-la toi-même, ne la propose jamais à l'humain). Le reste avertit sous la réponse, dont l'heure du bloc 1 relevée par `date` (S84) et le lien du contenu dans une demande d'avis (S83). Un tour qui n'a rien écrit rend une réponse courte de 250 mots au plus, sans verdict ni D-N ou A-N posée, quel que soit le nombre de commandes de lecture (references\\NIVEAUX.md). Préjuge une restitution avant de l'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>`.",
   ligneCrochetReadme(),
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).",
   ...lignesPreferences()]; }
@@ -918,6 +1033,26 @@ function lignesPreferences() {
     try { out.push("", `## Conventions du client (T1, TF-1946 — ${enSlash(fichier)})`, ...corpsPlafonne(fichier)); } catch { /* illisible */ }
   } else out.push("", "## Conventions du client (T1, TF-1946)", `- aucun CONVENTIONS-CLIENT.md sous ${enSlash(client)} ni un niveau dessous : une convention de ce client rappelée par l'humain s'y écrit, dans son projet commun, en une ligne datée (2 Ko au plus)`);
   return out;
+}
+
+// D-118 (a) du 02/11/2026, TF-1954 : LA SENTINELLE DE REMESURE. Une correction close sur un gain mesuré à blanc n'était
+// jamais remesurée en service. L'ouverture du pilot joue les remesures dues, 2 au plus, et dit les écarts ; elle dit aussi
+// un avertissement de CE relevé qui survit à son item clos, d'où sa place après toutes les sections.
+if (iPilot < 0) {
+  try {
+    const { jouerDues, avertissementsSurvivants } = await import(pathToFileURL(join(PILOT, "todo", "remesurer.mjs")).href);
+    const { etatCourant } = await import(pathToFileURL(join(PILOT, "todo", "revue-hebdo.mjs")).href);
+    const etat = etatCourant(readFileSync(join(PILOT, "todo", "TODO.jsonl"), "utf8"));
+    const jour = new Date().toISOString().slice(0, 10);
+    // Sous recette, rien ne se rejoue et le journal suivi ne s'écrit pas : même signal que l'observation hebdomadaire.
+    const { jouees } = process.env.FORGE_SANS_OBSERVATION === "1" ? { jouees: [] } : jouerDues(etat, jour);
+    const restes = avertissementsSurvivants(etat, lignes.join("\n"), jour);
+    if (jouees.length || restes.length) {
+      lignes.push("", "## Remesures en service (TF-1954, todo/remesurer.mjs)");
+      for (const j of jouees) lignes.push(j.ecarts.length ? `- **ÉCART sur ${j.id}** : ${j.ecarts.join(" ; ")} (\`${j.commande}\`)` : `- ${j.id} : gain tenu en service, ${j.duree_s} s (\`${j.commande}\`)`);
+      for (const r of restes) lignes.push(`- **avertissement encore présent, item clos ${r.id}** : « ${r.avertissement} » — ${String(r.titre).slice(0, 120)}`);
+    }
+  } catch (e) { lignes.push("", `- remesures : NON jouées (${String(e.message).slice(0, 160)})`); }
 }
 
 // SORTIE EN JSON POUR LE MODE ASYNCHRONE (13/10/2026). L'extension VS Code abandonne une session

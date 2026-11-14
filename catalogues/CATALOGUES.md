@@ -1,7 +1,7 @@
 # Catalogues de services des forges — vue générée
 
 > **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
-> 109 services · 91 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
+> 111 services · 93 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
 
@@ -32,7 +32,7 @@
 | cat-des-09 | **Contrôler la généricité d'une interface (règles importées)** | vérifier mécaniquement ce qui, dans un rendu, trahit une interface faite par défaut | `node oracles\oracle-taste.mjs <page.html>` | TF-0199 (14/08) : règles extraites d'une source externe MIT (consultée le 14/08), self-test 13 oracles / 56 règles. TA1/TA2 rétrogradées APRÈS mesure : la borne de saturation condamnait toute palette OKLCH du corpus, et la source se contredit (son propre accent recommandé viole sa règle) | prouve | experimental |
 | cat-des-10 | **Thème Power BI dérivé de la marque** | livrer des rapports Power BI au thème de la marque, jamais au thème par défaut | `node scripts\generer-theme-powerbi.mjs <tokens.json> --sortie <theme.json> · node oracles\oracle-theme-powerbi.mjs <tokens.json> <theme.json>` | TF-0863 (07/09) : self-test double sens (verte = régénération du corpus, rouge = thème par défaut Power BI → TP2, TP3) | prouve | experimental |
 
-## forge-development (pipeline) — 9 services
+## forge-development (pipeline) — 10 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -45,6 +45,7 @@
 | cat-dev-07 | **Gate de mutation (3e métrique)** | mesurer la force réelle de mes tests, pas seulement leur couverture | `digit-ai-forge-development\conductor\gates\mutation_gate.py + job CI mutation` | TF-0103 (12/08) : mesure réelle Docker 61,1 % (223/365) — honnête, sous seuil, consignée | prouve | experimental |
 | cat-dev-08 | **Gate parité runtime (conteneur Python, Worker Cloudflare)** | vérifier que ce que mes tests exécutent est ce que la production sert | `uv run python -m conductor.gates.runtime_parity_gate <repo cible>` | TF-1042 (13 cas) et TF-1998 du 29/10/2026 (16 cas double sens ; configurations synthétiques, aucun Worker exécuté) | prouve | experimental |
 | cat-dev-09 | **Gate Supabase côté serveur** | bloquer une session lue sans vérification côté serveur, un paquet auth-helpers et un proxy.ts ignoré | `uv run python -m conductor.gates.supabase_ssr_gate <repo cible>` | TF-2008 du 29/10/2026 : 14 cas double sens, pages supabase.com lues le 29/10/2026 | prouve | experimental |
+| cat-dev-10 | **Gate des erreurs de formulaire** | refuser une saisie refusée affichée loin de son champ, sans champ désigné ni forme attendue | `uv run python -m conductor.gates.formulaire_erreurs_gate <repo cible> <forge-design> <adresse d un écran> [<autre adresse> …]` | TF-2172 du 05/11/2026 : 30 cas, dont 4 sur l'oracle réel ; le bandeau « Refusé : CIBLE_INVALIDE » traversait les 6 gates existants et rend FAIL | prouve | experimental |
 
 ## forge-tests (pipeline) — 10 services
 
@@ -142,7 +143,7 @@
 | cat-seo-03 | **Valider forge et mission** | vérifier mécaniquement l'intégrité de la forge et d'une mission | `python scripts\validate.py [--mission <chemin>]` | exécuté 9/9 (forge) et 5/5 (mission réelle) | prouve | production |
 | cat-seo-04 | **Rapport HTML vérifié** | recevoir un rapport d'audit autonome et contrôlé avant remise | `python scripts\rapport_html.py --verifier` | rapport client réel livré (6e itération), contrôles exécutés | prouve | production |
 | cat-seo-05 | **Runs de suivi récurrents** | suivre l'évolution SEO d'un site entre deux audits | `méthode documentée (récurrence post-MEP)` | jamais exercé — un seul run réel à ce jour ; snapshot en dérive de schéma (D-S2) | declare | experimental |
-| cat-seo-06 | **Instrumentation de crawl avancée** | mesurer aussi les sites JS, le balisage, les CWV terrain (clé CrUX gratuite requise — sinon nœud 31 non mesuré) et les crawlers IA (journaux serveur requis, accès souvent exceptionnel — sinon verdict non mesurable motivé, nœud 58 jugé sur robots.txt/llms.txt seuls) | `python scripts\{crawler.py --rendu-js, crux.py, agents_ia.py}` | TF-0105 (12/08) : 22 tests de preuve + validate 12/12 rejoué pilot ; intégration rapport en restes | prouve | experimental |
+| cat-seo-06 | **Instrumentation de crawl avancée** | mesurer aussi les sites JS, le balisage, les CWV terrain (clé CrUX gratuite requise — sinon nœud 32 non mesuré) et les crawlers IA (journaux serveur requis, accès souvent exceptionnel — sinon verdict non mesurable motivé, nœud 59 jugé sur robots.txt/llms.txt seuls) | `python scripts\{crawler.py --rendu-js, crux.py, agents_ia.py}` | TF-0105 (12/08) : 22 tests de preuve + validate 12/12 rejoué pilot ; intégration rapport en restes | prouve | experimental |
 | cat-seo-07 | **Scorer et écrire le CSV d'actions** | transformer les actions rédigées de la mission en CSV scoré, trié et contrôlé | `python scripts\scorer_actions.py --mission <chemin>` | TF-0073 (12/08) : 17/17 preuves double sens + bout-en-bout réel 8/8, rejoués par le pilot | prouve | experimental |
 | cat-seo-08 | **Redirections qui préservent le chemin (Cloudflare)** | vérifier que mes anciens domaines et chemins redirigés portent le chemin jusqu'à la page cible, sans variable restée littérale | `python scripts\oracle_redirections.py --sonder <url> \| --regles <fichier> [--assume <id>] [--projet .]` | TF-1997 (29/10/2026, commit 8d4348b) : 60/60 et 13/13 à double sens, 4/4 mutations tuées, recette 378/378 | prouve | experimental |
 
@@ -155,7 +156,7 @@
 | cat-org-03 | **Études normatives** | ancrer les pratiques sur les normes du métier | `conversationnel` | étude documentée — contrôles proposés non implémentés | declare | experimental |
 | cat-org-04 | **Gate de conventions packagé** | vérifier les conventions en pre-commit/CI sans dépendre de la forge | `node output\02-composants\gate-conventions\gate-conventions.mjs [--staged]` | TF-0109 (12/08) : self-test 6/6 + 2 robustesse, rejoué pilot ; PROPOSÉ aux dépôts, jamais déployé d'office | prouve | experimental |
 
-## forge-agents-security (sur mandat) — 5 services
+## forge-agents-security (sur mandat) — 6 services
 
 | id | Service | Intention (« je veux… ») | Point d'entrée | Preuve | Statut | Cycle |
 |---|---|---|---|---|---|---|
@@ -164,6 +165,7 @@
 | cat-asc-03 | **Rejouer un corpus d'injection de prompt** | savoir si une charge d'injection a TRAVERSÉ jusqu'à un acte de mon agent | `node oracles\oracle-corpus-injection.mjs <cible>` | TF-0188 (14/08) : self-test 38 PASS (24 avant), dont 2 voisins légitimes qui NE déclenchent pas. Rejeu PASSIF sur artefact : aucun modèle sollicité, donc la résistance d'un système vivant n'est pas mesurée | prouve | experimental |
 | cat-asc-04 | **Juger un agent lancé par un workflow GitHub Actions** | savoir qui peut déclencher l'agent de mon workflow, quel texte de tiers devient sa consigne et quels secrets son shell lit | `node oracles\oracle-scan-workflow-agent.mjs <dépôt \| dossier \| fichier.yml>` | TF-2002 (29/10/2026, commit b1500a8) : self-test 76 PASS (55 avant), 20 des 21 contrôles neufs rouges sur le code d'avant | prouve | experimental |
 | cat-asc-05 | **Juger le serveur MCP de Supabase donné à un agent** | savoir si la configuration MCP de mon agent le borne à un projet de développement, en lecture seule, sans jeton en clair ni groupe qui dépense | `node oracles\oracle-scan-mcp-supabase.mjs <fichier \| dossier> --production <ref>` | TF-2009 (29/10/2026, commit 0463807) : self-test 100 PASS (76 avant), 23 des 24 contrôles neufs rouges sur le code d'avant | prouve | experimental |
+| cat-asc-06 | **Rejouer l'arrêt d'urgence d'une mission en course** | savoir si l'arrêt d'urgence de ma mission tient quand un job a déjà été autorisé : aucun job ne démarre après l'arrêt, aucun effet n'est émis, aucune action en cours n'est laissée sans accusé | `node oracles\oracle-arret-en-course.mjs <journal.jsonl>` | TF-2217 (06/11/2026, commit 4b5a5fa) : trois fixtures rouges (AU-1, AU-2, AU-3) et une verte ; self-test de la forge 125 PASS à 448eac5, relevé le 06/11/2026 | prouve | experimental |
 
 ## forge-websec (sur mandat) — 7 services
 

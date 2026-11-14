@@ -75,6 +75,11 @@ Un verdict « derive » de gravité majeure ou bloquante est une **alerte**. Dep
 
 Chaque restitution d'un tour de travail porte au **bloc 4** une ligne `Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif>` (S79, `oracles\oracle-synthese.mjs`, avertissante pendant l'essai ; N vaut 1 ou 2). « sert après N passe(s) » dit qu'une alerte a été levée par N passes de correction sans l'humain : elle ne devient pas une décision au bloc 3. « dérive » reste la ligne d'un écart qui demeure ou relève d'un choix de l'humain, et seul celui-là devient une décision.
 
+**Une règle nommée sans son texte déclenche une alerte** (décision humaine D-116 (b) du 02/11/2026, TF-1972). `--preparer consigne`
+signale en tête de sa sortie une consigne qui nomme une règle par son identifiant (`XYZ0202-R05`, « règle R-38 ») sans une citation
+d'au moins 6 mots, ou une ligne citée, sur la ligne ou dans les 3 suivantes. Le 20/10/2026, un plan et un prompt ont contredit une
+règle écrite et claire d'un produit, relus 4 fois sans son texte. Rien n'est imposé au livrable ; une citation se vérifie à la source.
+
 ## La boucle de correction (D-26 (a) du 18/10/2026)
 
 *Le fait.* Le 18/10, 0 alerte sur 1 a été corrigée sans l'humain : aucun agent ne reprenait une alerte, qui était notée puis posée. La seule corrigée l'a été à la main, en une passe (RI-20261018-01 « derive », puis RI-20261018-02 « sert »). La boucle rend ce geste systématique, borné et mesuré, pour tous les travaux, ceux du pilot comme ceux des produits.
@@ -113,9 +118,9 @@ Le référentiel `references\RELECTURE-INTENTION-REGLES.json` (loi n° 4 : une d
 ## Dates, seuil, revue
 
 - **Essai** : du 2026-10-18 au 2026-11-01. **Revue** : le 2026-11-08.
-- **Seuil d'arrêt** : plus de 4 000 000 de jetons de relecture par jour (décision humaine D-25 du 18/10/2026 : le seuil d'ouverture, 1 000 000, a été franchi le jour même à 1 145 733 jetons, dont 12 relectures d'une mesure ponctuelle et 5 d'une autre session). Le seuil porte sur les jetons consommés par les relectures d'intention, la dépense que l'essai ajoute. S'il est franchi, le pilot **arrête l'essai et demande** à l'humain ; il ne le poursuit pas de lui-même.
+- **Seuil d'arrêt** : plus de 6 000 000 de jetons de relecture par jour (décision humaine D-165 (c) du 04/11/2026 : le seuil de 4 000 000 avait été franchi le 03/11 à 5 620 487 jetons ; il venait de D-25 du 18/10/2026, après le seuil d'ouverture de 1 000 000, franchi le jour même à 1 145 733 jetons, dont 12 relectures d'une mesure ponctuelle et 5 d'une autre session). Le seuil porte sur les jetons consommés par les relectures d'intention, la dépense que l'essai ajoute. S'il est franchi, le pilot **arrête l'essai et demande** à l'humain ; il ne le poursuit pas de lui-même.
 - **Coût attendu** : environ 0,5 million de jetons par jour (étude, chapitre 4, O4), à recompter au relevé de flotte.
-- **Après l'essai** (décision humaine D-73 (b) du 26/10/2026, diagnostic « Oeil critique - 20261026a », §d-T3) : la relecture par tour est **prolongée en service** au-delà du 2026-11-01, avec le seuil d'arrêt de l'essai, 4 000 000 de jetons par jour. Elle remplace le retrait 2 du 21/10 (D-64 (a)), qui ne la prolongeait pas. La transformation T3 (TF-1948) la fera juger la réponse contre les 3 lignes du tour 1 et corriger d'abord, en 2 passes. La revue du 2026-11-08 garde ses critères ci-dessous.
+- **Après l'essai** (décision humaine D-73 (b) du 26/10/2026, diagnostic « Oeil critique - 20261026a », §d-T3) : la relecture par tour est **prolongée en service** au-delà du 2026-11-01, avec le seuil d'arrêt de l'essai, 4 000 000 de jetons par jour, relevé à 6 000 000 par D-165 (c) du 04/11/2026. Elle remplace le retrait 2 du 21/10 (D-64 (a)), qui ne la prolongeait pas. La transformation T3 (TF-1948) la fera juger la réponse contre les 3 lignes du tour 1 et corriger d'abord, en 2 passes. La revue du 2026-11-08 garde ses critères ci-dessous.
 - **Critères de la revue**, par type de travail : part des alertes que l'humain confirme (au moins 1 sur 2 pour garder le type) ; travaux repris par l'humain sans alerte préalable (0 visé) ; jetons par relecture et par jour, recomptés à la source. Un type dont les alertes sont confirmées moins d'une fois sur 2 passe à l'accord de 2 relecteurs (étude « lecteur visé », 13/10/2026).
 
 ## Non jugé (déclaré)

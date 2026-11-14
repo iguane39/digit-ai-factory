@@ -30,3 +30,18 @@ grandi). Périmée : « working tree vide » — 3 dossiers `baseline/` NON SUIV
 artefact VERSIONNÉ par contrat (TF-0102, `maquette-bailleur` l'est) : ces verrous de
 régression visuelle ne survivent pas à un clone. → candidature `revue-20260819-design`.
 D-D3 (producteur d'images local) et le mode aval de critique-le-design restent en l'état.
+
+### Annotation — 13/11/2026 (TF-2473, suite de TF-2461) : le rendu lit FORGE_DESIGN_PYTHON, plus l'environnement uv
+
+Ce qui change pour un produit : `--rendu` (la critique de `run-oracles-design.mjs`) ne lance plus `uv` et ne lit plus le
+dossier courant (forge-design b6ebb1a, `oracles/lib/rendu.mjs`). Il prend l'interpréteur Python dans cet ordre :
+`$FORGE_DESIGN_PYTHON`, puis `python` ou `python3` du PATH qui importe playwright, puis le `.venv` sous la racine de la forge.
+Un produit dont playwright vit seulement dans son environnement uv rend donc SKIP au rendu tant qu'il ne pose pas
+`FORGE_DESIGN_PYTHON`, et le verdict ne dépend plus du dossier d'où il lance.
+
+Le geste, à faire par le produit lui-même (le pilot n'écrit pas chez un produit, R-58) : lire l'interpréteur de son
+environnement avec `uv run python -c "import sys; print(sys.executable)"` (mesuré le 13/11/2026 : rend un chemin absolu),
+puis le poser avant la critique, en PowerShell `$env:FORGE_DESIGN_PYTHON = "<ce chemin>"`, en Bash `export FORGE_DESIGN_PYTHON="<ce chemin>"`.
+Une consigne, au pilot comme chez un produit, ne dit plus « playwright dans l'environnement uv » pour le rendu : elle dit
+`FORGE_DESIGN_PYTHON`. `oracles\oracle-chemin-prescrit.mjs` (règle CP5) refuse chez le pilot une ligne qui cite le repli retiré.
+Relevé du 13/11/2026 par `git grep` sur le pilot : aucune consigne du pilot ne le citait ; les produits ne sont pas relevés d'ici.

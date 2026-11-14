@@ -1,10 +1,10 @@
 # Niveaux d'intervention — proportionner la réponse à la question
 
-Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.7.0,
-30/10/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
+Référentiel daté (loi n° 4 : une donnée volatile est datée, sourcée, éditable) — **version 1.9.0,
+12/11/2026** (1.0.0 du 25/09 ; 1.1.0 ajoute la mise en page du niveau Simple ; 1.2.0 met le niveau
 Moyen en essai ; 1.3.0 ne compte plus une copie vers le dossier temporaire comme un effet ; 1.4.0
 consigne la revue de l'essai ; 1.5.0 engage l'étape 3, la propagation aux produits ; 1.6.0 juge la
-réponse courte sur les écritures du tour, plus sur le nombre de commandes ; 1.7.0 porte la réponse courte à 250 mots et sort le dossier temporaire des écritures, décision D-101 (b) du 29/10/2026). Source : l'étude `output\03-etudes\2026-09\20260925-etude-opportunite-niveaux-d-intervention.md`,
+réponse courte sur les écritures du tour, plus sur le nombre de commandes ; 1.7.0 porte la réponse courte à 250 mots et sort le dossier temporaire des écritures, décision D-101 (b) du 29/10/2026 ; 1.8.0 fait lire l'aide d'un outil avant d'en prescrire la mise à jour, TF-2224 ; 1.9.0 nomme `--prejuger` en plus de `--pre-vol` pour préjuger une réponse courte, TF-2464). Source : l'étude `output\03-etudes\2026-09\20260925-etude-opportunite-niveaux-d-intervention.md`,
 verdict O3 (3 niveaux fixés par les effets du tour, déployés en 3 étapes), validé par la décision
 humaine D-3 (a) du 25/09/2026. Candidature au registre : TF-1418 (niveaux d'intervention, étape 1).
 
@@ -50,6 +50,13 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
   > - Le planificateur Windows peut préparer le dossier le lundi.
   >
   > Source : `oracles/hook-ouverture.mjs:448`.
+- **Commande d'outil** (06/11/2026, TF-2224) : une commande qui met à jour, répare ou reconfigure un
+  outil du poste se lit dans l'aide de cet outil, jouée dans le tour (`<outil> --help`). Sa commande
+  dédiée vient en premier, la voie générique (npm, pip, winget, réinstallation) en repli. *Le fait* :
+  le 06/11/2026, une réponse Simple a prescrit `npm install -g @anthropic-ai/claude-code`, alors que
+  `claude --help` liste `update` ; il a fallu 2 messages humains pour l'obtenir. Aucun contrôle ne le juge : sur
+  2 612 messages des deux profils du poste, 8 prescrivent une commande de gestionnaire de paquets
+  sans aide lue dans le tour, et 7 sont des installations de dépendance légitimes.
 - **Brouillon** : la réponse se joue par `--pre-vol`, depuis un heredoc ou un fichier du dossier
   temporaire : depuis D-101 (b) du 29/10/2026, un brouillon temporaire ne fait plus du tour un tour de
   travail. *Le fait* : le 29/10, 2 fichiers de travail écrits dans ce dossier ont fait refuser un message
@@ -59,6 +66,14 @@ comme cible au lieu d'être atteinte par hasard. Ses bornes sont celles de l'exe
   26/10/2026, il relit aussi la transcription de la session et rend les écritures du tour
   (`ecritures_du_tour`). Exit 1 = le juge de fin de tour la refuserait : raccourcir, retirer la décision
   posée, ou restituer en entier un tour qui a écrit.
+  **`--prejuger <fichier>` juge aussi une réponse courte** (TF-2445 puis TF-2464, 12/11/2026) : le même
+  brouillon, écrit dans le dossier temporaire, se joue par `node oracles/hook-restitution.mjs --prejuger
+  <fichier>`. Il lit les écritures du tour au transcript ; si le tour n'a rien écrit, il applique
+  l'exemption comme le hook de fin de tour (verdict `affichable`, exit 0 ou 1) ; si le tour a écrit, le
+  brouillon reste jugé en restitution complète, de même qu'un brouillon sans transcript retrouvé. Un
+  brouillon « Niveau : Moyen » garde `--pre-vol`, qui juge sa forme. *Le fait* : avant le 12/11/2026,
+  `--prejuger`, que le rappel du hook prescrit, rendait `affichable: false` sur un brouillon court de 207 mots
+  d'un tour sans écriture, et ce référentiel ne nommait que `--pre-vol`.
   Une décision se cite dans la prose (« la décision de départ, D-39 »), elle ne se pose jamais. *Le
   fait* : le 01/10, une réponse de 158 mots a été refusée après affichage, et l'humain l'a lue 2 fois.
 - **Escalade** : dès qu'il faut écrire, rendre un verdict ou poser une décision, le tour quitte le
@@ -199,7 +214,8 @@ comme au pilot, avec les mêmes bornes, la même forme et la même escalade par 
   par le même lanceur. Il s'éveille dès que `forge\NIVEAUX.md` existe, et sa ligne cite ce chemin.
 - **Les chemins cités plus haut** (`oracles\…`, `gabarits\…`, `output\…`) sont ceux du pilot. Chez un
   produit, le contrôle avant affichage se joue par `node forge/hooks/factory.mjs restitution
-  --pre-vol`, et le gabarit de restitution est `forge\RESTITUTION.md`.
+  --pre-vol` ou `node forge/hooks/factory.mjs restitution --prejuger <fichier>`, et le gabarit de
+  restitution est `forge\RESTITUTION.md`.
 - **Les invariants** ne bougent pas, et chez un produit s'y ajoute la ligne « Remontée à la
   factory » de toute restitution complète.
 - **Recette** : `gabarits\hooks-factory.test.mjs`, sur un produit jetable : une réponse Simple courte

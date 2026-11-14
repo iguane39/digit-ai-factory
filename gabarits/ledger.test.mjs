@@ -54,7 +54,7 @@ const entrees = (d) => readFileSync(join(d, "forge", "ledger.jsonl"), "utf8").sp
 
 // Le témoin rouge : le gabarit privé de ses deux protections. La chirurgie est VÉRIFIÉE, sans quoi le rouge serait vide.
 const sansFlux = GABARIT.replace(/for _flux in \(sys\.stdout, sys\.stderr\):[\s\S]*?pass\n/, "");
-const MUTANT = sansFlux.replace("    afficher(ajouter(run, type_, **champs))", "    print(json.dumps(ajouter(run, type_, **champs), ensure_ascii=False))");
+const MUTANT = sansFlux.replace("    afficher(ajouter(archive, type_, **champs))", "    print(json.dumps(ajouter(archive, type_, **champs), ensure_ascii=False))");
 
 const dossiers = [];
 try {
@@ -284,7 +284,7 @@ try {
     for (const f of readdirSync(d).filter((x) => x.endsWith(".mjs") && !x.includes(".test.")))
       for (const t of typesDe(readFileSync(join(d, f), "utf8"))) prescrits.add(t);
   }
-  const LEDGER_MJS = join(ICI, "..", "..", "digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
+  const LEDGER_MJS = join(process.env.FORGE_ROOT || join(ICI, "..", ".."), "digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
   if (existsSync(LEDGER_MJS)) for (const t of typesDe(readFileSync(LEDGER_MJS, "utf8"))) prescrits.add(t);
   check(`TF-2018 vert — les ${prescrits.size} types de rectification prescrits par le parc sont au vocabulaire du gabarit`, () => {
     const v = vocabulaire(GABARIT);
@@ -296,6 +296,243 @@ try {
     const mutant = GABARIT.replace(' "rectification_versions_forges",', "");
     att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
     att(!vocabulaire(mutant).has("rectification_versions_forges") && prescrits.has("rectification_versions_forges"), "le mutant passe");
+  });
+
+  // TF-2083 (RT-38, 29/10/2026) : `conflit_regles` (R-43) et quatre autres types — `demande_emise`,
+  // `demande_recue`, `deplacement_effectue`, `deplacement_en_attente` — sont prescrits « au ledger »
+  // du produit par les gabarits de doctrine, et ce gabarit les refusait comme types inconnus. Test
+  // croisé : tout `type: X` que CLAUDE-PRODUIT.md, CLAUDE-PRODUIT-DETAIL.md ou REGLES-PROJET.md
+  // prescrit entre guillemets inversés doit être au vocabulaire du gabarit.
+  const DOCTRINE = [
+    join(ICI, "CLAUDE-PRODUIT.md"),
+    join(ICI, "..", "references", "CLAUDE-PRODUIT-DETAIL.md"),
+    join(ICI, "..", "REGLES-PROJET.md"),
+  ].filter((f) => existsSync(f));
+  const prescritsDoctrine = new Set();
+  for (const f of DOCTRINE)
+    for (const m of readFileSync(f, "utf8").matchAll(/`type: ?([a-z_]+)`/g)) prescritsDoctrine.add(m[1]);
+  check(`TF-2083 vert — les ${prescritsDoctrine.size} types prescrits au ledger par les gabarits de doctrine sont au vocabulaire`, () => {
+    const v = vocabulaire(GABARIT);
+    att(prescritsDoctrine.size >= 5, `relevé insuffisant (${prescritsDoctrine.size}) : le test croisé ne voit pas la doctrine`);
+    const manquants = [...prescritsDoctrine].filter((t) => !v.has(t));
+    att(!manquants.length, `hors vocabulaire : ${manquants.join(", ")}`);
+  });
+  check("TF-2083 rouge — sans conflit_regles au vocabulaire, le test croisé le voit", () => {
+    const mutant = GABARIT.replace(' "conflit_regles",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    att(!vocabulaire(mutant).has("conflit_regles") && prescritsDoctrine.has("conflit_regles"), "le mutant passe");
+  });
+  // TF-2494 (13/11/2026) : le message de R-42 d'oracle-conformite-projet PRESCRIT `type: anteriorite_ledger` (TF-1203) pour
+  // couvrir en bloc des écarts anciens, et ce gabarit le refusait comme type inconnu : le remède prescrit n'était pas
+  // écrivable. Test croisé (tout `type: X` que l'oracle prescrit est au vocabulaire), puis le REMÈDE JOUÉ de bout en bout
+  // (TF-1013) : l'écrivain écrit l'entrée que le message demande, et R-42 la lit et passe.
+  const ORACLE_CONFORMITE = join(ICI, "..", "oracles", "oracle-conformite-projet.mjs");
+  const prescritsR42 = new Set([...readFileSync(ORACLE_CONFORMITE, "utf8").matchAll(/`type: ?([a-z_]+)`/g)].map((m) => m[1]));
+  check(`TF-2494 vert — les ${prescritsR42.size} types que le message de R-42 prescrit sont au vocabulaire du gabarit`, () => {
+    att(prescritsR42.has("anteriorite_ledger") && prescritsR42.has("rectification_horodatage"), `relevé incomplet : ${[...prescritsR42]}`);
+    const v = vocabulaire(GABARIT);
+    const manquants = [...prescritsR42].filter((t) => !v.has(t));
+    att(!manquants.length, `hors vocabulaire : ${manquants.join(", ")}`);
+  });
+  check("TF-2494 rouge — sans anteriorite_ledger au vocabulaire, le test croisé le voit et l'écrivain refuse le remède prescrit", () => {
+    const mutant = GABARIT.replace(' "anteriorite_ledger",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    att(!vocabulaire(mutant).has("anteriorite_ledger") && prescritsR42.has("anteriorite_ledger"), "le mutant passe le croisement");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "anteriorite_ledger", "--avant", "2026-09-01T00:00:00Z", "--cause", "lacune du 02/08 antérieure à la session"], { encoding: "utf8", env: CONSOLE });
+    att(r.status !== 0 && /type inconnu/.test(r.stderr || ""), `le mutant écrit : exit ${r.status} ${r.stderr}`);
+  });
+  /** Un produit dont le ledger porte un saut de seq EN AVANT (3 puis 7), écrit à la main comme le ferait un second écrivain perdu. */
+  const produitAvecSaut = () => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-saut-")); dossiers.push(d);
+    mkdirSync(join(d, "forge"));
+    writeFileSync(join(d, "forge", "ledger.py"), GABARIT, "utf8");
+    writeFileSync(join(d, "forge", "ledger.jsonl"), [
+      { seq: 1, ts: "2026-08-01T08:00:00Z", type: "run_open", run_id: "essai" },
+      { seq: 2, ts: "2026-08-02T09:00:00Z", type: "retour" },
+      { seq: 3, ts: "2026-08-02T09:30:00Z", type: "etape_close" },
+      { seq: 7, ts: "2026-08-03T10:00:00Z", type: "retour" },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    return { d, script: join(d, "forge", "ledger.py") };
+  };
+  const r42 = (d) => {
+    const r = spawnSync(process.execPath, [ORACLE_CONFORMITE, d], { encoding: "utf8" });
+    return (JSON.parse(r.stdout || "{}").findings || []).filter((f) => f.regle === "R-42");
+  };
+  check("TF-2494 rouge — le saut de seq 3 → 7 que rien ne déclare est un écart de R-42", () => {
+    const { d } = produitAvecSaut();
+    att(r42(d).some((f) => f.statut === "FAIL" && /seq 7 là où 4 était attendu/.test(f.message)), `R-42 : ${JSON.stringify(r42(d))}`);
+  });
+  check("TF-2494 vert — le remède prescrit (anteriorite_ledger, écrite par l'écrivain) couvre le saut ancien : R-42 passe, [ANTÉRIORITÉ] imprimé", () => {
+    const { d, script } = produitAvecSaut();
+    const r = spawnSync(PYTHON, [script, "anteriorite_ledger", "--avant", "2026-09-01T00:00:00Z", "--cause", "lacune de seq du 03/08, antérieure à la session qui la révèle"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `le remède prescrit est refusé : exit ${r.status} ${r.stderr}`);
+    const f = r42(d);
+    att(!f.some((x) => x.statut === "FAIL") && f.some((x) => x.statut === "PASS" && /\[ANTÉRIORITÉ\] seq 7 là où 4 était attendu : saut en avant/.test(x.message)), `R-42 : ${JSON.stringify(f)}`);
+  });
+  check("TF-2494 vert — le remède prescrit (rectification_horodatage nommant le seq qui suit la lacune) couvre le saut : R-42 passe, [RECTIFIÉ] imprimé", () => {
+    const { d, script } = produitAvecSaut();
+    const entrees = JSON.stringify([{ seq: 7, ts_consigne: "2026-08-03T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu" }]);
+    const r = spawnSync(PYTHON, [script, "rectification_horodatage", "--entrees", entrees], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `exit ${r.status} ${r.stderr}`);
+    const f = r42(d);
+    att(!f.some((x) => x.statut === "FAIL") && f.some((x) => x.statut === "PASS" && /\[RECTIFIÉ\] seq 7 là où 4 était attendu : saut en avant/.test(x.message)), `R-42 : ${JSON.stringify(f)}`);
+  });
+  // TF-2198 (RP-18, 06/11/2026) : `demande_humain`, le type qui consigne une demande humaine mot pour
+  // mot, était refusé par le gabarit (type inconnu) : un produit l'écrivait à la main (2 entrées sur 458
+  // à son ledger) et la revue du 04/11 n'a été consignée qu'en résumé. Test croisé avec `ledger.mjs` :
+  // tout type que le script de doctrine nomme en constante (`const TYPE_X = "…"`) est au vocabulaire.
+  const typesConstantsMjs = new Set(existsSync(LEDGER_MJS)
+    ? [...readFileSync(LEDGER_MJS, "utf8").matchAll(/^const TYPE_[A-Z_]+ = "([a-z_]+)";/gm)].map((m) => m[1]) : []);
+  if (existsSync(LEDGER_MJS)) check(`TF-2198 vert — les ${typesConstantsMjs.size} types nommés en constante par ledger.mjs sont au vocabulaire du gabarit`, () => {
+    att(typesConstantsMjs.size >= 2, `relevé insuffisant (${typesConstantsMjs.size}) : le test croisé ne voit pas ledger.mjs`);
+    const v = vocabulaire(GABARIT);
+    const manquants = [...typesConstantsMjs].filter((t) => !v.has(t));
+    att(!manquants.length, `hors vocabulaire : ${manquants.join(", ")}`);
+  });
+  else console.log("  [SAUTÉ] TF-2198 — ledger.mjs de forge-agents absent de ce poste : le croisement n'est pas joué");
+  check("TF-2198 vert — demande_humain s'écrit au ledger du produit et --verifier ne la déclare pas hors vocabulaire", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "demande_humain", "--verbatim", "Refais la revue de la colonne Parcours, en entier", "--tour", "revue du 04/11"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `écriture refusée : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "demande_humain" && /colonne Parcours/.test(e.verbatim), `entrée écrite : ${JSON.stringify(e)}`);
+    const v = spawnSync(PYTHON, [script, "--verifier"], { encoding: "utf8", env: CONSOLE });
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2198 rouge — sans demande_humain au vocabulaire, l'écriture est refusée comme type inconnu", () => {
+    const mutant = GABARIT.replace(' "demande_humain",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "demande_humain", "--verbatim", "essai"], { encoding: "utf8", env: CONSOLE });
+    att(r.status !== 0 && /type inconnu/.test(r.stderr || ""), `le mutant écrit : exit ${r.status} ${r.stderr}`);
+  });
+  // TF-2206 (RP-26, 06/11/2026) : une décision qui en remplace une autre doit dire QUOI elle remplace et ce que devient
+  // ce que la première avait créé. Le ledger porte `remplace` (la ou les décisions remplacées) et `artefacts_remplaces`
+  // (liste de { artefact, sort }, sort parmi retire, conserve, a_decider). L'écrivain refuse la forme fausse AVANT d'écrire,
+  // rappelle l'oubli des artefacts sur la sortie d'erreur, et `--verifier` le déclare sur une entrée déjà écrite.
+  const ARTEFACTS = JSON.stringify([{ artefact: "11 ressources Azure du groupe rg-demo", sort: "retire" }, { artefact: "E-108 et son smoke", sort: "a_decider" }]);
+  check("TF-2206 vert — une décision qui remplace D-46 liste ses artefacts avec leur sort, l'entrée est écrite et --verifier ne déclare rien", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "reponse_humain", "--decision", "D-49", "--remplace", "D-46", "--artefacts_remplaces", ARTEFACTS], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0 && !/À PORTER/.test(r.stderr), `écriture : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.remplace === "D-46" && Array.isArray(e.artefacts_remplaces) && e.artefacts_remplaces[0].sort === "retire", `entrée : ${JSON.stringify(e)}`);
+    const v = spawnSync(PYTHON, [script, "--verifier"], { encoding: "utf8", env: CONSOLE });
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2206 rouge — un remplacement sans artefacts est écrit mais l'oubli se dit sur la sortie d'erreur, et --verifier le déclare sans échouer", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "reponse_humain", "--decision", "D-49", "--remplace", "D-46"], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0 && /À PORTER/.test(r.stderr) && /artefacts_remplaces/.test(r.stderr), `sortie d'erreur : ${r.stderr}`);
+    const v = spawnSync(PYTHON, [script, "--verifier"], { encoding: "utf8", env: CONSOLE });
+    att(v.status === 0 && /DÉCLARÉ/.test(v.stdout) && /remplace D-46/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2206 rouge — un sort inconnu, une liste vide et un remplace vide sont refusés sans rien écrire", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const avant = entrees(d).length;
+    const essais = [
+      ["--remplace", "D-46", "--artefacts_remplaces", JSON.stringify([{ artefact: "x", sort: "peut-etre" }])],
+      ["--remplace", "D-46", "--artefacts_remplaces", "[]"],
+      ["--remplace", "D-46", "--artefacts_remplaces", JSON.stringify([{ sort: "retire" }])],
+      ["--artefacts_remplaces", ARTEFACTS],
+      ["--remplace", "[]"],
+    ];
+    for (const a of essais) {
+      const r = spawnSync(PYTHON, [script, "reponse_humain", "--decision", "D-49", ...a], { encoding: "utf8", env: CONSOLE });
+      att(r.status !== 0, `accepté à tort : ${a.join(" ")}`);
+    }
+    att(entrees(d).length === avant, "une entrée refusée a pourtant été écrite");
+  });
+  check("TF-2206 vert — le champ booléen remplace de secret_range (forge/ranger-secret.mjs) n'est pas une décision remplacée : l'entrée s'écrit", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    for (const v of ["false", "true"]) {
+      const r = spawnSync(PYTHON, [script, "secret_range", "--variable", "ESSAI_CLE", "--fichier", ".env", "--empreinte_sha256", "ab12", "--date", "2026-11-06", "--remplace", v], { encoding: "utf8", env: CONSOLE });
+      att(r.status === 0, `secret_range --remplace ${v} refusé : exit ${r.status} ${r.stderr}`);
+    }
+    const e = entrees(d).at(-1);
+    att(e.type === "secret_range" && e.remplace === true, `entrée : ${JSON.stringify(e)}`);
+    const refus = spawnSync(PYTHON, [script, "reponse_humain", "--remplace", "true"], { encoding: "utf8", env: CONSOLE });
+    att(refus.status !== 0, "un remplace booléen sur une décision doit rester refusé");
+  });
+  // TF-2284 (06/11/2026) : l'écriture exemptait secret_range, `--verifier` non : il déclarait « remplace true sans artefacts_remplaces » sur une entrée que l'écrivain venait d'accepter.
+  const lancer = (script, ...a) => spawnSync(PYTHON, [script, ...a], { encoding: "utf8", env: CONSOLE });
+  const ecrireSecret = (script) => lancer(script, "secret_range", "--variable", "ESSAI_CLE", "--fichier", ".env", "--empreinte_sha256", "ab12", "--date", "2026-11-06", "--remplace", "true");
+  check("TF-2284 vert — un secret_range qui porte remplace true est écrit, et --verifier ne le déclare pas", () => {
+    const { d, script } = produit(GABARIT); dossiers.push(d);
+    const r = ecrireSecret(script);
+    att(r.status === 0, `écriture : exit ${r.status} ${r.stderr}`);
+    att(entrees(d).at(-1).remplace === true, `entrée : ${JSON.stringify(entrees(d).at(-1))}`);
+    const v = lancer(script, "--verifier");
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE|artefacts_remplaces/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2284 rouge — sans l'exemption, --verifier déclare à tort le secret_range ; une décision qui remplace sans artefacts reste déclarée avec elle", () => {
+    const mutant = GABARIT.replace('x["type"] != "secret_range" and ', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    att(ecrireSecret(script).status === 0, "écriture refusée");
+    const v = lancer(script, "--verifier");
+    att(/DÉCLARÉ/.test(v.stdout) && /remplace True/.test(v.stdout), `le mutant ne déclare pas : exit ${v.status} ${v.stdout}`);
+    const { d: d2, script: s2 } = produit(GABARIT); dossiers.push(d2);
+    att(lancer(s2, "reponse_humain", "--decision", "D-49", "--remplace", "D-46").status === 0, "écriture refusée");
+    const v2 = lancer(s2, "--verifier");
+    att(/DÉCLARÉ/.test(v2.stdout) && /remplace D-46/.test(v2.stdout), `la décision sans artefacts n'est plus déclarée : ${v2.stdout}`);
+  });
+  check("TF-2206 rouge — sans le contrôle, le sort inconnu serait écrit (le témoin voit la chirurgie)", () => {
+    const mutant = GABARIT.replace("    controler_remplacement(type_, champs)\n", "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = produit(mutant); dossiers.push(d);
+    const r = spawnSync(PYTHON, [script, "reponse_humain", "--remplace", "D-46", "--artefacts_remplaces", JSON.stringify([{ artefact: "x", sort: "peut-etre" }])], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, "le mutant refuse encore : le contrôle n'est pas celui qu'on croit");
+  });
+  // TF-2223 (RP-2, lot Produit-81 20261105a, 06/11/2026) : hors run, `ledger.py` exigeait un run_open et refusait donc un retour
+  // ou une réservation de décision ; la décision se numérotait à la main, et une friction isolée forçait l'ouverture d'un run.
+  // Désormais, sans ledger de run, un retour, une question, une réponse ou une demande humaine s'écrit à `forge/hors-run.jsonl`
+  // (même discipline de seq et de ts), jamais à `forge/ledger.jsonl` (R-42 exige que celui-ci s'ouvre par run_open). Le run_open
+  // suivant dit ce qui attend, et `--hors-run` le liste pour le prochain lot de retours.
+  const horsRun = (texte = GABARIT) => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-hors-run-")); dossiers.push(d);
+    mkdirSync(join(d, "forge"));
+    const script = join(d, "forge", "ledger.py");
+    writeFileSync(script, texte, "utf8");
+    return { d, script, journal: join(d, "forge", "hors-run.jsonl"), ledger: join(d, "forge", "ledger.jsonl") };
+  };
+  const py = (script, ...a) => spawnSync(PYTHON, [script, ...a], { encoding: "utf8", env: CONSOLE });
+  check("TF-2223 vert — hors run, un retour et une question s'écrivent à forge/hors-run.jsonl (seq 1, 2), sans créer le ledger du run", () => {
+    const h = horsRun();
+    const a = py(h.script, "retour", "--source", "produit", "--note", "friction hors run");
+    const b = py(h.script, "question_humain", "--decisions_posees", JSON.stringify({ "D-12": "Faut-il garder le gabarit ?" }));
+    att(a.status === 0 && b.status === 0, `écriture : ${a.stderr} ${b.stderr}`);
+    att(/HORS RUN/.test(a.stderr), `la sortie d'erreur ne dit pas le journal : ${a.stderr}`);
+    const l = readFileSync(h.journal, "utf8").split("\n").filter(Boolean).map((x) => JSON.parse(x));
+    att(l.length === 2 && l[0].seq === 1 && l[1].seq === 2 && l[0].type === "retour" && l[0].hors_run === true && l[1].decisions_posees["D-12"], `journal : ${JSON.stringify(l)}`);
+    att(!existsSync(h.ledger), "forge/ledger.jsonl a été créé hors run : R-42 le lirait comme un run sans run_open");
+  });
+  check("TF-2223 rouge — hors run, un type qui n'est ni un retour ni une décision (etape_open) reste refusé : la première entrée d'un ledger de run est run_open", () => {
+    const h = horsRun();
+    const r = py(h.script, "etape_open", "--etape", "tests");
+    att(r.status !== 0 && /run_open/.test(r.stderr), `accepté à tort : exit ${r.status} ${r.stderr}`);
+    att(!existsSync(h.journal) && !existsSync(h.ledger), "une entrée refusée a laissé un fichier");
+  });
+  check("TF-2223 vert — le run_open suivant dit ce qui attend, --hors-run le liste, --verifier --hors-run le juge intègre", () => {
+    const h = horsRun();
+    py(h.script, "retour", "--source", "produit", "--note", "premier");
+    py(h.script, "retour", "--source", "produit", "--note", "second");
+    const o = py(h.script, "run_open", "--run_id", "essai", "--versions_forges", "{}");
+    att(o.status === 0 && /À COMPILER/.test(o.stderr) && /2 entrée/.test(o.stderr), `run_open : exit ${o.status} ${o.stderr}`);
+    const l = py(h.script, "--hors-run");
+    att(l.status === 0 && /premier/.test(l.stdout) && /second/.test(l.stdout), `--hors-run : ${l.stdout} ${l.stderr}`);
+    const v = py(h.script, "--verifier", "--hors-run");
+    att(v.status === 0 && /2 entrée\(s\) · INTÈGRE/.test(v.stdout), `--verifier --hors-run : exit ${v.status} ${v.stdout}`);
+    const run = readFileSync(h.ledger, "utf8").split("\n").filter(Boolean).map((x) => JSON.parse(x));
+    att(run.length === 1 && run[0].type === "run_open" && run[0].seq === 1, "le ledger du run n'a pas repris sa numérotation depuis 1");
+  });
+  check("TF-2223 rouge — sans l'aiguillage hors run, le retour est refusé comme avant (le témoin voit la chirurgie)", () => {
+    const mutant = GABARIT.replace("    hors_run = type_ in HORS_RUN and not archive and not lignes(chemin(archive))\n", "    hors_run = False\n");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const h = horsRun(mutant);
+    const r = py(h.script, "retour", "--source", "produit", "--note", "x");
+    att(r.status !== 0 && /run_open/.test(r.stderr), `le mutant écrit : exit ${r.status} ${r.stderr}`);
   });
   check("TF-2018 vert — la rectification écrite en ligne de commande porte seq_vise en NOMBRE et --verifier ne la déclare pas", () => {
     const { d, script } = produit(GABARIT); dossiers.push(d);
@@ -332,6 +569,51 @@ try {
     const { d, script } = produit(mutant); dossiers.push(d);
     spawnSync(PYTHON, [script, "go_publication", "--r38", "true", "--citation", "D-12 (a) du 22/10"], { encoding: "utf8", env: CONSOLE });
     att(entrees(d).at(-1).r38 === "true", "le mutant écrit encore un booléen");
+  });
+
+  // ---- TF-2174 (RP-14, lot du 05/11/2026) : `--run` était CONSOMMÉ comme sélecteur d'archive, jamais écrit ----------------------
+  // Le fait : l'entrée seq 207 d'un produit est partie sans identifiant de run (--run avalé), un second --run levait TypeError
+  // (le champ `run` entrait en collision avec le paramètre positionnel d'`ajouter`). Le sélecteur d'archive s'appelle désormais
+  // --archive ; --run s'écrit au champ `run` de l'entrée ; l'ancien nom reste lu par --verifier (lecture seule).
+  const unProduit = (texte = GABARIT) => { const r = produit(texte); dossiers.push(r.d); return r; };
+  const ecrire = (script, ...args) => spawnSync(PYTHON, [script, ...args], { encoding: "utf8", env: CONSOLE });
+  check("rouge → vert — TF-2174 : --run s'écrit au champ run d'un run_open, d'un run_close et d'une rectification", () => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-gabarit-")); dossiers.push(d); mkdirSync(join(d, "forge"));
+    const script = join(d, "forge", "ledger.py"); writeFileSync(script, GABARIT, "utf8");
+    const o = ecrire(script, "run_open", "--run", "RUN-9", "--run_id", "essai", "--versions_forges", "{\"forge-x\": \"abc1234\"}");
+    att(o.status === 0, `run_open refusé : ${o.stderr}`);
+    att(entrees(d)[0].run === "RUN-9", `run_open sans son champ run : ${JSON.stringify(entrees(d)[0])}`);
+    const r = ecrire(script, "rectification_run_open", "--run", "RUN-9", "--seq_vise", "1", "--cause", "identifiant de run oublié");
+    att(r.status === 0 && entrees(d)[1].run === "RUN-9" && entrees(d)[1].seq_vise === 1, `rectification : ${r.stderr} ${JSON.stringify(entrees(d)[1])}`);
+    const c = ecrire(script, "run_close", "--run", "RUN-9", "--statut", "pret_client");
+    att(c.status === 0 && entrees(d)[2].run === "RUN-9" && entrees(d)[2].statut === "pret_client", `run_close : ${c.stderr} ${JSON.stringify(entrees(d)[2])}`);
+    att(!existsSync(join(d, "runs")), "un dossier runs/ a été créé");
+  });
+  check("rouge → vert — TF-2174 : deux --run ne lèvent plus TypeError (le dernier fait foi), et un nom d'option ne collisionne plus avec un paramètre", () => {
+    const { d, script } = unProduit();
+    const r = ecrire(script, "retour", "--run", "A", "--run", "B", "--resume", "x");
+    att(r.status === 0 && !/TypeError/.test(r.stderr), `exit ${r.status} : ${r.stderr.slice(-200)}`);
+    att(entrees(d).at(-1).run === "B", `champ run : ${JSON.stringify(entrees(d).at(-1))}`);
+    const t = ecrire(script, "retour", "--archive", "", "--type_", "z", "--resume", "y");
+    att(!/TypeError/.test(t.stderr), `un champ nommé type_ collisionne : ${t.stderr.slice(-200)}`);
+  });
+  check("vert — TF-2174 : --archive désigne l'archive d'un run clos (écriture et lecture) ; --run n'y redirige plus l'écriture", () => {
+    const { d, script } = unProduit();
+    mkdirSync(join(d, "runs", "ARCH"), { recursive: true });
+    const sans = ecrire(script, "retour", "--run", "ARCH", "--resume", "dans le ledger courant");
+    att(sans.status === 0 && entrees(d).at(-1).run === "ARCH" && !existsSync(join(d, "runs", "ARCH", "ledger.jsonl")), "--run a redirigé l'écriture vers l'archive");
+    const o = ecrire(script, "run_open", "--archive", "ARCH", "--run_id", "arch", "--versions_forges", "{}");
+    att(o.status === 0, `run_open dans l'archive refusé : ${o.stderr}`);
+    const archive = join(d, "runs", "ARCH", "ledger.jsonl");
+    att(existsSync(archive), "l'archive n'a pas reçu le run_open");
+    const avant = entrees(d).length;
+    att(ecrire(script, "retour", "--archive", "ARCH", "--resume", "dans l'archive").status === 0, "écriture dans l'archive refusée");
+    att(entrees(d).length === avant, "le ledger courant a changé");
+    att(readFileSync(archive, "utf8").split("\n").filter(Boolean).length === 2, "l'archive ne porte pas deux entrées");
+    const v = ecrire(script, "--verifier", "--archive", "ARCH");
+    att(v.status === 0 && /2 entrée\(s\)/.test(v.stdout), `--verifier --archive : ${v.stdout}${v.stderr}`);
+    const ancien = ecrire(script, "--verifier", "--run", "ARCH");
+    att(ancien.status === 0 && /2 entrée\(s\)/.test(ancien.stdout), `l'ancien --verifier --run n'est plus lu : ${ancien.stdout}${ancien.stderr}`);
   });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }

@@ -50,8 +50,10 @@ const args = process.argv.slice(2);
 /** Les dépôts dont la voie par défaut est jugée : ceux qui AUDITENT, donc ceux qui peuvent dépenser. */
 export const DEPOTS_AUDITEURS = ["digit-ai-forge-audit", "digit-ai-forge-agents"];
 
-/** La marque d'un appel à un modèle payant. Une clé, un point d'entrée distant, un client de SDK. */
-export const RE_APPEL_PAYANT = /ANTHROPIC_API_KEY|OPENAI_API_KEY|api\.anthropic\.com|api\.openai\.com|new\s+(?:Anthropic|OpenAI)\s*\(|from\s+["']@anthropic-ai\/|from\s+["']openai["']|import\s+anthropic\b|import\s+openai\b/;
+/** La marque d'un appel à un modèle payant. Une clé, un point d'entrée distant, un client de SDK.
+ *  Gemini et Azure OpenAI ajoutés le 03/11/2026 : le motif ne reconnaissait qu'Anthropic et OpenAI,
+ *  et un appel à Gemini dans un dépôt auditeur passait sans être vu (étude 20261103 OpenAI et Gemini). */
+export const RE_APPEL_PAYANT = /ANTHROPIC_API_KEY|OPENAI_API_KEY|GEMINI_API_KEY|api\.anthropic\.com|api\.openai\.com|\.openai\.azure\.com|generativelanguage\.googleapis\.com|new\s+(?:Anthropic|OpenAI|AzureOpenAI|GoogleGenAI)\s*\(|from\s+["']@anthropic-ai\/|from\s+["']openai["']|from\s+["']@google\/(?:genai|generative-ai)["']|import\s+anthropic\b|import\s+openai\b|from\s+google\s+import\s+genai\b|import\s+google\.generativeai\b/;
 
 /** Un garde d'option : le fichier lit un drapeau de ligne de commande avant d'agir. */
 export const RE_GARDE_OPTION = /(?:argv|args|process\.argv|sys\.argv)[^\n]{0,80}(?:includes|indexOf|in\s|contains)[^\n]{0,40}["'`]--/;
@@ -59,15 +61,50 @@ export const RE_GARDE_OPTION = /(?:argv|args|process\.argv|sys\.argv)[^\n]{0,80}
 /** La publication de ce qui est consommé. */
 export const RE_PUBLIE_LA_DEPENSE = /\bco[ûu]ts?\b|\bjetons?\b|\btokens?\b|\bplafond\b|\bbudget\b|\bconsomm/i;
 
+// TF-2113 (04/11/2026) — NOMMER UNE CLÉ POUR L'ÉCARTER N'EST PAS L'APPELER. `make-it-better/scripts/lancer.mjs:57` déclare la liste
+// `VARIABLES_ECARTEES = ['ANTHROPIC_API_KEY', …]` puis fait `delete env[k]` : le script RETIRE la clé de l'environnement du tour
+// (l'abonnement, jamais l'API payante), et l'oracle l'accusait d'un appel payant « au niveau module » (DP1 FAIL). Une ligne qui retire la
+// clé (`delete process.env.X`, `os.environ.pop`, `del os.environ[…]`), la nomme dans une liste d'écartement (nom en ECART, RETIR, EXCLU,
+// SUPPR…, valeur en liste), ou construit un environnement SANS elle (`{ X, ...reste } = env`, `k !== 'X'`) n'est pas un appel. Une vraie
+// LECTURE (`process.env.X`, `env['X']`, `os.environ.get('X')`, `getenv('X')`) reste accusée, même dans un fichier qui écarte aussi la clé.
+const MARQUE_CLE = /(?:ANTHROPIC|OPENAI|GEMINI)_API_KEY/;
+const CLE = "(?:ANTHROPIC|OPENAI|GEMINI)_API_KEY";
+const RE_LECTURE_CLE = new RegExp(`(?:env|environ)\\s*(?:\\.\\s*(?:get\\s*\\(\\s*)?|\\[\\s*|\\(\\s*)["'\`]?${CLE}|getenv\\s*\\(\\s*["'\`]${CLE}`);
+/** Les gestes qui RETIRENT une variable, ou construisent un environnement SANS elle : leur texte est ôté avant de relire la ligne. */
+const RE_GESTES_D_ECARTEMENT = [
+  /\bdelete\s+[\w.]*env\s*(?:\.\s*\w+|\[[^\]]*\])/g,                                   // delete process.env.X · delete env['X']
+  /\bdel\s+[\w.]*environ\s*\[[^\]]*\]/g,                                               // del os.environ['X']
+  /\b[\w.]*(?:environ|env)\s*\.\s*pop\s*\([^)]*\)/g,                                   // os.environ.pop('X', None)
+  new RegExp(`\\{[^}]*${CLE}[^}]*\\.\\.\\.\\w+[^}]*\\}\\s*=\\s*(?:process\\.)?env\\b`, "g"),   // const { X, ...reste } = process.env
+  new RegExp(`(?:!==?|\\bnot\\s+in\\b)\\s*[\\[({]?\\s*["'\`]${CLE}["'\`]`, "g"),               // k !== 'X' · k not in ('X',)
+];
+const RE_LISTE_ECARTEMENT = /^\s*(?:export\s+)?(?:(?:const|let|var)\s+)?\w*(?:ECART|RETIR|EXCLU|SUPPR|ENLEV|INTERD|SCRUB|STRIP|DROP|DENY|BLOCK|IGNOR)\w*\s*(?::[^=]+)?=\s*(?:new\s+(?:Set|Array)\s*\(\s*|frozenset\s*\(\s*|set\s*\(\s*)?[\[({]/i;
+const profondeur = (l) => (l.match(/[\[({]/g) || []).length - (l.match(/[\])}]/g) || []).length;
+
+/** Les lignes du texte qui portent la marque d'un appel payant, privées des lignes qui ÉCARTENT la clé (TF-2113). Rend [{ ligne, texte }]. */
+export function lignesPayantes(texte) {
+  const sortie = [];
+  let reste = 0;   // profondeur restant à fermer d'une liste d'écartement ouverte plus haut
+  String(texte).split(/\r?\n/).forEach((l, i) => {
+    if (/^\s*(?:\/\/|\*|#)/.test(l)) return;                         // un commentaire n'appelle rien
+    const ouvre = RE_LISTE_ECARTEMENT.test(l);
+    const enListe = reste > 0 || ouvre;
+    if (ouvre) reste = Math.max(0, profondeur(l)); else if (reste > 0) reste = Math.max(0, reste + profondeur(l));
+    if (!RE_APPEL_PAYANT.test(l)) return;
+    let ligne = l;
+    for (const re of RE_GESTES_D_ECARTEMENT) ligne = ligne.replace(re, "");
+    if (!RE_APPEL_PAYANT.test(ligne)) return;                         // il ne restait que le geste d'écartement
+    if (enListe && MARQUE_CLE.test(ligne) && !RE_LECTURE_CLE.test(ligne) && !RE_APPEL_PAYANT.test(ligne.replace(new RegExp(CLE, "g"), ""))) return;   // la clé n'est que NOMMÉE dans la liste
+    sortie.push({ ligne: i + 1, texte: l });
+  });
+  return sortie;
+}
+
+
 /** Un appel payant AU NIVEAU MODULE n'est gardé par rien : il part au chargement. */
 export function appelsAuNiveauModule(texte) {
-  return String(texte).split(/\r?\n/)
-    .map((l, i) => ({ ligne: i + 1, texte: l }))
-    .filter(({ texte: l }) => {
-      if (/^\s*(?:\/\/|\*|#)/.test(l)) return false;                 // un commentaire n'appelle rien
-      if (!RE_APPEL_PAYANT.test(l)) return false;
-      return /^(?:export\s+)?(?:const|let|var|from|import)\b/.test(l) || /^\S/.test(l);
-    });
+  return lignesPayantes(texte)
+    .filter(({ texte: l }) => /^(?:export\s+)?(?:const|let|var|from|import)\b/.test(l) || /^\S/.test(l));
 }
 
 export function fichiersDe(racine) {
@@ -106,7 +143,7 @@ export function juger(racineDuParc, { depots = DEPOTS_AUDITEURS } = {}) {
       let t = "";
       try { t = readFileSync(f, "utf8"); } catch { continue; }
       lus += 1;
-      if (!RE_APPEL_PAYANT.test(t)) continue;
+      if (!lignesPayantes(t).length) continue;
       porteurs += 1;
       const rel = relative(racineDuParc, f);
       const auModule = appelsAuNiveauModule(t);
@@ -147,6 +184,7 @@ export const NON_JUGE = [
   "les modèles payants appelés par un chemin que le motif ne connaît pas — un client maison, une passerelle interne, un appel HTTP brut vers un domaine tiers. La liste des marques est COURTE et écrite : la deviner plus large produirait des faux positifs sur tout fichier parlant d'API",
   "les dépôts hors de la liste des auditeurs : un produit qui appellerait un modèle payant n'est pas jugé ici, parce que R-34 vise les PANS D'AUDIT et que l'étendre sans mandat serait écrire une règle que personne n'a posée",
   "le fait qu'une option lue soit BIEN celle qui garde l'appel : DP1 constate qu'un fichier porteur lit au moins une option, jamais que cette option protège la bonne ligne. La borne est basse et assumée ; son contraire — aucune option lue du tout — est certain",
+  "l'ÉCARTEMENT d'une clé (TF-2113) est reconnu à sa forme — `delete process.env.X`, `os.environ.pop`, `{ X, ...reste } = env`, `k !== 'X'`, une liste dont le nom dit l'écartement (ECART, RETIR, EXCLU, SUPPR…) — jamais à son effet : une liste mal nommée qui servirait à LIRE la clé reste accusée, et une liste d'écartement qui ne serait jamais appliquée n'est pas détectée",
   "les recettes `*.test.mjs` et les fixtures, écartées par construction : une fixture écrit le défaut à dessein pour prouver que l'oracle sait échouer",
 ];
 

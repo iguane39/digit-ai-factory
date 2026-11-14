@@ -1,0 +1,303 @@
+{
+ "schema": "l99-boucle@1",
+ "prompt": "Tri des sujets Claude et IA des favoris TikTok et skill",
+ "ouverture": "d office : le prompt réécrit lance un run qui écrit, et l analyse a relevé 2 défauts bloquants",
+ "arbitre": {
+  "rubrique": "couches.md Ch1, 6 dimensions /100",
+  "arret": "0 bloquant et 0 majeur",
+  "seuil_score": null,
+  "gain_min": 3,
+  "borne": 3,
+  "garde_longueur": 0.15,
+  "retenue": "union_recomptee",
+  "verification_cloture": true,
+  "rejet_regression": true,
+  "score_de_passe": "le plus bas des 2 relecteurs, lecture à charge"
+ },
+ "passes": [
+  {
+   "n": 1,
+   "fichier": "prompt-p1.md",
+   "mots": 1579,
+   "relecteur": {
+    "agent": "verificateur A et verificateur B, neufs",
+    "aveugle": true,
+    "interdits": [
+     "analyse",
+     "passes précédentes",
+     "journal de boucle",
+     "synthèse du 20261102"
+    ]
+   },
+   "scores": {
+    "A": 82,
+    "B": 74
+   },
+   "score_mesure": 74,
+   "defauts": [
+    {
+     "severite": "majeur",
+     "defaut": "Le filtre écarte un contenu illisible alors que le verdict « Non qualifié » suppose sa présence",
+     "citation": "Écarte le reste du tableau, sans jugement sur le sujet.",
+     "vu_par": [
+      "A",
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "La réponse à D-120 n’a ni emplacement de lecture ni traitement d’une autorisation partielle",
+     "citation": "sauf si le porteur a choisi une option de la décision D-120 qui l'autorise",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Le seuil n’est pas cité et le partage Essai court / Décision directe n’est pas défini",
+     "citation": "une mesure de coût simple tranche",
+     "vu_par": [
+      "A"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Le sort d’un carrousel n’est pas dit et aucune alerte n’existe si beaucoup de contenus finissent non qualifiés",
+     "citation": "Un fichier vidéo déposé par le porteur",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Le contrôle de l’extraction ne prouve que le rappel",
+     "citation": "109 identifiants lus prouvent que l'extraction fonctionne",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Le back-test note des cas dont l’issue est connue et n’a pas de critère binaire",
+     "citation": "Rends la matrice telle quelle, même défavorable",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "« Verbe outillé » sans définition ni juge, et pas de branche de contrat pour l’arrêt",
+     "citation": "Si aucun verbe outillé n'est absent partout ailleurs",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "« Après 3 échecs, livre » contredit le contrat et laisse publier une forge rouge",
+     "citation": "Après 3 échecs, livre avec la liste des écarts restants.",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "D-120 serait absente du registre",
+     "citation": "grep D-120 decisions/REGISTRE.jsonl ne donne rien",
+     "vu_par": [
+      "A"
+     ],
+     "statut": "ecarte",
+     "dementi": true,
+     "recompte": {
+      "commande": "recherche de \"n\":120 dans decisions/REGISTRE.jsonl",
+      "resultat": "entrée présente : le registre porte le numéro sous le champ n"
+     }
+    }
+   ],
+   "majeurs_clos": 0,
+   "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 2,
+   "fichier": "prompt-p2.md",
+   "mots": 1990,
+   "relecteur": {
+    "agent": "verificateur A et verificateur B, neufs, autres que ceux de la passe 1",
+    "aveugle": true,
+    "interdits": [
+     "analyse",
+     "passes précédentes",
+     "journal de boucle",
+     "synthèse du 20261102"
+    ]
+   },
+   "scores": {
+    "A": 80,
+    "B": 74
+   },
+   "score_mesure": 74,
+   "verification_cloture": {
+    "agent": "verificateur neuf avec contexte",
+    "note": false,
+    "clotures": 8,
+    "defauts_crees": 5,
+    "suite": "les 5 signalements et le 9e point ont été corrigés avant la relecture aveugle"
+   },
+   "defauts": [
+    {
+     "severite": "majeur",
+     "defaut": "Le back-test ne dit pas où prendre les 14 sujets sans ouvrir les fichiers interdits, et son aveugle n’est pas vérifiable",
+     "citation": "Un agent neuf note à l'aveugle les 14 sujets étudiés",
+     "vu_par": [
+      "A",
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "« Remets l’état local » est ambigu et possiblement destructeur ; « échec » n’est pas défini",
+     "citation": "remets l'état local",
+     "vu_par": [
+      "A",
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Gain et preuve ne sont pas reliés aux notes de la grille, et les forges touchées n’ont pas de mesure",
+     "citation": "porte un gain d'au moins 3 avec une preuve d'au plus 2",
+     "vu_par": [
+      "A",
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "« Décision directe » n’a pas de sens pour le porteur et dégrade en silence un sujet qui tient le seuil",
+     "citation": "| Décision directe | Tous les autres cas |",
+     "vu_par": [
+      "A"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "« non qualifié » porte 2 sens selon l’étape",
+     "citation": "Sont non qualifiés les rangements",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Le format lu par l’oracle du skill, les motifs sans notes et le tableau vide ne sont pas définis",
+     "citation": "rejugé par l'oracle du skill, rend PASS",
+     "vu_par": [
+      "B"
+     ],
+     "statut": "retenu",
+     "recompte": {
+      "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+      "resultat": "citation présente"
+     }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "La portée dépasserait un tour d’exécution raisonnable",
+     "citation": "Étape 2 : le skill",
+     "vu_par": [
+      "A"
+     ],
+     "statut": "ecarte",
+     "dementi": true,
+     "recompte": {
+      "commande": "lecture du bloc 1 de output/04-plans/Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md",
+      "resultat": "un run de mandat a livré un skill, son oracle et son banc de 15:21 à 16:26 le 30/10/2026 ; la partie « livrable intermédiaire » reçoit tout de même un enregistrement du tableau avant l’étape 2"
+     }
+    }
+   ],
+   "majeurs_clos": 8,
+   "rejetee": false,
+   "decision": "arreter"
+  }
+ ],
+ "arret": {
+  "passe": 2,
+  "raison": "gain_insuffisant"
+ },
+ "score_affiche": {
+  "valeur": 74,
+  "nature": "mesure"
+ },
+ "corrections_apres_arret": {
+  "fichier": "prompt-remis.md",
+  "mots": 2428,
+  "note": "non noté : corrections des 6 majeurs retenus à la passe 2, vérifiées par un agent qui ne note pas ; le score 74 ne porte pas sur cette version"
+ }
+}

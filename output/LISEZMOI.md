@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 571 livrable(s) courant(s), 6 archivé(s), 7 famille(s).
+**État** : 702 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -157,17 +157,17 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260902-etude-opportunite-dataforseo-produit-02.md | — | 43.7 Ko | `03-etudes/2026-09/20260902-etude-opportunite-dataforseo-produit-02.md` |
 | 20260903-L99-amelioration-continue.md | — | 42.3 Ko | `03-etudes/2026-09/20260903-L99-amelioration-continue.md` |
 | 20260903-recidives-mesure.md | — | 7.3 Ko | `03-etudes/2026-09/20260903-recidives-mesure.md` |
-| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.html | — | 133.4 Ko | `03-etudes/2026-09/20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` |
+| 20260907-etude-opportunite-mission-data-silver-gold-powerbi.html | — | 134.5 Ko | `03-etudes/2026-09/20260907-etude-opportunite-mission-data-silver-gold-powerbi.html` |
 | 20260907-etude-opportunite-mission-data-silver-gold-powerbi.md | — | 46.5 Ko | `03-etudes/2026-09/20260907-etude-opportunite-mission-data-silver-gold-powerbi.md` |
 | 20260907-L99-mission-data-silver-gold-powerbi.md | — | 47.5 Ko | `03-etudes/2026-09/20260907-L99-mission-data-silver-gold-powerbi.md` |
 | 20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md | — | 10.9 Ko | `03-etudes/2026-09/20260908-pourquoi-on-reecrit-l-histoire-et-comment-cesser.md` |
-| 20260911-etude-opportunite-communication-marketing-ao.html | — | 141.1 Ko | `03-etudes/2026-09/20260911-etude-opportunite-communication-marketing-ao.html` |
+| 20260911-etude-opportunite-communication-marketing-ao.html | — | 142.1 Ko | `03-etudes/2026-09/20260911-etude-opportunite-communication-marketing-ao.html` |
 | 20260911-etude-opportunite-communication-marketing-ao.md | — | 48.9 Ko | `03-etudes/2026-09/20260911-etude-opportunite-communication-marketing-ao.md` |
 | 20260911-L99-forge-communication-marketing.md | — | 52.4 Ko | `03-etudes/2026-09/20260911-L99-forge-communication-marketing.md` |
 | 20260911-L99-regles-d-ecriture-factory.md | — | 58.5 Ko | `03-etudes/2026-09/20260911-L99-regles-d-ecriture-factory.md` |
-| 20260914-etude-opportunite-conception-documentaire-amont.html | — | 112.4 Ko | `03-etudes/2026-09/20260914-etude-opportunite-conception-documentaire-amont.html` |
+| 20260914-etude-opportunite-conception-documentaire-amont.html | — | 113.2 Ko | `03-etudes/2026-09/20260914-etude-opportunite-conception-documentaire-amont.html` |
 | 20260914-etude-opportunite-conception-documentaire-amont.md | — | 27.4 Ko | `03-etudes/2026-09/20260914-etude-opportunite-conception-documentaire-amont.md` |
-| 20260914-etude-opportunite-personas-par-phase.html | — | 110.9 Ko | `03-etudes/2026-09/20260914-etude-opportunite-personas-par-phase.html` |
+| 20260914-etude-opportunite-personas-par-phase.html | — | 111.1 Ko | `03-etudes/2026-09/20260914-etude-opportunite-personas-par-phase.html` |
 | 20260914-etude-opportunite-personas-par-phase.md | — | 26.4 Ko | `03-etudes/2026-09/20260914-etude-opportunite-personas-par-phase.md` |
 | 20260914-etude-opportunite-premiers-html-nouveaux-formats.md | — | 31.2 Ko | `03-etudes/2026-09/20260914-etude-opportunite-premiers-html-nouveaux-formats.md` |
 | 20260914-L99-conception-documentaire-amont.md | — | 36.8 Ko | `03-etudes/2026-09/20260914-L99-conception-documentaire-amont.md` |
@@ -179,17 +179,17 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | 20260914-personas-mesure-passes.md | — | 54.9 Ko | `03-etudes/2026-09/20260914-personas-mesure-passes.md` |
 | 20260914-personas-mesure-protocole.md | — | 4.4 Ko | `03-etudes/2026-09/20260914-personas-mesure-protocole.md` |
 | 20260914-releve-restes-archives.md | — | 6.5 Ko | `03-etudes/2026-09/20260914-releve-restes-archives.md` |
-| 20260915-etude-opportunite-inventaire-des-composants.html | — | 102.6 Ko | `03-etudes/2026-09/20260915-etude-opportunite-inventaire-des-composants.html` |
+| 20260915-etude-opportunite-inventaire-des-composants.html | — | 102.8 Ko | `03-etudes/2026-09/20260915-etude-opportunite-inventaire-des-composants.html` |
 | 20260915-etude-opportunite-inventaire-des-composants.md | — | 22.9 Ko | `03-etudes/2026-09/20260915-etude-opportunite-inventaire-des-composants.md` |
-| 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 129.3 Ko | `03-etudes/2026-09/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
+| 20260917-etude-opportunite-gestion-reseaux-sociaux.html | — | 129.7 Ko | `03-etudes/2026-09/20260917-etude-opportunite-gestion-reseaux-sociaux.html` |
 | 20260917-etude-opportunite-gestion-reseaux-sociaux.md | — | 39.7 Ko | `03-etudes/2026-09/20260917-etude-opportunite-gestion-reseaux-sociaux.md` |
-| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html | — | 97.8 Ko | `03-etudes/2026-09/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html` |
+| 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html | — | 98 Ko | `03-etudes/2026-09/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.html` |
 | 20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md | — | 20.8 Ko | `03-etudes/2026-09/20260917-etude-opportunite-revue-hebdomadaire-de-l-existant.md` |
 | 20260917-L99-gestion-reseaux-sociaux.md | — | 45.7 Ko | `03-etudes/2026-09/20260917-L99-gestion-reseaux-sociaux.md` |
 | 20260917-L99-revue-hebdomadaire-amelioration-continue.md | — | 36.5 Ko | `03-etudes/2026-09/20260917-L99-revue-hebdomadaire-amelioration-continue.md` |
 | 20260917-releve-autres-reseaux-sociaux.md | — | 8.3 Ko | `03-etudes/2026-09/20260917-releve-autres-reseaux-sociaux.md` |
 | 20260917-revue-hebdomadaire-mesure-pas0.md | — | 21.2 Ko | `03-etudes/2026-09/20260917-revue-hebdomadaire-mesure-pas0.md` |
-| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 116.2 Ko | `03-etudes/2026-09/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
+| 20260919-etude-opportunite-plan-d-amelioration-post-audit.html | — | 116.8 Ko | `03-etudes/2026-09/20260919-etude-opportunite-plan-d-amelioration-post-audit.html` |
 | 20260919-etude-opportunite-plan-d-amelioration-post-audit.md | — | 33 Ko | `03-etudes/2026-09/20260919-etude-opportunite-plan-d-amelioration-post-audit.md` |
 | 20260919-L99-audit-et-plan-d-amelioration-plateforme.md | — | 43.3 Ko | `03-etudes/2026-09/20260919-L99-audit-et-plan-d-amelioration-plateforme.md` |
 | 20260921-etude-opportunite-reseaux-sociaux-complement.md | — | 26.1 Ko | `03-etudes/2026-09/20260921-etude-opportunite-reseaux-sociaux-complement.md` |
@@ -248,17 +248,59 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md | 20261029f | 7.7 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json | — | 98.8 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` |
+| Digit-AI - Étude - Apprentissage des erreurs par les produits et la Factory - 20261104b.md | 20261104b | 22.5 Ko | `03-etudes/Digit-AI - Étude - Apprentissage des erreurs par les produits et la Factory - 20261104b.md` |
+| Digit-AI - Étude - ArtCraft pour la Factory - 20261102s.md | 20261102s | 14.1 Ko | `03-etudes/Digit-AI - Étude - ArtCraft pour la Factory - 20261102s.md` |
+| Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md | 20261102f | 35.8 Ko | `03-etudes/Digit-AI - Étude - Audit de securite par agents de Cloudflare - 20261102f.md` |
 | Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md | 20261029a | 8.8 Ko | `03-etudes/Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` |
 | Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 12.6 Ko | `03-etudes/Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` |
+| Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md | 20261103l | 199.3 Ko | `03-etudes/Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` |
+| Digit-AI - Étude - Cout et qualite de la boucle L99 - 20261106b.md | 20261106b | 24.3 Ko | `03-etudes/Digit-AI - Étude - Cout et qualite de la boucle L99 - 20261106b.md` |
+| Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md | 20261103k | 13 Ko | `03-etudes/Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` |
+| Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md | 20261102t | 25.3 Ko | `03-etudes/Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` |
+| Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md | 20261110c | 12.7 Ko | `03-etudes/Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
+| Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
+| Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
+| Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md | 20261106a | 98.4 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` |
+| Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
 | Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md | 20261030a | 14.2 Ko | `03-etudes/Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` |
+| Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md | 20261105a | 23 Ko | `03-etudes/Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` |
+| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md | 20261102e | 19.1 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` |
+| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109c.md | 20261109c | 10.3 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109c.md` |
+| Digit-AI - Étude - Video Make it better cent fois - 20261102b.md | 20261102b | 15.5 Ko | `03-etudes/Digit-AI - Étude - Video Make it better cent fois - 20261102b.md` |
+| Digit-AI - Fiche - Actions A-2 et A-3 detaillees - 20261105b.md | 20261105b | 4.5 Ko | `03-etudes/Digit-AI - Fiche - Actions A-2 et A-3 detaillees - 20261105b.md` |
 | Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md | 20261029c | 5.5 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique actions pour tenir les 8 demandes - 20261029c.md` |
 | Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md | 20261029b | 4.8 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique ce qu il fait et ne fait pas - 20261029b.md` |
 | Digit-AI - Fiche - Oeil critique code mort et sujets a integrer - 20261029e.md | 20261029e | 6.9 Ko | `03-etudes/Digit-AI - Fiche - Oeil critique code mort et sujets a integrer - 20261029e.md` |
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json | 20261028a | 514.7 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` |
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 190.2 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md | 20261028a | 5.1 Ko | `03-etudes/Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` |
+| Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md | 20261103a | 6 Ko | `03-etudes/Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md` |
+| Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md | 20261102g | 3.9 Ko | `03-etudes/Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` |
+| Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md | 20261103b | 6.3 Ko | `03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` |
+| Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
+| Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
+| Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md | 20261102k | 5.9 Ko | `03-etudes/Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` |
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
+| Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md | 20261104a | 53.5 Ko | `03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md` |
+| Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json | — | 10.7 Ko | `03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json` |
+| Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md | 20261103c | 20.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` |
+| Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json | — | 10.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md.boucle.json` |
+| Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md | 20261102j | 56.1 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` |
+| Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json` |
+| Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` |
+| Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md | 20261109b | 36.6 Ko | `03-etudes/Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md` |
+| Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json | — | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json` |
+| Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md | 20261102d | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` |
+| Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json | — | 19.6 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md.boucle.json` |
+| Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md | 20261112a | 17.8 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md` |
+| Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md.boucle.json | — | 11.8 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi d avancement des agents passe au crible L99 - 20261112a.md.boucle.json` |
+| Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md | 20261104c | 35.7 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md` |
+| Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json | — | 12.8 Ko | `03-etudes/Digit-AI - Revue - Prompt suivi des temps et couts des produits passe au crible L99 - 20261104c.md.boucle.json` |
+| Digit-AI - Revue - Prompt textes du clip ingénierie logicielle passé au crible L99 - 20261110b.md | 20261110b | 25.7 Ko | `03-etudes/Digit-AI - Revue - Prompt textes du clip ingénierie logicielle passé au crible L99 - 20261110b.md` |
+| Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md | 20261102a | 20 Ko | `03-etudes/Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` |
+| Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json | — | 9.2 Ko | `03-etudes/Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` |
+| Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md *(archivé)* | 20261109a | 7.1 Ko | `03-etudes/old/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109a.md` |
 
 ### 04-plans
 
@@ -479,11 +521,20 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte - 20260910h.md | 20260910h | 20 Ko | `04-plans/2026-09/Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte - 20260910h.md` |
 | Digit-AI - Synthese Mandat - Vues sorties du suivi et regle ecriture nombres - 20260916d.md | 20260916d | 11.9 Ko | `04-plans/2026-09/Digit-AI - Synthese Mandat - Vues sorties du suivi et regle ecriture nombres - 20260916d.md` |
 | Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md | 20260919f | 17.7 Ko | `04-plans/2026-09/Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md` |
+| Digit-AI - Fiche - Produit plateforme de pentest autorise a construire pour Client-A - 20261103a.md | 20261103a | 14.6 Ko | `04-plans/Digit-AI - Fiche - Produit plateforme de pentest autorise a construire pour Client-A - 20261103a.md` |
 | Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md | 20261020l | 14.7 Ko | `04-plans/Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` |
+| Digit-AI - Prompt - Activation du releve des couts chez un produit - 20261105h.md | 20261105h | 2 Ko | `04-plans/Digit-AI - Prompt - Activation du releve des couts chez un produit - 20261105h.md` |
 | Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md | 20261029a | 8.3 Ko | `04-plans/Digit-AI - Prompt - Bases de donnees de dev et qualification dans les forges - 20261029a.md` |
 | Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md | 20261028a | 10.1 Ko | `04-plans/Digit-AI - Prompt - Competences Cloudflare GitHub Supabase dans les forges - 20261028a.md` |
+| Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md | 20261103i | 16.5 Ko | `04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
+| Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md | 20261109g | 15 Ko | `04-plans/Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` |
+| Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |
+| Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md | 20261112e | 15.2 Ko | `04-plans/Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` |
+| Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md | 20261112g | 15.3 Ko | `04-plans/Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md` |
+| Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md | 20261102c | 14.5 Ko | `04-plans/Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` |
+| Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md | 20261102a | 11.1 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-91 et bases de donnees - 20261029d.md | 20261029d | 3.6 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-91 et bases de donnees - 20261029d.md` |
 | Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md | 20261001f | 11.9 Ko | `04-plans/Digit-AI - Revue Hebdomadaire - Sept propositions D-41 a D-47 - 20261001f.md` |
@@ -491,13 +542,29 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md | 20261029c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Bases de donnees de dev et qualification - 20261029c.md` |
 | Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md | 20261016f | 7.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Boucle L99 jusqu a un score etudiee - 20261016f.md` |
 | Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 6.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences Cloudflare GitHub Supabase - 20261028a.md` |
+| Digit-AI - Synthese Conseil - Competences OpenAI et Gemini - 20261103n.md | 20261103n | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Competences OpenAI et Gemini - 20261103n.md` |
+| Digit-AI - Synthese Conseil - D-173 appliquee au prompt de suivi des couts - 20261105c.md | 20261105c | 4.2 Ko | `04-plans/Digit-AI - Synthese Conseil - D-173 appliquee au prompt de suivi des couts - 20261105c.md` |
+| Digit-AI - Synthese Conseil - D-177 charge suivie en 3 indicateurs - 20261105f.md | 20261105f | 3.5 Ko | `04-plans/Digit-AI - Synthese Conseil - D-177 charge suivie en 3 indicateurs - 20261105f.md` |
 | Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md | 20261017a | 24.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Decisions a traiter en detail - 20261017a.md` |
+| Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md | 20261103h | 4 Ko | `04-plans/Digit-AI - Synthese Conseil - Detail de l'etude d'une etape de revue de code - 20261103h.md` |
+| Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md | 20261102o | 18.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Elements a traiter du tri TikTok et options - 20261102o.md` |
+| Digit-AI - Synthese Conseil - Etude apprentissage des erreurs - 20261104g.md | 20261104g | 9.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Etude apprentissage des erreurs - 20261104g.md` |
+| Digit-AI - Synthese Conseil - Etude suivi des temps et couts rendue - 20261105e.md | 20261105e | 8.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Etude suivi des temps et couts rendue - 20261105e.md` |
 | Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md | 20261018b | 11.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Flotte d agents analyse critique - 20261018b.md` |
 | Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md | 20261017b | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` |
+| Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md | 20261110c | 6.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md` |
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
+| Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md | 20261104f | 6.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md` |
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
+| Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md | 20261103j | 7.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` |
+| Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md | 20261102h | 7.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` |
+| Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md | 20261109f | 7.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md` |
+| Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md | 20261102f | 10.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` |
+| Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md | 20261112f | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md` |
+| Digit-AI - Synthese Conseil - Prompt suivi des temps et couts passe au crible L99 - 20261104h.md | 20261104h | 9.2 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt suivi des temps et couts passe au crible L99 - 20261104h.md` |
 | Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md | 20261016c | 6.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Supabase passe au crible L99 - 20261016c.md` |
+| Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md | 20261102d | 12.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt tri TikTok et skill passe au crible L99 - 20261102d.md` |
 | Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md | 20261030a | 8.7 Ko | `04-plans/Digit-AI - Synthese Conseil - Skill PDF de la Factory - 20261030a.md` |
 | Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md | 20261015k | 8.7 Ko | `04-plans/Digit-AI - Synthese Conseil - Sujets traitables maintenant - 20261015k.md` |
 | Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md | 20261018i | 8.5 Ko | `04-plans/Digit-AI - Synthese Etude - Relecteur d intention tous travaux - 20261018i.md` |
@@ -507,15 +574,24 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md | 20261018e | 13.6 Ko | `04-plans/Digit-AI - Synthese L99 - Relecteur critique d intention prompt reecrit - 20261018e.md` |
 | Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md | 20261019k | 13.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 a A-8 du reste a faire - 20261019k.md` |
 | Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md | 20261026s | 14.1 Ko | `04-plans/Digit-AI - Synthese Mandat - A-1 et A-2 indices du 19-10 et revue hebdomadaire - 20261026s.md` |
+| Digit-AI - Synthese Mandat - A1 A2 A3 de la mi-journee du 13-11 - 20261113g.md | 20261113g | 5 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 A3 de la mi-journee du 13-11 - 20261113g.md` |
+| Digit-AI - Synthese Mandat - A1 A2 A3 de la nuit du 12-11 - 20261112k.md | 20261112k | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 A3 de la nuit du 12-11 - 20261112k.md` |
+| Digit-AI - Synthese Mandat - A1 A2 A3 du 12-11 au soir - 20261112i.md | 20261112i | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 A3 du 12-11 au soir - 20261112i.md` |
+| Digit-AI - Synthese Mandat - A1 A2 A3 du matin du 13-11 - 20261113e.md | 20261113e | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 A3 du matin du 13-11 - 20261113e.md` |
 | Digit-AI - Synthese Mandat - A1 A2 faites A3 en cours - 20261026h.md | 20261026h | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 A2 faites A3 en cours - 20261026h.md` |
+| Digit-AI - Synthese Mandat - A1 et A2 de l apres-midi du 13-11 - 20261113h.md | 20261113h | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - A1 et A2 de l apres-midi du 13-11 - 20261113h.md` |
 | Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md | 20261004a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` |
 | Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md | 20261012a | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` |
 | Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md | 20261001e | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` |
+| Digit-AI - Synthese Mandat - Appel de preuve Gemini et cadence mensuelle des modeles - 20261104d.md | 20261104d | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Appel de preuve Gemini et cadence mensuelle des modeles - 20261104d.md` |
 | Digit-AI - Synthese Mandat - Archives classees en sous-dossiers - 20261016h.md | 20261016h | 9 Ko | `04-plans/Digit-AI - Synthese Mandat - Archives classees en sous-dossiers - 20261016h.md` |
 | Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md | 20261015c | 7 Ko | `04-plans/Digit-AI - Synthese Mandat - Audit complet vers forge-audit - 20261015c.md` |
 | Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md | 20261029e | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md` |
 | Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md | 20261018n | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` |
 | Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md | 20261018o | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` |
+| Digit-AI - Synthese Mandat - Campagne A1 et tri A2 du 12-11 - 20261112c.md | 20261112c | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A1 et tri A2 du 12-11 - 20261112c.md` |
+| Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md | 20261110b | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md` |
+| Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md | 20261102n | 20.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md` |
 | Digit-AI - Synthese Mandat - Campagne D-41 - 20261019e.md | 20261019e | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne D-41 - 20261019e.md` |
 | Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md | 20261003b | 11.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne D-55 socle des pages - 20261003b.md` |
 | Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md | 20261013h | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne du matin reprise et close - 20261013h.md` |
@@ -529,18 +605,25 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md | 20261026e | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Cible oeil critique retravaillee - 20261026e.md` |
 | Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md | 20261013i | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Commande publiee verte et reprise reseau - 20261013i.md` |
 | Digit-AI - Synthese Mandat - Competences Cloudflare GitHub Supabase construites - 20261028a.md | 20261028a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Cloudflare GitHub Supabase construites - 20261028a.md` |
+| Digit-AI - Synthese Mandat - Competences OpenAI et Gemini construites - 20261103r.md | 20261103r | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences OpenAI et Gemini construites - 20261103r.md` |
 | Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
+| Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md | 20261112d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md` |
+| Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md | 20261112h | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` |
 | Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md | 20261019f | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - D-41 D-43 D-44 executees - 20261019f.md` |
 | Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md | 20261019h | 6 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 b executee - 20261019h.md` |
 | Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md | 20261019g | 5.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-45 expliquee - 20261019g.md` |
 | Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md | 20261026g | 3.9 Ko | `04-plans/Digit-AI - Synthese Mandat - D-74 executee conventions client - 20261026g.md` |
 | Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md | 20261026n | 2.8 Ko | `04-plans/Digit-AI - Synthese Mandat - D-79 c enregistree - 20261026n.md` |
 | Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md | 20261026m | 5.7 Ko | `04-plans/Digit-AI - Synthese Mandat - D-79 detaillee - 20261026m.md` |
+| Digit-AI - Synthese Mandat - Decisions 125a et 126a du tri TikTok - 20261102j.md | 20261102j | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 125a et 126a du tri TikTok - 20261102j.md` |
+| Digit-AI - Synthese Mandat - Decisions 191 a 193 appliquees - 20261110e.md | 20261110e | 5.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 191 a 193 appliquees - 20261110e.md` |
 | Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md | 20261001c | 21.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 36a et 37a executees et publiees - 20261001c.md` |
 | Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md | 20261002a | 19.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 49 50 51 en cours - 20261002a.md` |
 | Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md | 20261012b | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions 58 a 60 executees et publiees - 20261012b.md` |
+| Digit-AI - Synthese Mandat - Decisions D-130 a D-135 construites - 20261102p.md | 20261102p | 9.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-130 a D-135 construites - 20261102p.md` |
+| Digit-AI - Synthese Mandat - Decisions D-194 a D-198 appliquees - 20261110c.md | 20261110c | 14.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-194 a D-198 appliquees - 20261110c.md` |
 | Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md | 20261018m | 16.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-24 a D-28 executees - 20261018m.md` |
 | Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md | 20261018p | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-29 a D-33 executees - 20261018p.md` |
 | Digit-AI - Synthese Mandat - Decisions D-49 a D-51 detaillees - 20261020b.md | 20261020b | 7.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions D-49 a D-51 detaillees - 20261020b.md` |
@@ -548,29 +631,41 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md | 20261001h | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Decisions posees seulement si ressort - 20261001h.md` |
 | Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md | 20261013e | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives hors d'acces non bloquants - 20261013e.md` |
 | Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md | 20261013f | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Depots prives silencieux confirmation - 20261013f.md` |
+| Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md | 20261112b | 5.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Derogation A2 et A3 du 12-11 - 20261112b.md` |
 | Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md | 20261026l | 4.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Deux chantiers fusionnes sur quatre - 20261026l.md` |
 | Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md | 20261017d | 17.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Douze decisions executees - 20261017d.md` |
+| Digit-AI - Synthese Mandat - Essai de l audit de securite de Cloudflare - 20261102l.md | 20261102l | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de l audit de securite de Cloudflare - 20261102l.md` |
 | Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md | 20261018j | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai de relecture d intention lance - 20261018j.md` |
 | Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md | 20261020g | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai du conseil de cinq agents - 20261020g.md` |
 | Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md | 20261018l | 12.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai publie et boucle de correction - 20261018l.md` |
+| Digit-AI - Synthese Mandat - Essai unslop dans oracle-slop - 20261109b.md | 20261109b | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Essai unslop dans oracle-slop - 20261109b.md` |
+| Digit-AI - Synthese Mandat - Essais de MarkItDown et du skill de logo - 20261103d.md | 20261103d | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Essais de MarkItDown et du skill de logo - 20261103d.md` |
+| Digit-AI - Synthese Mandat - Etude d'une etape de revue de code - 20261103m.md | 20261103m | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude d'une etape de revue de code - 20261103m.md` |
 | Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md | 20261003a | 10.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude opportunite pages HTML et indicateurs - 20261003a.md` |
 | Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md | 20261001g | 17.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude Opus 5.5 jouee enregistrement local - 20261001g.md` |
 | Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md | 20261001d | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Etude RSI et SSL dans la Factory - 20261001d.md` |
 | Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md | 20261019d | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Etudes des favoris TikTok - 20261019d.md` |
 | Digit-AI - Synthese Mandat - Extrait de production anonymise admis et outille - 20261029f.md | 20261029f | 6.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Extrait de production anonymise admis et outille - 20261029f.md` |
+| Digit-AI - Synthese Mandat - Favicon du produit de pentest en thème sombre - 20261103g.md | 20261103g | 3.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Favicon du produit de pentest en thème sombre - 20261103g.md` |
+| Digit-AI - Synthese Mandat - Favori TikTok ecoute et tri complete - 20261109d.md | 20261109d | 6 Ko | `04-plans/Digit-AI - Synthese Mandat - Favori TikTok ecoute et tri complete - 20261109d.md` |
 | Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md | 20261018c | 12.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Flotte d agents nommee et mesuree - 20261018c.md` |
 | Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md | 20261018d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Flotte d agents publiee - 20261018d.md` |
 | Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md | 20261017c | 28.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Format B applique aux decisions - 20261017c.md` |
 | Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md | 20261015d | 13.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Fusion des postes et lot Produit-12 ingere - 20261015d.md` |
 | Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md | 20261013g | 8.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Installateur publie commande Windows - 20261013g.md` |
 | Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md | 20261013d | 12 Ko | `04-plans/Digit-AI - Synthese Mandat - Installation sans question banniere - 20261013d.md` |
+| Digit-AI - Synthese Mandat - Kit du logo du produit de pentest - 20261103f.md | 20261103f | 7.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Kit du logo du produit de pentest - 20261103f.md` |
 | Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md | 20261021a | 9.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 agent nocturne et skill VS Code - 20261021a.md` |
 | Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md | 20261026c | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` |
+| Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md | 20261103e | 5 Ko | `04-plans/Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` |
+| Digit-AI - Synthese Mandat - Lot de retours Produit-86 du 12-11 traite - 20261113f.md | 20261113f | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Lot de retours Produit-86 du 12-11 traite - 20261113f.md` |
 | Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
+| Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md | 20261103q | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md` |
 | Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md | 20261020m | 4.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Note oeil critique remise - 20261020m.md` |
 | Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md | 20261021b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique continu propose - 20261021b.md` |
 | Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md | 20261020h | 11 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique des process etudie et premier cycle - 20261020h.md` |
+| Digit-AI - Synthese Mandat - Oeil critique du 29-10 au 05-11 - 20261110a.md | 20261110a | 24.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique du 29-10 au 05-11 - 20261110a.md` |
 | Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md | 20261026a | 11.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique et architecture etat au 26-10 - 20261026a.md` |
 | Digit-AI - Synthese Mandat - Oeil critique global des process etudie - 20261020j.md | 20261020j | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique global des process etudie - 20261020j.md` |
 | Digit-AI - Synthese Mandat - Oeil critique global releve des appels - 20261020k.md | 20261020k | 5.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Oeil critique global releve des appels - 20261020k.md` |
@@ -584,33 +679,57 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md | 20261016k | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` |
 | Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md | 20261026p | 3.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` |
 | Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md | 20261016l | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Plans classes par mois noms raccourcis - 20261016l.md` |
+| Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md | 20261103l | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Point d'etape de l'etude d'une revue de code - 20261103l.md` |
 | Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md | 20261026d | 10.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt cible oeil critique adapte a oeil-critique 1.1.0 - 20261026d.md` |
+| Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md | 20261105i | 5.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Prompt d activation du releve des couts - 20261105i.md` |
 | Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md | 20261001i | 4 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication 48a du pilot et forge-agents - 20261001i.md` |
 | Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md | 20261020d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication D-52 du pilot - 20261020d.md` |
+| Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md | 20261104e | 3.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot constatee - 20261104e.md` |
+| Digit-AI - Synthese Mandat - Publication du pilot et detail de D-182 et D-184 - 20261109c.md | 20261109c | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot et detail de D-182 et D-184 - 20261109c.md` |
+| Digit-AI - Synthese Mandat - Publication du pilot sur A1 - 20261109e.md | 20261109e | 2.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication du pilot sur A1 - 20261109e.md` |
 | Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md | 20261017e | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` |
 | Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md | 20261012d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` |
 | Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md | 20261001l | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` |
 | Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md | 20261016d | 5.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` |
+| Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md | 20261105b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md` |
 | Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md | 20261015m | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` |
 | Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md | 20261016j | 5.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette Terraform et revues datees - 20261016j.md` |
+| Digit-AI - Synthese Mandat - Registre des mutants et index des dossiers corriges - 20261103o.md | 20261103o | 8.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Registre des mutants et index des dossiers corriges - 20261103o.md` |
 | Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001n.md | 20261001n | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu arrete corrige et relance - 20261001n.md` |
 | Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md | 20261001k | 18.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu joue effort high retenu sur 6 taches - 20261001k.md` |
 | Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md | 20261001m | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rejeu lance candidatures ouvertes etude enregistree - 20261001m.md` |
 | Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md | 20261013k | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Relecteur du lecteur vise construit - 20261013k.md` |
+| Digit-AI - Synthese Mandat - Releve des couts par session construit - 20261105g.md | 20261105g | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Releve des couts par session construit - 20261105g.md` |
 | Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md | 20261026f | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 68a 69a 70a 73b executees - 20261026f.md` |
 | Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md | 20261026k | 6.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 75 a 80 en cours - 20261026k.md` |
 | Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md | 20261026t | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 81 a 84 en cours - 20261026t.md` |
 | Digit-AI - Synthese Mandat - Reponses 81 a 84 executees et publiees - 20261026x.md | 20261026x | 6.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses 81 a 84 executees et publiees - 20261026x.md` |
+| Digit-AI - Synthese Mandat - Reponses D-165 a D-169 appliquees - 20261105a.md | 20261105a | 11.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses D-165 a D-169 appliquees - 20261105a.md` |
+| Digit-AI - Synthese Mandat - Reponses de la revue D-114 a D-119 construites - 20261102k.md | 20261102k | 8.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Reponses de la revue D-114 a D-119 construites - 20261102k.md` |
 | Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md | 20261015i | 4.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` |
 | Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md | 20261015j | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` |
 | Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md | 20261013j | 3.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` |
 | Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md | 20261019j | 7.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md` |
+| Digit-AI - Synthese Mandat - Restes de campagne corriges et largeur des gabarits - 20261103b.md | 20261103b | 10.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Restes de campagne corriges et largeur des gabarits - 20261103b.md` |
 | Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md | 20261014b | 12.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 04-11 - 20261104a.md | 20261104a | 17.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 04-11 - 20261104a.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md | 20261105d | 11.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 05-11 - 20261105d.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 - 20261106a.md | 20261106a | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 - 20261106a.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md | 20261106b | 13.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 - 20261109d.md | 20261109d | 10.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 - 20261109d.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 au soir - 20261109h.md | 20261109h | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 au soir - 20261109h.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md | 20261029g | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` |
+| Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md | 20261102b | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` |
+| Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md | 20261103p | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` |
 | Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md | 20261001b | 18.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Sas traite onze lots ingeres deux attente - 20261001b.md` |
 | Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md | 20261015l | 47.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Six travaux faits et onze fiches - 20261015l.md` |
+| Digit-AI - Synthese Mandat - Skill clip de presentation integre - 20261110d.md | 20261110d | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill clip de presentation integre - 20261110d.md` |
+| Digit-AI - Synthese Mandat - Skill make-it-better construit - 20261102m.md | 20261102m | 8.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill make-it-better construit - 20261102m.md` |
 | Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md | 20261021c | 6.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md` |
 | Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md | 20261030a | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md` |
+| Digit-AI - Synthese Mandat - Suites du tri TikTok et revues de code - 20261103c.md | 20261103c | 14.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Suites du tri TikTok et revues de code - 20261103c.md` |
+| Digit-AI - Synthese Mandat - Suivi des agents A1 et A2 - 20261113d.md | 20261113d | 8.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Suivi des agents A1 et A2 - 20261113d.md` |
+| Digit-AI - Synthese Mandat - Suivi des agents toutes les 15 minutes - 20261112j.md | 20261112j | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Suivi des agents toutes les 15 minutes - 20261112j.md` |
 | Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md | 20261019a | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Sujets ouverts au 19-10 - 20261019a.md` |
 | Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md | 20261019i | 6.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation avec GitHub - 20261019i.md` |
 | Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md | 20261020a | 7 Ko | `04-plans/Digit-AI - Synthese Mandat - Synchronisation des deux postes publiee - 20261020a.md` |
@@ -621,9 +740,23 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md | 20261019b | 10.7 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours du 19-10 - 20261019b.md` |
 | Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md | 20261001j | 16.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Todos et retours recette hebergee au vert - 20261001j.md` |
 | Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md | 20261015n | 5.4 Ko | `04-plans/Digit-AI - Synthese Mandat - TODOs et retours, publication cedee a la session d'origine - 20261015n.md` |
+| Digit-AI - Synthese Mandat - Tri A3 et boite d entree du 12-11 - 20261112a.md | 20261112a | 6.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri A3 et boite d entree du 12-11 - 20261112a.md` |
 | Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md | 20261019c | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok - 20261019c.md` |
+| Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md | 20261109a | 9.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md` |
+| Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md | 20261102i | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` |
 | Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md | 20261026o | 4.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md *(archivé)* | 20261016a | 4.5 Ko | `04-plans/old/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` |
+| Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md *(archivé)* | 20261102e | 18.4 Ko | `04-plans/old/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md` |
+| 00-audit-environnement.md | — | 20.2 Ko | `04-plans/plateforme-pentest-gate-a-20261102/00-audit-environnement.md` |
+| 01-architecture.md | — | 49.6 Ko | `04-plans/plateforme-pentest-gate-a-20261102/01-architecture.md` |
+| 02-threat-model.md | — | 31.9 Ko | `04-plans/plateforme-pentest-gate-a-20261102/02-threat-model.md` |
+| 03-data-protection.md | — | 26.7 Ko | `04-plans/plateforme-pentest-gate-a-20261102/03-data-protection.md` |
+| 04-backlog.md | — | 19.4 Ko | `04-plans/plateforme-pentest-gate-a-20261102/04-backlog.md` |
+| 05-decisions.md | — | 17.7 Ko | `04-plans/plateforme-pentest-gate-a-20261102/05-decisions.md` |
+| 06-open-questions.md | — | 14.7 Ko | `04-plans/plateforme-pentest-gate-a-20261102/06-open-questions.md` |
+| 07-ai-access-matrix.md | — | 22.2 Ko | `04-plans/plateforme-pentest-gate-a-20261102/07-ai-access-matrix.md` |
+| 08-cost-model.md | — | 18.6 Ko | `04-plans/plateforme-pentest-gate-a-20261102/08-cost-model.md` |
+| 09-cyber-model-evaluation.md | — | 21.5 Ko | `04-plans/plateforme-pentest-gate-a-20261102/09-cyber-model-evaluation.md` |
 
 ### 05-catalogues-readmes-forges
 

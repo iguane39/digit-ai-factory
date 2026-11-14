@@ -70,6 +70,14 @@ l'oracle, le seul qui se rejoue.
 sujet : 1 474 mots, 6 puces en bref, et une solution durable en cinq couches à la place du tableau
 de préconisations. L'oracle la refuse sur CP1, CP2, CP3 et CP5 : c'était un diagnostic.
 
+**Une question posée à ce tiers** (D-119 (b) du 02/11/2026, TF-1983) : chaque question a d'abord été posée à
+l'humain si la réponse est connue de lui. Une hypothèse ouverte du document source ne se recopie pas en question
+à un tiers : le 26/10/2026, une fiche demandait à son destinataire le statut de son propre signataire.
+
+**Un comparatif de montants** (D-114 (a) du 02/11/2026, TF-1971) : dès qu'une fiche compare deux montants, elle porte
+la rubrique « Compris : … · Non compris : … · Conséquence : … ». Le 19/10/2026, 224 € contre 320 € comptaient le
+pare-feu d'un seul côté, et 6 relectures ne l'ont pas relevé. `oracle-ecriture` EC-17 avertit quand elle manque.
+
 ## Les vocabulaires fermés
 
 - **Gain** : un montant avec son unité de temps (`~180 € par mois`), ou un effet nommé (`Panne

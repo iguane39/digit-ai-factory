@@ -8,7 +8,11 @@ destinataire: humain
 <!-- Gabarit du pilot (gabarits\ETUDE-OPPORTUNITE.md, TF-0155). Fige la grille d'instruction
      des propositions entre `candidat` et `decide` — elle n'existait qu'en une ligne de
      journal et en exemplaires non normalisés. Jugé par oracles\oracle-etude-opportunite.mjs.
-     Emplacement du livrable : output\03-etudes\<AAAAMMJJ>-etude-opportunite-<objet>.md -->
+     Emplacement du livrable : output\03-etudes\<Projet> - Étude - <objet> - <AAAAMMJJ><indice>.md
+     (R-4 : « <Projet> - <Objet> - AAAAMMJJ<indice>.<ext> » ; R-25 : le type « Étude » est au
+     registre). Le préfixe daté <AAAAMMJJ>-etude-opportunite-<objet>.md, prescrit ici jusqu'au
+     02/11/2026 (TF-0197), reste valide pour les études qui le portent : R-4 ne renomme pas les
+     fichiers historiques (TF-2028). -->
 
 ## Seuil de déclenchement (à vérifier AVANT d'écrire)
 
@@ -57,6 +61,9 @@ explicite `état de l'art : non instruit` avec son motif. Jamais d'entre-deux.>
 
 - **O0 — ne rien faire** : à réfuter EXPLICITEMENT (coût du statu quo, cité) ou à retenir.
 - **O1…O4** : <options réelles, chacune : contenu, coût estimé, ce qu'elle exclut.>
+
+Deux options comparées sur un montant portent la rubrique « Compris : … · Non compris : … · Conséquence : … »
+(D-114 (a) du 02/11/2026, TF-1971 ; `oracle-ecriture` EC-17 avertit quand elle manque).
 
 ## 5. Verdict
 

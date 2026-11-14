@@ -35,7 +35,7 @@ const FIGURES = [
   ["volume", new RegExp(String.raw`(?<![\d.,:/-])(${NOMBRE})\s*(?:jetons?\b|tokens?\b|Ko\b|Mo\b|Go\b)`, "gu")],
   ["compte", new RegExp(String.raw`(?<![\d.,:/-])(${NOMBRE})\s+(?:fichiers?|lignes?|tests?|cas\b|commits?|sessions?|demandes?|refus\b|erreurs?|d[ée]fauts?|produits?|scripts?|contr[ôo]les?|entr[ée]es\b|items?\b|occurrences?)`, "giu")],
 ];
-const DECLARE_NON_MESURE = /non mesur|non recompt|non v[ée]rifi|projet[ée]|estim|environ|hypoth|à mesurer|\bcible\b|objectif|attendue?s?\b|vis[ée]e?s?\b|d'ici|plafond|seuil|au plus|au moins/i;
+export const DECLARE_NON_MESURE = /non mesur|non recompt|non v[ée]rifi|projet[ée]|estim|environ|hypoth|à mesurer|\bcible\b|objectif|attendue?s?\b|(?<![A-Za-zÀ-ÿ])vis[ée]e?s?(?![A-Za-zÀ-ÿ])|d'ici|plafond|seuil|au plus|au moins/i;
 
 /**
  * Les chiffres d'une réponse qu'aucune sortie du tour ne montre : [{ nature, chiffre, ligne }]. Le bloc 1 (l'heure, jugée par S84) et le
@@ -58,6 +58,58 @@ export function chiffresSansReleve(texte, nombres) {
         const chiffre = NORMALISE(m[1]);
         if (!connus.has(chiffre)) out.push({ nature, chiffre: m[0].trim(), ligne: ligne.trim().slice(0, 140) });
       }
+    }
+  }
+  return out;
+}
+
+// ---- D-131 (a) du 02/11/2026 (TF-2056) — LES CHIFFRES D'UN GAIN ÉCRIT AU REGISTRE ----------------------------------------------------------------
+// S90 juge le texte d'une restitution ; `gains_constates`, le champ qu'un tour écrit à la clôture d'un item, n'était jugé par personne. Le fait :
+// le 02/11/2026, « 813 Markdown suivis, 4 accusés » sans sortie à l'appui ; la mesure rejouée en donnait 1 209 et 5. Ici, TOUT chiffre du gain
+// compte (pas seulement les cinq natures de S90 : « 4 accusés » n'en est pas une), sauf ce qui n'est pas un compte : dates, heures, années,
+// numéros de règle ou de tâche (TF-2056, D-131, S90), SHA, versions, chemins, numéros de loi ou de section (« n° 3 », « § 4 »).
+// Le chiffre se compare comme S90 le fait (`nombresDuTexte` : « 1 209 » et « 1209 », « 21,4 » et « 21.4 » sont le même) ; une clause qui le dit non
+// mesuré, estimé ou visé (`DECLARE_NON_MESURE`) n'est pas accusée. NON JUGÉ : que le chiffre retrouvé soit le bon, un total calculé dans le gain
+// (accusé à tort, d'où un simple avertissement), un chiffre en lettres.
+const DATES = [
+  /\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?Z?)?/g,                                  // dates et instants ISO
+  /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g,                                                                      // dates 02/11/2026
+  /(?<![\w/\\.-])(?:0?[1-9]|[12]\d|3[01])\/(?:0[1-9]|1[0-2])(?![\w/\\.-])/g,                          // dates 02/11 ; 22/22 et 13/14 restent des comptes
+  /\b\d{1,2}\s?(?:h\s?\d{2}|:\d{2})\b/g,                                                                 // heures 14h15, 14:15
+];
+const RATIO = /(?<![\w/\\.-])(\d{1,6})\/(\d{1,6})(?![\w/\\.-])/g;                                         // « 22/22 » : deux comptes, lus un à un
+const NON_COMPTES = [
+  /\b(?:20[2-3]\d)\b/g,                                                                                  // années
+  /\bv?\d+\.\d+\.\d+(?:\.\d+)*\b/g,                                                                      // versions 2.57.0
+  /\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b/g,                                                // SHA
+  /\b\d{6,}[A-Za-z]\b/g,                                                                                 // lots 20261102n
+  /\b[A-Za-z_]+-?\d[\w-]*\b/g,                                                                           // TF-2056, D-131, S90, K2, md5
+  /(?:n°|\bno\.?|§)\s*\d+/gi,                                                                            // « n° 3 », « § 4 »
+  /\S*[\\/]\S*/g,                                                                                        // chemins et URL
+];
+const NOMBRE_GAIN = /\d(?:[\d   ]*\d)?(?:[.,]\d+)?/g;
+// Un nombre rapporté par un agent et MARQUÉ tel est la forme que la doctrine prescrit (AGENT-CAMPAGNE.md, TF-1009 et TF-1802 : « rapporté par l'agent, non recompté ») :
+// la clause qui le dit n'est pas accusée, comme celle qui le dit non mesuré.
+const DECLARE_RAPPORTE = new RegExp(`${DECLARE_NON_MESURE.source}|rapport[ée]s? (?:par|de)\\b|selon (?:l'|le )?(?:agent|rapport)|d'après (?:l'|le )?(?:agent|rapport)`, "i");
+/**
+ * Les chiffres d'un gain : [{ chiffre, forme, morceaux, extrait }]. `forme` est la graphie comparable de `nombresDuTexte` ; `morceaux`, les nombres
+ * qu'un bloc « 5 12 » contient quand l'espace sépare deux nombres plutôt qu'il ne groupe des milliers (le bloc est lu connu si tous ses morceaux le sont).
+ */
+export function chiffresDeGains(texte) {
+  const out = [], vus = new Set();
+  for (const clause of String(texte || "").split(/[;\n]|\.\s/)) {
+    if (DECLARE_RAPPORTE.test(clause)) continue;
+    // Les dates sortent d'abord ; un ratio de comptes (« 22/22 ») est ensuite lu côté par côté, avant que la règle des chemins ne l'emporte.
+    let lue = clause.replace(/`/g, " ");
+    for (const re of DATES) lue = lue.replace(re, " ");
+    lue = lue.replace(RATIO, "$1, $2");
+    for (const re of NON_COMPTES) lue = lue.replace(re, " ");
+    for (const m of lue.matchAll(NOMBRE_GAIN)) {
+      const [forme, ...morceaux] = [...nombresDuTexte(m[0])];
+      if (vus.has(forme)) continue;
+      vus.add(forme);
+      const i = clause.indexOf(m[0].trim());
+      out.push({ chiffre: m[0].trim(), forme, morceaux, extrait: clause.slice(Math.max(0, i - 25), i + m[0].length + 25).trim() });
     }
   }
   return out;

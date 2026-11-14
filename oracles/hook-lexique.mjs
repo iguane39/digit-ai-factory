@@ -91,15 +91,42 @@ export function correctionDeProcessus(message) {
  * leur skill ou leur forge. Limite assumée : « le rapport d'audit du projet est prêt » reçoit aussi la
  * ligne ; elle ne bloque rien et ne dit à la session que la route à suivre si audit il y a.
  */
-const MOT_AUDIT = /\b(?:audit|audits|auditer|audite[rz]?)\b\s*(?:(?:des|du|de|d['’]|les|la|le|l['’]|cette|cet|ce|mon|ma|notre|son|sa)(?![\p{L}])\s*)*(\p{L}+)?/iu;
+const MOT_AUDIT = /(?<![\p{L}\p{N}_])(audit|audits|auditer|audite[rz]?|auditons)(?![\p{L}\p{N}_])\s*(?:(?:des|du|de|d['’]|les|la|le|l['’]|cette|cet|ce|mon|ma|notre|son|sa)(?![\p{L}])\s*)*(\p{L}+)?/giu;
 const AUDIT_SPECIALISE = /^(?:prompts?|skills?|seo|geo|s[ée]curit[ée]|websec|tests?|couverture|accessibilit[ée]|rgaa|traductions?|design|rendu|donn[ée]es|forge)$/iu;
 const OBJET_PRODUIT = /\b(?:complet|compl[èe]te|global|globale|g[ée]n[ée]ral|projet|produit|appli|application|code|d[ée]p[ôo]t|repo|plateforme|site|gouvernance|maturit[ée]|poc[- ]to[- ]prod)\b/iu;
+
+/**
+ * TF-2301 (09/11/2026, décision R-58) — LE VERBE DE LA DEMANDE PORTE L'AUDIT. Le fait : la consigne d'une série
+ * d'animations, dont une liste d'idées citait `forge-audit`, a reçu « ce message demande un AUDIT DU PRODUIT »,
+ * parce que le mot « audit » et le mot « produit » se trouvaient dans la même phrase. Le mot ne suffit plus, il
+ * doit être DEMANDÉ : (1) un verbe d'audit (« audite », « auditer »), ou le nom « audit » sous un verbe de
+ * demande (« lance », « fais », « je veux », « il faut »…) dans la même proposition, ou le nom en tête de
+ * phrase (« Audit complet du projet. ») ; (2) jamais collé à un identifiant (`forge-audit`, `audit-produit`) ; (3)
+ * jamais dans une citation entre guillemets ; (4) jamais dans une énumération d'idées (une ligne à puce sans verbe,
+ * ou une phrase ouverte par « idées : », « pistes : », « exemples : »…). Limite assumée : un verbe de demande placé
+ * dans une idée (« idées : lancer un audit du produit ») est lu comme une idée, pas comme une demande.
+ */
+const VERBE_DE_DEMANDE = /(?<![\p{L}])(?:lanc(?:e|er|ez|ons)|relanc(?:e|er|ez)|fais|faire|faites|effectu(?:e|er|ez)|r[ée]alis(?:e|er|ez)|m[èe]ne|mener|menez|conduis|conduire|conduisez|ouvr(?:e|ir|ez)|pass(?:e|er|ez)|proc[èe]d(?:e|er|ez)|d[ée]clench(?:e|er|ez)|d[ée]marr(?:e|er|ez)|ex[ée]cut(?:e|er|ez)|pr[ée]par(?:e|er|ez)|planifi(?:e|er|ez)|demand(?:e|er|ez)|command(?:e|er|ez)|veux|voudrais|souhait(?:e|es|ons)|aimerais|exige|besoin|faut|faudrait|obtien(?:s|dr)|obtenir|donne|donner|donnez)(?![\p{L}])/iu;
+const CITATION = /«[^»]*»|"[^"\n]*"|“[^”]*”/gu;
+const PUCE = /^\s*(?:[-*•–—]|\d+\s*[).])\s/u;
+const INTRO_D_ENUMERATION = /(?<![\p{L}])(?:id[ée]es?|pistes?|exemples?|options?|suggestions?|inspirations?|propositions?|th[èe]mes?|liste)(?![\p{L}])[^:\n]*:/iu;
 export function demandeAuditProduit(message) {
-  return String(message || "").split(/[.!?\n]/).some((p) => {
-    const a = MOT_AUDIT.exec(p);
-    if (!a) return false;
-    if (a[1] && AUDIT_SPECIALISE.test(a[1])) return false;
-    return OBJET_PRODUIT.test(p);
+  return String(message || "").split(/[.!?\n]/).some((brut) => {
+    const p = brut.replace(CITATION, " ");
+    if (!OBJET_PRODUIT.test(p)) return false;
+    const enPuce = PUCE.test(brut);
+    for (const a of p.matchAll(MOT_AUDIT)) {
+      if (a[2] && AUDIT_SPECIALISE.test(a[2])) continue;
+      const avant = p[a.index - 1], apres = p[a.index + a[1].length];
+      if ((avant && /[-./\\@]/.test(avant)) || (apres && /[-/\\@]/.test(apres))) continue; // un identifiant, pas une demande
+      const prefixe = p.slice(0, a.index);
+      if (INTRO_D_ENUMERATION.test(prefixe)) continue; // une idée citée, pas une demande
+      if (/^audit/i.test(a[1]) && !/^audit(?:s)?$/i.test(a[1])) return true; // « audite », « auditer » : le verbe d'audit
+      const fenetre = prefixe.slice(-60).split(/[;:(]/).pop();
+      if (VERBE_DE_DEMANDE.test(fenetre)) return true; // le nom « audit » sous un verbe de demande
+      if (!enPuce && prefixe.trim() === "") return true; // « Audit complet du projet » : la demande nominale
+    }
+    return false;
   });
 }
 
@@ -219,14 +246,42 @@ export function estMessageHumain(message) {
 export const MARQUEURS_NON_HUMAINS =
   /<task-notification>|<cross-session-message|\[SYSTEM NOTIFICATION|<system-reminder>|NOT\s+USER\s+INPUT/i;
 
-/** Le texte injecté dans le contexte — une ligne par appel de skill, puis par consigne de règle, ou rien. */
-export function contexte(message) {
+/**
+ * TF-2144 (RT-44 du 04/11/2026) — LE STANDARD D'AUDIT DU CLIENT SE LIT AVANT LE ROUTAGE. Le 04/11, un audit complet a été rendu deux fois
+ * par forge-audit générique, avec un tenant fabriqué, alors que le client publie son prompt, son modèle, son tenant et sa porte
+ * (`verifier-rapport-audit.mjs`) ; la porte rendait NON CONFORME le rapport que forge-audit déclarait diffusable. `standard` est ce que
+ * `standardClientAudit` d'`oracles/lib-mobilisation.mjs` a lu dans le projet commun du client ; sans porte ni convention, rien n'est ajouté.
+ */
+export function ajoutStandardClient(standard) {
+  if (!standard || !standard.client || (!standard.porte && !(standard.conventions || []).length)) return "";
+  const lieu = standard.projet_commun ? ` (projet commun ${String(standard.projet_commun).replace(/\\/g, "/")})` : "";
+  const conv = (standard.conventions || []).length ? ` Ses conventions sur l'audit : ${standard.conventions.map((l) => `« ${l.replace(/^[-*]\s*/, "")} »`).join(" ; ")}.` : "";
+  const declare = ["prompt", "modele", "tenant"].filter((c) => standard[c]).map((c) => `${c} : ${standard[c]}`).join(" ; ");
+  const porte = standard.porte
+    ? ` Sa PORTE : \`node "${String(standard.porte).replace(/\\/g, "/")}" "<rapport>.html"\` (sortie CONFORME, exit 0, ou le rapport n'est pas diffusable) ; en enregistrer la sortie par ` +
+      "`> forge\\audit\\<AAAAMMJJ>\\porte-client.txt` : la mobilisation de forge-audit exige ce fichier, frais et CONFORME, avant « livré » (verrou S85, TF-2144)."
+    : "";
+  return ` STANDARD D'AUDIT PUBLIÉ PAR LE CLIENT ${standard.client}${lieu} (TF-2144, RT-44) : à lire AVANT de lancer forge-audit, et il prime sur ses valeurs génériques ` +
+    `(prompt, modèle, tenant) ; un rapport rendu hors de ce format est NON CONFORME (cas du 04/11/2026 : 5 anomalies à la porte du client).${declare ? ` Déclaré : ${declare}.` : ""}${conv}${porte}`;
+}
+
+/** Le texte injecté dans le contexte — une ligne par appel de skill, puis par consigne de règle, ou rien. `standardAudit` : TF-2144. */
+export function contexte(message, standardAudit = null) {
   const appels = reconnaitre(message).map((a) =>
     `[LEXIQUE RV-6 — hook-lexique] Ce message est un APPEL du skill \`${a.skill}\` (${a.forme}) : ` +
     `l'invoquer par l'outil Skill AVANT toute autre action ou réponse ; retirer le mot-clé, le reste du message est l'entrant. ` +
     `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`);
-  const consignes = reconnaitreConsignes(message).map((c) => `[${c.regle} — hook-lexique] ${c.texte}`);
+  const consignes = reconnaitreConsignes(message).map((c) => `[${c.regle} — hook-lexique] ${c.texte}${c.regle === "audit" ? ajoutStandardClient(standardAudit) : ""}`);
   return [...appels, ...consignes].join("\n");
+}
+
+/** Le standard d'audit du client du dossier de session, lu SEULEMENT si le message est une demande d'audit du produit ; null sinon (import paresseux, jamais bloquant). */
+export async function standardPourLeMessage(message, dossier) {
+  try {
+    if (!dossier || !reconnaitreConsignes(message).some((c) => c.regle === "audit")) return null;
+    const { standardClientAudit } = await import("./lib-mobilisation.mjs");
+    return standardClientAudit(dossier);
+  } catch { return null; }
 }
 
 /**
@@ -472,6 +527,21 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ["Fais un audit de sécurité de l'application", []],
     ["Relance l'audit des tests du projet", []],
     ["l'audit forge-tests a rendu exit 3", []],
+    // TF-2301 (09/11/2026) — LE VERBE DE LA DEMANDE PORTE L'AUDIT. Les rouges sont les mentions d'une consigne
+    // d'animations (identifiant `forge-audit`, énumération d'idées, citation, constat au passé) ; les verts sont
+    // les mêmes mots portés par un verbe de demande, y compris au milieu d'une liste ou après des idées.
+    ["Idées d'animation pour la série : un audit du produit raconté en 30 secondes, un test de charge du site", []],
+    ["Pistes : forge-audit sur le produit entier, forge-seo pour le site", []],
+    ["Pour la série, une scène où forge-audit passe le produit au crible", []],
+    ["- audit complet du projet en accéléré\n- tests du site en direct", []],
+    ["Le titre « audit complet du projet » est trop long", []],
+    ["Le rapport d'audit du projet est prêt", []],
+    ["L'audit complet du projet a été fait hier", []],
+    ["Audit complet du projet", ["audit"]],
+    ["Je veux un audit complet du produit avant jeudi", ["audit"]],
+    ["Voici ma demande :\n- lance un audit complet du projet\n- puis corrige les écarts", ["audit"]],
+    ["Idées d'animation : un audit du produit raconté en 30 secondes.\nPuis lance un audit complet du projet", ["audit"]],
+    ["Il faut un audit de gouvernance du projet", ["audit"]],
     // TF-1753 (15/10/2026, lot Produit-64 20261015a RT-69) — « peut-on le faire comme X ? » demande
     // une IMITATION, pas une délégation à X. Les verts reprennent la question de l'humain et ses
     // voisines ; les rouges sont les « comme » qui n'imitent personne, et la délégation explicite.
@@ -585,6 +655,44 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
   console.log(`  [${okOrigine ? "PASS" : "FAIL"}] niveau — notification portant « vite : » → REFUS, non humaine, rien injecté`);
   okOrigine ? pass++ : fail++;
 
+  // TF-2144 (RT-44 du 04/11/2026) — LE STANDARD D'AUDIT DU CLIENT SE LIT AVANT LE ROUTAGE, dans les deux sens. Un parc jetable :
+  // un client `_ClientFictif` dont le projet commun publie sa porte et ses conventions, un produit dessous, un produit hors client.
+  {
+    const { standardClientAudit } = await import("./lib-mobilisation.mjs");
+    const parc = mkdtempSync(join(tmpdir(), "standard-audit-"));
+    const commun = join(parc, "_ClientFictif", "projet-commun");
+    mkdirSync(join(commun, "kit", "pack"), { recursive: true });
+    mkdirSync(join(parc, "_ClientFictif", "produit-a"), { recursive: true });
+    mkdirSync(join(parc, "produit-libre"), { recursive: true });
+    writeFileSync(join(commun, "CONVENTIONS-CLIENT.md"), "# Conventions\n\n- Audit : le rapport suit le modèle POC-to-Prod et passe la porte du kit (2026-10-19).\n- Autre chose sans rapport.\n", "utf8");
+    writeFileSync(join(commun, "kit", "pack", "verifier-rapport-audit.mjs"), "// porte fictive\n", "utf8");
+    const msgAudit = "lance un audit complet du projet";
+    const std = standardClientAudit(join(parc, "_ClientFictif", "produit-a"), parc);
+    const injecte = contexte(msgAudit, std);
+    const cas = [
+      [std.client === "_ClientFictif" && /verifier-rapport-audit\.mjs$/.test(std.porte || "") && std.source === "detecte" && std.conventions.length === 1,
+        "produit sous un client : la porte du projet commun et la convention d'audit sont lues"],
+      [/STANDARD D'AUDIT PUBLIÉ PAR LE CLIENT _ClientFictif/.test(injecte) && /verifier-rapport-audit\.mjs/.test(injecte) && /porte-client\.txt/.test(injecte) && /AUDIT DU PRODUIT/.test(injecte),
+        "la consigne d'audit nomme le standard, sa porte et le fichier de preuve exigé"],
+      [!/STANDARD D'AUDIT PUBLIÉ/.test(contexte(msgAudit)) && /AUDIT DU PRODUIT/.test(contexte(msgAudit)),
+        "rouge — sans standard lu, la consigne d'audit reste celle d'avant (aucune mention du client)"],
+      [standardClientAudit(join(parc, "produit-libre"), parc).porte === null && !/STANDARD D'AUDIT PUBLIÉ/.test(contexte(msgAudit, standardClientAudit(join(parc, "produit-libre"), parc))),
+        "rouge — un produit hors de tout dossier client n'a aucun standard à lire, rien n'est ajouté"],
+      [!/STANDARD D'AUDIT PUBLIÉ/.test(contexte("lance un audit SEO du site", std)) && contexte("lance un audit SEO du site", std) === "",
+        "rouge — un audit spécialisé (SEO) n'est pas routé vers le standard d'audit du produit"],
+    ];
+    // La forme déclarée prime sur la détection, et une déclaration inutilisable est DITE, jamais contournée.
+    writeFileSync(join(commun, "STANDARD-AUDIT.json"), JSON.stringify({ porte: "kit/pack/verifier-rapport-audit.mjs", prompt: "kit/prompt.md", modele: "modele-v3", tenant: "tenant-fictif (260 contraintes)" }), "utf8");
+    const decl = standardClientAudit(join(parc, "_ClientFictif", "produit-a"), parc);
+    cas.push([decl.source === "declare" && decl.tenant === "tenant-fictif (260 contraintes)" && /Déclaré : prompt : kit\/prompt\.md ; modele : modele-v3 ; tenant : tenant-fictif/.test(contexte(msgAudit, decl)),
+      "forme déclarée (STANDARD-AUDIT.json) : prompt, modèle et tenant du client sont repris dans la consigne"]);
+    writeFileSync(join(commun, "STANDARD-AUDIT.json"), JSON.stringify({ porte: "../../hors-du-projet/porte.mjs" }), "utf8");
+    const evade = standardClientAudit(join(parc, "_ClientFictif", "produit-a"), parc);
+    cas.push([evade.refus.some((r) => /sort du projet commun/.test(r)) && evade.source === "detecte",
+      "rouge — une porte déclarée hors du projet commun est refusée et dite ; la porte détectée prend le relais"]);
+    for (const [ok, glose] of cas) { console.log(`  [${ok ? "PASS" : "FAIL"}] TF-2144 — ${glose}`); ok ? pass++ : fail++; }
+  }
+
   console.log(`\nhook-lexique : ${pass} PASS, ${fail} FAIL`);
   process.exit(fail ? 1 : 0);
 }
@@ -605,15 +713,20 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
   dossier = racineDuProjet(dossier || process.cwd());
   const lignes = [];
   const humain = estMessageHumain(message);
-  if (humain) {
-    const appels = contexte(message);
-    if (appels) lignes.push(appels);
-    const ref = referentielNiveaux(dossier);
-    const niveau = ref ? contexteNiveau(message, ref) : "";
-    if (niveau) lignes.push(niveau);
-  }
-  // TF-1958 : la lettre d'une décision ouverte, lue dans la transcription ; asynchrone (import paresseux).
-  (humain ? contexteLettre(message, transcript) : Promise.resolve(""))
+  // TF-2144 : le standard d'audit du client, lu dans son projet commun, SEULEMENT pour une demande d'audit ; asynchrone (import paresseux).
+  (humain ? standardPourLeMessage(message, dossier) : Promise.resolve(null))
+    .catch(() => null)
+    .then((standard) => {
+      if (humain) {
+        const appels = contexte(message, standard);
+        if (appels) lignes.push(appels);
+        const ref = referentielNiveaux(dossier);
+        const niveau = ref ? contexteNiveau(message, ref) : "";
+        if (niveau) lignes.push(niveau);
+      }
+      // TF-1958 : la lettre d'une décision ouverte, lue dans la transcription ; asynchrone (import paresseux).
+      return humain ? contexteLettre(message, transcript) : "";
+    })
     .catch(() => "")
     .then((lettre) => {
       if (lettre) lignes.push(lettre);

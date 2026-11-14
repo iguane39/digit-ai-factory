@@ -161,6 +161,12 @@ function selfTest() {
   resultats.push({ fixture: "K8/accolades non résolues", attendu: "SKIP", obtenu: k8("node oracles\\oracle-{x,y}.mjs").statut });
   resultats.push({ fixture: "K8/forge absente du parc", attendu: "SKIP", obtenu: k8("node oraclesoracle-x.mjs", "beta").statut });
 
+  // TF-2246 (06/11/2026) : l'oracle de l'arrêt d'urgence rejoué en course (forge-agents-security, TF-2217)
+  // était livré et découvert par sa forge, mais absent du catalogue du pilot. Le catalogue RÉEL le cite.
+  const reel = readFileSync(join(ICI, "..", "catalogues", "catalogue.jsonl"), "utf8").split(/\r?\n/).filter((l) => l.trim()).slice(1).map((l) => JSON.parse(l));
+  resultats.push({ fixture: "catalogue réel/oracle-arret-en-course de forge-agents-security (TF-2246)", attendu: "PASS",
+    obtenu: reel.some((s) => s.forge === "agents-security" && /oracle-arret-en-course\.mjs/.test(s.point_entree)) ? "PASS" : "FAIL" });
+
   rmSync(dossier, { recursive: true, force: true });
   const rates = resultats.filter((r) => r.attendu !== r.obtenu);
   console.log(JSON.stringify({ oracle: "oracle-catalogues", mode: "self-test", verdict: rates.length ? "FAIL" : "PASS", resultats }, null, 1));

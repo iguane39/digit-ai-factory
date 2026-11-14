@@ -15,7 +15,11 @@ node oracles\oracle-boite-entree.mjs # un lot est-il arrivé sans être pris ? (
 node oracles\oracle-skills.mjs       # skills, hooks, câblages = versionnés et vivants ? (K1-K8)
 ```
 
-Verdicts portés au ledger en `oracles_verdict`. La suspension n'est pas un excès de zèle :
+Verdicts portés au ledger en `oracles_verdict`. **Au ledger d'un produit (suivi par git), l'entrée de
+`oracle-boite-entree` ne porte que des comptes** (TF-2339, 10/11/2026) : la commande est
+`node oracles\oracle-boite-entree.mjs --pour-ledger`, qui rend le verdict et « 3 constats B1 », sans nom de
+fichier ni chemin. Le 11/09/2026, trois sidecars d'autres dépôts, nommés dans une entrée de ledger, étaient des
+noms de produits que la porte de publication a refusés sur 14 commits. La suspension n'est pas un excès de zèle :
 des oracles qui ne savent plus refuser ne peuvent rien juger de ce qui suit, et un lot non
 pris fausse tout ce qu'on croit savoir du reste-à-faire — on ouvrirait un run en croyant
 connaître le travail en attente.
@@ -313,11 +317,16 @@ Outillage réel, tout en lecture (aucune exécution active — R-33 ne s'appliqu
 FORGE_TESTS_QUALIF_URL=<url-deployee>   # pans qualif : 1 et 2, sans identifiants
 node scripts\capturer.mjs <url> --sortie <capture.json> --suivre-redirections
 node oracles\oracle-exposition.mjs <capture.json>          # 3 (EX-1…EX-11)
+node oracles\oracle-sca.mjs <racine-produit>               # gate : dépendances vulnérables (npm audit, pip-audit)
 ```
 
 depuis `<racine>\digit-ai-forge-websec`. La chaîne de redirections se lit **dans la capture**
 (`--suivre-redirections`), qui donne aussi le contrôle 4 sur `/docs`. Verdicts au ledger en
-`oracles_verdict`, l'URL auditée nommée.
+`oracles_verdict`, l'URL auditée nommée. `oracle-sca` ne lit pas la capture : il se joue sur la RACINE du produit
+(`package-lock.json`, `requirements.txt`, `uv.lock`, `poetry.lock`) et rend 0 PASS, 1 FAIL ou 2 SKIP motivé (outil ou
+manifeste absent, registre injoignable). Un SKIP se consigne tel quel, avec son motif : l'audit des dépendances n'a pas eu
+lieu, ce n'est pas un PASS. *Le fait* : trois verdicts `oracle-sca` du 03/11/2026 ont été joués au gate chez un produit de
+l'écosystème (rapporté par l'agent du lot wc le 13/11/2026, non rejoué ici), et ce bloc ne nommait pas l'oracle (TF-2489).
 
 Le smoke ne remplace pas l'audit : il regarde la **frontière**, là où l'audit regarde
 l'intérieur. Un produit dont le smoke échoue ne « passe » pas au vert parce que ses pans
@@ -333,6 +342,15 @@ DANS le projet audité — corriger le chemin, jamais contourner). Ajouter `--li
 (fonctionnel, technique) + jeux de données synthétiques + dashboard HTML, **puis copiés
 datés dans `output\` du produit** (règle 16), ce qui est un geste explicite et non un
 effet de bord de l'audit.
+
+**Une recette qui consomme un état borné se rejoue (TF-2438, TF-2466, 13/11/2026).** Avant le premier audit,
+le pilot joue `node oracles\oracle-recette-rejouable.mjs <racine-produit>` sur le produit. Exit 0 : aucune recette
+ne nomme un budget, un quota ou une fenêtre glissante sans le déclarer, ou chacune porte sa ligne `Rejeu :`.
+Exit 1 : la recette consomme un état borné sans le déclarer, et elle ajoute `Rejeu : état créé à chaque passage`
+ou `Rejeu : période 24 h` (`references\CONVENTION-RECETTES.md`) avant l'audit. Exit 2 : aucun fichier de recette
+sous la racine, ce qui se consigne et ne vaut pas PASS. Le contrôle lit les fichiers de recette, il ne rejoue rien :
+qu'un second passage sur la même base soit réellement jugé reste à la recette de forge-tests. Le verdict entre au
+ledger en `oracles_verdict`.
 
 **Corrigé le 15/08 (TF-0271)** : cette ligne prescrivait `etapes\tests\livrables\`, chemin
 qui — résolu depuis la racine produit — tombe DANS le projet audité. La garde **G-1** le
@@ -430,7 +448,8 @@ déclare comme tel, jamais par silence.
 Dockerfile/compose dans le produit, déploiement **staging** réel, `ROLLBACK.md` testé une
 fois, oracle MEP exécuté (`ETAPE-MEP.md`, liste à jour ; build, healthcheck ×3, smoke tests des exigences critiques
 contre l'instance servie, rollback prouvé, scan secrets de l'image ; chaîne de déploiement,
-sauvegarde et fournisseur d'identité déclarés, M-16 à M-18). Puis générer
+sauvegarde et fournisseur d'identité déclarés, M-16 à M-18 ; réglages de plateforme lus contre le registre
+et version servie lue avec O-26 et O-27, M-21 et M-22). Puis générer
 `DOSSIER-MEP.md` et demander le **GO humain** — la production n'est jamais lancée sans lui, et
 jamais depuis un poste : le GO est la porte d'approbation de la chaîne ou la poussée d'un commit nommé ;
 sans GO, clore en `pret_production_en_attente_GO` (état de succès).
@@ -477,11 +496,16 @@ erreur), et sa `cause`. `node <pilot>\oracles\mesure-refus-enclenchement.mjs` co
 tous les produits, les clôtures que le juge aurait refusées et la part à tort, en séparant les runs
 qui ont consigné par l'outil : c'est sur ces chiffres que l'humain décidera du passage en bloquant.
 
+**Le lot part dans le tour où le retour est écrit, pas à la clôture (D-191 (a), TF-2329).** Le contrôle LOT du hook de fin de
+tour d'un produit (`oracles\hook-restitution.mjs`, recette `oracles\hook-restitution.test.mjs` cas 72 à 76) refuse un tour qui a
+écrit une entrée `type: retour` (ledger du run ou journal hors run) qu'aucun lot de `forge\retours\` ne cite par son seq, et
+`--prejuger` rend le même refus avant l'affichage ; un retour écrit avant le tour reste à l'alerte d'ouverture (TF-1988). La
+clôture ne compile donc plus que ce que les tours n'ont pas déjà remis, et le geste est le même :
 Compiler les entrées `type: retour` du ledger en un **lot de retours** —
 `forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md` + **sidecar `.tf.jsonl`** homonyme
 (candidatures SANS id, gabarit `gabarits\RETOURS-FORGES.md` ; le préfixe projet est
 obligatoire, décision 13/08) avec contrôle de complétude ledger↔lot — puis
-**remise automatique** : copie des deux fichiers dans le sas `<pilot>\input\00-retours\_arrivee\`. Ensuite `run_close`
+**remise automatique** : copie des deux fichiers dans le sas `<pilot>\input\00-retours\_arrivee\` (`node forge\retours\oracle-lot.mjs "<lot>.md" --remettre`, TF-2314). Ensuite `run_close`
 au ledger avec le bilan, et synthèse à l'humain. Hors run, toute inspection/incident produit
 son propre lot — un fichier par lot, jamais modifié après remise. **À réception d'un sidecar
 dans `input\00-retours\`** (côté pilot) : le confronter d'abord au registre ET à l'archive
@@ -499,6 +523,10 @@ MVP → tests 100 % · ledger vérifié par `ledger.mjs verify` · couverture de
 à l'ouverture du run (R-19 ter, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage) ·
 chaîne de déploiement exclusive, sauvegarde des actifs critiques et fournisseur d'identité déclarés au
 dossier de MEP (M-16 à M-18, TF-1212 ; **avertissement** tant que l'humain n'en a pas fait un blocage).
+
+*« Prêt pour la production » exige aussi le pan `parcours-personas` de forge-tests et `oracle-exploitabilite` de forge-design, tous deux au verdict PASS dans le ledger du run* (TF-2124, D-166 (a) du 04/11/2026) : un manque rend un avertissement nommé jusqu'au 18/11/2026 inclus, puis un échec dès le 19/11/2026, jugé par la règle R-61 bis d'`oracles\oracle-conformite-projet.mjs`, rejouée avec `--declarer-pret` avant l'écriture du `run_close` ; la date se lit à l'horloge, `--aujourd-hui AAAA-MM-JJ` la fixe pour la recette.
+
+*Un forge-tests PARTIEL se motive avant « prêt »* (TF-2207, RP-27, décision R-58 du 06/11/2026) : l'exit 3 de la campagne reste acceptable, mais le `run_close` « prêt » est refusé, dès le 06/11/2026 et sans période d'avertissement, tant que le dernier verdict `PARTIEL` de la campagne (oracle `forge-tests` ou `forge_tests`) ne porte pas un champ `motif_partiel` de 20 caractères au moins, qui nomme les pans non couverts et dit pourquoi l'état est acceptable. Le motif se consigne par une entrée de plus (`oracles_verdict`, même oracle, même verdict) ; un PASS consigné ensuite lève aussi le refus. Même règle R-61 bis, même `--declarer-pret` : `ledger.mjs append` d'un `run_close` « prêt » la joue avant d'écrire. Mesuré le 05/11/2026 chez Produit-86 : trois `run_close` « prêt » sur un PARTIEL, 27 exigences sur 127 citées par un test de bout en bout.
 
 *« Livré » a une définition opposable* (R-61, TF-1711, 15/10/2026) : toutes les exigences de la fiche
 implémentées et testées, seuls les secrets restant à saisir par l'administrateur, par un geste guidé

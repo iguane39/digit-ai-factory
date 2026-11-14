@@ -1,0 +1,35 @@
+{
+  "schema": "pilot/suivi-couts@1",
+  "version": "1.0.0",
+  "date": "2026-11-05",
+  "revue_prevue": "2026-12-15",
+  "pourquoi": "Loi transverse n° 4 : un prix et un seuil mesuré sont des données volatiles. Ils vivent ici, datés et sourcés, jamais dans scripts/relever-couts.mjs. Le relevé de fin de session lit les seuils et le plafond ; la vue lit les prix au moment où elle calcule, et aucun montant n'est écrit dans un relevé.",
+  "decision": "TF-2181, option O2 de l'étude output/03-etudes/Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md ; GO humain « A1 » du 05/11/2026 ; lecture de la charge par D-177 du 05/11/2026 (« A, b & c séparés »).",
+  "regle": "Un prix se relit à la page source à chaque nouvelle génération de modèles, et au plus tard à revue_prevue ; un modèle absent de `prix` a un coût équivalent « non calculable », sorti du total. Les seuils se remesurent à revue_prevue sur toutes les sessions principales des 2 profils du poste.",
+  "sources": [
+    { "nom": "Anthropic, page « Pricing »", "url": "https://platform.claude.com/docs/en/about-claude/pricing", "lu_le": "2026-11-05T14:25+01:00", "note": "page sans date de mise à jour ; lignes Opus 5.5 et Sonnet 5.5 relues une seconde fois à la source le 05/11/2026" },
+    { "nom": "Mesure des écarts entre messages, étude 20261105a section 1.1", "lu_le": "2026-11-05T14:24+01:00", "note": "587 sessions principales, 108 856 écarts, profils ~/.claude et ~/.claude-b du poste Dell-XPS-16" },
+    { "nom": "Mesure des écarts qui précèdent un message humain, construction de TF-2181", "lu_le": "2026-11-05T15:25+01:00", "note": "588 sessions principales, 1 487 messages humains ; médiane 208 s, 75e centile 894 s, 90e 3 275 s, 95e 11 302 s" }
+  ],
+  "unite_prix": "dollars US par million de jetons, tarif public de l'API",
+  "prix": {
+    "claude-opus-5-5":   { "entree": 4,    "ecriture_cache_5m": 5,     "ecriture_cache_1h": 8,    "lecture_cache": 0.20, "sortie": 20 },
+    "claude-sonnet-5-5": { "entree": 2,    "ecriture_cache_5m": 2.50,  "ecriture_cache_1h": 4,    "lecture_cache": 0.10, "sortie": 10 },
+    "claude-haiku-5-5":  { "entree": 0.10, "ecriture_cache_5m": 0.125, "ecriture_cache_1h": 0.20, "lecture_cache": 0.01, "sortie": 0.50,
+                           "seuil_prompt": 100000,
+                           "au_dela": { "entree": 0.50, "ecriture_cache_5m": 0.625, "ecriture_cache_1h": 1, "lecture_cache": 0.05, "sortie": 2.50 } },
+    "claude-opus-5":     { "entree": 5,    "ecriture_cache_5m": 6.25,  "ecriture_cache_1h": 10,   "lecture_cache": 0.50, "sortie": 25 },
+    "claude-opus-4-8":   { "entree": 5,    "ecriture_cache_5m": 6.25,  "ecriture_cache_1h": 10,   "lecture_cache": 0.50, "sortie": 25 },
+    "claude-sonnet-5":   { "entree": 2,    "ecriture_cache_5m": 2.50,  "ecriture_cache_1h": 4,    "lecture_cache": 0.20, "sortie": 10 },
+    "claude-fable-5-1":  { "entree": 10,   "ecriture_cache_5m": 12.50, "ecriture_cache_1h": 20,   "lecture_cache": 0.25, "sortie": 50 }
+  },
+  "seuils_inactivite_s": {
+    "retenu": 24.85,
+    "voisins": [11.723, 296.172],
+    "methode": "95e centile des écarts entre messages consécutifs d'une même session ; voisins aux 90e et 99e centiles. Un écart plus long que le seuil ne compte pas dans le temps actif. Risque déclaré par l'étude : le seuil compte comme inactif un appel d'outil plus long ; le relevé écrit donc le temps aux 3 seuils, à comparer à la télémétrie avant de figer."
+  },
+  "plafond_temps_humain_s": {
+    "valeur": 894,
+    "methode": "75e centile des écarts qui précèdent un message humain. Le temps humain additionne ces écarts, chacun borné à ce plafond : au-delà, l'écart mêle réflexion et absence. Le relevé écrit aussi combien d'écarts ont été bornés."
+  }
+}

@@ -1,0 +1,600 @@
+{
+  "schema": "l99-boucle@1",
+  "prompt": "Skill make-it-better et page de versions",
+  "ouverture": "d'office : le prompt réécrit lance un run qui écrit, et l'analyse a relevé 2 bloquants",
+  "arbitre": {
+    "rubrique": "couches.md Ch1, 6 dimensions /100",
+    "arret": "0 bloquant et 0 majeur",
+    "seuil_score": null,
+    "gain_min": 3,
+    "borne": 3,
+    "garde_longueur": 0.15,
+    "retenue": "union_recomptee",
+    "verification_cloture": true,
+    "rejet_regression": true,
+    "score_de_passe": "le plus bas des 2 relecteurs, lecture à charge",
+    "extension": {
+      "borne": 4,
+      "motif": "la passe 3 gagne 4 points avec 6 majeurs retenus, tous à correction simple",
+      "decidee_apres_passe": 3
+    }
+  },
+  "passes": [
+    {
+      "n": 1,
+      "fichier": "prompt-p1.md",
+      "mots": 1567,
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "synthèses du 20261102"
+        ]
+      },
+      "scores": {
+        "A": 82,
+        "B": 76
+      },
+      "score_mesure": 76,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "La clause « passe devant le tour 1 » et la clause du fait rejeté ne filtrent rien",
+          "citation": "la version classée première à l'aveugle vient du tour 10 ou plus",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Le point 3 de l'étape 0 n'a pas de branche d'échec",
+          "citation": "Si le point 1 ou 2 échoue",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "`--simuler` absent de la signature, disposition de l'espace non nommée",
+          "citation": "`lancer.mjs --document <f> --espace <d>",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Recette : 3 tours par format ou en tout, arrêt par « rien », quota non borné",
+          "citation": "Fixture fictive, Markdown et HTML : 3 tours réels en Opus par l'abonnement.",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "La règle de conclusion est atteinte par hasard : 48,5 % sur 6 documents, 63,2 % sur 5 (recalculé)",
+          "citation": "Sinon, une seule passe suffit.",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Échantillon aveugle mal défini : proximité, égalités, arrêt avant le tour 50",
+          "citation": "les versions gardées les plus proches",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Séparation du classement et lien avec le marquage non établis",
+          "citation": "Le lanceur n'a pas accès à ce classement.",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Alias contre identifiant servi, champs de `rate_limit_event` non cités",
+          "citation": "modèle servi différent du modèle demandé",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Détection d'un dépôt public non définie",
+          "citation": "refuse un espace situé dans un dépôt git public",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        }
+      ],
+      "majeurs_clos": 0,
+      "rejetee": false,
+      "decision": "continuer"
+    },
+    {
+      "n": 2,
+      "fichier": "prompt-p2.md",
+      "mots": 2162,
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs, autres que ceux des passes précédentes",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "synthèses du 20261102"
+        ]
+      },
+      "scores": {
+        "A": 85,
+        "B": 80
+      },
+      "score_mesure": 80,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "Capture HTML sans outil, finalité ni cas d'échec",
+          "citation": "le lanceur pose avant le tour une capture",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Rendu d'une version Markdown dans l'aperçu non défini",
+          "citation": "iframe sandbox=",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "`bilan.mjs` contre publication au pilot non réglé",
+          "citation": "Le bilan se publie sous `output/03-etudes/`",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Calcul de hasard présenté sans son hypothèse",
+          "citation": "Au hasard, avec une chance sur 2 par document",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "« Le même résultat » entre 2 essais non défini",
+          "citation": "ne rendent pas le même résultat",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Étape 0 sans exigence sur `utilization` et `resetsAt`",
+          "citation": "rate_limit_info.unifiedWindows.seven_day.utilization",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Emplacement de la copie de tour non précisé, `classement.json` voisin",
+          "citation": "lancée dans une copie de la dernière version gardée",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Arrêt seul compté défavorable sans que le bilan le dise",
+          "citation": "Un document est favorable si la version cible",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        }
+      ],
+      "majeurs_clos": 9,
+      "rejetee": false,
+      "decision": "continuer",
+      "verification_cloture": {
+        "agent": "verificateur neuf avec contexte",
+        "note": false,
+        "clotures": 9,
+        "defauts_crees": 5,
+        "suite": "les 5 signalements ont été corrigés avant la relecture aveugle"
+      }
+    },
+    {
+      "n": 3,
+      "fichier": "prompt-p3.md",
+      "mots": 2535,
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs, autres que ceux des passes précédentes",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "synthèses du 20261102"
+        ]
+      },
+      "scores": {
+        "A": 86,
+        "B": 84
+      },
+      "score_mesure": 84,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "Échelle de `utilization` non fixée",
+          "citation": "`utilization` de la fenêtre `seven_day` à 0,80 ou plus",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Tour coupé : qui tue, sortie partielle, reprise, `note.json` absent",
+          "citation": "Un tour coupé après 15 minutes compte comme rejeté.",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "« Terminé » non défini pour le verdict",
+          "citation": "Le verdict a 3 issues, sur 5 ou 6 documents terminés",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Quota sans formule ni action, `--tours` modifiable",
+          "citation": "Le premier document tourne seul",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Faits sans chiffre ni nom non contrôlés, sans limite au verdict",
+          "citation": "tout nombre, nom propre ou citation entre guillemets",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "« installé » ambigu face à l'interdit d'écrire dans `~/.claude/skills/`",
+          "citation": "Le skill existe à la source et est installé",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        }
+      ],
+      "majeurs_clos": 7,
+      "rejetee": false,
+      "decision": "continuer",
+      "verification_cloture": {
+        "agent": "verificateur neuf avec contexte",
+        "note": false,
+        "clotures": 7,
+        "defauts_crees": 6,
+        "suite": "le 8e point et les 6 signalements ont été corrigés avant la relecture aveugle ; le confinement a été mesuré par 2 appels réels"
+      }
+    },
+    {
+      "n": 4,
+      "fichier": "prompt-p4.md",
+      "mots": 2720,
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs, autres que ceux des passes précédentes",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "synthèses du 20261102"
+        ]
+      },
+      "scores": {
+        "A": 85,
+        "B": 78
+      },
+      "score_mesure": 78,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "Coupure du poste et délai non distingués, créé par la passe 4",
+          "citation": "rejoue le tour interrompu par une coupure du poste",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Oracles sans chemin, commande ni critère, déjà en passe 3",
+          "citation": "Oracles à jouer après la dernière écriture",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Reprise après pause et document bloqué non traités, créé par la passe 4",
+          "citation": "Un document en pause ou arrêté",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "La consigne de tour ne dit pas d'appliquer la modification, déjà en passe 3",
+          "citation": "Propose une seule modification",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Risque de hasard sans hypothèse, biais de longueur non écrit, déjà en passe 3",
+          "citation": "Le verdict lit le seul essai",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Motif faux d'un document arrêté avant le tour 10, déjà en passe 3",
+          "citation": "si la version du tour cible 1 est l'origine",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Recette : « dépassement » ambigu, cas de délai absents, déjà en passe 3",
+          "citation": "dépassement, modèle servi différent",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "`historique.md` et versions rejetées, déjà en passe 3",
+          "citation": "reprend les 5 dernières notes",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "String.includes de la citation dans le prompt de la passe, script journal.mjs",
+            "resultat": "citation présente"
+          }
+        }
+      ],
+      "majeurs_clos": 5,
+      "rejetee": true,
+      "decision": "rejeter",
+      "verification_cloture": {
+        "agent": "verificateur neuf avec contexte",
+        "note": false,
+        "clotures": 5,
+        "defauts_crees": 0,
+        "suite": "le 6e point a été corrigé avant la relecture aveugle"
+      }
+    }
+  ],
+  "arret": {
+    "passe": 3,
+    "raison": "regression"
+  },
+  "score_affiche": {
+    "valeur": 84,
+    "nature": "mesure"
+  },
+  "corrections_apres_arret": {
+    "base": "prompt-p4.md, soit la passe 3 et ses 6 corrections, plus les 8 majeurs vus à la passe 4",
+    "fichier": "prompt-final.md",
+    "mots": 2882,
+    "verification": {
+      "agent": "verificateur neuf avec contexte",
+      "note": false,
+      "clotures": 8,
+      "defauts_crees": 2,
+      "suite": "les 2 signalements ont été corrigés"
+    },
+    "non_renote": true
+  }
+}

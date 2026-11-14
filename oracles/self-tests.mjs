@@ -50,18 +50,23 @@
  * après elle et nomme celle qui a écrit. Deux recettes le faisaient à chaque passage, sans le dire.
  *
  * Usage : node oracles\self-tests.mjs        → exit 0 si tout passe, 1 sinon.
+ *         `--appliquer` accepte une baisse ou une disparition du cliquet ; `--ecrire-baseline` inscrit les hausses dans un arbre de
+ *         campagne (worktree git lié), où elles ne s'inscrivent pas seules (TF-2480).
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline,
+  confronter as confronterBaseline, ecrire as ecrireBaseline, lire as lireBaseline, decisionInscription, arbreDeCampagne,
 } from "./lib-baseline-recettes.mjs";
 import { confronterSensRouge, verdictSensRouge, SEUIL_I6_BLOQUANT } from "./lib-sens-rouge.mjs";
 import { creerGarde } from "./lib-garde-arbre-suivi.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
+// TF-2256 (06/11/2026) : les recettes qui filtrent leurs cas par une variable `FORGE_CAS_*` (lib-filtre-cas.mjs) se jouent ICI en entier. Une variable
+// restée dans l'environnement de la session rendrait chacune PARTIELLE sans que ce total le dise : le total d'un dépôt ne se mesure jamais sur une sélection.
+for (const k of Object.keys(process.env)) if (k.startsWith("FORGE_CAS_")) delete process.env[k];
 // I7 (TF-1690, 14/10/2026) — UNE RECETTE N'ÉCRIT PAS DANS L'ARBRE SUIVI. Chaque recette se joue sous
 // une garde qui relève les fichiers suivis avant et après elle ; un écart nomme la recette et les
 // chemins (motif et limites : `lib-garde-arbre-suivi.mjs`). Le cas : deux recettes réécrivaient à chaque
@@ -367,13 +372,31 @@ const ETAT_DU_PARC = [
     motif: "README d'input\\ et output\\ absents, périmés ou non rédigés",
     remede: "node scripts\\readme-dossiers.mjs, puis rédiger le bloc ROLE des README signalés",
   },
+  {
+    // TF-2487 (13/11/2026) : 4 des 5 agents de la flotte échouaient à oracle-scan-agentdef et aucun pas ne les jouait. Un FAIL
+    // se retire (l'outil que le rôle n'emploie pas) ou se déclare dans la source de l'agent ; un FAIL non déclaré, un motif
+    // de moins de 60 caractères ou une déclaration périmée est rouge. SANS_OBJET (2) si forge-agents-security est absent.
+    nom: "../scripts/compiler-flotte.mjs",
+    args: ["--verifier", "--json"],
+    motif: "agent compilé de .claude/agents en échec à oracle-scan-agentdef sans déclaration motivée dans sa source gabarits/flotte/<id>.yaml",
+    remede: "retirer l'outil que le rôle n'emploie pas, ou ajouter à gabarits/flotte/<id>.yaml « # scan-agentdef CAP-n : <motif> », puis node scripts\\compiler-flotte.mjs",
+  },
+  {
+    // TF-2496 (13/11/2026) : l'oracle ne se jouait que sur ses fixtures (--self-test), et le parc réel lui rendait 30 FAIL que
+    // personne ne lisait : des expressions mortes (`\bà\b`, `\b(à`) dans le pilot et ses forges, qui rendent PASS en croyant juger.
+    // C'est un état du PARC : le défaut naît d'une écriture, jamais d'un artefact qu'on passerait à un oracle.
+    nom: "oracle-pieges-regex.mjs",
+    motif: "expression régulière morte : frontière de mot ASCII collée à une lettre accentuée, classe de majuscules sous drapeau i, octet de contrôle dans une source",
+    remede: "frontière Unicode `(?<![\\wà-ÿ])…(?![\\wà-ÿ])` ou forme non accentuée à la ligne nommée ; une expression juste se déclare `// piege-ok : <motif>` sur sa ligne",
+  },
 ];
 for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // Certains oracles d'etat jugent des ARTEFACTS nommes plutot qu'un parc entier : ils portent
   // leur liste ici, une seule fois, au lieu de la deviner. Sans ce passage, l'oracle rendait
   // SANS_OBJET faute de cible — un vert de complaisance, exactement ce que cet agregateur
   // existe pour eteindre. Un chemin relatif se resout depuis la racine du pilot.
-  const cibles = (argsParc || []).map((c) => join(ICI, "..", c));
+  // Un argument d'option (`--verifier`) passe tel quel ; seul un chemin se résout depuis la racine.
+  const cibles = (argsParc || []).map((c) => (c.startsWith("--") ? c : join(ICI, "..", c)));
   const r = garde.jouer(`${nom} (parc réel)`, () => spawnSync(process.execPath, [join(ICI, nom), ...cibles], { encoding: "utf8" }));
   let verdict = null, sansObjet = null;
   try {
@@ -453,7 +476,14 @@ for (const d of bilan.disparues) {
     + "présente à la baseline, jouée par PERSONNE à ce passage. Restaurer la recette, ou retirer l'entrée "
     + "par `--appliquer` après avoir dit POURQUOI — une disparition est un geste écrit.");
 }
-if (bilan.montees.length && !bilan.baisses.length && !bilan.disparues.length) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
+// TF-2480 (13/11/2026) : dans un arbre de campagne (worktree git lié), les hausses ne s'inscrivent pas toutes seules : la référence de main se met à jour
+// par son écrivain, joué dans main (motif et limites : `lib-baseline-recettes.mjs`). `--ecrire-baseline` les inscrit sciemment.
+const inscription = decisionInscription(bilan, { campagne: arbreDeCampagne(join(ICI, "..")), forcer: process.argv.includes("--ecrire-baseline") });
+if (inscription.ecrire) ecrireBaseline(CHEMIN_BASELINE, bilan.baseline);
+if (inscription.campagne) {
+  console.log(`  [CLIQUET] arbre de campagne (worktree git lié) : ${bilan.montees.length} hausse(s) vue(s) et NON inscrite(s) dans ${CHEMIN_BASELINE} — `
+    + "la référence de main se met à jour par son écrivain, joué dans main ; `--ecrire-baseline` l'inscrit ici sciemment (TF-2480)");
+}
 if ((bilan.baisses.length || bilan.disparues.length) && APPLIQUER) {
   const accepte = { ...bilan.baseline };
   for (const b of bilan.baisses) accepte[b.nom] = { cas: b.vu, vu_le: jour, baisse_acceptee_le: jour };

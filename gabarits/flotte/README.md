@@ -12,11 +12,14 @@ Chaque fichier `<id>.yaml` est une définition au format `agent.def` de forge-ag
 | `constructeur` | construction complexe, sur complexité manifeste ou escalade | Opus, max |
 | `redacteur` | document sous gabarit, jugé par son oracle | Sonnet, high |
 
-Pour changer un agent, on modifie son `.yaml`, puis on recompile le lot entier depuis la racine du pilot :
+Pour changer un agent, on modifie son `.yaml`, puis on recompile le lot entier depuis la racine du pilot. Le script compile dans un tampon par `compile-agent-def.mjs` de forge-agents, joue `oracle-scan-agentdef` de forge-agents-security sur chaque agent compilé, et n'installe dans `.claudeagents` que si chaque FAIL est déclaré (TF-2487) :
 
 ```
-node <forge-agents>\.claude\skills\forge-agents\scripts\compile-agent-def.mjs gabarits\flotte\*.yaml --out .claude\agents
+node scripts\compiler-flotte.mjs
+node scripts\compiler-flotte.mjs --verifier
 ```
+
+La seconde commande juge les agents déjà installés sans rien écrire ; `oracles\self-tests.mjs` la joue sur le parc (I4). Un constat CAP de l'oracle se résout de deux façons : retirer de la définition l'outil que le rôle n'emploie pas, ou le déclarer par une ligne de commentaire de la source, `# scan-agentdef CAP-n : <motif>`. Le motif dit la mesure qui montre que le rôle emploie l'outil (60 caractères au moins) ; une déclaration dont la règle ne se déclenche plus est refusée. Le compilateur ignore les commentaires : `agent.def` ne gagne aucune clé. Relevé du 13/11/2026 : constructeur et redacteur déclarent CAP-1 (WebFetch et WebSearch lisent la documentation officielle), explorateur et verificateur déclarent CAP-3 (Bash, et PowerShell, sont leur façon de compter et de rejouer) ; la mesure de chaque emploi est dans la ligne.
 
 Claude Code charge les agents d'un projet à l'ouverture d'une session : un agent ajouté ou recompilé ne sert qu'à partir de la session suivante. Constaté le 18/10/2026 : lancé dans la session qui venait de compiler la flotte, `explorateur` a été refusé (« Agent type 'explorateur' not found »). Chez un produit, l'ouverture qui recopie l'héritage rend donc la flotte disponible à l'ouverture d'après.
 

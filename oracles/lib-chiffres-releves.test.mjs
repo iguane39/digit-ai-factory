@@ -28,6 +28,11 @@ check("vert — le même chiffre lu dans une sortie du tour passe, à la graphie
 check("vert — une ligne qui déclare le chiffre non mesuré, estimé ou visé n'est pas accusée", () => {
   for (const l of ["Score de 84 sur 100, projeté et non mesuré.", "Environ 15 minutes.", "Objectif : de 6 à 0 en 30 jours."]) att(!figures(l, "").length, l);
 });
+check("« visé » (TF-2066) — rouge : le délai visé n'est pas accusé ; vert : un autre sens (révisé, visite, viser) l'est toujours", () => {
+  // La frontière `\b` ne voit pas le « é » : « visé » en fin de mot n'était pas reconnu, « visée » et « visés » l'étaient.
+  for (const l of ["Le délai visé est de 15 minutes.", "Les délais visés : 15 minutes.", "La durée visée dure 15 minutes.", "Délai visé 15 minutes."]) att(!figures(l, "").length, l);
+  for (const l of ["Le texte révisé dure 15 minutes.", "Une visite de 15 minutes.", "Il faut viser 15 minutes.", "Un plan avisé coûte 15 minutes."]) att(figures(l, "").length === 1, `accusation perdue : ${l}`);
+});
 check("borne — le bloc 1, le bloc 9, le code, un lien encodé et un chemin ne sont pas lus", () => {
   att(!figures("## 1. En-tête\nDurée 12 minutes.\n## 9. Traces\n40 fichiers.\n", "").length, "blocs 1 et 9 lus");
   att(!figures("```\n99 tests\n```\n", "").length, "bloc de code lu");
@@ -86,5 +91,33 @@ check("oracle — S90 lit les nombres passés par le hook, et rend SANS_OBJET sa
   att(lire([]).statut === "SANS_OBJET", "S90 juge sans les nombres du tour");
   rmSync(d, { recursive: true, force: true });
 });
-console.log(`\nlib-chiffres-releves (D-100, D-101) : ${pass} PASS, ${fail} FAIL`);
+// D-131 (a) du 02/11/2026 (TF-2056) : les chiffres d'un gain écrit au registre.
+const { chiffresDeGains } = await import("./lib-chiffres-releves.mjs");
+const sansReleve = (gain, sortie) => { const lus = nombresDuTexte(sortie); return chiffresDeGains(gain).filter((c) => !lus.has(c.forme) && !(c.morceaux.length > 1 && c.morceaux.every((p) => lus.has(p)))).map((c) => c.chiffre); };
+check("gains rouge — le cas du 02/11 : « 813 Markdown suivis, 4 accusés » devant une sortie qui dit 1 209 et 5", () => {
+  const r = sansReleve("813 Markdown suivis, 4 accusés", "Markdown suivis : 1 209\naccusés : 5");
+  att(r.join(",") === "813,4", `obtenu ${r.join(",")}`);
+});
+check("gains vert — les mêmes chiffres lus dans la sortie, à la graphie près (milliers, virgule décimale, pourcentage)", () => {
+  att(!sansReleve("813 Markdown suivis, 4 accusés", "813 fichiers .md, 4 lignes").length, "chiffres lus accusés");
+  att(!sansReleve("1 209 fichiers, 21,4 s, 19 % des textes", '{"n":1209,"s":21.4,"part":"19%"}').length, "la graphie trompe la comparaison");
+});
+check("gains vert — dates, heures, années, TF-, D-, S90, SHA, versions, chemins, n° et § ne sont pas des comptes", () => {
+  const r = sansReleve("TF-2056 clos le 02/11/2026 (2026-11-02T14:15:00.000Z, 14h15) par D-131 (a), S90, commit 813bc9a, v2.57.0, loi n° 3, § 4, lot 20261102n, output/03-etudes/2026-09/x.md", "rien");
+  att(!r.length, `accusés : ${r.join(",")}`);
+});
+check("gains — un ratio de comptes (« 22/22 ») se lit côté par côté ; une date sans année (« 02/11 ») sort", () => {
+  att(sansReleve("recette 22/22", "").join(",") === "22", "22/22 n'est pas lu comme un compte");
+  att(!sansReleve("recette 22/22", "22 passed").length, "22/22 accusé devant une sortie qui le montre");
+  att(!sansReleve("mesuré le 02/11", "").length, "02/11 lu comme un compte");
+});
+check("gains vert — une clause qui dit le chiffre non mesuré, estimé, objectif ou rapporté par l'agent n'est pas accusée ; la clause voisine l'est", () => {
+  for (const g of ["environ 800 fichiers", "653 mutants jugés, rapporté par l'agent", "objectif de 85", "1 562 tests selon l'agent"]) att(!sansReleve(g, "").length, g);
+  att(sansReleve("environ 800 fichiers ; 4 accusés", "").join(",") === "4", "la clause voisine échappe");
+});
+check("gains — un chiffre n'est dit qu'une fois par gain, et l'extrait nomme son contexte", () => {
+  const c = chiffresDeGains("12 tests verts, puis 12 tests rejoués");
+  att(c.length === 1 && /12 tests verts/.test(c[0].extrait), JSON.stringify(c));
+});
+console.log(`\nlib-chiffres-releves (D-100, D-101, D-131) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

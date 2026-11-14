@@ -73,8 +73,19 @@ export const RE_RACINE_CONFIG = /homedir\(\)\s*,\s*["'`]\.claude/;
 export function resolutionsAuNiveauModule(texte) {
   return String(texte).split(/\r?\n/)
     .map((l, i) => ({ ligne: i + 1, texte: l }))
-    .filter(({ texte: l }) => /^(?:export\s+)?(?:const|let|var)\s+[\w{[]/.test(l) && RE_HOME.test(l));
+    .filter(({ texte: l }) => /^(?:export\s+)?(?:const|let|var)\s+[\w{[]/.test(l) && RE_HOME.test(l) && !RE_DECLARE_UNE_FONCTION.test(l));
 }
+
+/**
+ * Une déclaration de premier niveau qui EST une fonction — `const f = (x) => … homedir() …`,
+ * `const f = x => …`, `const f = async (x) => …`, `const f = function (x) { … }` — dont la
+ * résolution vit dans le CORPS : il ne s'exécute pas au chargement (TF-2483, mesuré le 13/11/2026 :
+ * `oracles\oracle-reprise.mjs:131` était accusé pour sa seule colonne 0). La valeur doit COMMENCER
+ * par la fonction : une paire de parenthèses sans parenthèse imbriquée suivie de `=>`, ou un seul
+ * identifiant suivi de `=>`. Une fonction invoquée aussitôt, `(() => homedir())()`, ou une fonction
+ * passée en argument, `lire(join(homedir(), …), (x) => x)`, ne commence pas ainsi et reste accusée.
+ */
+export const RE_DECLARE_UNE_FONCTION = /^(?:export\s+)?(?:const|let|var)\s+[\w$]+\s*=\s*(?:async\s+)?(?:function\b|(?:\([^()]*\)|[\w$]+)\s*=>)/;
 
 export function fichiersDuDepot(depot) {
   const trouves = [];
@@ -168,7 +179,7 @@ export const NON_JUGE = [
   "que la fonction partagée résolve JUSTE : cet oracle constate qu'on passe par elle et qu'elle rend deux choses, jamais que son ordre de résolution soit le bon. C'est son propre banc qui en répond",
   "les résolutions faites par du code NON JavaScript (Python du socle, scripts shell) : le même défaut y est possible, et aucune mesure n'est faite ici. La borne est déclarée, pas comblée",
   "les recettes `*.test.mjs`, écartées par construction : un banc pose ses propres racines jetables, et c'est exactement ce qu'on lui demande de faire",
-  "CA2 discrimine par l'INDENTATION — une déclaration de premier niveau est au niveau module. Une résolution écrite dans une expression immédiatement invoquée au premier niveau échapperait à la mesure ; aucune n'a été trouvée sur ce dépôt, et la forme est déclarée plutôt que promise",
+  "CA2 discrimine par l'INDENTATION — une déclaration de premier niveau est au niveau module, sauf quand sa valeur COMMENCE par une fonction (`const f = (x) => … homedir() …`), dont le corps ne s'exécute pas au chargement (TF-2483). Une résolution écrite dans une expression immédiatement invoquée au premier niveau échapperait à la mesure ; aucune n'a été trouvée sur ce dépôt, et la forme est déclarée plutôt que promise",
 ];
 
 // ---- CLI ---------------------------------------------------------------------------------------

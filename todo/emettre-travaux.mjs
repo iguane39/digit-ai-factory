@@ -53,7 +53,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cheminsTables } from "../scripts/lib-confidentiel.mjs";
+import { cheminsTables, pseudoDe } from "../scripts/lib-confidentiel.mjs";
 import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 import { verifier } from "../gabarits/oracle-travaux-pilot.mjs";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
@@ -107,7 +107,7 @@ export function pseudonymeDe(nomReel, chemin = cheminsTables().produits) { // ca
   let d;
   try { d = JSON.parse(readFileSync(chemin, "utf8")); } catch { return null; }
   for (const [reel, pseudo] of Object.entries(d.produits || {}))
-    if (memeProduit(reel, nomReel)) return pseudo;
+    if (memeProduit(reel, nomReel)) return pseudoDe(pseudo); // forme objet : TF-2130
   return null;
 }
 
@@ -163,7 +163,7 @@ export function repartirOrphelins(perdus, chemin = cheminsTables().produits) {
   let table = {};
   try { table = existsSync(chemin) ? JSON.parse(readFileSync(chemin, "utf8")).produits || {} : {}; } catch { table = {}; }
   const connu = (d) => [...PRODUITS_DE_L_ECOSYSTEME].some((p) => memeProduit(d, p))
-    || Object.entries(table).some(([reel, pseudo]) => memeProduit(d, pseudo) || memeProduit(d, reel));
+    || Object.entries(table).some(([reel, pseudo]) => memeProduit(d, pseudoDe(pseudo)) || memeProduit(d, reel));
   return { absents: perdus.filter((e) => connu(e.destinataire_produit)), inconnus: perdus.filter((e) => !connu(e.destinataire_produit)) };
 }
 

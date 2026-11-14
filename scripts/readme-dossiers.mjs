@@ -240,8 +240,8 @@ const estIgnore = (rel) => IGNORES.has(rel) || [...IGNORES].some((i) => i.endsWi
 // l'histoire du dépôt n'entre pas dans une projection que le dépôt publie. C'est la même loi que
 // la mention des dossiers machine retirée par TF-0615 — « une projection commitée ne parle que de
 // ce que le dépôt porte » — appliquée cette fois aux fichiers non suivis, et pas seulement aux
-// fichiers ignorés. Le CHIFFRE, lui, se dit (loi n° 3 : jamais par omission) : le pied de table
-// annonce combien de fichiers non suivis ont été tenus hors de l'index.
+// fichiers ignorés. Le CHIFFRE, lui, se dit (loi n° 3 : jamais par omission) : le générateur
+// imprime sur le poste combien de fichiers non suivis il a tenus hors des index (TF-2068).
 function suivis() {
   const r = spawnSync("git", ["-C", BASE, "-c", "core.quotepath=false", "ls-files", "--", ...RACINES], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   return new Set(r.status === 0 ? r.stdout.split(/\r?\n/).filter(Boolean) : []);
@@ -378,9 +378,9 @@ function attendu(dir, rel) {
   }
   if (!entrees.length) lignes.push("| _(dossier vide)_ | | | |");
   const notes = [`_${nf} fichier(s), ${nd} sous-dossier(s)_`];
-  // Le chiffre se DIT (loi n° 3) : un index qui tait ce qu'il a écarté se lit comme un index
-  // complet, et c'est exactement l'illusion contre laquelle TF-0914 a été payé.
-  if (nonSuivis) notes.push(`${nonSuivis} fichier(s) présent(s) sur le poste et NON suivi(s) par git — non listés (un index publié ne nomme que ce que le dépôt porte, TF-0914)`);
+  // Le chiffre se DIT (loi n° 3), mais SUR LE POSTE, pas dans l'index (TF-2068, 03/11/2026) : écrit
+  // au pied, il changeait selon le poste qui régénère, et un worktree jugeait périmé l'index du
+  // main. Même règle que D-20 (a) pour l'index d'output. Le générateur l'imprime, plus bas.
   // TF-0615 : les dossiers MACHINE ne sont PLUS mentionnés. Ils sont ignorés par git, donc ils ne
   // voyagent pas : la version commitée affirmait la présence de `_oracles\` dans un dossier où il
   // n'existe que sur le poste dont un hook l'a créé. Toute autre machine qui régénère retirait la
@@ -390,7 +390,7 @@ function attendu(dir, rel) {
   // exclut déjà ces dossiers (EST_MACHINE au filtre) : rien n'est perdu que l'on comptait.
   if (existsSync(join(dir, "LISEZMOI.md"))) notes.push("voir aussi `LISEZMOI.md` (conventions et correspondance des anciens chemins)");
   lignes.push("", notes.join(" · "), "");
-  return { texte: lignes.join("\n"), role };
+  return { texte: lignes.join("\n"), role, nonSuivis };
 }
 
 function* dossiers(dir) {
@@ -414,6 +414,7 @@ const defauts = [];
 // tolérance qu'il servait à lever — un drapeau sans objet est une affordance morte.
 const ecrits = [];
 const preserves = [];
+const ecartes = [];  // TF-2068 : fichiers non suivis écartés des index, dits sur le poste
 for (const racine of RACINES) {
   const abs = join(BASE, racine);
   if (!existsSync(abs)) { defauts.push(`${racine}\\ : racine absente`); continue; }
@@ -441,7 +442,8 @@ for (const racine of RACINES) {
     const rel = posix(relative(BASE, dir));
     const readme = join(dir, "README.md");
     if (estRedigeMain(readme)) { preserves.push(affiche(rel) + "README.md"); continue; }
-    const { texte: texteBrut, role } = attendu(dir, rel);
+    const { texte: texteBrut, role, nonSuivis } = attendu(dir, rel);
+    if (nonSuivis) ecartes.push({ ou: affiche(rel), n: nonSuivis });
     const propre = pseudonymise(texteBrut);
     if (!propre.ok) {
       defauts.push(`${affiche(rel)}README.md : NON régénéré — ${propre.motif}. Un index qui ne peut 
@@ -465,6 +467,7 @@ for (const racine of RACINES) {
 const MODE = DEPOT_PRODUIT ? " — dépôt de produit (`forge\\`) : ni pseudonymisation ni rôle du pilot (TF-1451, TF-1452)" : "";
 if (!SILENCIEUX && ecrits.length) console.log(`README régénérés dans ${BASE}${MODE} (${ecrits.length}) : ${ecrits.join(" · ")}`);
 if (!SILENCIEUX && !ecrits.length && !CHECK) console.log(`README à jour dans ${BASE}${MODE}, rien à régénérer`);
+if (!SILENCIEUX && ecartes.length) console.log(`${ecartes.reduce((s, e) => s + e.n, 0)} fichier(s) présent(s) sur ce poste et NON suivi(s) par git, écarté(s) des index publiés (TF-0914) : ${ecartes.map((e) => `${e.ou} ${e.n}`).join(" · ")}`);
 if (!SILENCIEUX && preserves.length) console.log(`${preserves.length} README rédigé(s) à la main (sans la marque du générateur), préservé(s) tel(s) quel(s) (TF-1667) : ${preserves.slice(0, 8).join(" · ")}${preserves.length > 8 ? " · …" : ""}`);
 if (defauts.length) {
   console.error(`[readme-dossiers] ${defauts.length} défaut(s) :\n  - ${defauts.join("\n  - ")}`);

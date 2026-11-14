@@ -1,0 +1,316 @@
+{
+  "schema": "l99-boucle@1",
+  "prompt": "Étude d'opportunité : suivre temps, délais, charges, jetons et coûts de chaque produit",
+  "arbitre": {
+    "rubrique": "couches.md Ch1, 6 dimensions /100",
+    "arret": "0 bloquant et 0 majeur",
+    "seuil_score": null,
+    "gain_min": 3,
+    "borne": 3,
+    "garde_longueur": 0.15,
+    "retenue": "union_recomptee",
+    "verification_cloture": true,
+    "rejet_regression": true,
+    "score_de_passe": "le plus bas des 2 relecteurs, lecture à charge"
+  },
+  "passes": [
+    {
+      "n": 1,
+      "fichier": "prompt-p1.md",
+      "mots": 1448,
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "fichiers « passe au crible L99 »"
+        ]
+      },
+      "scores_relecteurs": {
+        "A": 86,
+        "B": 88
+      },
+      "score_mesure": 86,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "La commande de E1 imprime les 72 types d'événements ; elle ne rend ni les 4 comptes cités, ni le nombre de journaux, ni l'absence de clé de jetons",
+          "citation": "`cat */forge/ledger.jsonl \\| grep -o '\"type\":\"[a-z_]*\"' \\| sort \\| uniq -c`",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "cat */forge/ledger.jsonl | grep -o '\"type\":\"[a-z_]*\"' | sort -u | wc -l ; cat */forge/ledger.jsonl | grep -cE '\"(input_tokens|tokens?|jetons)\":'",
+            "resultat": "72 types imprimés ; 0 clé de jetons, non rendue par la commande citée"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Ni page de décision, ni longueur, ni critère de choix du run de démonstration",
+          "citation": "L'étude porte une démonstration : le relevé des cinq mesures pour un run réel d'un produit, dans la fenêtre de conservation, sous pseudonyme.",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"page de décision\" prompt-p1.md ; grep -ci \"mots\" prompt-p1.md",
+            "resultat": "0 et 0"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Seuil d'inactivité sans échantillon, sans critère de choix, sans sensibilité",
+          "citation": "Pose un seuil d'inactivité au-delà duquel un écart entre deux messages ne compte pas, et justifie-le par la distribution mesurée des écarts.",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"percentile\\|centile\" prompt-p1.md",
+            "resultat": "0"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Seconde méthode de recomptage des jetons non nommée, aucune sortie si l'écart dépasse 1 %",
+          "citation": "La démonstration, dont le total de jetons est recompté par une seconde méthode, écart d'au plus 1 %.",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"seconde méthode\" prompt-p1.md",
+            "resultat": "1 occurrence, sans méthode nommée ni conduite en cas d'écart"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Prix introuvable : le coût (b) ne dit pas ce qu'il devient",
+          "citation": "Pour (b), une table de prix datée et sourcée, lue en ligne le jour de l'étude ; un prix non relu se marque « non vérifié ».",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"non calculable\" prompt-p1.md",
+            "resultat": "0"
+          }
+        }
+      ],
+      "majeurs_clos": 0,
+      "rejetee": false,
+      "decision": "continuer"
+    },
+    {
+      "n": 2,
+      "fichier": "prompt-p2.md",
+      "mots": 1989,
+      "verification_cloture": {
+        "agent": "verificateur neuf, avec contexte (défauts retenus, prompt avant et après)",
+        "note": false,
+        "clotures": 7,
+        "defauts_crees": 2,
+        "detail": "7 défauts fermés sur 7 ; 2 défauts créés, corrigés avant la relecture : la méthode B ne rendait pas les 4 catégories (relever-flotte ne compte que 2 agrégats de sous-agents, lignes 182-183), et --projet filtre sur un nom réel de dossier (ligne 261). Renvoi HERITAGE.json précisé en gabarits\\HERITAGE.json."
+      },
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "fichiers « passe au crible L99 »"
+        ]
+      },
+      "scores_relecteurs": {
+        "A": 84,
+        "B": 74
+      },
+      "score_mesure": 74,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "Plafond de 3 500 mots irréaliste face au gabarit (seuil, entrants, partition, non-recouvrement, état de l'art, options O0-O4) et au contrat ; tableaux comptés ou non, non dit ; aucune correspondance contrat vers sections du gabarit",
+          "citation": "Le corps tient en 3 500 mots au plus.",
+          "vu_par": [
+            "A",
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n \"^## \" gabarits/ETUDE-OPPORTUNITE.md ; grep -ci \"état de l'art\" prompt-p2.md",
+            "resultat": "8 sections imposées dont « 3. État de l'art daté » (au moins 5 sources ou « non instruit ») ; 0 mention de l'état de l'art dans le prompt"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Preuves exigées avant la recommandation mais exclues de l'étude : le porteur ne peut pas juger, et aucun test T1 à T3 ne les couvre",
+          "citation": "Ces preuves vont dans la restitution de fin de run (`gabarits\\RESTITUTION.md`), pas dans l'étude",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"pas dans l'étude\" prompt-p2.md ; grep -n \"T[1-4] :\" prompt-p2.md",
+            "resultat": "1 occurrence ; T1 à T3 jugent l'étude seule"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Unité du coût de construction non dite ; oracle-etude-opportunite refuse un effort chiffré en jours (règle E8)",
+          "citation": "Chaque option dit son coût de construction",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n \"E8\" oracles/oracle-etude-opportunite.mjs",
+            "resultat": "lignes 16 et 130 : aucun effort chiffré en jours sur une ligne de coût (TF-0408)"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Charge de travail lourde pour une session, sans ordre de priorité ni règle de repli",
+          "citation": "Les jetons de ce run se comptent par deux décomptes écrits séparément, sur les mêmes fichiers.",
+          "vu_par": [
+            "A",
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"priorit\" prompt-p2.md ; grep -ci \"repli\" prompt-p2.md",
+            "resultat": "0 et 0"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "« Rupture visible » sans critère opérant : deux sessions poseront deux seuils",
+          "citation": "Le seuil est la rupture visible de cette distribution, à défaut son 95e centile.",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n \"rupture visible\" prompt-p2.md",
+            "resultat": "1 occurrence, aucun critère chiffré de rupture"
+          }
+        }
+      ],
+      "majeurs_clos": 5,
+      "rejetee": true,
+      "decision": "rejeter",
+      "motif_rejet": "score mesuré 74, sous les 86 de la passe 1 gardée (rejet_regression, D-111 (a)) ; 2 des 5 majeurs viennent des corrections elles-mêmes (plafond de mots, preuves hors de l'étude)"
+    },
+    {
+      "n": 3,
+      "fichier": "prompt-p3.md",
+      "mots": 2057,
+      "origine": "repartie de la passe 1 gardée, sur demande du porteur du 05/11/2026 (« A2 puis A1 ») : appliquer les 10 corrections ouvertes et faire relire à l'aveugle",
+      "verification_cloture": {
+        "agent": "verificateur neuf, avec contexte (10 défauts visés, prompt avant et après)",
+        "note": false,
+        "clotures": 9,
+        "defauts_crees": 1,
+        "detail": "9 défauts fermés sur 10 ; le défaut 3 restait ouvert par un défaut créé : `--projet <pseudonyme>` exécuté tel quel filtre 0 dossier (relever-flotte.mjs ligne 261, basename(d).toLowerCase().includes). Corrigé avant la relecture : exécuter avec le fragment réel, jamais écrit, citer la commande avec <pseudonyme>."
+      },
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "fichiers « passe au crible L99 »"
+        ]
+      },
+      "scores_relecteurs": {
+        "A": 84,
+        "B": 84
+      },
+      "score_mesure": 84,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "Aucune correspondance entre les 11 lignes du contrat et les sections du gabarit ; place du résumé de 5 lignes non dite",
+          "citation": "0. Le résumé de décision en 5 lignes, juste après l'intention.",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"correspondance\\|sous-section\" prompt-p3.md ; grep -n \"^## \" gabarits/ETUDE-OPPORTUNITE.md | wc -l",
+            "resultat": "0 ; 9 sections au gabarit"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Aucun ordre de sacrifice entre les preuves, la table de prix et les centiles voisins si la session ne tient pas",
+          "citation": "Priorité : l'étude d'abord, les preuves ensuite.",
+          "vu_par": [
+            "A"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"sacrifi\\|ordre de repli\" prompt-p3.md",
+            "resultat": "0"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Le contrat omet partition, non-recouvrement cité, plan de revue daté et test rétro, exigés par oracle-etude-opportunite (E1, E2, E7, E10)",
+          "citation": "10. Aucun nom réel de produit ni de client dans le fichier.",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -ci \"partition\\|non-recouvrement\\|plan de revue\\|test rétro\" prompt-p3.md ; sed -n 6,22p oracles/oracle-etude-opportunite.mjs",
+            "resultat": "0 ; E1, E2, E7 et E10 présents dans l'en-tête de l'oracle"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "Rétention par défaut sans repli si la page n'est pas lisible : risque d'une valeur donnée de mémoire (l'état de l'art a déjà le repli « non instruit », partie démentie)",
+          "citation": "Vérifie dans la documentation de Claude Code la rétention par défaut des transcriptions, cite la page et sa date de lecture.",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n \"rétention\" prompt-p3.md | grep -ci \"non vérifi\" ; grep -c \"non\" prompt-p3.md",
+            "resultat": "0 repli pour la rétention ; le repli « non instruit » de l'état de l'art existe (ligne 149 et paragraphe des options)"
+          }
+        }
+      ],
+      "majeurs_clos": 9,
+      "rejetee": true,
+      "decision": "rejeter",
+      "motif_rejet": "score mesuré 84, sous les 86 de la passe 1 gardée (rejet_regression, D-111 (a), bruit toléré 0) ; les 5 majeurs de la passe 1 sont fermés, 4 majeurs nouveaux portent sur la projection du contrat dans le gabarit, l'ordre de sacrifice et un repli de lecture en ligne"
+    }
+  ],
+  "arret": {
+    "passe": 1,
+    "raison": "regression"
+  },
+  "score_affiche": {
+    "valeur": 86,
+    "nature": "mesure"
+  }
+}

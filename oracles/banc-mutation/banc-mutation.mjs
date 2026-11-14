@@ -68,6 +68,14 @@ function executerReel(script, args, env) {
 
 export const empreinte = (chemin) => empreinteFichier(chemin);
 
+/**
+ * Un taux se LIT SANS ARRONDI TROMPEUR (TF-2066) : 62 détections sur 69 mutations font 89,86 %, et un affichage à
+ * l'entier lisait « 90 % » sous un plancher de 90 %. Un taux entier s'écrit entier (« 100 % »), un autre porte sa
+ * décimale (« 89,9 % ») ; `tauxExact` ajoute le rapport et deux décimales pour un message d'échec.
+ */
+export const pourcent = (x) => (x === null || x === undefined ? "—" : `${String(Math.round(x * 1000) / 10).replace(".", ",")} %`);
+export const tauxExact = (detectees, appliquees) => (appliquees ? `${detectees}/${appliquees} = ${(detectees / appliquees * 100).toFixed(2).replace(".", ",")} %` : "aucune mutation jouée");
+
 /** Mesure un oracle : { vert_ok, appliquees, detectes, survivants[], non_jugees[], taux, arret }. */
 export function mesurerOracle(entree, racine, executer = executerReel) {
   const vert = resolve(racine, entree.vert);
@@ -116,7 +124,7 @@ export function mesurer(manifeste, racine = PILOT, executer = executerReel, { se
   for (const r of resultats) {
     if (!r.vert_ok) defauts.push(`${r.id} : ${r.motif_vert || `le livrable vert ne passe pas (${r.verdict_vert})`} — rien n'est mesuré`);
     else if (r.arret) defauts.push(`${r.id} : ${r.appliquees} mutation(s) pertinente(s) appliquée(s), moins de ${MIN_MUTATIONS_PERTINENTES} — critère d'arrêt de l'étude`);
-    else if (seuil !== null && r.taux < seuil) defauts.push(`${r.id} : taux ${(r.taux * 100).toFixed(0)} % sous le seuil ${(seuil * 100).toFixed(0)} %`);
+    else if (seuil !== null && r.taux < seuil) defauts.push(`${r.id} : taux ${tauxExact(r.detectes.length, r.appliquees)} sous le seuil ${pourcent(seuil)}`);
   }
   for (const s of modifies) defauts.push(`${s} : le script d'un oracle a changé pendant le banc — le banc ne touche jamais le juge`);
   const jouees = resultats.reduce((n, r) => n + r.appliquees, 0);
@@ -129,7 +137,7 @@ export function mesurer(manifeste, racine = PILOT, executer = executerReel, { se
 }
 
 export function tableauMarkdown(res) {
-  const pct = (x) => (x === null ? "—" : `${Math.round(x * 100)} %`);
+  const pct = pourcent;
   const l = ["| Oracle | Mutations pertinentes jouées | Détectées | Survivants | Taux de détection |", "|---|---|---|---|---|"];
   for (const r of res.oracles) l.push(`| \`${r.id}\` | ${r.vert_ok ? r.appliquees : "vert invalide"} | ${r.detectes.length} | ${r.survivants.length} | ${pct(r.taux)} |`);
   l.push(`| **Total** | ${res.total.mutations} | ${res.total.detectees} | ${res.total.survivants} | ${pct(res.total.taux)} |`);

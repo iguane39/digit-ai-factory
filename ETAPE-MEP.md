@@ -22,6 +22,10 @@ Qui fait quoi, et surtout qui NE decide pas : ce tableau se lit par acteur, et l
 | oracle-ops (O-13, TF-1116 et TF-1118) | tout geste destructif écrit dans un document d'exploitation ou un carnet d'écarts porte sa MATURITÉ (éprouvé sur cette cible, ou déduit et à mesurer) et sa MESURE DE NON-RÉGRESSION — joué sur les documents que la MEP produit, § 3 septies |
 | oracle-ops (O-14, TF-1114) | chaque nom de l'export machine du parc figure littéralement dans `docs\projet\COMPOSANTS-OPS.md` — joué à chaque MEP qui actualise ce document, § 3 septies |
 | oracle-ops (O-19, TF-1212) | chaque actif de données critique de la déclaration de sauvegarde porte RPO, RTO, sauvegarde effective conforme au RPO, et une restauration réussie depuis 12 mois au plus — consommé par M-17, § 3 terdecies |
+| oracle-ops (O-26, TF-2201) | la version servie par une instance se LIT dans `/healthz` (`scripts/version-servie.mjs lire`), elle ne se reconstitue pas : un commit de 7 à 40 caractères, qui est un commit du dépôt et celui que le dossier annonce — consommé par M-22, § 3 quaterdecies |
+| oracle-ops (O-27, TF-2209) | l'inventaire des composants contient chaque composant que les sorties d'état de la MEP nomment (`terraform state list`, `docker ps`, `az resource list`) ; un FAIL vaut refus de la porte « prêt » — consommé par M-22, § 3 quaterdecies |
+| oracle-ops (O-30, TF-2308) | un test de mise en production lit l'état servi avant ses épreuves, le RELIT après la dernière et le laisse comme il l'a trouvé : le relevé `forge-ops/etat-servi@1` que prend `gabarits/smoke-mise-en-production.mjs` est jugé par `node <ops>/oracles/oracle-ops.mjs --etat-servi <releve.json>` (relevé introuvable : SKIP) — consommé par M-3, § 3 |
+| oracle-ops (O-31, TF-2397) | aucune chaîne n'applique par un `terraform apply` direct une pile qui pose `supabase_settings` : l'outil `scripts/appliquer-terraform.mjs … --executer --sortie` écrit le relevé `forge-ops/application@1`, un apply direct est un constat bloquant, et le jugement se joue par `node <ops>/oracles/oracle-ops.mjs --application-terraform <racine ou fichier de chaîne> [--racine <dépôt>] [--releve <application.json>]` (ni chaîne ni relevé donnés : SKIP) — consommé par M-13, § 3 |
 | pilot (cette étape) | orchestre les gestes, exécute M-1…M-5 (qui consomme O-1…O-4 comme preuves), assemble `DOSSIER-MEP.md` |
 | humain | **GO production** — incompressible, jamais délégué à un oracle |
 
@@ -184,6 +188,59 @@ pas le relevé. Les plateformes autres qu'Azure : leur mécanisme de stratégie 
 commande vérifiée à sa source. Une option impossible encore proposée à l'humain : les options
 vivent dans la restitution, que ce contrôle ne lit pas.
 
+## 1 quater. La revue de code se propose ICI, sur demande (D-162, 03/11/2026)
+
+**La décision humaine** : D-162 (a), réponse « 162a » du 03/11/2026 à l'étude d'opportunité
+20261103k (option O2). La revue de code par un seul agent reste à la demande, outillée par
+`digit-ai-forge-websec/referentiels/revue-de-code.md`, et cette étape la propose. Le point se refait
+le 2026-12-01, ou au retour du rejeu des failles du second produit relu (D-152) s'il vient avant.
+
+**Pourquoi ici.** Aucune revue de la chaîne de construction ne vise les classes d'attaque, et aucun
+oracle de forge-websec ne lit le code applicatif (`classes-attaque.md`, § 4). L'entrée de la mise en
+production est le dernier moment où une faille de code se corrige avant d'être servie, comme pour la
+mutation (§ 1 bis).
+
+**Le geste, à l'entrée de l'étape** : lire le marqueur `forge\revue-de-code-derniere.json` du
+produit. Si aucune revue n'y est notée, ou si 10 commits au moins ont touché le code source depuis
+son `sha`, la revue se PROPOSE au bloc de décisions de la restitution, avec 3 chiffres : les lignes de
+code suivi, le nombre de tranches de 2 000 lignes, et la dépense attendue de 250 000 à 300 000 jetons.
+Une ancienneté inconnue vaut périmée, comme pour la mutation. La décision reste humaine (R-29) : la
+revue engage l'abonnement.
+
+**Jouée** : le pilot commande les tranches selon le référentiel, une par agent, la suivante seulement
+si le cumul relevé laisse 130 000 jetons de marge sur 300 000. Il fusionne le rapport chez le produit,
+relit les constats élevés et critiques (statut « relu » ou « non confirmé »), puis écrit le marqueur :
+`{ "sha", "date", "rapport", "jetons", "constats" }`. La revue tourne en parallèle de M-1 à M-5 et son
+rapport se verse avant le GO.
+
+**Rien ne bloque.** Un constat élevé ou critique qui n'est pas « non confirmé » se pose au GO, avec
+son identifiant et son statut ; le GO reste humain. forge-websec ne bloque jamais une mise en
+production (`CLAUDE.md` de la forge, garde-fous).
+
+**La section du dossier** (M-19), jouée ou refusée, jamais muette :
+
+```markdown
+## Revue de code
+
+Revue jouée le 2026-12-01 : rapport `output/<produit> - Revue de code - 20261201a.md`, consigne
+`revue-de-code.md` 1.0.0 de forge-websec. 2 tranches, 268 000 jetons relevés.
+Constats : 9 (0 critique, 1 élevé, 3 moyens, 5 faibles) ; statuts : 2 relus, 0 rejoué,
+1 non confirmé, 6 lus.
+Posé au GO : RC-1, élevé, relu.
+```
+
+« Revue proposée et refusée le <date> : <motif> » et « Revue non proposée : dernière revue du <date>,
+<n> commits depuis » sont des réponses valides. Le silence n'en est pas une.
+
+**Le contrôle exécutable.** `node oracles\oracle-trace-mutation-mep.mjs <produit>` le joue en TM14 :
+la section existe ; jouée, elle cite un rapport `.md`, un nombre de constats et les jetons ; refusée
+ou non proposée, elle le dit. **Sévérité : AVERTISSEMENT**, règle neuve opposable à tous les produits
+(précédent D-70 (b)). Son passage en blocage ne se pose pas : la doctrine de forge-websec l'exclut.
+
+**Hors jugement, et c'est dit.** Le contenu du rapport : aucun oracle ne lit un rapport de revue. Le
+compte des commits depuis la dernière revue : TM14 ne le refait pas. La vérité des statuts recopiés
+au dossier.
+
 ## 2. Ce que l'étape produit (staging, autonome)
 
 Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fichiers de build) :
@@ -235,13 +292,13 @@ et elle grossit par les incidents, pas par la devinette.
 
 ## 3. Oracle MEP (exécuté, jamais déclaratif)
 
-12 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
+22 contrôles, et pour chacun **la preuve exigee** — pas la case a cocher. Le tableau se lit de gauche a droite : ce qui est verifie, puis ce qui prouve qu'il l'a ete.
 
 | # | Contrôle | Preuve exigée |
 |---|---|---|
 | M-1 | Build du conteneur | `docker build` exit 0, image taguée `<produit>:<run-id>` |
 | M-2 | Healthcheck | HTTP 200 sur l'endpoint de santé de l'instance staging, 3 mesures espacées de 10 s |
-| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient |
+| M-3 | Smoke tests | ≥ 1 parcours rejoué par exigence MVP d'impact maximal (champ `cotation.impact` du référentiel `EXIGENCES.json` — toutes les ex æquo du niveau le plus élevé), exécutés **contre l'instance staging servie**, pas contre un TestClient ; l'état servi est relu après la dernière épreuve et doit être celui du départ (gabarit `gabarits/smoke-mise-en-production.mjs` de forge-ops, jugé par O-30 : `node <ops>/oracles/oracle-ops.mjs --etat-servi <releve.json>`, TF-2308) |
 | M-4 | Rollback | procédure de `ROLLBACK.md` exécutée une fois avec succès (retour N-1 + healthcheck 200 + retour N) **et RELUE après coup** : le fichier ne porte aucune valeur masquée (`***`, `[REDACTED]`) ni vide — §2 bis, TF-0512 |
 | M-5 | Propreté | aucun secret en clair dans l'image ni dans compose (scan des fichiers embarqués) |
 | M-6 | Hôte historique | **si et seulement si** le produit déclare un hôte historique : la CIBLE d'une redirection résout et répond AVANT que la redirection soit armée, et l'ANCIEN hôte est interrogé APRÈS déploiement (200, ou 301 vers un emplacement qui répond, chemin et requête préservés) — §3 quater, TF-0482 |
@@ -251,12 +308,16 @@ et elle grossit par les incidents, pas par la devinette.
 | M-10 | **Portes à base externe, rejouées le jour du lancement** | **si et seulement si** la chaîne du produit joue une porte qui juge une base externe (avis de dépendances, base de vulnérabilités, dépôt de paquets). Le feu vert du dossier de MEP porte la sortie de chacune, rejouée le jour même du lancement sur l'objet lancé, jamais le verdict de la qualification. Contrôle exécutable : `node scripts\verifier-portes-du-jour.mjs <produit>`, joué en TM5 par `oracle-trace-mutation-mep` — § 3 nonies, TF-1498 |
 | M-11 | **Garde-fous de la plateforme relevés, contraintes connues relues** | **si et seulement si** le produit déploie sur une plateforme à stratégies (Azure Policy) ou porte une contrainte « Obligatoire ici ». Le dossier de MEP porte le relevé daté des stratégies de la portée cible, fait AVANT de concevoir l'ordre de déploiement. Il cite chaque contrainte connue avec son verdict contre la séquence retenue : commentaire d'un environnement, entrée du registre de la factory, parole de l'humain mot pour mot. Contrôle exécutable : `node scripts\verifier-garde-fous.mjs <produit>`, joué en TM6 par `oracle-trace-mutation-mep` — § 1 ter, TF-1495 et TF-1496 |
 | M-12 | **Scripts qui accordent un droit** | **si et seulement si** le produit porte un script ou une chaîne qui accorde un droit, ou qui nomme une permission Microsoft Graph. Chaque identifiant de permission Graph est celui de la table officielle datée, sous son nom et son type ; l'échec d'un octroi reste visible ; l'effet est relu dans la plateforme avant d'être annoncé. Contrôle exécutable : `node scripts\verifier-droits-accordes.mjs <produit>`, joué en TM7 par `oracle-trace-mutation-mep` — § 3 octies, TF-1497 |
-| M-13 | **Étapes de chaîne** | **si et seulement si** la chaîne du produit crée un objet d'annuaire, touche à `az webapp auth` ou écrit dans la plateforme. Un objet créé se lit avant d'être complété ; l'authentification se lit et s'écrit par l'API `authsettingsV2` ; le dossier porte la section « Étapes de chaîne remises à l'exploitant » (exécuté hors production et daté, écritures à blanc avec leur différence, branches que seule la production exécute). Contrôle exécutable : `node scripts\verifier-etape-chaine.mjs <produit>`, joué en TM8 par `oracle-trace-mutation-mep` ; sondage du formulaire Entra : `scripts\verifier-formulaire-entra.mjs` — § 3 decies, TF-1519, TF-1543, TF-1546 à TF-1549 |
+| M-13 | **Étapes de chaîne** | **si et seulement si** la chaîne du produit crée un objet d'annuaire, touche à `az webapp auth` ou écrit dans la plateforme. Un objet créé se lit avant d'être complété ; l'authentification se lit et s'écrit par l'API `authsettingsV2` ; le dossier porte la section « Étapes de chaîne remises à l'exploitant » (exécuté hors production et daté, écritures à blanc avec leur différence, branches que seule la production exécute). Contrôle exécutable : `node scripts\verifier-etape-chaine.mjs <produit>`, joué en TM8 par `oracle-trace-mutation-mep` ; sondage du formulaire Entra : `scripts\verifier-formulaire-entra.mjs` ; une pile qui pose `supabase_settings` s'applique par `scripts/appliquer-terraform.mjs … --executer --sortie`, jamais par un `terraform apply` direct, ce que juge O-31 : `node <ops>/oracles/oracle-ops.mjs --application-terraform <racine ou fichier de chaîne>` (un apply direct est bloquant) — § 3 decies, TF-1519, TF-1543, TF-1546 à TF-1549, TF-2397 |
 | M-14 | **Parcours tiers embarqués** (AVERTISSEMENT, règle neuve du 13/10/2026) | **si et seulement si** le produit embarque un parcours tiers qui engage l'utilisateur : un cadre intégré, une directive `frame-src`, `child-src` ou `form-action`, ou l'adresse d'une passerelle de paiement ou de réservation. Le dossier de MEP porte la section « Parcours tiers embarqués » : chaque tiers nommé, la vérification **jouée dans un navigateur** à une date, sur **l'état exécuté** (DOM après chargement) et non sur le HTML servi, et l'étape atteinte, « jusqu'à l'étape qui encaisse » ou « à confirmer » quand seul un paiement réel tranche. Contrôle exécutable : `node scripts\verifier-parcours-tiers.mjs <produit>`, joué en TM9 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 undecies, TF-1583 |
 | M-15 | **Contre-lecture d'un plan voté** (BLOQUANT depuis le 14/10/2026, décision sur TF-1688) | **si et seulement si** le dossier fait voter ou approuver un plan (d'infrastructure, de migration, de production) avant un geste irréversible. La section « Contre-lecture » lit les **paramètres de l'exécution** qui a produit le plan, chacun avec sa valeur à l'exécution, l'endroit où elle a été lue, la valeur attendue et sa référence (fiche ou décision) ; chaque écart est tranché ; une ligne « Non comparé : … » dit ce qu'elle ne compare pas. Contrôle exécutable : `node scripts\verifier-contre-lecture.mjs <produit>`, joué en TM10 par `oracle-trace-mutation-mep`, qui le **bloque** — § 3 duodecies, TF-1681, TF-1688 |
 | M-16 | **Déploiement par la chaîne, exclusivement** (AVERTISSEMENT, règle neuve du 17/10/2026) | Tout déploiement vers un environnement géré passe par la chaîne du produit, jamais par une commande lancée d'un poste. Le dossier porte la section « Chaîne de déploiement » : la chaîne nommée (fichier de pipeline du produit, ou chaîne de l'hébergeur déclenchée par la poussée) et l'exécution qui a déployé, citée par son identifiant ; ou « Aucun environnement géré : <motif> ». Le dossier ne prescrit aucune commande de déploiement direct (`railway up`, `az webapp deploy`, `terraform apply`…). Exigence fatale CTL-D09-01 du référentiel d'audit. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle pipeline`, joué en TM11 par `oracle-trace-mutation-mep`, qui l'**avertit** sans le bloquer — § 3 terdecies, TF-1212 |
 | M-17 | **Sauvegarde et restauration des actifs critiques** (AVERTISSEMENT, règle neuve du 17/10/2026) | Le dossier porte la section « Sauvegarde et restauration » : elle cite la déclaration de sauvegarde du produit (`forge-ops/sauvegarde@1`), que l'oracle O-19 de forge-ops juge (RPO et RTO déclarés, sauvegarde effective conforme au RPO, restauration réussie depuis 12 mois au plus, durée sous le RTO, intégrité constatée) ; ou « Aucun actif de données critique : <motif> », refusé si le produit persiste des données. Exigences fatales CTL-D05-09, CTL-D12-06 et CTL-D16-09. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle sauvegarde`, joué en TM12, qui l'**avertit** — § 3 terdecies, TF-1212 |
 | M-18 | **Fournisseur d'identité central, avec MFA** (AVERTISSEMENT, règle neuve du 17/10/2026) | Le dossier porte la section « Fournisseur d'identité » : le fournisseur central qui authentifie tout accès humain et le MFA qui l'accompagne, la procédure de tout compte local restant (secours) ; ou « Aucun accès humain authentifié : <motif> », refusé si le code porte une authentification locale. Exigence fatale CTL-D03-01. Contrôle exécutable : `node scripts\verifier-exigences-fatales.mjs <produit> --regle identite`, joué en TM13, qui l'**avertit** — § 3 terdecies, TF-1212 |
+| M-19 | **Revue de code proposée** (AVERTISSEMENT, règle neuve du 03/11/2026) | Le dossier porte la section « Revue de code » : jouée, elle cite le rapport chez le produit, le nombre de constats par gravité et par statut, les jetons relevés et les constats posés au GO ; ou « Revue proposée et refusée le <date> : <motif> » ; ou « Revue non proposée : dernière revue du <date>, <n> commits depuis ». Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM14, qui l'**avertit** sans le bloquer — § 1 quater, D-162 (a), TF-2057 |
+| M-20 | **Identifiants de test stables et recopiables** (AVERTISSEMENT, règle neuve du 05/11/2026) | **si et seulement si** le produit remet à l'humain des identifiants de test : ils restent les mêmes d'un déploiement à l'autre, et ne changent que sur demande de l'humain ou si leur fichier manque ; chaque mot de passe tient en 20 caractères au moins d'un alphabet sans sosie (0 O 1 l I) ni signe ; la chaîne vérifie la connexion de chaque compte. Consigne du porteur du 04/11/2026, citée mot pour mot : « arrête de changer les mdp à chaque fois que tu déploies une nouvelle version. Et remonte cette règle à la Factory. » Outil : `node <ops>\scripts\identifiants-test.mjs assurer`, `verifier` et `renouveler --demande`. Contrôle exécutable : `node <ops>\oracles\oracle-ops.mjs --identifiants-test <fichier.json> --journal <journal.jsonl>`, règle O-25 de forge-ops ; référentiel `<ops>\references\IDENTIFIANTS-DE-TEST.md` — TF-2166, TF-2167 |
+| M-21 | **Réglages de plateforme lus contre leur attendu** (AVERTISSEMENT, règle neuve du 06/11/2026) | Le dossier porte la section « Réglages de plateforme » : pour chaque réglage de `references\REGLAGES-SURS-PAR-DEFAUT.json` que le produit emploie, l'état lu le jour du dossier par la commande `cmd_lire` de l'entrée, l'attendu et un verdict ; un écart accepté nomme sa décision (`D-nn`) ; ou « Aucun réglage de plateforme : <motif> ». Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM15 — § 3 quaterdecies, R-66, D-178 (a), TF-2233 |
+| M-22 | **Version servie lue, inventaire confronté** (AVERTISSEMENT, FAIL pour un FAIL porté par le dossier) | Le dossier porte la section « Version servie et inventaire » : le commit lu par `version-servie.mjs lire`, le verdict d'O-26 de forge-ops et celui d'O-27 rejoué par la porte « prêt » ; ou « Sans objet : <motif> ». Un FAIL d'O-26 ou d'O-27 vaut refus. Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM16 — § 3 quaterdecies, TF-2201, TF-2209, TF-2243 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -823,6 +884,76 @@ l'inventaire des accès de déploiement direct sur chaque environnement reste un
 de la déclaration de sauvegarde : O-19 juge ce qu'elle déclare, pas la plateforme. La configuration
 réelle du fournisseur d'identité : sa capture reste la preuve d'audit de CTL-D03-01.
 
+### § 3 quaterdecies — Ce que le dossier lit en vrai avant le GO : les réglages de plateforme, la version servie, l'inventaire (M-21, M-22, TF-2233, TF-2243)
+
+**Le fait des réglages, du 06/11/2026.** L'étude « Sécurité par défaut de bout en bout » (20261106a) n'a trouvé
+dans `ETAPE-MEP.md` aucun des 8 réglages de sécurité standard de Supabase, GitHub et Cloudflare : sa seule ligne
+voisine, M-18, vise le fournisseur d'identité des utilisateurs de l'application, pas les membres de l'organisation de
+la plateforme. Dans l'audit du cas témoin, 7 écarts sur 30 étaient une option gratuite laissée à sa valeur d'origine.
+La décision humaine D-178 (a) en fait la règle R-66 : un réglage admissible s'applique à la création, se vérifie à
+chaque livraison, et son exception se décide. Le dossier de MEP est la dernière livraison avant la production.
+
+**M-21 — l'état lu de chaque réglage de plateforme, contre son attendu.** Pour chaque réglage de
+`references\REGLAGES-SURS-PAR-DEFAUT.json` que le produit emploie, le dossier porte l'état **lu le jour du dossier**
+par la commande `cmd_lire` de l'entrée, l'attendu de l'entrée, et un verdict :
+
+- `conforme` : l'état lu est l'attendu ;
+- `écart` sur un réglage classé `decision` : le choix du porteur est nommé (`D-nn`), et l'écart accepté se vérifie tel
+  que décidé ;
+- `écart` sur un réglage classé `defaut` : corrigé avant le GO, ou nommé avec sa décision. Dans les deux cas un retour
+  s'ouvre vers la forge qui crée (R-66, point 5 : `node scripts\ouvrir-retour-reglage.mjs`) ;
+- `non lu` : le réglage n'est pas vérifié, et le dossier ne se présente pas comme complet.
+
+La comparaison de l'état lu à l'attendu est le contrôle bloquant que forge-ops pose avant la MEP (TF-2230, en
+construction à la date de cette section). Tant qu'il n'est pas livré, la session lit et recopie, et le dossier le dit.
+
+**M-22 — la version servie se lit, l'inventaire se confronte.** Le dossier de MEP cite la version servie par
+l'instance, lue dans `/healthz` : `node <ops>/scripts/version-servie.mjs lire https://<instance> --attendu <commit>
+--sortie version-servie.json`, puis le verdict d'O-26 : `node <ops>/oracles/oracle-ops.mjs --version-servie
+version-servie.json --depot <dépôt du produit> --attendu <commit>`. Il ne cite jamais un commit reconstitué. La porte
+« prêt » rejoue O-27 avec les sorties d'état de la MEP (`terraform state list`, `docker ps` filtré sur le produit,
+`az resource list`) : `node <ops>/oracles/oracle-ops.mjs --inventaire-a-jour docs\projet\COMPOSANTS-OPS.md --etat
+<genre>:<fichier>`. **Un FAIL d'O-26 ou d'O-27 vaut refus** : le dossier ne se présente pas au GO avant correction et
+rejeu. O-27 sans sortie d'état rend SKIP, et le dossier dit que l'inventaire n'a pas été comparé. Mesures de forge-ops
+qui fondent les deux verdicts, rapportées par sa documentation et non remesurées ici : une empreinte servie qui ne
+correspondait à aucun des 25 derniers commits (TF-2201), un inventaire resté au texte du premier commit pendant 3
+déploiements (TF-2209).
+
+**La forme, au dossier de MEP** (les exemples sont inventés) :
+
+```
+## Réglages de plateforme
+
+Registre des réglages sûrs lu le 2026-11-06 : references\REGLAGES-SURS-PAR-DEFAUT.json
+
+| Réglage | Classement | État lu | Lu le | Attendu | Verdict ou décision |
+|---|---|---|---|---|---|
+| Supabase, TLS imposé | defaut | true | 2026-11-06 | true | conforme |
+| Supabase, double vérification des membres | decision | 2 membres sur 3 | 2026-11-06 | true pour chaque membre | écart accepté, D-123 du 2026-11-02 |
+```
+
+```
+## Version servie et inventaire
+
+Version servie : commit 6f78b88 lu le 2026-11-06 par `version-servie.mjs lire` (instance de préproduction).
+O-26 : PASS
+O-27 : PASS (sorties d'état : terraform state list, docker ps filtré sur le produit)
+```
+
+« Aucun réglage de plateforme : <motif> » et « Sans objet : <motif> » (un produit statique sans point de santé) sont
+des réponses valides. Le silence n'en est pas une.
+
+**Le contrôle exécutable.** `node oracles\oracle-trace-mutation-mep.mjs <produit>` joue TM15 (la section des réglages
+existe, chaque ligne est datée et porte son verdict, un écart accepté nomme sa décision) et TM16 (la section de la
+version servie existe, porte le commit lu et les verdicts d'O-26 et d'O-27). **Sévérité.** TM15 AVERTIT : règle neuve,
+opposable à tous les produits, elle entre en avertissement (précédent D-70 (b)). TM16 AVERTIT une section absente ou
+incomplète et FAIL un dossier qui porte lui-même un FAIL d'O-26 ou d'O-27, parce que la décision de TF-2243 en fait un
+refus de la porte « prêt ». Un FAIL suivi d'un rejeu PASS se lit au dernier verdict.
+
+**Hors jugement, et c'est dit.** La vérité des états recopiés : le contrôle ne rejoue ni la commande de lecture du
+registre, ni `version-servie.mjs`, ni O-27. Que le dossier cite tous les réglages des plateformes que le produit
+emploie : il ne sait pas lesquelles. La comparaison à l'attendu elle-même : elle est celle de forge-ops (TF-2230).
+
 ## 3 bis. Qualif populée (avant le GO — demande utilisateur RT-6/RS-7)
 
 Entre le staging technique et le GO, une **version de qualification populée de données** est
@@ -909,6 +1040,12 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   la portée cible, et chaque contrainte avec son verdict contre la séquence retenue (M-11, § 1 ter) ;
 - les trois sections des exigences fatales du référentiel d'audit : « Chaîne de déploiement »,
   « Sauvegarde et restauration », « Fournisseur d'identité » (M-16 à M-18, § 3 terdecies) ;
+- la section « Revue de code » : jouée, avec les constats élevés et critiques posés au GO, ou
+  proposée puis refusée (M-19, § 1 quater) ;
+- les réglages de plateforme que le produit emploie, avec leur état lu le jour du dossier contre l'attendu du registre,
+  et la décision nommée de chaque écart accepté (M-21, § 3 quaterdecies, R-66) ;
+- la version servie lue par `version-servie.mjs lire` et les verdicts d'O-26 et d'O-27, un FAIL valant refus
+  (M-22, § 3 quaterdecies, TF-2243) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - le geste exact qui déclenche la mise en production — l'approbation de la porte de la chaîne, ou la
   poussée d'un commit nommé (§4 bis), jamais une commande de déploiement lancée d'un poste vers un

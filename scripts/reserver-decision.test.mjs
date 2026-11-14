@@ -302,6 +302,31 @@ try {
     const tresVieux = new Date(Date.now() - 5000); utimesSync(lockEssai, tresVieux, tresVieux);
     att(sousVerrou(lockEssai, () => "pris", { essais: 3, pauseMs: 10, perimeMs: 1000 }) === "pris" && !existsSync(lockEssai), "9 : un verrou plus vieux que le délai écrit doit être repris puis levé");
   }
+  // ---- 10. TF-2223 (RP-2, lot Produit-81 20261105a, 06/11/2026) : HORS RUN, la réservation s'inscrit au journal hors run. Avant, elle
+  // échouait (« ledger du produit introuvable : un produit ouvre son run avant de poser une décision ») et la décision se numérotait à la main.
+  // Le ledger du run n'est pas créé (R-42 exige qu'il s'ouvre par run_open) ; le numéro suivant compte le journal hors run, avant comme après
+  // l'ouverture d'un run ; `forge/ledger.py` écrit le même journal que l'outil (même seq, même forme).
+  {
+    const d = join(base, "produit-hors-run");
+    mkdirSync(join(d, "forge", "retours"), { recursive: true });
+    const a = lancer(["--question", "Faut-il garder le gabarit hors run ?", "--produit", d]);
+    att(a.code === 0 && a.o?.reserve === "D-1" && /hors-run\.jsonl$/.test(a.o?.registre || ""), `10 : hors run, la première réservation doit rendre D-1 au journal hors run, obtenu ${a.code} ${JSON.stringify(a.o || a.brut).slice(0, 240)}`);
+    const b = lancer(["--question", "Faut-il compiler le journal au prochain lot ?", "--produit", d]);
+    att(b.o?.reserve === "D-2", `10 : la seconde réservation hors run doit rendre D-2, obtenu ${JSON.stringify(b.o || b.brut).slice(0, 200)}`);
+    const l = existsSync(join(d, "forge", "hors-run.jsonl")) ? lignes(join(d, "forge", "hors-run.jsonl")) : [];
+    att(l.map((x) => x.seq).join() === "1,2" && l.every((x) => x.type === "question_humain" && x.hors_run === true) && l[1].decisions_posees?.["D-2"], `10 : le journal hors run doit porter deux question_humain numérotées 1,2, obtenu ${JSON.stringify(l).slice(0, 240)}`);
+    att(!existsSync(join(d, "forge", "ledger.jsonl")), "10 : la réservation hors run ne doit pas créer forge/ledger.jsonl (R-42 exige run_open en tête)");
+    att(lancer(["--prochain", "--produit", d]).o?.prochain === "D-3", "10 : --prochain hors run doit compter le journal hors run (D-3)");
+    if (PYTHON) {
+      writeFileSync(join(d, "forge", "ledger.py"), LEDGER_GABARIT, "utf8");
+      const py = spawnSync(PYTHON, [join(d, "forge", "ledger.py"), "retour", "--source", "produit", "--note", "friction"], { encoding: "utf8", cwd: d, env: { ...process.env, PYTHONUTF8: "1" } });
+      const lp = lignes(join(d, "forge", "hors-run.jsonl"));
+      att(py.status === 0 && lp.length === 3 && lp[2].seq === 3 && lp[2].type === "retour", `10 : ledger.py hors run doit ajouter la ligne 3 au MÊME journal, obtenu ${py.status} ${py.stderr}`);
+      spawnSync(PYTHON, [join(d, "forge", "ledger.py"), "run_open", "--run_id", "essai"], { encoding: "utf8", cwd: d, env: { ...process.env, PYTHONUTF8: "1" } });
+      const c = lancer(["--question", "Faut-il ouvrir le run maintenant ?", "--produit", d]);
+      att(c.o?.reserve === "D-3" && /ledger\.jsonl$/.test(c.o?.registre || ""), `10 : le run ouvert, la réservation passe par le ledger du run et compte les D-N du journal hors run (D-3), obtenu ${JSON.stringify(c.o || c.brut).slice(0, 240)}`);
+    }
+  }
   att(empreinte(REGISTRE_PILOT) === empreintePilot, "9 : le registre du pilot a été modifié par la recette (elle ne doit jamais l'écrire)");
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 240)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }

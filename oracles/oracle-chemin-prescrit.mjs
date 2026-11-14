@@ -43,6 +43,10 @@
  *         règle que le fait fondateur réclame : *la fixture du remède est aussi obligatoire que la
  *         fixture du défaut.* Une option prescrite que la recette ne joue jamais n'a jamais été
  *         vue fonctionner, et le producteur est le premier à l'essayer.
+ *   CP5 · aucune consigne ne cite un REPLI RETIRÉ (TF-2473) : la table `REPLIS_RETIRES` nomme chaque
+ *         repli, la référence qui l'a retiré et son remède ; un paragraphe qui parle de l'outil retiré
+ *         sans nommer le remède est refusé. Premier repli : playwright cherché dans l'environnement
+ *         uv par `--rendu` de forge-design, retiré par TF-2461, remplacé par `FORGE_DESIGN_PYTHON`.
  *
  * ============================================================================================
  * LES EXCLUSIONS, ÉCRITES ET MESURÉES — un faux positif sur une prescription fait désactiver
@@ -84,6 +88,11 @@ export const RE_PRESCRIPTION = /node\s+((?:[A-Za-z]:)?[\w.$<>/\\-]*[\w>-]+\.(?:m
 export const HORS_PORTEE = [
   /^~[\\/]/, /^forge[\\/]/, /^\.claude[\\/]/, /^\.\.[\\/]/,
   /[<>]/, /\$FORGE_ROOT/i, /%[A-Z_]+%/,
+  // TF-2482 : le nom d'EXEMPLE d'une seule lettre, sans dossier (`node x.mjs`, `python y.py`), que la
+  // prose de la doctrine emploie pour DÉCRIRE un programme sans en prescrire un. Mesuré : le seul cas
+  // jugé à tort est `references\NIVEAUX.md:116`. Un chemin avec dossier (`scripts/x.mjs`) ou un nom
+  // plein (`xy.mjs`) reste jugé : la borne est la lettre unique, pas « tout nom court ».
+  /^[A-Za-z]\.(?:mjs|cjs|js|py)$/,
 ];
 
 /**
@@ -168,6 +177,13 @@ export function depotsDuParc(racine) {
   } catch { return []; }
 }
 
+/**
+ * UN ARBRE GIT IMBRIQUÉ N'EST PAS LE DÉPÔT JUGÉ (TF-2482). Un sous-dossier qui porte son propre
+ * `.git` (fichier ou dossier) est un autre arbre de travail : les worktrees d'agents de
+ * `.claude\worktrees\` y copient les documents d'un état ancien ou à venir du dépôt. Mesuré le
+ * 13/11/2026 sur main : 28 des 31 commandes « introuvables » de CP1 venaient de ces arbres. Le
+ * `.git` de la racine jugée ne l'écarte pas : seul un SOUS-dossier est testé.
+ */
 export function documents(d, out = []) {
   let noms = [];
   try { noms = readdirSync(d); } catch { return out; }
@@ -175,7 +191,7 @@ export function documents(d, out = []) {
     if (SAUTES.has(nom)) continue;
     const p = join(d, nom);
     let st; try { st = statSync(p); } catch { continue; }
-    if (st.isDirectory()) documents(p, out);
+    if (st.isDirectory()) { if (!existsSync(join(p, ".git"))) documents(p, out); }
     else if (/\.md$/i.test(nom)) out.push(p);
   }
   return out;
@@ -273,6 +289,68 @@ export function pointsDEntree(depot, racineParc) {
   return out;
 }
 
+// ── CP5 (TF-2473, décision du pilot du 13/11/2026) ───────────────────────────────────────────────
+//
+// LE FAIT : TF-2461 (forge-design b6ebb1a, 12/11/2026) a retiré de `--rendu` le repli qui cherchait
+// playwright dans l'environnement uv du dossier courant : le verdict du rendu dépendait du dossier de
+// lancement. Un produit qui lançait la critique avec playwright dans son seul environnement uv rend
+// désormais SKIP tant qu'il ne pose pas `FORGE_DESIGN_PYTHON`. Une consigne qui dit encore « playwright
+// dans l'environnement uv » envoie le producteur vers un chemin qui ne rend plus de verdict, et le
+// message d'échec de CP1 à CP4 ne la voit pas : elle ne prescrit pas de script, elle prescrit un repli.
+//
+// LA TABLE EST UNE DONNÉE (loi n° 4) : un repli retiré s'y ajoute avec sa date, sa référence et son
+// remède, sans toucher à la règle. Une consigne est un PARAGRAPHE (des lignes sans ligne vide ; une ligne
+// de tableau est un paragraphe à elle seule) : elle cite le repli quand elle porte TOUS les motifs de
+// `exige` (le sujet, l'outil, le repli) SANS nommer le remède. La variable nommée dans le même
+// paragraphe est le remède, jamais un contournement : le paragraphe qui explique le retrait la nomme,
+// et il passe. Les trois motifs sont exigés ensemble parce que playwright et uv se côtoient, sans
+// rapport avec le rendu, dans les consignes de forge-tests (mesuré le 13/11/2026 : 3 paragraphes).
+export const REPLIS_RETIRES = [
+  {
+    id: "uv-rendu-forge-design",
+    retire_par: "TF-2461 (forge-design b6ebb1a, 12/11/2026)",
+    exige: [
+      /--rendu\b|\brendu\b|critique|run-oracles-design|oracle-exploitabilite|detecterOutillageRendu|lib[\\/]rendu|render_page/i,
+      /playwright/i,
+      /(?<![\w.-])uv(?![\w-]|\.\w)/i,
+    ],
+    cite: /(?<![\w.-])uv(?![\w-]|\.\w)/i,
+    remede: /FORGE_DESIGN_PYTHON/,
+    dit: "le rendu de forge-design ne cherche plus playwright dans l'environnement uv du dossier courant",
+    reparer: "poser FORGE_DESIGN_PYTHON sur l'interpréteur qui porte playwright (`uv run python -c \"import sys; print(sys.executable)\"` le donne, chez le produit)",
+  },
+];
+
+/** Les paragraphes d'un texte : `{ ligne, lignes[] }`, `ligne` étant celle de la première ligne. */
+const paragraphes = (texte) => {
+  const out = []; let cur = null;
+  String(texte).split(/\r?\n/).forEach((l, i) => {
+    if (!l.trim()) { cur = null; return; }
+    if (l.trim().startsWith("|")) { out.push({ ligne: i + 1, lignes: [l] }); cur = null; return; }
+    if (!cur) { cur = { ligne: i + 1, lignes: [] }; out.push(cur); }
+    cur.lignes.push(l);
+  });
+  return out;
+};
+
+/** Les consignes du dépôt qui citent un repli retiré : `{ document, ligne, repli }`. */
+export function replisRetiresCites(depot, table = REPLIS_RETIRES) {
+  const out = [];
+  for (const doc of documents(depot)) {
+    const texte = readFileSync(doc, "utf8");
+    if (estUneVueGeneree(texte)) continue;
+    for (const p of paragraphes(texte)) {
+      const bloc = p.lignes.join("\n");
+      for (const repli of table) {
+        if (!repli.exige.every((re) => re.test(bloc)) || repli.remede.test(bloc)) continue;
+        const i = p.lignes.findIndex((l) => repli.cite.test(l));
+        out.push({ document: doc, ligne: p.ligne + Math.max(i, 0), repli });
+      }
+    }
+  }
+  return out;
+}
+
 export function juger(depot, { racineParc = null } = {}) {
   const racine = racineParc || racineDuParc(depot);
   const F = [];
@@ -361,6 +439,17 @@ export function juger(depot, { racineParc = null } = {}) {
       "Preuve lui a dit le contraire. Remède : corriger le chemin dans le référentiel, puis régénérer la vue.");
   }
 
+  // ── CP5 — aucune consigne ne cite un repli retiré (TF-2473) ────────────────────────────────
+  const citees = replisRetiresCites(depot);
+  if (!citees.length) {
+    ok("CP5", `aucune consigne ne cite un des ${REPLIS_RETIRES.length} repli(s) retiré(s) de la table (${REPLIS_RETIRES.map((r) => r.id).join(", ")})`);
+  } else {
+    ko("CP5", citees.map((c) => `${rel(c.document)}:${c.ligne}`).join(", "),
+      `${citees.length} consigne(s) citent un repli RETIRÉ : `
+      + citees.map((c) => `${rel(c.document)}:${c.ligne} (${c.repli.id}, retiré par ${c.repli.retire_par} : ${c.repli.dit})`).join(" ; ")
+      + `. Le producteur qui la suit n'obtient plus de verdict. Remède : ${[...new Set(citees.map((c) => c.repli.reparer))].join(" ; ")}`);
+  }
+
   return {
     verdict: F.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS", findings: F,
     prescriptions: toutes.length, jugeables: jugeables.length, horsPortee: toutes.length - jugeables.length,
@@ -374,6 +463,9 @@ export const NON_JUGE = [
   "la prescription en PROSE (« lancez le script de capture », « relancez l'oracle ») : seule la forme `node <script>` est reconnue, parce que deviner une prescription accuserait la doctrine qui décrit un défaut pour l'interdire — le faux positif le plus cher de tous",
   "les chemins de CONVENTION D'ACCUEIL (`forge\\…`, `.claude\\…`, `~\\…`) et les chemins sous PLACEHOLDER (`<racine>`, `$FORGE_ROOT`) sont écartés par construction : un gabarit prescrit un chemin qui n'a de sens que chez son hôte futur, et résoudre un paramètre serait l'inventer",
   "les documents de `output\\` et `input\\` : livrables et entrants datés, jamais des prescriptions. Un plan du 30/08 cite l'outillage du 30/08, et le corriger réécrirait l'histoire au lieu de cesser d'en produire (R-42)",
+  "les documents d'un ARBRE GIT IMBRIQUÉ (un sous-dossier qui porte son propre `.git`, tel un worktree d'agent de `.claude\\worktrees\\`) : un autre arbre de travail, jugé par son propre dépôt et non par celui-ci (TF-2482). Un dépôt versionné DANS le dépôt jugé échappe donc à CP1, et c'est voulu",
+  "le nom d'EXEMPLE d'une seule lettre sans dossier (`node x.mjs`, `python y.py`) : la prose de la doctrine s'en sert pour décrire un programme, pas pour en prescrire un (TF-2482). Un vrai script d'une lettre, sans dossier, échapperait à CP1 — aucun n'existe au parc, la borne est mesurée plutôt que promise",
+  "CP5 ne lit que les documents `.md` DU DÉPÔT jugé, jamais ceux d'un produit (lecture seule, R-58) : une consigne de produit qui cite encore le repli retiré n'est pas vue d'ici, et le pilot ne l'y corrige pas. Il juge aussi par PARAGRAPHE : une consigne coupée en deux par une ligne vide, ou un repli décrit sans le mot `uv` (« l'environnement du projet »), lui échappe ; et il n'est évalué que si CP0 ne rend pas SANS OBJET, c'est-à-dire si le dépôt prescrit au moins une commande `node`",
   "CP2 juge la PRÉSENCE du libellé de l'option dans la source du script, jamais que le script en fasse quelque chose de juste : une option lue et jetée passe CP2, et c'est le banc — donc CP3 — qui a une chance de l'attraper",
   "CP3 ne mesure QUE les scripts qui portent un banc nommé `<script>.test.mjs`. Un script sans banc n'est pas accusé ici : son juge est l'invariant I1 de `oracles\\self-tests.mjs`, et deux vérités sur le même objet valent moins qu'une",
   "CP3 constate qu'un CAS cite l'option, jamais qu'il la joue BIEN ni sur la cible que la prescription nomme. Le défaut fondateur — `--sections` qui rend TimeoutError sur un panneau MASQUÉ — demanderait d'exécuter le geste sur une instance servie : c'est la classe `controle-joue-sur-fichier-pas-sur-instance-servie`, un autre dispositif sur un autre objet. La borne est déclarée, pas comblée",

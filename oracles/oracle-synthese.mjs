@@ -37,8 +37,8 @@
  *       vocabulaire fermé (TF-0457) — sans quoi l'étiquette n'engage à rien ;
  *   S12 toute action `manuelle_dev` / `manuelle_utilisateur` porte sa raison d'impossibilité
  *       IA, vocabulaire fermé (TF-0458) — la loi transverse n° 5 l'exige depuis l'origine ;
- *   S13 toute action laissée à l'humain est EXÉCUTABLE : un chemin, une commande ou un
- *       libellé d'écran, dans le groupe de la puce (TF-0459) ;
+ *   S13 toute action laissée à l'humain est EXÉCUTABLE : un chemin, une commande, une adresse
+ *       http(s) (TF-2310, en accord avec S92) ou un libellé d'écran, dans le groupe de la puce (TF-0459) ;
  *   S14 toute action porte un identifiant stable, ou se déclare `neuve` (TF-0460) — sans
  *       identifiant, deux restitutions successives ne se comparent pas.
  *   S15 toute décision du bloc 3 RAPPELLE SON SUJET avant ses options : ≥ 25 mots, sans
@@ -116,9 +116,34 @@
  *       et ne range pas quatre identifiants en code ou plus sur sa ligne (une énumération se met en liste) ; avertissante ;
  *   S89 UN ÉCART ENTRE DEUX RÉFÉRENCES GIT (29/10, TF-1984, gabarit 2.54.0) : des fichiers dits « absents de » ou « pas dans » une référence git exigent, dans le texte,
  *       `git diff --name-status`, `--diff-filter` ou un essai d'existence (`cat-file -e`, `ls-tree`) ; avertissante ;
+ *   S93 UNE DÉCISION POSÉE SANS RÉPONSE SE RAPPELLE AU BLOC 3 (06/11, TF-2214, RP-34, gabarit 2.63.0) : chez un produit, chaque D-N que `forge\ledger.jsonl` pose (`question_humain`, depuis 14 jours au plus) sans `reponse_humain`
+ *       postérieure qui la nomme est nommée au bloc 3 (`lib-decisions.mjs`, `decisionsSansReponse`) ; SANS_OBJET hors produit ; avertissante ;
+ *   S94 UN LIVRABLE DÉJÀ LIÉ « LIVRÉ » ET RÉÉCRIT PREND L'INDICE SUIVANT (06/11, TF-2191, RT-50, gabarit 2.63.0) : rejoue `scripts/verifier-jugement.mjs` (J-1) sur chaque cible de la ligne « Livré : » portant un sceau, posé par le hook de fin
+ *       de tour au PASS qui la lie ; un contenu changé depuis le sceau FAIL, l'indice suivant nommé ; BLOQUANTE au hook ;
+ *   S95 UNE DÉCISION QUI EN REMPLACE UNE AUTRE LISTE LES ARTEFACTS DE LA PREMIÈRE ET DIT LEUR SORT (06/11, TF-2206 et TF-2210, RP-26, RP-30, gabarit 2.63.0) : « D-N remplace D-M » exige la ligne `Artefacts de D-M : <liste>` avec le sort
+ *       de chacun (conservé, retiré, à décider…) ou « aucun artefact » ; avertissante ;
+ *   S104 « POURQUOI VOUS » NOMME UN MOTIF DE R-58 (06/11, TF-2273, RP-46, gabarit 2.64.0) : la ligne « Pourquoi vous » d'une décision au format B porte l'un des six motifs (dépense, publication, irréversible, doctrine, arbitrage, produit) ;
+ *       sinon la décision ne se pose pas, la session exécute et rend pour information ; avertissante ;
+ *   S125 DES DÉFAUTS SANS ARBITRAGE SE CORRIGENT DANS LE TOUR (10/11, TF-2332, gabarit 2.66.0) : une décision en citation qui propose
+ *       « tout, une partie, rien » sur des défauts à corriger est refusée, corriger étant un geste d'agent (loi n° 5) ;
+ *   S34 (TF-2331, 10/11, gabarit 2.66.0) étendue : une action manuelle_utilisateur de relecture de fond est refusée tant que le bloc 4
+ *       ne montre pas la relecture par un agent ; S9 (TF-2342) compte l'ouverture après retrait de l'en-tête YAML et du titre ;
+ *   S135 UN « LOT DE CLÔTURE » SUPPOSE UN RUN QUI SE CLORA (12/11, TF-2429, gabarit 2.67.0) : chez un produit, une phrase qui promet un « lot de clôture » (hors ligne de remontée, que S48 juge, hors citation, hors négation)
+ *       alors que le ledger ne porte aucun run ouvert est signalée ; numéro pris au suivant libre (S125) plus 10 ; SANS_OBJET hors produit ; avertissante ;
+ *   S115 UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (09/11, TF-2304, loi n° 5, gabarit 2.65.0) : une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage
+ *       (decision, depense, irreversible) porte une commande d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, cmdlets Az et Graph ; pas git, node ni npm, souvent demandés pour un autre poste), la même figure ailleurs dans le texte, et aucune ligne qui la porte ne montre un code de retour d'échec ;
+ *       numéro pris au suivant libre (S105) plus 10, comme S103, pour ne pas heurter une règle qu'une autre session ajoute le même jour ; avertissante ;
  *   S91 UNE ACTION DIT CE QU'ELLE FAIT (30/10, gabarit 2.56.0) : un tableau d'actions A-N au bloc 8 porte une colonne « Action » et, sur chaque ligne, une phrase de 4 mots au moins hors code ; avertissante ;
  *   S90 UN CHIFFRE SE RELÈVE (30/10, D-100 (a) du 29/10, gabarit 2.55.0) : une durée, un coût, un score, un volume ou un compte d'objets qu'aucune sortie du tour ne montre, et que la ligne
  *       ne dit pas non mesuré ; lue par `lib-chiffres-releves.mjs`, sur les nombres passés par le hook (`--nombres-tour`) ; avertissante ;
+ *   S92 LA LIGNE « À ouvrir : » (03/11, TF-2077, RT-32, gabarit 2.59.0) : pendant de S87 — quand une action `manuelle_utilisateur` du bloc 8 porte une adresse http(s) hors
+ *       plateforme tierce de la liste (celles-là relèvent de S52/S53), le bloc 0 se clôt par `À ouvrir : [<nom>](<adresse>)` ; cette ligne est exemptée de S9 comme « Livré : » ; avertissante ;
+ *   S103 UN GUIDE NE FAIT PAS ÉCRIRE L'HUMAIN DANS UN FICHIER D'ENVIRONNEMENT (06/11, TF-2190, RT-49) : une étape ou sous-puce de la section « Guide » qui dit d'ajouter, remplacer, coller ou éditer une ligne
+ *       d'un `.env` (ou une `NOM=` / « la valeur de NOM » quand le guide cite ce fichier) est signalée, et `forge/ranger-secret.mjs` nommé (D-167 (a), TF-2127) ; lue par `lib-enumeration-liste.mjs` ;
+ *       numéro pris au-delà du suivant libre (S93) plus 10, pour ne pas heurter les règles qu'une autre session ajoute le même jour ; hors de BLOQUANTES du hook de restitution, donc avertissante à l'écran ;
+ *   S68 (TF-2302, 09/11, gabarit 2.65.0) étendue aux droits : une absence de droit, de rôle ou d'attribution conclue d'un relevé d'attributions directes (`az role assignment list` sans `--include-groups`, ou un relevé qui se dit « direct »)
+ *       cite la lecture de l'héritage de groupe (`--include-groups`, droits effectifs, appartenance aux groupes) ; S48 (TF-2305, gabarit 2.65.0) lit aussi le défaut constaté sur soi (« j'aurais dû », « j'ai proposé une voie manuelle alors que
+ *       je pouvais… ») comme une correction du tour ; le préjugement (`hook-restitution --prejuger`, TF-2303) refuse un `--motif` sur S48 et FRICTIONS tant que le texte ne cite aucun lot « <projet> - RETOURS - AAAAMMJJx » ;
  *   S36 / S38 (TF-1981), S48 (TF-1982, TF-1987), S68 (TF-1985) étendues dans le même gabarit 2.54.0 : la critique d'implémentation ne se lit comme un verdict ni en action
  *       (bloc 8) ni en option (bloc 3), et ni `hors_mandat` ni `borne_atteinte` ne dispensent de la jouer ; « reste au produit » suppose un run ouvert au ledger ;
  *       une recréation ou un redémarrage de conteneur ou de service est une correction ; un 200 au corps vide ne prouve pas une absence sans 404 ni essai de chaque portée ;
@@ -208,10 +233,14 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { chargerLexique, termesEmployes } from "./lib-lexique.mjs";
-import { enumerationsEnLigne, etapesDeGuide, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
+import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
+import { enumerationsEnLigne, etapesDeGuide, etapesQuiEcriventDansUnEnv, etapesQuiEnchainent, etapesSansClotureEnDerniere } from "./lib-enumeration-liste.mjs";
 import { affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
 import { chiffresSansReleve } from "./lib-chiffres-releves.mjs";
-import { lireCarte, derniereDemande, etatDesLivrables } from "./lib-mobilisation.mjs";
+import { estPointDeSuivi, lignesAgent } from "./lib-suivi-agents.mjs";
+import { lireCarte, derniereDemande, etatDesLivrables, sessionDe, REPLI_DIT } from "./lib-mobilisation.mjs";
+import { motifDeResteAuProduit, retourNommeNonEcrit } from "./lib-frictions.mjs";
+import { decisionsSansReponse } from "./lib-decisions.mjs";
 
 // --racine <dossier> (TF-1644, 14/10/2026) : le dossier du PROJET dont la restitution est jugée,
 // quand le fichier jugé n'y vit pas. Le hook de fin de tour écrit le message dans un fichier
@@ -220,6 +249,10 @@ import { lireCarte, derniereDemande, etatDesLivrables } from "./lib-mobilisation
 // Le FAIL du 12/10 n'est apparu qu'au rejeu sur un fichier placé sous le `forge\` du produit.
 const _option = (nom) => { const i = process.argv.indexOf(nom); return i > 1 ? process.argv[i + 1] || null : null; };
 const RACINE_PROJET = _option("--racine");
+// --session <id> (TF-2045, 02/11/2026) : la session qui restitue. S85 et S86 jugent la dernière ligne de `forge/mobilisation.jsonl` ÉCRITE PAR
+// CETTE SESSION, pas la dernière du fichier, que l'autre session d'un produit peut avoir écrite. Le hook de fin de tour la passe ; à défaut,
+// `CLAUDE_CODE_SESSION_ID` ; sans l'une ni l'autre, la dernière ligne du fichier, et le constat le dit.
+const SESSION_JUGEE = _option("--session") || sessionDe();
 // --horloge <ISO> (TF-1646, 14/10/2026) : le moment du jugement pour S69, l'horloge du poste à défaut.
 const HORLOGE = _option("--horloge");
 // --releves-tour <ISO,ISO,…|aucun> et --releves-session <ISO,…|aucun> (TF-1938, 21/10/2026) : les instants où le tour, puis la
@@ -576,6 +609,21 @@ function manqueAuRappel(ligne) {
   return manque;
 }
 
+// TF-2273 (06/11/2026) — LES SIX MOTIFS DE R-58, lus dans la ligne « Pourquoi vous » d'une décision au format B (S104). Lexique FERMÉ, mesuré le 06/11/2026 sur les
+// 151 lignes « Pourquoi vous » des 65 synthèses d'`output\04-plans\` qui en portent : voir la règle S104.
+const L_MOT = "\\p{L}\\p{N}_";
+const motR58 = (src) => new RegExp(`(?<![${L_MOT}])(?:${src})`, "iu");
+const MOTIFS_R58 = [
+  ["depense", motR58("d[ée]penses?|d[ée]pens[ée]\\w*|co[ûu]t(?:e|era|ent|s)?(?![" + L_MOT + "])|factur\\w*|payant\\w*|budget\\w*|abonnement\\w*|licence\\w*|\\d\\s*(?:€|eur(?:os?)?|usd|\\$)|argent|frais(?![" + L_MOT + "])|tarif\\w*|quota\\w*|consommation|montant\\w*|offre commerciale")],
+  ["publication", motR58("publi\\w*|pouss(?:er|e|é|ée|ent)(?![" + L_MOT + "])|push\\w*|diffus\\w*|mise? en (?:production|ligne|prod)|production|hors du poste|en ligne|rend\\w* (?:public|visible)|expos\\w*|d[ée]ploi\\w*|envoy\\w*|expéditeur|domaine d'envoi|contenu visible|tag(?:ger|uer)?(?![" + L_MOT + "])")],
+  ["irreversible", motR58("irr[ée]versible\\w*|supprim\\w*|d[ée]finitiv\\w*|d[ée]trui\\w*|effac\\w*|ne se d[ée]fait|sans retour|perdu\\w*|perte\\w*|[ée]cras\\w*|r[ée]voqu\\w*|purg\\w*|rotation|irrattrapable")],
+  ["doctrine", motR58("doctrine\\w*|r[èe]gles?(?![" + L_MOT + "])|norme\\w*|opposable\\w*|gouvernance|noyau|s'impos\\w*|convention\\w*|politique\\w*|loi n|R-\\d+|invariant\\w*|contrat\\w*|tous les produits|toutes les forges|obligatoire\\w*|standard\\w*|d[ée]cision humaine|r[ée]glage appliqu[ée] [àa] toutes")],
+  ["arbitrage", motR58("arbitr\\w*|pr[ée]f[ée]rence\\w*|vous seul\\w*|seule? vous|seule? (?:à|a) (?:savoir|trancher|d[ée]cider)|il n'y a que vous|go[ûu]t\\w*|priorit\\w*|trancher|concurrent\\w*|choix|chois\\w*|(?:votre|vos) (?:souhait\\w*|attente\\w*|appr[ée]ciation|volont[ée]|ligne|strat[ée]gie|temps|comptes?|marque)|strat[ée]gi\\w*|vous (?:seul )?(?:savez|connaissez|d[ée]tenez)|votre accord|compte\\b")],
+  ["produit", motR58("produits? autonomes?|chez (?:un|le|ce|votre|les) (?:produits?|clients?)|[ée]criture chez|d[ée]p[ôo]t du produit|projet du client|client\\w*|hors run|repo du produit|(?:le|du|au|sur un|\\d+) produits?(?![" + L_MOT + "])|produits relev[ée]s|projets voisins")],
+];
+/** Les motifs de R-58 que le texte d'un « Pourquoi vous » nomme (liste vide : aucun ne relève de R-58). */
+const motifsR58De = (texte) => MOTIFS_R58.filter(([, re]) => re.test(String(texte))).map(([nom]) => nom);
+
 // TF-1338 (26/09/2026, lot Produit-64 du 22/09) — UNE TÊTE DE DÉCISION CITÉE COMMENCE UN PARAGRAPHE.
 // Le fait : dans un bloc 3 conforme, « > **171** paragraphes ; s'arrêter au CSS… », simple REPLI
 // de la phrase ouverte deux lignes plus haut, a ouvert un segment ; portant le tableau et son (a),
@@ -752,6 +800,35 @@ function runOuvert(produit) {
   } catch { return { existe: true, ouvert: false }; }
   return { existe: true, ouvert: dernier === "run_open" };
 }
+// TF-2429 (S135) — les phrases qui promettent un « lot de clôture ». Lues hors citations (« … », `…`, blocs de code) et hors ligne de remontée (S48 la juge) ; écartée, une phrase dont
+// l'expression suit une négation ou un contraste (« pas », « plus », « jamais », « au lieu de », « plutôt que », « et non », « sans »), parce qu'elle dit ce qui ne se fait plus.
+const LOT_DE_CLOTURE_135 = uni(/\blots?\s+de\s+cl[ôo]ture\b/i);
+const NEGATION_AVANT_135 = uni(/\b(?:pas|plus|jamais|sans|au lieu d[eu]|plut[ôo]t que|et non|aucun\w*)\b[^.\n|]{0,60}$/i);
+function annoncesLotDeCloture(texte) {
+  const nu = String(texte).replace(/```[\s\S]*?```/g, " ").replace(/`[^`\n]*`/g, " ").replace(/«[^»\n]*»/g, " ");
+  const annonces = [];
+  for (const ligne of nu.split("\n")) {
+    if (/remont[ée]e\s+(?:à|a|vers)\s+la\s+factory/i.test(ligne)) continue;
+    for (const phrase of ligne.split(/(?<=[.;!?])\s+/)) {
+      const m = LOT_DE_CLOTURE_135.exec(phrase);
+      if (!m || NEGATION_AVANT_135.test(phrase.slice(0, m.index))) continue;
+      annonces.push(phrase.replace(/^[\s>*|-]+/, "").trim().slice(0, 110));
+    }
+  }
+  return annonces;
+}
+/** Les `seq` des entrées `type: retour` du ledger courant d'un produit (TF-2137) ; ledger absent ou illisible : aucun. */
+function retoursDuLedger(produit) {
+  const seqs = [];
+  try {
+    for (const l of readFileSync(join(produit, "forge", "ledger.jsonl"), "utf8").split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      let e; try { e = JSON.parse(l); } catch { continue; }
+      if (e && e.type === "retour" && Number.isFinite(e.seq)) seqs.push(e.seq);
+    }
+  } catch { /* ledger absent : aucun retour lu */ }
+  return seqs;
+}
 const CORRECTION_DU_TOUR = uni(new RegExp([
   String.raw`correction d['’](?:une|la|ma) (?:restitution|r[ée]ponse|synth[èe]se|fiche) pr[ée]c[ée]dente`,
   String.raw`\b(?:la|cette|ma|une) (?:recommandation|d[ée]cision|affirmation|conclusion|analyse)\b[^.\n|]{0,60}\b(?:est|a [ée]t[ée]|[ée]tait) (?:retir[ée]e|fausse|erron[ée]e)\b`,
@@ -760,6 +837,13 @@ const CORRECTION_DU_TOUR = uni(new RegExp([
   String.raw`\bmon erreur\b`,
   String.raw`\b(?:j['’](?:ai|avais)|nous avons) (?:affirm[ée]|[ée]crit|dit|annonc[ée]|recommand[ée])\b[^.\n]{0,40}\b[àa] tort\b`,
   String.raw`\bheures? (?:d['’]en-t[êe]te )?(?:invent[ée]es?|compos[ée]es?)\b`,
+  // TF-2305 (09/11/2026, récidive de TF-1643, classe remontee-declaree-nulle-apres-correction) — UN DÉFAUT CONSTATÉ SUR SOI EST UNE CORRECTION, DÈS QUE LE TOUR L'ÉCRIT. Le 09/11/2026, une session
+  // connaissait son propre défaut (une voie manuelle proposée alors qu'elle pouvait automatiser le geste, loi n° 5) et ne l'a remonté que sur l'ordre du porteur. La lecture reste à la PREMIÈRE
+  // PERSONNE (« j'aurais dû », « mon oubli », « j'ai proposé une voie manuelle alors que je pouvais… ») : ce qu'un tour n'écrit pas, S48 ne le voit pas (dit en non_juge).
+  String.raw`\bj['’]aurais d[uû]\b`,
+  String.raw`\bmon (?:oubli|manquement|d[ée]faut)\b`,
+  String.raw`\b(?:j['’]ai|la session a)\s+(?:propos[ée]|laiss[ée]|donn[ée]|renvoy[ée]|demand[ée])\b[^.\n]{0,120}\b(?:voie|geste|action)s?\s+manuel\w*\b[^.\n]{0,120}\balors (?:que|qu['’])[^.\n]{0,100}\b(?:pouvai\w*|aurais pu|aurait pu|automatis\w*)`,
+  String.raw`\bcontraire (?:à|a) la loi n[°o.]?\s*5\b`,
   // TF-1987 (29/10/2026, récidive de TF-1643 et TF-1644) — UNE CORRECTION D'INFRASTRUCTURE EST UNE CORRECTION. Le 24/10/2026, un tour qui recréait le conteneur d'un moteur
   // avec un volume (`docker rm`, `docker run -v`) s'est clos sur « rien à remonter » : la perte du travail en cours était la cause, la restitution n'en voyait aucune. Le
   // vocabulaire lit les commandes que la restitution cite en preuve et les verbes de recréation ou de redémarrage d'un conteneur, d'un service ou d'un moteur.
@@ -885,40 +969,67 @@ const RE_TITRE_OUVERTURE =
 // compte pas dans les 20 mots exigés. La PRÉSENCE de la ligne, elle, se juge au hook de fin de tour (`controlerLivre`, hook-restitution.mjs) : elle se lit dans la
 // transcription du tour, que ce juge ne voit pas. Une ligne « Livré : » sans aucun lien n'est pas exemptée.
 const RE_ETIQUETTE_LIVRE = /^[ \t]*(?:[-*][ \t]+)?\**[ \t]*Livr[ée]s?[ \t]*\**[ \t]*:[ \t]*\**/i;
+// TF-2077 (RT-32, S92, gabarit 2.59.0) — « À ouvrir : [<nom>](<adresse http(s)>) » est, comme « Livré : », la seule AUTRE ligne du bloc 0
+// autorisée à porter une adresse : elle se retire de la même façon de la lecture de S9. Les deux étiquettes partagent ce traitement.
+const RE_ETIQUETTE_OUVRIR = /^[ \t]*(?:[-*][ \t]+)?\**[ \t]*[ÀA][ \t]*ouvrir[ \t]*\**[ \t]*:[ \t]*\**/i;
 const RE_LIEN_MARKDOWN = /\[[^\]\n]*\]\((?:<[^>\n]*>|[^)\n]*)\)/g;
 const RE_PUCE_A_LIEN = /^[ \t]*(?:[-*]|\d+[.)])[ \t]+.*\]\(/;
 function sansLigneLivre(ouverture) {
   const lignes = ouverture.split("\n"), sortie = [];
   for (let i = 0; i < lignes.length; i++) {
     const l = lignes[i];
-    if (!RE_ETIQUETTE_LIVRE.test(l)) { sortie.push(l); continue; }
+    const etiq = RE_ETIQUETTE_LIVRE.test(l) ? RE_ETIQUETTE_LIVRE : (RE_ETIQUETTE_OUVRIR.test(l) ? RE_ETIQUETTE_OUVRIR : null);
+    if (!etiq) { sortie.push(l); continue; }
     const puces = [];
     while (i + 1 < lignes.length && RE_PUCE_A_LIEN.test(lignes[i + 1])) puces.push(lignes[++i]);
-    if (!puces.length && !(l.match(RE_LIEN_MARKDOWN) || []).length) { sortie.push(l); continue; }   // « Livré : » sans lien : de la prose
-    const reste = l.replace(RE_ETIQUETTE_LIVRE, "").replace(RE_LIEN_MARKDOWN, " ").replace(/[·\s,;]+/g, " ").trim();
+    if (!puces.length && !(l.match(RE_LIEN_MARKDOWN) || []).length) { sortie.push(l); continue; }   // « Livré : » / « À ouvrir : » sans lien : de la prose
+    const reste = l.replace(etiq, "").replace(RE_LIEN_MARKDOWN, " ").replace(/[·\s,;]+/g, " ").trim();
     if (reste) sortie.push(reste);
     for (const p of puces) { const r = p.replace(/^[ \t]*(?:[-*]|\d+[.)])[ \t]+/, "").replace(RE_LIEN_MARKDOWN, " ").replace(/[·\s,;]+/g, " ").trim(); if (r) sortie.push(r); }
   }
   return sortie.join("\n");
 }
 function lireOuverture(texte) {
+  // TF-2342 (10/11/2026) : le frontmatter et le titre sont retirés AVANT de comparer les deux lectures. Comparés avant, un en-tête et un titre plus longs
+  // que la synthèse titrée (ou égaux : « D-19 (a) » ajoute deux mots au titre) faisaient garder la lecture « en tête », qui se vidait ensuite au retrait :
+  // S9 lisait 0 mot dans une synthèse de 72 mots (bissection du 16/09/2026).
+  const sansEnteteNiTitre = (t) => {
+    let o = t.trim();
+    for (let i = 0; i < 4; i++) {
+      const avant = o;
+      o = o.replace(/^---[\s\S]*?\n---\s*/, "").replace(/^#[^\n]*\n?/, "").trim();
+      if (o === avant) break;
+    }
+    return o;
+  };
+  const compte = (t) => t.split(/\s+/).filter(Boolean).length;
   const premierBloc = texte.search(/(^|\n)#{2,4}\s/);
-  let ouverture = (premierBloc > 0 ? texte.slice(0, premierBloc) : "").trim();
+  let ouverture = sansEnteteNiTitre(premierBloc > 0 ? texte.slice(0, premierBloc) : "");
+  let source = "en tête, avant le premier titre de niveau 2 à 4, après retrait de l'en-tête YAML et du titre";
   const mTitre = RE_TITRE_OUVERTURE.exec(texte);
   if (mTitre) {
     const apres = texte.slice(mTitre.index + mTitre[0].length);
     const fin = apres.search(/(^|\n)#{1,4}\s/);
-    const titree = (fin >= 0 ? apres.slice(0, fin) : apres).trim();
-    const compte = (t) => t.split(/\s+/).filter(Boolean).length;
-    if (compte(titree) > compte(ouverture)) ouverture = titree;
+    const titree = sansEnteteNiTitre(fin >= 0 ? apres.slice(0, fin) : apres);
+    if (compte(titree) > compte(ouverture)) { ouverture = titree; source = `sous le titre d'ouverture « ${mTitre[0].replace(/^[\s#]+/, "").trim().slice(0, 50)} »`; }
   }
-  for (let i = 0; i < 4; i++) {
-    const avant = ouverture;
-    ouverture = ouverture.replace(/^---[\s\S]*?\n---\s*/, "").replace(/^#[^\n]*\n?/, "").trim();
-    if (ouverture === avant) break;
-  }
+  const brute = ouverture;                       // avant retrait des lignes « Livré : » / « À ouvrir : », pour S87/S92
   ouverture = sansLigneLivre(ouverture).trim();
-  return { ouverture, mots: ouverture.split(/\s+/).filter(Boolean).length };
+  return { ouverture, mots: compte(ouverture), brute, source };
+}
+
+// TF-2214 et TF-2191 — le dossier du PRODUIT qui porte le fichier jugé ou `--racine` (un `forge/retours/` en remontant, douze niveaux au plus, même voie que S48 et le verrou « livré ») ; null hors d'un produit.
+function produitDuJuge(cheminJuge) {
+  const departs = [];
+  if (cheminJuge) { try { departs.push(dirname(resolve(cheminJuge))); } catch { /* chemin non résolu */ } }
+  if (RACINE_PROJET) { try { departs.push(resolve(RACINE_PROJET)); } catch { /* racine non résolue */ } }
+  for (let d of departs) {
+    for (let i = 0; i < 12 && d; i++) {
+      if (existsSync(join(d, "forge", "retours"))) return d;
+      const parent = dirname(d); if (parent === d) break; d = parent;
+    }
+  }
+  return null;
 }
 
 // `cheminJuge` — le chemin du fichier passé en argument, quand il y en a un. S42 (TF-1015) juge
@@ -929,6 +1040,17 @@ function juger(texte, cheminJuge = null) {
   const findings = [];
   const ok = (regle, message) => findings.push({ regle, statut: "PASS", message });
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
+
+  // S116 (12/11/2026, D-209 (a), prompt « Suivi des agents toutes les 15 minutes » 20261112g, ÉTAPE 3.5) — LE POINT DE SUIVI
+  // DES AGENTS N'EST PAS UNE RESTITUTION. Le hook `hook-suivi-agents.mjs` réveille la session toutes les 15 minutes tant qu'un
+  // agent tourne ; elle écrit alors un point dont la première ligne est exactement « Suivi agents », puis une ligne mesurée par
+  // agent (état et âge en minutes, tâches faites et restantes). Jugé comme une restitution, chaque point serait refusé.
+  // La forme est stricte (`estPointDeSuivi`, lib-suivi-agents.mjs) : aucun titre, aucune D-N ni A-N, 60 lignes au plus, au moins
+  // une ligne d'agent mesurée. Le « faux point » (le motif sans ligne d'agent mesurée) est jugé comme tout autre texte.
+  if (estPointDeSuivi(texte)) {
+    ok("S116", `point de suivi des agents : ${lignesAgent(texte).length} ligne(s) d'agent mesurée(s), forme reconnue — pas une restitution (hook-suivi-agents)`);
+    return findings;
+  }
 
   // Le POINT D'ÉTAPE se DÉCLARE, et il se déclare au bloc 1 (TF-1182). Sans bloc 1 reconnu, la
   // mention n'est pas une déclaration : le document est jugé comme une restitution ordinaire.
@@ -1218,7 +1340,7 @@ function juger(texte, cheminJuge = null) {
   // On accepte les deux formes, et on garde la plus longue : celui qui titre son ouverture ET
   // écrit avant le titre ne doit être puni ni pour l'un ni pour l'autre.
   // La lecture vit dans `lireOuverture` depuis le gabarit 2.50.0 : S1 s'en sert pour dire si le bloc 0 existe.
-  const { ouverture, mots } = lireOuverture(texte);
+  const { ouverture, mots, source: sourceOuverture } = lireOuverture(texte);
   const techniques = [
     [/\bTF-\d{3,4}\b/, "identifiant TF nu"],
     [/[\w-]+\.(?:md|mjs|py|json|jsonl|html|toml)\b/, "chemin ou nom de fichier"],
@@ -1226,13 +1348,145 @@ function juger(texte, cheminJuge = null) {
     [/\b[a-f0-9]{7,40}\b/, "sha"],
   ].filter(([motif]) => motif.test(ouverture)).map(([, quoi]) => quoi);
   if (mots < 20) {
-    ko("S9", `synthèse d'ouverture absente ou trop courte (${mots} mot(s) lu(s), en tête ou sous un titre d'ouverture) — ` +
-      "l'état, ce que ça change et ce qui est attendu se disent en langage commanditaire AVANT le détail");
+    ko("S9", `synthèse d'ouverture absente ou trop courte (${mots} mot(s) lu(s) ${sourceOuverture}) — ` +
+      "l'état, ce que ça change et ce qui est attendu se disent en langage commanditaire AVANT le détail ; " +
+      "S9 lit le paragraphe entre le titre et le premier bloc, ou celui qui suit un titre « 0. Synthèse d'ouverture » (la plus longue des deux lectures, après retrait de l'en-tête YAML et du titre)");
   } else if (techniques.length) {
     ko("S9", `la synthèse d'ouverture porte du vocabulaire technique nu (${techniques.join(", ")}) — ` +
       "ces éléments vont APRÈS, dans les blocs : on ordonne, on ne supprime jamais");
   } else {
     ok("S9", `synthèse d'ouverture en langage commanditaire (${mots} mots, sans identifiant nu)`);
+  }
+
+  // S92 (TF-2077, RT-32, gabarit 2.59.0) — L'ADRESSE D'UN SERVICE À OUVRIR SE LIT EN TÊTE, PAS SEULEMENT DANS UNE ACTION DU BLOC 8.
+  // Pendant de la ligne « Livré : » (S87) : quand une action `manuelle_utilisateur` du bloc 8 porte une adresse http(s) — un service, une
+  // console, une page que le lecteur ouvre lui-même —, le bloc 0 se clôt par « À ouvrir : [<nom>](<adresse>) », là où le lecteur lit
+  // d'abord. Le 14/10/2026, une adresse qui ne vivait qu'au bloc 8 a fait écrire « L'URL n'est même pas fournie » (TF-1708, redite RT-32).
+  // Comme « Livré : », cette ligne est exemptée de S9 (sansLigneLivre la retire de l'ouverture). AVERTISSANTE : hors de l'ensemble BLOQUANTES
+  // du hook de fin de tour. NON JUGÉ : que l'adresse de la ligne soit celle du bloc 8, qu'elle réponde, qu'un seul lien suffise à plusieurs services.
+  {
+    const RE_URL_92 = /https?:\/\/[^\s)`>\]]+/i;
+    // Une action qui vise l'interface d'une plateforme tierce de la liste (Google Ads, GitHub…) relève de S52/S53 : elle est GUIDÉE
+    // écran par écran EN TÊTE, et c'est là que son adresse est surfacée. S92 ne la redouble pas ; il vise un service HORS liste (une
+    // application déployée, une console maison, une page produit) dont l'adresse se perdrait au seul bloc 8.
+    const PLATEFORMES_92 = chargerPlateformes();
+    const vise92 = (g) => Boolean(PLATEFORMES_92) && PLATEFORMES_92.some((p) =>
+      (p.reHote && p.reHote.test(g)) || (p.reRepere && p.reRepere.test(String(g).replace(/`[^`]*`/g, " "))));
+    const actions92 = actionsGroupees(bActions).filter((g) => /\bmanuelle_utilisateur\b/.test(g) && RE_URL_92.test(g) && !vise92(g));
+    if (!actions92.length) {
+      ok("S92", "aucune action manuelle_utilisateur ne porte d'adresse http(s) hors plateforme tierce — aucune ligne « À ouvrir : » n'est due");
+    } else {
+      const brute = lireOuverture(texte).brute || "";
+      const ligneOuvrir = brute.split("\n").some((l) => RE_ETIQUETTE_OUVRIR.test(l)
+        && (l.match(RE_LIEN_MARKDOWN) || []).some((lien) => RE_URL_92.test(lien)));
+      ligneOuvrir
+        ? ok("S92", `${actions92.length} action(s) manuelle_utilisateur à adresse http(s), et le bloc 0 porte sa ligne « À ouvrir : [nom](adresse) »`)
+        : ko("S92", `${actions92.length} action(s) manuelle_utilisateur portent une adresse http(s) que le bloc 0 ne reprend pas — ajoute en FIN de bloc 0 la ligne `
+          + "« À ouvrir : [<nom>](<adresse>) », là où le lecteur lit d'abord, comme la ligne « Livré : » pour un livrable (S87). Le 14/10/2026, "
+          + `une adresse laissée au seul bloc 8 a fait écrire « L'URL n'est même pas fournie » (TF-2077, RT-32). Ex. : ${actions92[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+    }
+  }
+
+  // S93 (TF-2214, 06/11/2026, gabarit 2.63.0) — UNE DÉCISION POSÉE SANS RÉPONSE SE RAPPELLE AU BLOC 3. LE FAIT : D-48 (« Supprime-t-on le réseau vide créé en Europe du Nord le 03/11 ? »)
+  // a été posée le 03/11 à 21:24, n'a reçu ni réponse ni rappel dans aucune restitution suivante, et les ressources qu'elle visait sont restées facturées deux jours (retour RP-34
+  // de Produit-86, ledger seq 553). Chez un produit (un `forge\retours\` en remontant depuis `--racine`), chaque D-N que `forge\ledger.jsonl` pose (`question_humain`) sans qu'une
+  // entrée `reponse_humain` postérieure la nomme, posée depuis 14 jours au plus, est nommée au bloc 3 : posée à nouveau, ou rappelée en une ligne. AVERTISSANTE (hors de BLOQUANTES du
+  // hook). NON JUGÉ : une réponse que le produit n'a pas consignée avec son numéro (elle compte comme absente : mesure du 06/11/2026, 25 décisions sur 40 sans réponse nommée sur
+  // 11 ledgers locaux) ; une décision posée il y a plus de 14 jours ; le pilot, dont le registre `decisions\REGISTRE.jsonl` ne consigne pas les réponses ; que le rappel dise la bonne question.
+  {
+    const produit93 = produitDuJuge(cheminJuge);
+    if (!produit93) {
+      findings.push({ regle: "S93", statut: "SANS_OBJET", message: "hors d'un produit (aucun forge/retours/ en remontant depuis le fichier jugé ou --racine) : le pilot ne consigne pas les réponses, pas de décision ouverte à rappeler" });
+    } else {
+      const ouvertes93 = decisionsSansReponse(produit93);
+      const b3_93 = bloc(texte, BLOCS[2][0]) || "";
+      const manquantes93 = ouvertes93.filter((d) => !new RegExp(`\\b${d.n}\\b`).test(b3_93));
+      // TF-2266 : le remède se dit dans la forme que `manqueAuRappel` (S4) reconnaît — JJ/MM à HH:MM tirés de l'horodatage du ledger.
+      const horodate93 = (ts) => { const t = new Date(ts); if (Number.isNaN(t.getTime())) return "JJ/MM à HH:MM"; const p = (n) => String(n).padStart(2, "0"); return `${p(t.getDate())}/${p(t.getMonth() + 1)} à ${p(t.getHours())}:${p(t.getMinutes())}`; };
+      if (!ouvertes93.length) ok("S93", "aucune décision posée au ledger du produit depuis 14 jours n'attend de réponse");
+      else if (!manquantes93.length) ok("S93", `${ouvertes93.length} décision(s) en attente de réponse, toutes nommées au bloc 3 (${ouvertes93.map((d) => d.n).join(", ")})`);
+      else ko("S93", `${manquantes93.length} décision(s) posée(s) au ledger du produit sans réponse nommée ne sont pas rappelées au bloc 3 : `
+        + manquantes93.slice(0, 5).map((d) => `${d.n} (posée le ${String(d.ts).slice(0, 10)}${d.seq != null ? `, ledger seq ${d.seq}` : ""}${d.question ? ` : « ${d.question.slice(0, 80)} »` : ""})`).join(" ; ")
+        + `${manquantes93.length > 5 ? ` (+${manquantes93.length - 5})` : ""}. Rappelle chacune en une ligne au bloc 3, dans la forme que S4 lit comme un rappel, sans option ni question : « ${manquantes93[0].n} : <son sujet, trois mots au moins>, posée le ${horodate93(manquantes93[0].ts)}, inchangée » (TF-2266 : la forme « > **D-N — <la question ?>** posée le <jour>, sans réponse » était refusée par S4), ou écris qu'elle est répondue `
+        + "et consigne la réponse au ledger (`reponse_humain`, avec son numéro). Le 03/11/2026, D-48 restée sans rappel a laissé des ressources facturées deux jours (TF-2214).");
+    }
+  }
+  // S94 (TF-2191, 06/11/2026, gabarit 2.63.0) — UN LIVRABLE DÉJÀ LIÉ « LIVRÉ » ET RÉÉCRIT PREND L'INDICE SUIVANT. LE FAIT : l'étude 20261105b, liée « Livré » dans une restitution, a été réécrite
+  // en place après trois remarques du porteur ; `allouer-indice.mjs` rendait « c » et personne ne l'a demandé : « Pourquoi un nouveau fichier n'a pas été créé pour cette nouvelle version ? »
+  // (retour RT-50 de Produit-84). Le hook de fin de tour pose le sceau (`<fichier>.jugement.json`, `scripts\verifier-jugement.mjs --sceller`) sur chaque livrable que la restitution PASS
+  // vient de lier ; S94 rejoue `verifier-jugement.mjs` (règle J-1) sur chaque cible de la ligne « Livré : » : un contenu qui n'est plus celui du sceau est refusé, avec l'indice à prendre.
+  // BLOQUANTE au hook (le porteur l'a demandé : « la restitution refuse »). NON JUGÉ : un livrable lié avant la pose du sceau (aucun sceau : un état, pas un défaut) ; un nom hors convention
+  // `<nom> - AAAAMMJJx.md|html|pdf` ; une réécriture faite avant que la restitution qui le lie ait eu son premier PASS ; la qualité de la nouvelle version.
+  {
+    const base94 = produitDuJuge(cheminJuge) || (RACINE_PROJET ? resolve(RACINE_PROJET) : null);
+    const brute94 = lireOuverture(texte).brute || "";
+    const lignes94 = brute94.split("\n"), cibles94 = [];
+    for (let i = 0; i < lignes94.length; i++) {
+      if (!RE_ETIQUETTE_LIVRE.test(lignes94[i])) continue;
+      const groupe = [lignes94[i]];
+      while (i + 1 < lignes94.length && RE_PUCE_A_LIEN.test(lignes94[i + 1])) groupe.push(lignes94[++i]);
+      for (const l of groupe) for (const m of l.matchAll(/\]\((<[^>\n]*>|[^)\n]*)\)/g)) cibles94.push(m[1].replace(/^<|>$/g, "").trim());
+    }
+    if (!base94 || !cibles94.length) {
+      findings.push({ regle: "S94", statut: "SANS_OBJET", message: !cibles94.length ? "aucune ligne « Livré : » avec lien au bloc 0 — aucun livrable à comparer à son sceau" : "ni produit ni --racine : les liens « Livré : » ne se résolvent pas, pas de sceau à lire" });
+    } else {
+      const outil94 = join(dirname(fileURLToPath(import.meta.url)), "..", "scripts", "verifier-jugement.mjs");
+      const ecrases94 = [], examines94 = [];
+      for (const cible of cibles94) {
+        if (/^[a-z][a-z0-9+.-]*:/i.test(cible)) continue;   // adresse externe : hors du dépôt
+        let rel = cible; try { rel = decodeURIComponent(cible); } catch { /* lien non encodé : lu tel quel */ }
+        const f = resolve(base94, rel.split("#")[0]);
+        if (!existsSync(f) || !/\s-\s\d{8}[a-z]\.(?:html?|md|pdf)$/i.test(f) || /synth[eè]se|restitution/i.test(basename(f)) || !existsSync(f + ".jugement.json")) continue;
+        examines94.push(f);
+        const r = spawnSync(process.execPath, [outil94, f], { encoding: "utf8" });
+        let o = null; try { o = JSON.parse(r.stdout); } catch { /* sortie illisible : non jugé */ }
+        if (o && o.verdict === "FAIL" && (o.findings || []).some((x) => x.regle === "J-1" && x.severite === "bloquant")) ecrases94.push(f);
+      }
+      const indice94 = (f) => { const m = /(\d{8})([a-z])\.(?:html?|md|pdf)$/i.exec(f); return m ? `${m[1]}${String.fromCharCode(Math.min(m[2].toLowerCase().charCodeAt(0) + 1, 122))}` : "l'indice suivant"; };
+      if (ecrases94.length) ko("S94", `${ecrases94.length} livrable(s) lié(s) « Livré » ont changé depuis le sceau posé à leur liaison précédente : ${ecrases94.slice(0, 3).map((f) => `« ${basename(f)} »`).join(", ")}`
+        + `${ecrases94.length > 3 ? ` (+${ecrases94.length - 3})` : ""}. Une version modifiée est un NOUVEAU fichier daté à l'indice suivant (règle 5 : jamais d'écrasement) : `
+        + `\`node scripts/allouer-indice.mjs\` rend l'indice libre (ici ${indice94(ecrases94[0])}), la version déjà liée reste telle qu'elle a été remise, et c'est le nouveau fichier que « Livré : » lie. `
+        + "Le 05/11/2026, une étude liée « Livré » a été réécrite en place après trois remarques (TF-2191).");
+      else if (examines94.length) ok("S94", `${examines94.length} livrable(s) lié(s) « Livré » portent un sceau et n'ont pas changé depuis`);
+      else ok("S94", `${cibles94.length} lien(s) « Livré : », aucun ne porte encore de sceau — le hook de fin de tour le pose au premier PASS de la restitution qui le lie`);
+    }
+  }
+  // S95 (TF-2206 et TF-2210, 06/11/2026, gabarit 2.63.0) — UNE DÉCISION QUI EN REMPLACE UNE AUTRE LISTE LES ARTEFACTS DE LA PREMIÈRE ET DIT LEUR SORT. LE FAIT : D-49 (Docker du poste) a remplacé D-46 b
+  // (machine Azure) ; 11 ressources Azure, E-108 et E-109 et leurs contrôles de smoke sont restés, et une décision a ensuite été posée sur cette machine comme si elle servait. La consigne « 46b est
+  // remplacée » n'a déclenché aucune liste ; le porteur a demandé lui-même la suppression (retours RP-26 et RP-30 de Produit-86). Quand la restitution déclare qu'une décision D-N en remplace une autre
+  // D-M (« D-49 remplace D-46 », « D-46 est remplacée par D-49 », « en remplacement de D-46 »), elle porte une ligne « Artefacts de D-M : <liste> » dont la liste dit le sort de chacun (conservé, retiré,
+  // supprimé, archivé, transformé, à décider) ou « aucun artefact ». AVERTISSANTE. NON JUGÉ : que la liste soit complète ; que le sort dit soit le bon ; une substitution écrite sans numéro (« l'ancienne machine
+  // est remplacée ») ; le champ `remplace` du ledger, que juge `ledger.py`/`ledger.mjs` (TF-2206, côté gabarits produits).
+  {
+    const plat95 = String(texte).replace(/```[\s\S]*?```/g, " ");
+    const remplacees95 = new Set();
+    for (const m of plat95.matchAll(/\bD\s*-\s*(\d{1,4})\b[^.\n]{0,25}?\b(?:remplac(?:e|ent|era|erait|ée?s?|é)|annul(?:e|ée?)|abandonn(?:e|ée?))\s+par\s+(?:la\s+d[ée]cision\s+)?D\s*-\s*\d{1,4}\b/gi)) remplacees95.add(Number(m[1]));
+    for (const m of plat95.matchAll(/\bD\s*-\s*\d{1,4}\b[^.\n]{0,40}?\b(?:remplac(?:e|ent|era|erait|ant)|annule\s+et\s+remplace|se\s+substitue(?:nt)?\s+à|supplante)\s+(?:la\s+d[ée]cision\s+)?D\s*-\s*(\d{1,4})\b/gi)) remplacees95.add(Number(m[1]));
+    for (const m of plat95.matchAll(/\ben\s+remplacement\s+de\s+(?:la\s+d[ée]cision\s+)?D\s*-\s*(\d{1,4})\b/gi)) remplacees95.add(Number(m[1]));
+    if (!remplacees95.size) {
+      ok("S95", "aucune décision ne se déclare en remplacement d'une autre (D-N remplace D-M) — aucune liste d'artefacts n'est due");
+    } else {
+      const SORT_95 = /\b(?:conserv\w*|retir\w*|supprim\w*|archiv\w*|gard\w*|transform\w*|réaffect\w*|à\s+d[ée]cider|aucun(?:e)?\s+artefact|rien\s+à\s+retirer)\b/i;
+      const lignes95 = plat95.split("\n");
+      const sansListe95 = [...remplacees95].filter((m) => {
+        const re = new RegExp(`^[\\s>*_\\-\\d.)]*Artefacts?\\s+(?:de|laissés?\\s+par|créés?\\s+par)\\s+(?:la\\s+d[ée]cision\\s+)?D\\s*-\\s*${m}\\b[^:\\n]*:\\s*(.*)$`, "i");
+        for (let i = 0; i < lignes95.length; i++) {
+          const mm = re.exec(lignes95[i]);
+          if (!mm) continue;
+          // Les sous-puces (plus indentées que la ligne « Artefacts de D-M ») prolongent la liste ; une puce sœur, non.
+          const retrait = (l) => (/^[ \t]*/.exec(l) || [""])[0].length;
+          const suite = [mm[1]]; for (let j = i + 1; j < lignes95.length && retrait(lignes95[j]) > retrait(lignes95[i]) && lignes95[j].trim(); j++) suite.push(lignes95[j]);
+          const corps = suite.join(" ");
+          if (corps.replace(/[*_`]/g, "").split(/\s+/).filter(Boolean).length >= 2 && SORT_95.test(corps)) return false;
+        }
+        return true;
+      });
+      sansListe95.length
+        ? ko("S95", `${sansListe95.length} décision(s) remplacée(s) sans liste de leurs artefacts : ${sansListe95.map((m) => `D-${m}`).join(", ")}. Quand une décision en remplace une autre, ce que la première a créé (ressources, `
+          + "fichiers, contrôles, décisions filles) reste en place tant que personne ne le retire. Ajoute au bloc 3 ou au bloc 4, pour chacune, une ligne « Artefacts de D-M : <liste> — sort : conservé, retiré ou à décider "
+          + `(un mot par artefact) », ou « Artefacts de D-M : aucun artefact ». Le 05/11/2026, D-49 a remplacé D-46 b sans cette liste : 11 ressources Azure et 2 contrôles sont restés, et une décision a été posée dessus (TF-2206, TF-2210).`)
+        : ok("S95", `${remplacees95.size} décision(s) remplacée(s) (${[...remplacees95].map((m) => `D-${m}`).join(", ")}), chacune avec sa ligne « Artefacts de D-M » et le sort de ses artefacts`);
+    }
   }
 
   // S10 (TF-0408) — l'effort parle en complexité × durée, jamais en jours : sur toute
@@ -1351,9 +1605,17 @@ function juger(texte, cheminJuge = null) {
       : ok(regle, `${concernes.length} action(s) concernée(s) — ${siOk}`);
   };
 
-  juger8("S11", /\bauto_ia\b/, (g, zm) => MOTIFS_IA.test(zm),
+  // TF-2137 (05/11/2026, RT-42 de Produit-84) — `hors_mandat` NE COUVRE PAS LA CONSIGNATION D'UN RETOUR. Le 04/11/2026, l'action « consigner le retour » (auto_ia) est restée
+  // non exécutée sous `hors_mandat`, et le porteur a dû réclamer la remontée. Écrire un retour au ledger du produit est du ressort de toute session de ce produit : le
+  // motif déclarait un périmètre qui n'existe pas. Le registre du pilot (TODO.jsonl) est un autre mandat, et reste admis sous `hors_mandat`.
+  // `(?<![\w-])` : « allers-retours » n'est pas un retour (mesuré : deux actions de traitement de candidats l'ont accusé au premier jet).
+  const CONSIGNE_UN_RETOUR = /\b(?:consign|signal|remont|enregistr|journalis|[ée]cri)\w*[^.\n|]{0,80}(?<![\w-])(?:retours?|remont[ée]es?|frictions?)\b|(?<![\w-])(?:retours?|frictions?)\b[^.\n|]{0,60}\bconsign\w*|ledger\.(?:py|mjs)\s+retour|\btype\s*:?\s*retour\b/i;
+  const REGISTRE_DU_PILOT = /TODO\.jsonl|TODO-FORGE|journaliser\.mjs|ingerer-lot|registre (?:du )?pilot/i;
+  const consigneUnRetour = (g) => CONSIGNE_UN_RETOUR.test(g) && !REGISTRE_DU_PILOT.test(g);
+  juger8("S11", /\bauto_ia\b/, (g, zm) => MOTIFS_IA.test(zm) && !(/\bhors_mandat\b/.test(zm) && consigneUnRetour(g)),
     "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
-    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat.",
+    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat. " +
+    "`hors_mandat` ne couvre pas une action qui consigne un retour : l'écrire au ledger du produit est du ressort de toute session (TF-2137).",
     "chaque action `auto_ia` non exécutée porte son motif");
 
   juger8("S12", HUMAINS, (g, zm) => MOTIFS_HUMAIN.test(zm),
@@ -1369,8 +1631,12 @@ function juger(texte, cheminJuge = null) {
   // `_LOCALISATEURS` comptait comme un chemin. S13 ne pouvait donc JAMAIS refuser une action écrite
   // au format canonique (acteur entre accents graves). Prouvé sur la synthèse du 17/08 du banc des
   // défauts échappés : PASS avec les accents graves, FAIL sans eux, au mot près.
-  juger8("S13", HUMAINS, (g) => _LOCALISATEURS.test(g.replace(/`?\b(auto_ia|manuelle_dev|manuelle_utilisateur)\b`?/g, " ")),
-    "une action laissée à l'humain sans chemin, commande ni libellé d'écran : le lecteur doit rouvrir le projet " +
+  // TF-2310 (09/11/2026, décision R-58) — UNE ADRESSE HTTP(S) EST UN LOCALISATEUR, COMME POUR S92. Une action `manuelle_utilisateur` qui donne l'adresse servie
+  // (« ouvrir https://…/accueil ») était accusée de n'avoir ni chemin ni libellé d'écran, alors que S92 exige que cette même adresse soit lue en tête : l'adresse nue est
+  // ce que le lecteur ouvre. Elle ne compte qu'ici, pas dans `_LOCALISATEURS` : cette liste sert aussi de preuve à S3 et S8, qu'une adresse nue ne doit pas satisfaire.
+  const ADRESSE_HTTP = /\bhttps?:\/\/[^\s)`>\]|]+/i;
+  juger8("S13", HUMAINS, (g) => { const sans = g.replace(/`?\b(auto_ia|manuelle_dev|manuelle_utilisateur)\b`?/g, " "); return _LOCALISATEURS.test(sans) || ADRESSE_HTTP.test(sans); },
+    "une action laissée à l'humain sans chemin, commande, adresse http(s) ni libellé d'écran : le lecteur doit rouvrir le projet " +
     "pour savoir ce qu'on lui demande — c'est le coût que cette règle existe pour supprimer.",
     "chaque action humaine est exécutable telle quelle");
 
@@ -1494,9 +1760,22 @@ function juger(texte, cheminJuge = null) {
       .filter((l) => /\bmanuelle_utilisateur\b/.test(l));
     const ECRITURE = uni(/\b(cr[ée]er|ajouter|[ée]crire dans|coller|ins[ée]rer|renseigner)\b[^.;|]{0,60}\b(ligne|variable|fichier|cl[ée]|entr[ée]e|section)\b/i);
     const fautives = humaines.filter((l) => ECRITURE.test(l) && !/\bacces\b/.test(l));
+    // TF-2331 (10/11/2026, RP-08) — UNE RELECTURE DE FOND EST UN GESTE D'AGENT, ELLE AUSSI. Le 26/10/2026, la restitution des supports portait l'action A-1, « relecture de
+    // fond » par l'humain, au lieu de la faire ; les relecteurs neufs simulaient le participant, jamais le formateur ; l'humain a dû demander une revue pour que des corrections
+    // soient proposées, et elle a été faite quatorze jours plus tard. S34 ne visait que créer, ajouter et écrire (la décision nommait S13, qui juge l'exécutabilité d'une action
+    // et non son acteur : le défaut vit ici). Une action `manuelle_utilisateur` qui demande une relecture de fond (relecture de fond, du contenu, sur le fond) est refusée tant
+    // que le bloc 4 ne montre pas la relecture par agent, jouée et sa sortie citée : l'humain relit alors ce qu'un agent n'a pas pu juger, jamais à la place. Un motif `acces` ou
+    // `presence` (le lecteur doit être là, ou détenir un droit) lève le refus, comme pour l'écriture. Ce que S34 ne juge pas : que la relecture par agent ait réellement couvert
+    // le fond — la phrase du bloc 4 le déclare, la lecture humaine du rapport de l'agent le vérifie.
+    const RELECTURE_DE_FOND = uni(/\b(?:relecture|relire|relis|revue|r[ée]viser|contre-?lecture|faire relire)\b[^.;|\n]{0,50}\b(?:de fond|sur le fond|du fond|du contenu|de contenu|[àa] fond)\b|\b(?:de fond|sur le fond)\b[^.;|\n]{0,25}\b(?:relecture|relire|revue)\b/i);
+    const RELECTURE_PAR_AGENT = uni(/\brelecteurs?\b|\brelu[es]? par (?:un |des |trois |deux |\d+ )?(?:agents?|relecteurs?|v[ée]rificateurs?)|\brelecture\b[^.;\n]{0,40}\bpar (?:un |des |trois |deux |\d+ )?(?:agents?|relecteurs?|v[ée]rificateurs?)|\bv[ée]rificateurs? (?:a|ont) (?:relu|jug[ée])|\bagents? (?:relecteur|v[ée]rificateur)/i);
+    const preuveRelecture = RELECTURE_PAR_AGENT.test(bloc(texte, BLOCS[3][0]) || "");
+    const fautivesRelecture = preuveRelecture ? [] : humaines.filter((l) => RELECTURE_DE_FOND.test(l) && !/\b(?:acces|presence)\b/.test(l));
     fautives.length
       ? ko("S34", `${fautives.length} action(s) manuelle_utilisateur demandent à l'humain de CRÉER, AJOUTER ou ÉCRIRE une ligne, une variable ou un fichier — c'est un geste d'agent (loi n° 5) ; ce qui lui reste est la valeur, jamais l'écriture : « ${fautives[0].trim().slice(0, 90)} »`)
-      : ok("S34", "aucune action humaine ne demande un geste d'écriture que l'IA peut faire");
+      : fautivesRelecture.length
+        ? ko("S34", `${fautivesRelecture.length} action(s) manuelle_utilisateur demandent à l'humain une RELECTURE DE FOND alors que le bloc 4 ne montre aucune relecture par un agent — c'est un geste d'agent (loi n° 5) : la jouer dans le tour avec des relecteurs neufs, citer sa sortie au bloc 4, et ne laisser à l'humain que ce qu'aucun agent ne peut juger (TF-2331) : « ${fautivesRelecture[0].trim().slice(0, 90)} »`)
+        : ok("S34", "aucune action humaine ne demande un geste d'écriture ni une relecture de fond que l'IA peut faire");
   }
   // S35 — UNE PREUVE DU BLOC 4 EST UNE SORTIE EXÉCUTÉE, JAMAIS UN RENVOI À UNE ACTION. « Préparé »,
   // « prêt à coller », « voir A-2 » ne prouvent rien : ils annoncent. Le fait du 02/09 : des lignes
@@ -1651,6 +1930,77 @@ function juger(texte, cheminJuge = null) {
     // TF-0987 : la CIBLE de S21 est elle-même un motif, donc elle se lit dans la zone où un motif
     // est DÉCLARÉ — pas dans le « comment » de l'action, qui cite des noms de colonnes.
     { cibleSurMotif: true });
+
+  // ---- S115 (09/11/2026, TF-2304, gabarit 2.65.0) — UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE UN GESTE QUE LA SESSION JOUE AILLEURS DANS LE TEXTE ------------------------------------
+  //
+  // LE FAIT, 09/11/2026. Une session a proposé à l'utilisateur des gestes manuels (écrire à un tiers, passer par le portail) pour débloquer l'accès à une base de développement, alors qu'elle
+  // pouvait exécuter le geste elle-même, désigner l'administrateur Entra, au besoin après une approbation groupée ; elle ne l'a offert qu'après que l'utilisateur a demandé l'automatisation.
+  // C'est la loi n° 5 (voie automatique d'abord) : avant de laisser une action à l'humain, énumérer les quatre voies — l'identité de la session, les identités de service qui ont le droit,
+  // l'automatisation du dépôt, l'API de la plateforme — et noter le code de retour de chacune.
+  //
+  // CE QUE LA RÈGLE JUGE, ÉTROITEMENT. Une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage (`decision`, `depense` et `irreversible` relèvent de l'humain, même
+  // quand le geste est une commande) porte une COMMANDE d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, un cmdlet des modules Az, Graph ou AzureAD), la MÊME commande —
+  // l'outil et ses mots jusqu'au premier argument ou drapeau — figure ailleurs dans le texte (hors du bloc 8, ou dans une action `auto_ia`), et aucune ligne qui la porte, ni l'action elle-même,
+  // ne montre un CODE de retour d'échec (HTTP 4xx/5xx, `exit 1`, `Unauthorized`, `Forbidden`, `Authorization_…`, `permission denied`). AVERTISSANTE, et pas bloquante : la même commande peut être
+  // citée pour une autre raison qu'un essai (un mode d'emploi donné à l'humain pour un geste qu'il doit faire), et une règle qui bloque sur une citation apprend à la déguiser.
+  // NON JUGÉ : un geste donné en prose sans commande (« désigne l'administrateur ») ; une commande locale (git, node, npm) ou d'une action écrite pour « l'autre poste » ; une commande lancée dans le tour et jamais citée (seule la transcription la voit) ; que le code cité soit vrai ;
+  // une action qui demande une approbation groupée avant l'exécution (hook gestes-distants) : c'est la bonne forme, et elle porte un motif `decision`.
+  {
+    // Seuls les outils qui agissent sur une PLATEFORME DISTANTE sous une identité comptent : az, gh, aws, gcloud, kubectl, terraform et les cmdlets des modules Az, Graph et AzureAD. Les commandes
+    // locales (git, node, npm, python) sont écartées : « git pull » est le plus souvent demandé pour un AUTRE poste que la session n'atteint pas. Mesure d'entrée du 09/11/2026 sur les 394
+    // synthèses d'`output\04-plans\` : le premier jet, qui lisait aussi git, node et npm, accusait 12 fichiers, tous des commandes à jouer sur un autre poste.
+    const CLI_DISTANT = new Set(["az", "gh", "aws", "gcloud", "kubectl", "terraform"]);
+    const CMDLET = /^(?:Invoke|Set|New|Get|Remove|Add|Grant|Update)-(?:Az|Mg|Ad)[A-Za-z]*$/;
+    const AUTRE_POSTE = /\bautres?\s+(?:poste|machine|ordinateur)s?\b|\bsur\s+(?:son|votre|le)\s+poste\b/i;
+    const signature = (brut) => {
+      const t = String(brut).trim().replace(/^(?:\$|PS>|>)\s+/, "").split(/\s+/);
+      const tete = (t[0] || "").toLowerCase().replace(/\.(?:exe|cmd)$/, "");
+      if (CMDLET.test(t[0] || "")) return tete;
+      if (!CLI_DISTANT.has(tete)) return null;
+      const mots = [];
+      for (const x of t.slice(1)) {
+        if (!/^[a-z][a-z0-9_-]*$/i.test(x) || mots.length >= 4) break;
+        mots.push(x.toLowerCase());
+      }
+      return mots.length ? [tete, ...mots].join(" ") : null;
+    };
+    // Les commandes d'un texte : les lignes d'un bloc de code clôturé, puis les fragments entre accents graves hors bloc.
+    const commandesDe = (s) => {
+      const sortie = [];
+      let dans = false;
+      for (const ligne of String(s).split("\n")) {
+        if (/^\s*```/.test(ligne)) { dans = !dans; continue; }
+        if (dans) { const c = signature(ligne); if (c) sortie.push(c); continue; }
+        for (const m of ligne.matchAll(/`([^`\n]+)`/g)) { const c = signature(m[1]); if (c) sortie.push(c); }
+      }
+      return [...new Set(sortie)];
+    };
+    const TRACE_ECHEC = /(HTTP\s*[45]\d{2}|\b[45]\d{2}\s+(?:Forbidden|Unauthorized|Denied|Conflict)\b|\bE[A-Z]{4,}\b|Authorization_\w+|exit\s*[1-9]\d*|permission denied|access denied|\bUnauthorized\b|\bForbidden\b)/;
+    const ARBITRAGE = /\b(decision|depense|irreversible)\b/;
+    const sansBloc8 = bActions ? texte.replace(bActions, "\n") : texte;
+    const ailleurs = [sansBloc8, ...groupes8.filter((g) => !HUMAINS.test(g))].join("\n");
+    const cmdAilleurs = new Set(commandesDe(ailleurs));
+    const lignesTexte = String(texte).split("\n");
+    const fautifs115 = [];
+    let jugees115 = 0;
+    for (const g of groupes8.filter((x) => HUMAINS.test(x) && !ARBITRAGE.test(zoneMotif(x)) && !AUTRE_POSTE.test(x))) {
+      for (const sig of commandesDe(g)) {
+        jugees115++;
+        if (!cmdAilleurs.has(sig)) continue;
+        const re = new RegExp(sig.split(" ").map((x) => x.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")).join("\\s+"), "i");
+        if (TRACE_ECHEC.test(g) || lignesTexte.some((l) => re.test(l.replace(/\\/g, "/")) && TRACE_ECHEC.test(l))) continue;
+        fautifs115.push({ sig, g });
+      }
+    }
+    if (!jugees115) ok("S115", "aucune action manuelle (hors arbitrage) ne porte de commande d'un outil que la session joue — rien à comparer à la loi n° 5");
+    else if (!fautifs115.length) ok("S115", `${jugees115} commande(s) d'action manuelle, aucune ne figure ailleurs dans le texte sans code de retour d'échec`);
+    else ko("S115", `${fautifs115.length} commande(s) d'action manuelle figurent AUSSI ailleurs dans le texte, donc la session les joue, sans le code de retour d'un essai : `
+      + fautifs115.slice(0, 3).map((f) => `\`${f.sig}\``).join(", ") + `${fautifs115.length > 3 ? ` (+${fautifs115.length - 3})` : ""}. `
+      + "La loi n° 5 veut les quatre voies essayées avant de laisser un geste à l'humain, chacune avec son code de retour : l'identité de la session, les identités de service qui ont le droit, l'automatisation du dépôt, l'API de la plateforme. "
+      + "Joue la commande et cite son code de retour (HTTP 403, exit 1…) dans l'action, ou fais-en une action `auto_ia` ; si le geste détruit ou attribue un droit à distance, pose l'approbation groupée en décision et exécute ensuite. "
+      + "Le 09/11/2026, des gestes manuels (écrire à un tiers, passer par le portail) ont été proposés pour un accès que la session pouvait désigner elle-même, et ne l'ont été qu'après la demande de l'utilisateur (TF-2304). "
+      + `Ex. : ${fautifs115[0].g.replace(/\s+/g, " ").trim().slice(0, 110)}`);
+  }
 
   // ---- S22 (TF-0546, 24/08) — un NÉGATIF sur une ressource externe ne se prononce pas d'une
   // seule sonde ----------------------------------------------------------------------------------
@@ -2914,10 +3264,47 @@ function juger(texte, cheminJuge = null) {
         ko("S48", `« reste au produit » renvoie la remontée à la clôture d'un run, or aucun run n'est ouvert au ledger du produit (${run.existe ? "forge\\ledger.jsonl sans run_open en cours" : "forge\\ledger.jsonl absent"}) : `
           + "le lot n'est compilé qu'à la clôture d'un run, la remontée n'a donc aucun lot où se joindre. Hors run, le tour remet son lot : « Remontée à la factory : lot « <produit> - RETOURS - AAAAMMJJ<indice> » remis ». "
           + `Le 26/10/2026, une correction a été renvoyée au lot de clôture d'un run qui n'existait pas, et S48 a accepté la ligne (TF-1982) — ${ligne.trim().slice(0, 100)}`);
+      } else if (RESTE_AU_PRODUIT.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne) && retourNommeNonEcrit(motifDeResteAuProduit(ligne), retoursDuLedger(dossierProduit)).refus) {
+        // TF-2137 (RT-42) — le motif nomme un retour que le ledger du produit ne porte pas : promis au futur, ou cité sans entrée correspondante.
+        const verdictMotif = retourNommeNonEcrit(motifDeResteAuProduit(ligne), retoursDuLedger(dossierProduit));
+        ko("S48", `« reste au produit » nomme un retour qui n'est pas écrit au ledger du produit : ${verdictMotif.raison}. Un motif se lit comme un fait : le retour est déjà une entrée \`type: retour\` de \`forge\\ledger.jsonl\` (`
+          + "`python forge/ledger.py retour --resume \"…\"`), ou la ligne nomme le lot remis. "
+          + `Le 04/11/2026, « reste au produit, parce que le retour sera consigné avec A-2 » a été jugé affichable, le retour n'a été écrit nulle part et le porteur a dû réclamer la remontée (TF-2137, RT-42) — ${ligne.trim().slice(0, 100)}`);
       } else
         ok("S48", /rien (?:à|a) remonter/i.test(ligne) ? "le tour déclare n'avoir rien à remonter à la factory, et ne corrige aucune erreur de la session"
           : RESTE_AU_PRODUIT.test(ligne) && !/RETOURS - \d{8}[a-z]+/.test(ligne) ? "le tour garde son retour au produit et dit pourquoi"
           : "le tour nomme le lot de retours remis à la factory");
+    }
+  }
+
+  // ---- S135 (12/11/2026, TF-2429, gabarit 2.67.0) — UN « LOT DE CLÔTURE » SUPPOSE UN RUN QUI SE CLORA -----------------------------------------------------
+  //
+  // LE FAIT. Le 26/10/2026 (un produit sans run ouvert) puis le 09/11/2026 (un autre, dont le ledger comptait 2 `run_open` pour 0 `run_close` : un run ouvert qui ne se clôt pas, cas que
+  // D-191 (a) traite en faisant partir le lot dans le tour), des restitutions écrivaient « partent avec le lot de clôture du run » pour des retours que le ledger gardait seuls. S48 (TF-1982) refuse
+  // déjà « reste au produit » sans run ouvert. Restait la promesse d'un « lot de clôture » écrite ailleurs que sur la ligne de remontée, que S48 ne lit pas, sans run ouvert (TF-2329, TF-2429).
+  // Un lot de clôture se compile à la clôture d'un run : sans run ouvert, aucune clôture ne viendra.
+  //
+  // LA RÈGLE. Chez un produit, une phrase qui parle d'un « lot de clôture » alors que `forge/ledger.jsonl` ne porte aucun run ouvert (même lecture que S48 : `runOuvert`) est
+  // signalée. AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook), à la demande de la décision du 12/11/2026 (« faire avertir »).
+  // MESURE D'ENTRÉE (12/11/2026, 167 sessions de 26 produits du poste, 7 047 messages d'assistant) : 59 messages disent « lot de clôture », 4 le disent sans run ouvert au ledger, tous
+  // chez un même produit, tous avant le 29/10 (date de S48 TF-1982), tous sur la ligne « reste au produit, parce que » que S48 refuse désormais ; 0 hors de cette ligne. Le besoin
+  // résiduel mesuré est donc nul à ce jour : la règle couvre la forme qui n'est pas encore arrivée, au prix d'un avertissement.
+  // CE QUI N'EST PAS LU, dit plutôt que promis : la ligne « Remontée à la factory » (S48 la juge) ; ce qui est entre « », entre accents graves ou en bloc de code (une citation de la
+  // règle n'est pas une promesse) ; une phrase qui nie la promesse (« pas », « plus », « jamais », « au lieu de », « sans » avant l'expression) ; un « lot de fin de run » ou
+  // « à la clôture du run » sans le mot « lot de clôture » ; l'état du ledger à l'instant de l'écriture (c'est celui d'aujourd'hui qui est lu).
+  {
+    const produit135 = produitDuJuge(cheminJuge);
+    if (!produit135)
+      findings.push({ regle: "S135", statut: "SANS_OBJET", message: "hors d'un produit (aucun forge/retours/ en remontant depuis le fichier jugé ou --racine) : le pilot et les forges n'ont pas de run au ledger auquel rattacher un lot de clôture" });
+    else {
+      const annonces135 = annoncesLotDeCloture(texte);
+      const run135 = runOuvert(produit135);
+      if (!annonces135.length) ok("S135", "aucune phrase ne promet un « lot de clôture » en dehors de la ligne de remontée");
+      else if (run135.ouvert) ok("S135", `${annonces135.length} phrase(s) parlent d'un « lot de clôture », et un run est ouvert au ledger du produit : la clôture viendra`);
+      else ko("S135", `${annonces135.length} phrase(s) renvoient à un « lot de clôture » (${annonces135.slice(0, 2).map((a) => `« ${a} »`).join(" ; ")}) alors qu'aucun run n'est ouvert au ledger du produit `
+        + `(${run135.existe ? "forge\\ledger.jsonl sans run_open en cours" : "forge\\ledger.jsonl absent"}) : un lot de clôture se compile à la clôture d'un run, et sans run ouvert aucune clôture ne viendra. `
+        + "Hors run, le tour remet son lot lui-même : compile `forge/retours/<projet> - RETOURS - AAAAMMJJx.md`, joue `node forge/retours/oracle-lot.mjs \"<lot>.md\" --remettre`, et nomme-le à la ligne « Remontée à la factory » "
+        + "(D-191 (a), TF-2429)");
     }
   }
 
@@ -3159,6 +3546,54 @@ function juger(texte, cheminJuge = null) {
           + "Le 20/10/2026, les mêmes décisions écrites ainsi ont été jugées « bien meilleures » par l'humain qui avait dû demander une réexplication de la première version (TF-1979). "
           + `Ex. : ${fautes88[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
       else ok("S88", `${vues88} décision(s) dont « De quoi s'agit-il » ne s'ouvre pas par un nom interne sans glose et ne range pas quatre identifiants sur une ligne`);
+    }
+
+    // ---- S104 (06/11/2026, TF-2273, gabarit 2.64.0) — « POURQUOI VOUS » NOMME UN MOTIF DE R-58, OU LA DÉCISION NE SE POSE PAS.
+    //
+    // LE FAIT : une décision (D-480) a été posée au porteur pour des tests de bout en bout et une dérive d'infrastructure locale qu'il avait demandés d'office, « sans GO » ; aucun
+    // motif de R-58 ne lui revenait. Le travail fait d'office a trouvé un défaut réel (un job en erreur 500) ; la décision a coûté un aller-retour au porteur (retour RP-46 de Produit-86).
+    // R-58 (REGLES-PROJET.md §AM) : une décision n'est posée que si elle porte `depense`, `publication`, `irreversible`, `doctrine`, `arbitrage` ou `produit` ; sinon la session
+    // exécute l'option recommandée et la rend pour information (blocs 4 et 8). Le format B demande « Pourquoi vous » à chaque décision : S104 lit cette ligne et cherche l'un des six motifs
+    // dans un lexique fermé (`MOTIFS_R58`). AVERTISSANTE à son entrée. Mesure (06/11/2026, 65 synthèses d'`output\04-plans\`) : 139 lignes sur 151 nomment un motif ; les 12 autres reposent
+    // presque toutes sur une consigne que le porteur avait déjà donnée (« l'ordre des transformations que vous avez arrêté »), ce que R-58 point 5 traite en exécutant la consigne.
+    // NON JUGÉ : la sincérité du motif (un mot du lexique dans une phrase qui ne le porte pas), et la lecture de la demande de l'humain (« d'office », « sans GO »), que cet oracle ne reçoit pas.
+    {
+      const enCitation104 = groupesLignes.filter((g) => /^\s*>\s*\*\*\s*D-\d{1,3}\b/.test(g[0]));
+      const motifDe = (g) => { const l = g.find((x) => /pourquoi vous/i.test(x)); return l === undefined ? null : l.replace(/^.*?pourquoi vous\s*\**\s*:?\s*\**\s*/i, "").replace(/\s+/g, " ").trim(); };
+      const vues104 = enCitation104.map((g) => ({ g, motif: motifDe(g) })).filter((x) => x.motif !== null);
+      const sans104 = vues104.filter((x) => !motifsR58De(x.motif).length);
+      if (!vues104.length) findings.push({ regle: "S104", statut: "SANS_OBJET", message: "aucune décision en bloc de citation portant « Pourquoi vous » — motif R-58 non jugé" });
+      else if (sans104.length)
+        ko("S104", `${sans104.length} décision(s) sur ${vues104.length} dont « Pourquoi vous » ne relève d'aucun motif de R-58 (dépense, publication, irréversible, doctrine, arbitrage, produit) : « ${sans104[0].motif.slice(0, 120)} ». `
+          + "Une décision n'est posée que si elle porte l'un de ces six motifs ; sinon la session exécute l'option recommandée dans le tour et la rend pour information (bloc 4, ou bloc 8 en auto_ia), surtout quand la demande du porteur "
+          + "prolongeait ce travail (« d'office », « sans GO ») ; une consigne du porteur est déjà une décision (R-58 point 5). Le 06/11/2026, D-480 posée pour des tests et un redéploiement local demandés d'office n'avait aucun motif humain (TF-2273). "
+          + `Ex. : ${sans104[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+      else ok("S104", `${vues104.length} décision(s) dont « Pourquoi vous » nomme un motif de R-58 (${[...new Set(vues104.flatMap((x) => motifsR58De(x.motif)))].join(", ")})`);
+    }
+
+    // ---- S125 (10/11/2026, TF-2332, gabarit 2.66.0) — DES DÉFAUTS SANS ARBITRAGE SE CORRIGENT DANS LE TOUR, ILS NE SE POSENT PAS EN DÉCISION.
+    //
+    // LE FAIT : le 09/11/2026, une revue a posé la décision D-179 (« corriger tout, une partie, ou rien ») au lieu de corriger d'abord les défauts qui n'appelaient aucun arbitrage :
+    // des solutions laissées dans un kit, des durées qui divergeaient, un pied de page. Un aller-retour avec l'humain, et la quatrième récidive de la classe fondée par TF-2273 (S104
+    // regarde le motif, pas l'objet). Le numéro est le suivant libre plus 10, comme S103 et S115.
+    // CE QUE LA RÈGLE LIT : une décision en bloc de citation dont le texte parle de corriger des défauts (défaut, anomalie, coquille, erreur, incohérence, divergence) ET offre le trio
+    // « tout / une partie / rien » ou « tous / certains / aucun ». Ces options ne laissent rien à l'humain que la session ne puisse faire : corriger est un geste d'agent (loi n° 5),
+    // et un défaut sans arbitrage se corrige, puis se rend au bloc 4. Une option humaine s'écrit autrement : un choix entre deux corrections incompatibles, une dépense, une publication,
+    // une exception à la doctrine. Mesure d'entrée (10/11/2026) : 594 décisions en bloc de citation dans les 433 fichiers d'`output\04-plans\`, 0 accusée.
+    // NON JUGÉ : un trio d'options écrit avec d'autres mots, et la nature réelle des défauts (qu'ils soient sans arbitrage) ; la règle lit la forme du trio, pas le fond de la revue.
+    {
+      const CORRIGE125 = /\b(?:corrig|r[ée]par|trait)\w*/i;
+      const DEFAUTS125 = /\bd[ée]fauts?\b|\banomalies?\b|\bcoquilles?\b|\berreurs?\b|\bincoh[ée]rences?\b|\bdivergences?\b/i;
+      const TRIO125 = /\b(?:tout|tous|l['’]ensemble)\b[\s\S]{0,160}\b(?:une partie|partiellement|certains|seulement)\b[\s\S]{0,160}\b(?:rien|aucun)\b/i;
+      const enCitation125 = groupesLignes.filter((g) => /^\s*>\s*\*\*\s*D-\d{1,3}\b/.test(g[0]));
+      const fautes125 = enCitation125.filter((g) => { const x = g.join("\n"); return CORRIGE125.test(x) && DEFAUTS125.test(x) && TRIO125.test(x); });
+      if (!enCitation125.length) findings.push({ regle: "S125", statut: "SANS_OBJET", message: "aucune décision en bloc de citation — correction de défauts posée en décision non jugée" });
+      else if (fautes125.length)
+        ko("S125", `${fautes125.length} décision(s) sur ${enCitation125.length} proposent à l'humain de corriger des défauts « tout, une partie ou rien » — corriger est un geste d'agent (loi n° 5) : `
+          + "les défauts sans arbitrage se corrigent dans le tour et se rendent au bloc 4, et ne reste en décision que ce qui relève de l'humain (dépense, publication, irréversible, doctrine, arbitrage entre deux corrections incompatibles, produit). "
+          + "Le 09/11/2026, la décision D-179 posée ainsi a coûté un aller-retour pour des défauts évidents (TF-2332). "
+          + `Ex. : ${fautes125[0][0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+      else ok("S125", `${enCitation125.length} décision(s) dont aucune ne propose de corriger des défauts « tout, une partie ou rien »`);
     }
 
     // ---- S49 (17/09/2026, TF-1172) — UNE OPTION QUI COMMANDE UN GESTE HUMAIN DIT COMMENT LE FAIRE
@@ -3496,6 +3931,27 @@ function juger(texte, cheminJuge = null) {
           + "et « Résultat attendu : … » en dernière sous-puce (E-11, retour humain du 17/10/2026 : « il devait y avoir des puces et sous-puces affichées »).")
         : ok("S81", `${etapesDeGuide(texte).length} étape(s) de guide, aucune n'enchaîne trois gestes dans un paragraphe`);
     }
+  }
+
+  // ---- S103 (06/11/2026, TF-2190, RT-49 de Produit-84) — UN GUIDE NE FAIT PAS ÉCRIRE L'HUMAIN DANS UN FICHIER D'ENVIRONNEMENT ------
+  //
+  // LE FAIT. Le 05/11/2026, un guide disait « ajoutez la ligne CLOUDFLARE_BILLING_TOKEN=<le secret> » et « remplacez la valeur de
+  // SUPABASE_ACCESS_TOKEN », alors que `forge\ranger-secret.mjs` (D-167 (a), TF-2127) range un secret reçu en session dans le fichier
+  // d'environnement du produit et consigne son empreinte au ledger. Retour du porteur : « Pourquoi les lignes dans le .env ne sont pas
+  // créées automatiquement, comme demandé par la Factory. Corrige. » Le hook de restitution avait rendu le guide affichable.
+  // Le juge vit dans `lib-enumeration-liste.mjs` (`etapesQuiEcriventDansUnEnv`) : une étape ou une sous-puce de la section « Guide » avec
+  // un verbe d'écriture à l'impératif et un fichier d'environnement (ou une ligne `NOM=`). Une étape qui nomme `ranger-secret` est le remède.
+  // NON JUGÉ : un geste hors de la section « Guide » (action du bloc 8, prose), une variable posée dans la console d'un hébergeur.
+  {
+    const ecrivent103 = etapesQuiEcriventDansUnEnv(texte);
+    if (!etapesDeGuide(texte).length) ok("S103", "aucune étape de guide — rien dont juger le fichier d'environnement");
+    else if (!ecrivent103.length) ok("S103", `${etapesDeGuide(texte).length} étape(s) de guide, aucune ne fait écrire l'humain dans un fichier d'environnement`);
+    else ko("S103", `${ecrivent103.length} étape(s) ou sous-puce(s) du guide font écrire l'humain dans un fichier d'environnement : `
+      + ecrivent103.slice(0, 2).map((e) => `l.${e.ligne} « ${e.extrait.slice(0, 80)} »`).join(" · ")
+      + ". Le geste existe : le porteur donne le secret dans la conversation et la session le range avec `<valeur> | node forge/ranger-secret.mjs NOM` "
+      + "(D-167 (a), TF-2127), qui l'écrit dans le fichier d'environnement ignoré par git et consigne au ledger son nom et son empreinte, jamais sa valeur. "
+      + "Remplace l'étape par : « Donnez le secret NOM dans la conversation », et dis que la session le range. Le 05/11/2026, un guide disait « ajoutez la ligne "
+      + "NOM=<le secret> » ; retour du porteur : « Pourquoi les lignes dans le .env ne sont pas créées automatiquement, comme demandé par la Factory. Corrige. »");
   }
 
   // ---- S54 (01/10/2026, TF-1494) — UN PARAGRAPHE DE PROSE S'ÉCRIT SUR UNE SEULE LIGNE SOURCE ------
@@ -4080,17 +4536,40 @@ function juger(texte, cheminJuge = null) {
       vusPortee++;
       if (!ESSAI_PORTEE.test(p)) fautesPortee.push(p);
     }
-    if (!vus && !vusPortee) ok("S68", "aucune information déclarée non mesurable, illisible ou introuvable sur une image ou un site, ni ressource de plateforme déclarée absente sur un 200 au corps vide — rien à juger");
-    else if (fautes.length || fautesPortee.length) ko("S68", (fautes.length ? `${fautes.length} absence(s) déclarée(s) sur ${vus} sans l'essai du moyen disponible — une source en image se lit `
-      + "avec l'outil de lecture d'image (recadrage au besoin) avant d'être dite « non mesurable » ; un site se parcourt par son `sitemap.xml`, nombre "
-      + "de pages relues cité, avant d'être dit « introuvable » : le 25/09/2026, 4 images lues donnaient le jour de collecte déclaré non mesurable la "
-      + `veille (TF-1580). Ex. : ${fautes[0].replace(/\s+/g, " ").trim().slice(0, 110)}` : "")
-      + (fautes.length && fautesPortee.length ? " · " : "")
-      + (fautesPortee.length ? `${fautesPortee.length} ressource(s) de plateforme déclarée(s) absente(s) sur un 200 au corps vide (sur ${vusPortee}) sans 404, sans liste de niveau organisation `
-      + "ni essai dans chaque projet : l'API d'une plateforme est bornée par projet, un 200 au corps vide dit « pas dans ce projet » et non « supprimée » — le 26/10/2026, "
-      + "une connexion de service lue vide dans un projet était vivante dans le projet voisin, et son remplacement aurait coupé 2 pipelines (TF-1985). "
-      + `Ex. : ${fautesPortee[0].replace(/\s+/g, " ").trim().slice(0, 110)}` : ""));
-    else ok("S68", `${vus + vusPortee} absence(s) déclarée(s), chacune avec l'essai du moyen disponible (image lue, sitemap, ou ressource essayée dans chaque portée)`);
+    // TF-2302 (09/11/2026, décision R-58) — UNE ABSENCE DE DROIT NE SE CONCLUT PAS D'UN RELEVÉ D'ATTRIBUTIONS DIRECTES. Le 09/11/2026, une session a relevé les droits Azure d'un utilisateur par
+    // `az role assignment list --all --assignee …` sans `--include-groups`, n'a vu que les attributions directes, a conclu à une absence de droit sur l'abonnement, puis a orienté l'utilisateur
+    // vers un tiers qui détenait exactement les mêmes droits (un Contributor hérité d'un groupe). Même forme que le 200 au corps vide : la lecture est bornée (ici, à la portée « direct »),
+    // et son silence dit « pas dans cette portée », pas « absent ». Le paragraphe qui conclut à une absence de droit, de rôle ou d'attribution depuis ce relevé cite la lecture de
+    // l'héritage de groupe : `--include-groups`, les droits effectifs, l'appartenance aux groupes. NON JUGÉ : un relevé fait par un autre outil que `az role assignment list`, sauf s'il
+    // se dit lui-même « direct » ; que l'essai cité ait eu lieu.
+    const RELEVE_DROITS = /\baz\s+role\s+assignment\s+list\b/i;
+    const LECTURE_DIRECTE = uni(/\b(?:attributions?|droits?|r[ôo]les?)\s+directe?s?\b|\bdirectement\s+(?:attribu|assign)\w*/i);
+    const ABSENCE_DE_DROIT = uni(/\b(?:n['’]a\s+(?:aucune?|pas\s+de|pas)\s+(?:droits?|r[ôo]les?|attributions?|acc[èe]s|permissions?)|aucune?\s+(?:droits?|r[ôo]les?|attributions?|acc[èe]s|permissions?)|pas\s+de\s+(?:droits?|r[ôo]les?|attributions?|permissions?)|sans\s+(?:droits?|r[ôo]les?|acc[èe]s|permissions?)|ne\s+(?:d[ée]tient|poss[èe]de|dispose|porte)\s+(?:aucune?|pas)|absence\s+de\s+(?:droits?|r[ôo]les?|attributions?|permissions?))\b/i);
+    const HERITAGE_LU = uni(/--include-groups|effectivePermissions|permissions?\s+effectives?|droits?\s+effectifs?|Microsoft\.Authorization\/permissions|get-member-groups|transitiveMemberOf|\bmemberOf\b|h[ée]ritage\s+de\s+groupes?|(?:par|via)\s+(?:un|le|les|des)\s+groupes?|appartenance\s+aux?\s+groupes?/i);
+    const paragraphesDroits = texte.replace(/\r\n?/g, "\n").replace(/```/g, "").split(/\n\s*\n/).map((p) => p.replace(/«[^»]*»/g, " "));
+    const fautesDroits = [];
+    let vusDroits = 0;
+    for (const p of paragraphesDroits) {
+      if (!(RELEVE_DROITS.test(p) || LECTURE_DIRECTE.test(p)) || !ABSENCE_DE_DROIT.test(p)) continue;
+      vusDroits++;
+      if (!HERITAGE_LU.test(p)) fautesDroits.push(p);
+    }
+    if (!vus && !vusPortee && !vusDroits) ok("S68", "aucune information déclarée non mesurable, illisible ou introuvable sur une image ou un site, ni ressource de plateforme déclarée absente sur un 200 au corps vide, ni absence de droit conclue d'un relevé — rien à juger");
+    else if (fautes.length || fautesPortee.length || fautesDroits.length) ko("S68", [
+      fautes.length ? `${fautes.length} absence(s) déclarée(s) sur ${vus} sans l'essai du moyen disponible — une source en image se lit `
+        + "avec l'outil de lecture d'image (recadrage au besoin) avant d'être dite « non mesurable » ; un site se parcourt par son `sitemap.xml`, nombre "
+        + "de pages relues cité, avant d'être dit « introuvable » : le 25/09/2026, 4 images lues donnaient le jour de collecte déclaré non mesurable la "
+        + `veille (TF-1580). Ex. : ${fautes[0].replace(/\s+/g, " ").trim().slice(0, 110)}` : "",
+      fautesPortee.length ? `${fautesPortee.length} ressource(s) de plateforme déclarée(s) absente(s) sur un 200 au corps vide (sur ${vusPortee}) sans 404, sans liste de niveau organisation `
+        + "ni essai dans chaque projet : l'API d'une plateforme est bornée par projet, un 200 au corps vide dit « pas dans ce projet » et non « supprimée » — le 26/10/2026, "
+        + "une connexion de service lue vide dans un projet était vivante dans le projet voisin, et son remplacement aurait coupé 2 pipelines (TF-1985). "
+        + `Ex. : ${fautesPortee[0].replace(/\s+/g, " ").trim().slice(0, 110)}` : "",
+      fautesDroits.length ? `${fautesDroits.length} absence(s) de droit conclue(s) sur ${vusDroits} d'un relevé d'attributions DIRECTES, sans la lecture de l'héritage de groupe — `
+        + "`az role assignment list` sans `--include-groups` ne voit que les attributions posées sur l'utilisateur lui-même, et un droit hérité d'un groupe n'y figure pas : lire `--include-groups` (ou les droits effectifs, ou l'appartenance aux groupes) AVANT d'écrire qu'un droit manque, "
+        + "et ne router vers un tiers qu'après preuve que ni la session ni l'utilisateur ne peut faire le geste (loi n° 5). Le 09/11/2026, une session a conclu à l'absence de droit sur un abonnement et orienté l'utilisateur vers un tiers qui détenait exactement les mêmes droits, un Contributor hérité d'un groupe (TF-2302). "
+        + `Ex. : ${fautesDroits[0].replace(/\s+/g, " ").trim().slice(0, 110)}` : "",
+    ].filter(Boolean).join(" · "));
+    else ok("S68", `${vus + vusPortee + vusDroits} absence(s) déclarée(s), chacune avec l'essai du moyen disponible (image lue, sitemap, ressource essayée dans chaque portée, ou héritage de groupe lu pour un droit)`);
   }
 
   // S89 (TF-1984, 29/10/2026, gabarit 2.54.0) — UN ÉCART ENTRE DEUX RÉFÉRENCES GIT SE LIT AVEC SON STATUT DE FICHIER, JAMAIS EN « ABSENT DE ».
@@ -4272,7 +4751,7 @@ function juger(texte, cheminJuge = null) {
     if (!declarations.length) return { etat: "sans-declaration", produit };
     const { carte, erreur } = lireCarte();
     if (erreur) return { etat: "carte-illisible", produit, erreur };
-    const trace = derniereDemande(produit);
+    const trace = derniereDemande(produit, SESSION_JUGEE);
     if (!trace.derniere) return { etat: "sans-trace", produit, trace, declarations };
     return { etat: "juge", produit, trace, declarations, ...etatDesLivrables(produit, carte, trace.derniere) };
   })();
@@ -4304,17 +4783,21 @@ function juger(texte, cheminJuge = null) {
     else if (verrou.etat === "carte-illisible") for (const r of ["S85", "S86"]) so(r, `${verrou.erreur} — les livrables exigés ne se déduisent pas ; node scripts/verifier-carte-forges.mjs au pilot`);
     else if (verrou.etat === "sans-trace") {
       so("S85", "sans trace de mobilisation, les livrables exigés ne se déduisent pas — S86 le dit");
-      ko("S86", `une livraison ou une clôture est déclarée chez un produit sans trace de mobilisation (${verrou.trace.existe ? `${verrou.trace.chemin} sans ligne lisible` : `${verrou.trace.chemin} absent`}) : `
+      ko("S86", `une livraison ou une clôture est déclarée chez un produit sans trace de mobilisation (${!verrou.trace.existe ? `${verrou.trace.chemin} absent`
+        : verrou.trace.autres_sessions ? `${verrou.trace.chemin} ne porte aucune ligne de cette session (${verrou.trace.session}) : ${verrou.trace.autres_sessions} ligne(s) d'autres sessions, qui ne valent pas la sienne (TF-2045)`
+        : `${verrou.trace.chemin} sans ligne lisible`}) : `
         + "à chaque demande, chacune des 13 forges reçoit « mobilisee » ou « ecartee » avec son motif, et « livré » se juge contre ces verdicts (T4, TF-1949). "
         + `Écris la trace de la demande : ${REMEDE_TRACE}. Ex. : ${verrou.declarations[0].replace(/\s+/g, " ").slice(0, 110)}`);
     } else {
       const d = verrou.trace.derniere;
-      ok("S86", `trace de mobilisation présente : dernière demande du ${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}`);
+      // TF-2045 : la ligne jugée est celle de la session qui restitue ; un repli (ligne d'avant l'identifiant, session inconnue) se dit ici.
+      const repliDit = verrou.trace.repli ? ` — REPLI DÉCLARÉ : ${REPLI_DIT[verrou.trace.repli]}` : "";
+      ok("S86", `trace de mobilisation présente : dernière demande de la session${verrou.trace.session ? ` ${String(verrou.trace.session).slice(0, 8)}` : ""} du ${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}${repliDit}`);
       verrou.manquants.length
-        ? ko("S85", `${verrou.manquants.length} livrable(s) exigé(s) absent(s) chez le produit pour les forges mobilisées de la dernière demande (${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}) : `
+        ? ko("S85", `${verrou.manquants.length} livrable(s) exigé(s) absent(s) chez le produit pour les forges mobilisées de la dernière demande de cette session (${d.ts || "?"}, type ${d.type || (d.types || []).join("+")}${repliDit}) : `
           + verrou.manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})`).join(" ; ")
           + " — « livré » attend les livrables de chaque forge mobilisée (T4, TF-1949 ; 2 produits sur 10 clos ou publiés les portaient). Produis-les ; une forge qui n'a pas servi "
-          + "s'écarte avec son motif dans une nouvelle ligne de trace (node <PILOT_ROOT>/scripts/mobiliser.mjs --verifier liste ce qui manque).")
+          + "s'écarte avec son motif dans une nouvelle ligne de trace, et un livrable que la demande ne touche pas se déclare inchangé avec son motif (`livrables_inchanges` de la forge, TF-2221) (node <PILOT_ROOT>/scripts/mobiliser.mjs --verifier liste ce qui manque).")
         : ok("S85", `${verrou.etats.length} livrable(s) exigé(s) présent(s) pour ${new Set(verrou.etats.map((e) => e.forge)).size} forge(s) mobilisée(s) à livrable, dernière demande du ${d.ts || "?"}`);
     }
   }
@@ -4358,7 +4841,7 @@ function juger(texte, cheminJuge = null) {
   // le test rouge sur le code précédent, la taille du tirage, la règle d'arrêt (étapes 4, 6 et 8 de la
   // méthode, R-63).
   {
-    const GAIN_ECHANTILLON = uni(/\b(gagne|gain|am[ée]lior\w*|progress\w*|monte|passe de)\b[^.\n]{0,80}\b[ée]chantillon\b|\b[ée]chantillon\b[^.\n]{0,80}\b(gagne|gain|am[ée]lior\w*|progress\w*|\+\s?\d+(?:[,.]\d+)?\s*points?|passe de)\b/i);
+    const GAIN_ECHANTILLON = uni(/\b(gagne|gain|am[ée]lior\w*|progress\w*|monte|passe de)\b[^.\n]{0,80}\b[ée]chantillon\b|\b[ée]chantillon\b[^.\n]{0,80}\b(gagne|gain|am[ée]lior\w*|progress\w*|\+\s?\d+(?:[,.]\d+)?\s*points?|passe de)\b/i);   // piege-ok : uni() réécrit chaque \b en frontière Unicode (TF-0805), la classe [ée] touche une vraie frontière (TF-2496)
     const POPULATION = uni(/\b(changements?|modifications?|retypages?|d[ée]placements?)\b[^.\n]{0,60}\b(?:dans|sur) (?:toute )?la population\b|\btirage des changements\b|\bchangements? (?:non contr[ôo]l[ée]s|relus)\b/i);
     const EXISTANT = uni(/\b(appliqu[ée]e?s? (?:aux|[àa] l['’]|sur les) (?:lignes?|fichiers?|[ée]l[ée]ments?)? ?(?:d[ée]j[àa] (?:trait|rang|class)\w*|existant)|effet sur l['’]existant|lignes? d[ée]j[àa] (?:trait|rang|class)[ée]e?s?)\b/i);
     const gains = phrasesDe(texte).filter((p) => GAIN_ECHANTILLON.test(p));
@@ -4596,6 +5079,14 @@ const verdictDe =(f) => (f.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS");
 const arg = process.argv[2];
 if (arg === "--self-test") {
   const dir = mkdtempSync(join(tmpdir(), "restitution-"));
+  // TF-2256 (06/11/2026) : `FORGE_CAS_SYNTHESE=93` (ou `S93`, `93,94,95`, `1427`) ne joue que les sections dont l'en-tête cite ce numéro de
+  // règle S ou de TF — voir `lib-filtre-cas.mjs`. Chaque section est un bloc `if (veut(…)) { … }` qui suit son commentaire ; une section
+  // dont d'autres blocs emploient une constante (jouerPe, constatDe, ro, ria…) se joue aussi quand l'une de ces utilisatrices est voulue :
+  // ses numéros portent ceux de ses utilisatrices, et ses constantes partagées sont déclarées `var` pour rester visibles hors du bloc.
+  // Seul le préambule (fixtures, vert/rouge de base) se joue toujours. Sans la variable, tout se joue, comme avant.
+  const filtre = creerFiltre("FORGE_CAS_SYNTHESE");
+  // Les cas S104 (TF-2273) vivent dans la section de S78, dont ils réutilisent la décision au format B : tout ce qui sert S78 sert S104 (ses définitions comprises).
+  const veut = (...ids) => filtre.veut(...(ids.includes(78) ? [...ids, 104, 2273] : ids));
   // TF-1494 (01/10/2026) : l'ouverture de la verte tient sur UNE ligne source, comme S54 l'exige ;
   // sa forme coupée d'origine, mot pour mot, est la fixture rouge de S54 (`OUVERTURE_COUPEE`).
   const verte = `# Restitution — campagne de test
@@ -5087,28 +5578,35 @@ Aucun écart : la demande a été suivie à la lettre.
   }
   // TF-0805 — la trace accentuée en fin de mot est LUE ; la fixture rouge (« acces » sans aucune
   // trace) garde son sens rouge sur S21, jouée plus haut.
+  if (veut(21, 805)) {
   if (!accentFinal.includes("accès tenté le 14/08")) casse.push("fixture accent-final : la substitution n'a pas eu lieu, le cas n'est pas joué");
   const raf = spawnSync(process.execPath, [moi, join(dir, "accent-final.md")], { encoding: "utf8" });
   if (!/"S21"[^}]*PASS/.test(raf.stdout))
     casse.push("S21 (TF-0805) : une trace écrite avec un mot accentué en fin de mot (« tenté », « refusé ») n'est pas lue — " +
       "la frontière ASCII fait rougir une action prouvée : " + (/"S21"[\s\S]{0,180}/.exec(raf.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // TF-0661 — S29 dans SES DEUX SENS.
-  const ro = spawnSync(process.execPath, [moi, join(dir, "risque-orphelin.md")], { encoding: "utf8" });
+  if (veut(29, 661, 103, 2190, 1338, 1428, 1449, 78, 93, 94, 95, 88, 1979, 23, 49, 80, 1847)) {
+  var ro = spawnSync(process.execPath, [moi, join(dir, "risque-orphelin.md")], { encoding: "utf8" });
   const rrep = spawnSync(process.execPath, [moi, join(dir, "risque-repris.md")], { encoding: "utf8" });
   if (!/"S29"[^}]*FAIL/.test(ro.stdout))
     casse.push("S29 : un risque declare NON COUVERT avec un bloc 8 vide passe pour conforme — declarer un risque n'est pas le traiter");
   if (!/"S29"[^}]*PASS/.test(rrep.stdout))
     casse.push("S29 : le MEME risque, la main passee au bloc 8, est accuse — la regle crie sur un travail juste");
+  }
   // 01/09 — S33 dans ses DEUX sens, et le durcissement de S30 dans le sien.
+  if (veut(33, 30)) {
   const rsd = spawnSync(process.execPath, [moi, join(dir, "selecteur-double.md")], { encoding: "utf8" });
   if (!/"S33"[^}]*FAIL/.test(rsd.stdout))
     casse.push("S33 : deux actions portant le MÊME sélecteur passent pour désignables — le doublon ne se voit pas");
   if (!/"S33"[^}]*PASS/.test(rv.stdout))
     casse.push("S33 : la verte, dont chaque action porte son sélecteur A-N, est accusée — la règle crie sur un travail juste : " +
       (/"S33"[sS]{0,180}/.exec(rv.stdout) || [""])[0].replace(/s+/g, " "));
+  }
   // S47 dans ses DEUX sens. Le vert est celui qui compte le plus : la fixture d'origine nomme la
   // forge de tests et cite un journal, donc la règle ne doit pas crier dessus — une règle qui
   // accuse un rappel juste se fait désactiver, et c'est la leçon N4.
+  if (veut(47)) {
   if (!/"S47"[^}]*PASS/.test(rv.stdout))
     casse.push("S47 : la verte, dont le rappel nomme la forge de tests et cite son journal, est accusée — " +
       (/"S47"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
@@ -5117,11 +5615,13 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S47 : un rappel fait ENTIÈREMENT de périphrases (« un des outils de la chaîne », « cette chose », " +
       "« cet objet ») passe encore — il fait 25 mots, donc S15 le laisse passer, et le lecteur ne sait pas de quoi " +
       "on parle. C'est le retour humain du 16/09/2026, mot pour mot : « on ne comprend absolument rien au charabia »");
+  }
   // 17/09 — S49 DANS SES TROIS SENS (TF-1172). Les deux fixtures ne diffèrent que par la ligne
   // « Comment faire » ; le troisième sens est porté par la verte d'origine, dont aucune option ne
   // commande de geste et que la règle doit laisser tranquille.
+  if (veut(49, 1172, 80, 1847)) {
   const rgs = spawnSync(process.execPath, [moi, join(dir, "geste-sans-comment.md")], { encoding: "utf8" });
-  const rga = spawnSync(process.execPath, [moi, join(dir, "geste-avec-comment.md")], { encoding: "utf8" });
+  var rga = spawnSync(process.execPath, [moi, join(dir, "geste-avec-comment.md")], { encoding: "utf8" });
   if (!/"S49"[^}]*FAIL/.test(rgs.stdout))
     casse.push("S49 : une option qui commande « se connecter … puis saisir le code » sans dire COMMENT le faire passe — " +
       "c'est exactement la décision du 16/09/2026 dont le mode opératoire vivait soixante lignes plus bas, et qui a dû " +
@@ -5132,11 +5632,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S49"[^}]*PASS/.test(rv.stdout))
     casse.push("S49 : la verte, dont aucune option ne commande de geste humain, est accusée — la règle mordrait sur " +
       "tout le corpus : " + (/"S49"[\s\S]{0,200}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 18/10 — S49 ET S80 (TF-1847) : le remède que S49 recommande — « Comment faire » suivi d'une liste
   // numérotée, un geste par ligne — PASSE S49 ET S80 (geste-avec-comment) ; la MÊME option avec l'ancienne
   // ligne en ligne « 1) … 2) … 3) » passe S49 (de quoi exécuter est là) et FAIL S80 (la forme est le défaut) ;
   // l'énumération en cellule FAIL S80 en le disant ; deux éléments et une citation entre guillemets français
   // PASSENT ; la verte PASSE.
+  if (veut(49, 80, 1847)) {
   {
     const constat80 = (r, regle) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === regle) || {}; } catch { return {}; } };
     const j80 = (nom) => spawnSync(process.execPath, [moi, join(dir, nom)], { encoding: "utf8" });
@@ -5159,9 +5661,11 @@ Aucun écart : la demande a été suivie à la lettre.
     if (!/puces et sous-puces/.test(constat80(j80("geste-comment-en-ligne.md"), "S80").message || ""))
       casse.push("S80 : le constat doit citer le retour humain du 17/10/2026 (« puces et sous-puces »)");
   }
+  }
   // 27/09 — S52 ET S53 DANS LEURS TROIS SENS (D-24 (b), TF-1362, TF-1361).
+  if (veut(52, 53, 1362, 1361, 81, 1847, 103, 2190, 92, 2077)) {
   const ris =spawnSync(process.execPath, [moi, join(dir, "interface-sans-source.md")], { encoding: "utf8" });
-  const ria = spawnSync(process.execPath, [moi, join(dir, "interface-avec-source.md")], { encoding: "utf8" });
+  var ria = spawnSync(process.execPath, [moi, join(dir, "interface-avec-source.md")], { encoding: "utf8" });
   const rpe = spawnSync(process.execPath, [moi, join(dir, "plateforme-sans-ecran.md")], { encoding: "utf8" });
   const extraitDe = (r, regle) => (new RegExp(`"${regle}"[\\s\\S]{0,200}`).exec(r.stdout) || [""])[0].replace(/\s+/g, " ");
   for (const regle of ["S52", "S53"]) {
@@ -5187,11 +5691,13 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S52/S53 : la restitution guidée en tête n'est pas PASS en entier — le guide doit être une forme RECONNUE, "
       + "et une forme que le gabarit prescrit et que son juge refuse est un piège : "
       + ((JSON.parse(ria.stdout || "{}").findings || []).filter((f) => f.statut === "FAIL").map((f) => f.regle).join(", ") || ria.stderr.slice(0, 200)));
+  }
   // 18/10 — S81 (TF-1847, E-11) DANS SES QUATRE SENS. La verte est le guide à une sous-puce par geste et
   // « Résultat attendu » en dernière sous-puce (ria, déjà PASS en entier ci-dessus). Les trois rouges ne
   // diffèrent d'elle que par une seule chose : les gestes de l'étape 1 dans un paragraphe, la clôture
   // placée avant le dernier geste, une sous-puce qui en enchaîne trois. L'ancienne forme en paragraphe
   // PASSE encore S53, qui juge la présence de la clôture : c'est S81 qui juge la forme.
+  if (veut(81, 1847)) {
   {
     const constat81 = (r, regle) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === regle) || {}; } catch { return {}; } };
     const j81 = (nom) => spawnSync(process.execPath, [moi, join(dir, nom)], { encoding: "utf8" });
@@ -5210,6 +5716,35 @@ Aucun écart : la demande a été suivie à la lettre.
     if (!/Résultat attendu/.test(constat81(rtete, "S81").message || ""))
       casse.push("S81 : le constat sur la clôture mal placée doit la NOMMER (« Résultat attendu ») : " + String(constat81(rtete, "S81").message || "").slice(0, 200));
   }
+  }
+  // 06/11 — S103 (TF-2190, RT-49) DANS SES QUATRE SENS. La verte est le guide d'importation sans fichier d'environnement (ria, rv) ; les deux rouges
+  // font écrire la ligne (« Ajoutez la ligne NOM=<le secret> » dans `.env`) ou la valeur (« Remplacez la valeur de NOM ») ; le remède joué — donner le
+  // secret dans la conversation, la session le range par `forge/ranger-secret.mjs` — passe.
+  if (veut(103, 2190)) {
+  {
+    const constat103 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S103") || {}; } catch { return {}; } };
+    const sousPuceOuvrir = "   - Ouvrez Outils." + saut;
+    const avecGeste = (lignes) => interfaceAvecSource.replace(sousPuceOuvrir, lignes.map((l) => `   - ${l}` + saut).join(""));
+    const fixtures103 = {
+      "s103-ligne.md": avecGeste(["Ouvrez le fichier `.env` du produit.", "Ajoutez la ligne `CLOUDFLARE_BILLING_TOKEN=<le secret>`."]),
+      "s103-valeur.md": avecGeste(["Ouvrez le fichier `.env` du produit.", "Remplacez la valeur de `SUPABASE_ACCESS_TOKEN`."]),
+      "s103-remede.md": avecGeste(["Donnez le secret `CLOUDFLARE_BILLING_TOKEN` dans la conversation.", "La session le range dans `.env` avec `forge/ranger-secret.mjs`."]),
+    };
+    for (const [nom, contenu] of Object.entries(fixtures103)) writeFileSync(join(dir, nom), contenu, "utf8");
+    const rl = spawnSync(process.execPath, [moi, join(dir, "s103-ligne.md")], { encoding: "utf8" });
+    const rva = spawnSync(process.execPath, [moi, join(dir, "s103-valeur.md")], { encoding: "utf8" });
+    const rre = spawnSync(process.execPath, [moi, join(dir, "s103-remede.md")], { encoding: "utf8" });
+    for (const [r, statut, quoi] of [
+      [ria, "PASS", "la verte (un guide d'importation, aucun fichier d'environnement) est accusée"],
+      [rv, "PASS", "la verte d'origine, sans guide, est accusée"],
+      [rl, "FAIL", "« Ajoutez la ligne CLOUDFLARE_BILLING_TOKEN=<le secret> » dans un guide qui ouvre `.env` passe — c'est le guide du 05/11/2026"],
+      [rva, "FAIL", "« Remplacez la valeur de SUPABASE_ACCESS_TOKEN » dans un guide qui ouvre `.env` passe"],
+      [rre, "PASS", "le remède (donner le secret dans la conversation, la session le range par ranger-secret) est accusé — le remède que le message prescrit échoue"],
+    ]) if (constat103(r).statut !== statut)
+      casse.push(`S103 (TF-2190) : ${quoi} — attendu ${statut} : ` + String(constat103(r).message || "sortie illisible").slice(0, 200));
+    if (!/ranger-secret\.mjs/.test(constat103(rl).message || ""))
+      casse.push("S103 : le constat doit NOMMER le geste forge/ranger-secret.mjs : " + String(constat103(rl).message || "").slice(0, 200));
+  }
   const rnn = spawnSync(process.execPath, [moi, join(dir, "numero-nu.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnn.stdout))
     casse.push("S30 : un numéro NU (« 1. ») passe encore pour un sélecteur de décision — c'est par cette tolérance " +
@@ -5217,7 +5752,9 @@ Aucun écart : la demande a été suivie à la lettre.
   const rnd = spawnSync(process.execPath, [moi, join(dir, "numero-double.md")], { encoding: "utf8" });
   if (!/"S30"[^}]*FAIL/.test(rnd.stdout))
     casse.push("S30 : deux décisions portant le MÊME numéro passent pour sélectionnables — le doublon ne se voit pas");
+  }
   // 30/08 — S30 admet « D-5 » ; S31 et S32 dans leurs deux sens.
+  if (veut(30, 31, 32)) {
   const rnt = spawnSync(process.execPath, [moi, join(dir, "numero-tiret.md")], { encoding: "utf8" });
   if (!/"S15"[^}]*PASS/.test(rnt.stdout))
     casse.push("S15 accuse le SÉLECTEUR de la décision : la forme « D-12 — » que S30 prescrit est lue comme un "
@@ -5226,8 +5763,10 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S30"[^}]*PASS/.test(rnt.stdout))
     casse.push("S30 : la forme « D-12 — », celle que la doctrine prescrit, est refusée : " +
       (/"S30"[\s\S]{0,180}/.exec(rnt.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // La forme de référence doit être LUE, pas seulement tolérée : deux décisions distinctes ne se
   // comptent pas comme une, et un numéro derrière un chevron reste un numéro.
+  if (veut(30, 31, 32)) {
   const rct = spawnSync(process.execPath, [moi, join(dir, "d3-citation.md")], { encoding: "utf8" });
   for (const regle of ["S4", "S15", "S16", "S30", "S31", "S32"]) {
     if (!new RegExp(`"${regle}"[^}]*PASS`).test(rct.stdout)) {
@@ -5235,8 +5774,10 @@ Aucun écart : la demande a été suivie à la lettre.
         (new RegExp(`"${regle}"[\\s\\S]{0,180}`).exec(rct.stdout) || [""])[0].replace(/\s+/g, " "));
     }
   }
+  }
   // TF-1578 — S10 dans ses DEUX sens : une durée MESURÉE sur une ligne qui nomme la colonne « Coût »
   // passe ; la MÊME ligne, la quantité en jours portée par la colonne, est accusée.
+  if (veut(10, 1578)) {
   const rs10m = spawnSync(process.execPath, [moi, join(dir, "s10-duree-mesuree.md")], { encoding: "utf8" });
   const rs10c = spawnSync(process.execPath, [moi, join(dir, "s10-cout-en-jours.md")], { encoding: "utf8" });
   if (!/"S10"[^}]*PASS/.test(rs10m.stdout))
@@ -5244,7 +5785,9 @@ Aucun écart : la demande a été suivie à la lettre.
       + "colonne « Coût » — écrite en lettres, EC-9 la refuse : le fait n'a plus d'écriture admise");
   if (!/"S10"[^}]*FAIL/.test(rs10c.stdout))
     casse.push("S10 (TF-1578) : la colonne « Coût » qui porte 3 jours passe — borner la règle l'a éteinte");
+  }
   // TF-1607 — S59 dans ses TROIS sens ; TF-1606 — S60 dans ses TROIS sens.
+  if (veut(59, 60, 1607, 1606)) {
   const jugeS = (nom) => spawnSync(process.execPath, [moi, join(dir, nom)], { encoding: "utf8" }).stdout;
   const statutDe = (sortie, regle) => ((JSON.parse(sortie || "{}").findings || []).find((f) => f.regle === regle) || {}).statut;
   const s59r = jugeS("s59-renvoi.md"), s59c = jugeS("s59-ci-dessous.md");
@@ -5262,7 +5805,9 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S60 (TF-1606) : le MÊME message, affiché dans un bloc de code, est accusé — " + statutDe(s60a, "S60"));
   if (statutDe(rv.stdout, "S60") !== "SANS_OBJET")
     casse.push("S60 (TF-1606) : la verte, qui n'envoie aucun message, n'est pas SANS_OBJET — " + statutDe(rv.stdout, "S60"));
+  }
   // TF-1577 — S5 dans ses DEUX sens sur la forme du gabarit (motif en sous-puce).
+  if (veut(5, 1577)) {
   const rs5m = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-motif.md")], { encoding: "utf8" });
   const rs5n = spawnSync(process.execPath, [moi, join(dir, "s5-sous-puce-nue.md")], { encoding: "utf8" });
   if (!/"S5"[^}]*PASS/.test(rs5m.stdout))
@@ -5270,7 +5815,9 @@ Aucun écart : la demande a été suivie à la lettre.
       + "sans motif : " + (/"S5"[\s\S]{0,200}/.exec(rs5m.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S5"[^}]*FAIL/.test(rs5n.stdout))
     casse.push("S5 (TF-1577) : le MÊME élément, sa sous-puce ne portant aucun motif, passe — lire la sous-puce a éteint la règle");
+  }
   // TF-0998 — S24 dans ses DEUX sens.
+  if (veut(24, 998)) {
   const rmg = spawnSync(process.execPath, [moi, join(dir, "motif-gabarit.md")], { encoding: "utf8" });
   if (!/"S24"[^}]*PASS/.test(rmg.stdout))
     casse.push("S24 (TF-0998) : une ligne du bloc 5 portant le libellé « — motif : » que le GABARIT impose est lue comme " +
@@ -5297,13 +5844,15 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("une ouverture TITRÉE et conforme n'est pas lue par S9 : " + (/"S9"[\s\S]{0,200}/.exec(rt.stdout) || [""])[0]);
   }
   if (!/"S9"[^}]*FAIL/.test(rts.stdout)) casse.push("une ouverture titrée mais TECHNIQUE passe S9 — le titre ne doit rien blanchir");
+  }
   // TF-0568 — LES QUATRE MISES EN PAGE DE LA MEME DECISION. La mesure du 24/08 est celle-ci :
   // le meme arbitrage, ecrit quatre fois, doit rendre le meme verdict. Avant correctif, une seule
   // des quatre passait — la puce unique de douze lignes — et les trois autres rendaient S15 FAIL
   // sur un chapeau vide ou tronque. Le cinquieme cas est le SENS ROUGE : meme tableau, chapeau
   // reduit a quatre mots, S15 doit continuer d'echouer. Sans lui, l'elargissement serait une
   // porte ouverte, et l'on aurait remplace une regle trop etroite par une regle qui ne juge rien.
-  const CHAPEAU = "Publier la version corrigee de la forge de tests ? Le banc rouge vient de tourner en entier : " +
+  if (veut(568, 15, 573)) {
+  var CHAPEAU = "Publier la version corrigee de la forge de tests ? Le banc rouge vient de tourner en entier : " +
     "chaque defaut plante volontairement a ete detecte, donc la surveillance fonctionne et la version est prete.";
   const OPT_A = "(a) taguer v1.12.0 maintenant — recommande : le journal de recette `recette-S01.md` ne porte aucun defaut ouvert ;";
   const OPT_B = "(b) attendre le prochain lot — cout : les 26 commits restent locaux.";
@@ -5333,12 +5882,14 @@ Aucun écart : la demande a été suivie à la lettre.
     const r = spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
     if (!/"S15"[^}]*FAIL/.test(r.stdout)) casse.push("un chapeau de quatre mots au-dessus d'un tableau passe S15 — l'elargissement blanchirait tout");
   }
+  }
   // TF-0573 — LE CHAPEAU COMMUN, dans ses deux sens. Le fait : onze decisions issues d'une meme
   // enquete. S15 demandant 25 mots de rappel a chacune, il ne restait qu'a repeter le contexte onze
   // fois (illisible) ou a le supposer connu (ce qui a produit « aucune mise en contexte »). Le bloc
   // 3 admet donc une prose de tete qui porte l'histoire UNE FOIS ; presente et substantielle, elle
   // abaisse le rappel du par decision. Sens rouge : SANS elle, les memes rappels courts echouent —
   // sinon on aurait supprime S15 en croyant l'assouplir.
+  if (veut(15, 573)) {
   {
     const COMMUN = "Onze annonces immobilieres se sont retrouvees rattachees a la mauvaise commune, "
       + "decouvertes en corrigeant une anomalie de recherche : la donnee de rattachement venait du "
@@ -5367,7 +5918,19 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push("les memes rappels courts SANS chapeau commun passent S15 — l'assouplissement aurait supprime la regle");
     }
   }
+  }
   // 14/09 — S13, SES DEUX SENS (TF-1085).
+  if (veut(13, 1085, 2310)) {
+  // 09/11 — TF-2310 : la MÊME action humaine, sans puis avec une adresse http(s) nue. Une adresse donne ce que le lecteur ouvre (S92 l'exige en tête) : elle est un localisateur pour S13.
+  // Le rouge garde le mot « http » sans adresse (« en http, sur le site ») : la règle lit une adresse, pas un mot.
+  const jouer13 = (nom, lieu) => { const f = join(dir, nom); writeFileSync(f, avecHumaine(lieu), "utf8"); return spawnSync(process.execPath, [moi, f], { encoding: "utf8" }); };
+  const r13h = jouer13("s13-http-sans-adresse.md", " en http, sur le site");
+  const r13u = jouer13("s13-avec-adresse.md", " : ouvrir https://exemple.invalide/accueil");
+  if (!/"S13"[^}]*FAIL/.test(r13h.stdout))
+    casse.push("S13 (TF-2310) : le mot « http » sans adresse tient lieu de localisateur — la règle lirait un mot au lieu d'une adresse");
+  if (!/"S13"[^}]*PASS/.test(r13u.stdout))
+    casse.push("S13 (TF-2310) : une action humaine qui donne l'adresse http(s) à ouvrir est accusée de n'avoir ni chemin ni libellé d'écran, alors que S92 exige cette adresse : " +
+      (/"S13"[\s\S]{0,180}/.exec(r13u.stdout) || [""])[0].replace(/\s+/g, " "));
   const r13n = spawnSync(process.execPath, [moi, join(dir, "s13-sans-chemin.md")], { encoding: "utf8" });
   const r13c = spawnSync(process.execPath, [moi, join(dir, "s13-avec-chemin.md")], { encoding: "utf8" });
   if (!/"S13"[^}]*FAIL/.test(r13n.stdout))
@@ -5376,7 +5939,9 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S13"[^}]*PASS/.test(r13c.stdout))
     casse.push("S13 : la MÊME action, AVEC un chemin, est accusée — la règle mordrait sur une action exécutable : " +
       (/"S13"[\s\S]{0,180}/.exec(r13c.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 08/09 — S38 ET S39, LEURS DEUX SENS CHACUNE (TF-0923).
+  if (veut(38, 39, 923)) {
   const rte = spawnSync(process.execPath, [moi, join(dir, "test-esquive.md")], { encoding: "utf8" });
   const rtb = spawnSync(process.execPath, [moi, join(dir, "test-bloque.md")], { encoding: "utf8" });
   if (!/"S38"[^}]*FAIL/.test(rte.stdout))
@@ -5395,7 +5960,9 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S39"[\s\S]{0,180}/.exec(rrt.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S38"[^}]*PASS/.test(rv.stdout) || !/"S39"[^}]*PASS/.test(rv.stdout))
     casse.push("S38 ou S39 accuse la fixture VERTE, qui ne porte ni test esquivé ni remontée : la règle crie sur un travail juste");
+  }
   // 08/09 — S40 ET S41, LEURS DEUX SENS CHACUNE (TF-0923, second paquet).
+  if (veut(40, 41, 923)) {
   const rche = spawnSync(process.execPath, [moi, join(dir, "chemin-hors-etudes.md")], { encoding: "utf8" });
   const rce = spawnSync(process.execPath, [moi, join(dir, "chemin-etude.md")], { encoding: "utf8" });
   if (!/"S40"[^}]*FAIL/.test(rche.stdout))
@@ -5414,10 +5981,14 @@ Aucun écart : la demande a été suivie à la lettre.
       "ouvert le bon texte : " + (/"S41"[\s\S]{0,180}/.exec(rsdoc.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S40"[^}]*PASS/.test(rv.stdout) || !/"S41"[^}]*PASS/.test(rv.stdout))
     casse.push("S40 ou S41 accuse la fixture VERTE, qui ne cite ni chemin en forme d'étude ni décision régie : la règle crie sur un travail juste");
+  }
   // 11/09 — S42 DANS SES DEUX SENS (TF-1015), à UN caractère près.
+  if (veut(42, 1015)) {
   if (cheminDeLongueur(116).length !== 116 || cheminDeLongueur(117).length !== 117)
     casse.push("fixture S42 : les chemins construits ne font pas 116 et 117 caractères — la paire ne prouve plus la borne");
+  }
   // 01/10 — S42 sous `forge\` (TF-1500) : le chemin cité, puis le fichier jugé lui-même.
+  if (veut(42, 1500)) {
   if (cheminForge(116).length !== 116 || cheminForge(117).length !== 117)
     casse.push("fixture S42 (TF-1500) : les chemins `forge/` construits ne font pas 116 et 117 caractères");
   for (const [f, attendu, quoi] of [
@@ -5439,6 +6010,7 @@ Aucun écart : la demande a été suivie à la lettre.
       "la règle mord sur un nom conforme : " + (/"S42"[\s\S]{0,180}/.exec(rcp.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S42"[^}]*PASS/.test(rv.stdout))
     casse.push("S42 accuse la fixture VERTE, qui ne cite aucun chemin long : la règle crie sur un travail juste");
+  }
   // 16/09 — S21, S37 ET S8 DANS LEURS DEUX SENS (TF-0987, TF-0992, TF-1125). Les trois paires ne
   // different QUE par la nature du fragment ou le TEMPS du verbe : c'est la seule forme qui prouve
   // qu'une regle a ete BORNEE et non supprimee.
@@ -5446,6 +6018,7 @@ Aucun écart : la demande a été suivie à la lettre.
   // S21 (TF-0987) — une action dont le motif declare est `decision` et dont le COMMENT cite une
   // colonne de livrable nommee `presence`. Avant la correction, S21 lisait le nom de la colonne
   // comme son motif et accusait une action explicitement hors de sa portee.
+  if (veut(21, 37, 8, 987, 992, 1125)) {
   const s21v = verte.replace("puis relancer la recette S-01.", "puis trier sur la colonne `presence` du livrable.");
   const s21r = s21v.replace("  - pourquoi pas l'IA : decision — arbitrage normatif sur le seuil retenu ;",
                             "  - pourquoi pas l'IA : presence — le fichier de corpus n'est pas sur ce poste ;");
@@ -5462,9 +6035,11 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S21"[^}]*FAIL/.test(r21r.stdout))
     casse.push("S21 : la MÊME action portant RÉELLEMENT le motif `presence` sans aucune trace de tentative passe — " +
       "le périmètre de lecture a supprimé la règle au lieu de la borner");
+  }
   // S37 (TF-0992) — `corriges: []`, le NOM D'UN CHAMP dans une sortie VERTE, contre une prose qui
   // annonce une correction sans nommer sa classe ni son controle.
-  const B4 = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
+  if (veut(37, 992, 8, 1125)) {
+  var B4 = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
   const s37v = verte.replace(B4, B4 + "\n- Rapprochement rejoué — preuve : \`node todo\rapprocher.mjs\` rend \`corriges: []\` et \`nomsPorteurs: []\`, exit 0.");
   const s37r = verte.replace(B4, B4 + "\n- Le débordement de la légende est corrigé dans la maquette.");
   const f37v = join(dir, "s37-champ-cite.md");
@@ -5480,9 +6055,11 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S37"[^}]*FAIL/.test(r37r.stdout))
     casse.push("S37 : une PROSE annonçant « est corrigé » sans contrôle rouge → vert ni classe passe — " +
       "le retrait des citations de code a emporté la règle avec lui");
+  }
   // S8 (TF-1125) — l'IRREEL DU PASSE decrit un evenement qui n'a PAS eu lieu ; le passe compose
   // de l'indicatif revendique une completion. La preuve vit en SOUS-PUCE dans les deux cas, donc
   // hors de la puce jugee : seule la tournure les separe.
+  if (veut(8, 1125)) {
   const s8v = verte.replace(B4, B4 +
     "\n- La liaison du rapport au modèle est traitée dans le client, là où elle aurait fait échouer la publication." +
     "\n  - preuve : \`pbi-deploy --check\` exit 0.");
@@ -5502,12 +6079,14 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S8"[^}]*FAIL/.test(r8r.stdout))
     casse.push("S8 : la MÊME phrase au PASSÉ COMPOSÉ — « a fait échouer » —, sans preuve dans sa puce, passe : " +
       "la soustraction de l'irréel a emporté l'indicatif avec elle");
+  }
   // 16/09 — S44 ET S45 DANS LEURS DEUX SENS (TF-0988, TF-1127).
   //
   // S44 — la demande citée au bloc 6 porte « uniquement ». Rouge : le bloc ne dit pas ce qu'il y a
   // en plus. Vert : LE MÊME bloc, une phrase ajoutée qui le déclare. Les deux ne diffèrent que par
   // cette phrase, seule forme qui prouve que la règle juge la déclaration et non le mot.
-  const B6 = "Aucun écart : la demande a été suivie à la lettre.";
+  if (veut(44, 45, 988, 1127, 1489)) {
+  var B6 = "Aucun écart : la demande a été suivie à la lettre.";
   const s44r = verte.replace(B6, "Vous avez demandé « uniquement les 66 colonnes en cible » → j'ai produit la page des champs → le périmètre est tenu.");
   const s44v = verte.replace(B6, "Vous avez demandé « uniquement les 66 colonnes en cible » → j'ai produit la page des champs → elle ne contient rien d'autre : aucun tableau des colonnes écartées.");
   const f44r = join(dir, "s44-exclusivite-nue.md");
@@ -5525,11 +6104,13 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S44"[\s\S]{0,180}/.exec(r44v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S44"[^}]*PASS/.test(rv.stdout))
     casse.push("S44 accuse la fixture VERTE, dont le bloc 6 ne porte aucun mot d'exclusivité : la règle crie sur un travail juste");
+  }
   // 01/10 — S44 AU SEGMENT DE LA DEMANDE (TF-1489, lot Produit-03 du 28/09, RA-47), DANS SES QUATRE
   // SENS. La paire du lot : la seule insertion de « seulement » dans le « pourquoi » d'une entrée du
   // bloc 6 faisait passer S44 de PASS à FAIL. Le MÊME mot, déplacé dans la demande, doit échouer :
   // c'est ce qui prouve que la règle juge la demande et non le bloc. Même chose en tableau, où la
   // demande vit dans la première colonne et la prose de l'auteur dans les deux autres.
+  if (veut(44, 1489)) {
   const s44Auteur = verte.replace(B6, "Vous avez demandé « les 66 colonnes en cible » → j'ai produit la page des champs → seulement la page des champs, sans autre livrable.");
   const s44Demande = verte.replace(B6, "Vous avez demandé « seulement les 66 colonnes en cible » → j'ai produit la page des champs → sans autre livrable.");
   const TABLEAU44 = (demande, fait) => "| Vous avez demandé | J'ai fait | Pourquoi |\n|---|---|---|\n"
@@ -5546,12 +6127,14 @@ Aucun écart : la demande a été suivie à la lettre.
     if (!new RegExp(`"S44"[^}]*${attendu}`).test(r.stdout))
       casse.push(`S44 (TF-1489) : ${quoi} — attendu ${attendu} : ` + (/"S44"[\s\S]{0,180}/.exec(r.stdout) || [""])[0].replace(/\s+/g, " "));
   }
+  }
   // 01/10 — S54 DANS SES TROIS SENS (TF-1494, lot Produit-03 du 29/09, RA-50). Rouge : l'ouverture de
   // la verte telle qu'elle était écrite jusqu'au 01/10, coupée à la main sur quatre lignes source —
   // la forme exacte que le chat affiche en colonne. Verte : la MÊME ouverture sur une ligne. Formes
   // admises : une liste numérotée dont l'élément se poursuit sur la ligne suivante, un bloc de code
   // de trois lignes et une citation de deux lignes ne sont PAS de la prose ; sans ce sens, la règle
   // accuserait les formes que le gabarit prescrit lui-même (décision en citation, bloc 8 en puces).
+  if (veut(54, 1494)) {
   const OUVERTURE_UNE_LIGNE = "Le contrôle complet de la forge de tests est terminé et tout est au vert : chaque défaut que nous avions volontairement planté a bien été détecté, ce qui prouve que la surveillance fonctionne. Rien n'attend de correction ; la seule chose attendue de vous est la décision de publication ci-dessous.";
   const OUVERTURE_COUPEE = "Le contrôle complet de la forge de tests est terminé et tout est au vert : chaque défaut que\n"
     + "nous avions volontairement planté a bien été détecté, ce qui prouve que la surveillance\n"
@@ -5576,6 +6159,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S54"[^}]*PASS/.test(r54f.stdout))
     casse.push("S54 accuse une liste continuée, un bloc de code ou une citation — ce ne sont pas des paragraphes de prose : "
       + (/"S54"[\s\S]{0,200}/.exec(r54f.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 01/10 — S55 ET S56 (TF-1493, TF-1498), LE FEU VERT DE PRODUCTION. Quatre fixtures bâties sur la
   // verte (datée du 14/08), qui reçoit un guide de LANCEMENT en tête et « le feu vert peut être
   // donné » au bloc 2. Rouge : aucune ligne « Ne vérifie pas », et l'audit des dépendances daté de la
@@ -5583,6 +6167,7 @@ Aucun écart : la demande a été suivie à la lettre.
   // guide et sous le verdict, et les portes rejouées le 14/08, chiffrées ; elle passe EN ENTIER. Le
   // feu vert que l'agent ATTEND de l'humain, l'usage courant du pilot, ne déclenche rien. Et la
   // chaîne sans porte à base externe se DÉCLARE, ce qui tient S56.
+  if (veut(55, 56, 1493, 1498)) {
   const NE_VERIFIE = "Ne vérifie pas : les valeurs que le plan envoie à la plateforme, ni leur validité à la date d'application.";
   const GUIDE_LANCEMENT = (avecLimite) => "## Guide — Relancer la production de la version 1.12.0" + saut + saut
     + "Source officielle lue le 14/08/2026 : `learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals`." + saut + saut
@@ -5643,8 +6228,10 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S56"[^}]*PASS[^}]*déclare qu'aucune porte/.test(r56d.stdout))
     casse.push("S56 : une chaîne qui DÉCLARE n'avoir aucune porte à base externe est accusée : "
       + (/"S56"[\s\S]{0,200}/.exec(r56d.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // S45 — le bloc 5 porte un élément bloqué par `dependance_externe`. Rouge : le bloc 3 ouvre
   // droit sur sa décision. Vert : LE MÊME, un inventaire d'un bloquant énoncé sur place en tête.
+  if (veut(45)) {
   const B5 = "- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.";
   const s45base = verte.replace(B5, "- Traduction du pack anglais : motif dependance_externe — le prestataire n'a pas rendu le glossaire.");
   const TETE = "**Bloquants à lever avant d'avancer**\n\n" +
@@ -5664,11 +6251,13 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S45"[\s\S]{0,200}/.exec(r45v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S45"[^}]*PASS/.test(rv.stdout))
     casse.push("S45 accuse la fixture VERTE, dont le bloc 5 ne porte aucun motif d'obstacle : la règle crie sur un travail juste");
+  }
   // 26/09 — TF-1338 : une ligne CITÉE qui continue un paragraphe cité n'ouvre pas de décision, même
   // quand elle commence par un nombre (« > **171** paragraphes ») ou par « décision D-3 » — les deux
   // formes réellement repliées ainsi, le 22/09 chez un produit et le 25/09 au pilot. Vert : S30, S16
   // et S32 PASS sur la décision réelle. Rouge : LA MÊME, sa tête privée de numéro — la segmentation
   // la trouve toujours, et S30 l'accuse toujours.
+  if (veut(1338)) {
   const B3cite = (tete) => "## 3. Décisions attendues\n\n" +
     `> **${tete}Jusqu'où pousse-t-on la hiérarchie de lecture du guide de développement ?**\n>\n` +
     "> Le guide se lit mal : la prose court sur toute la largeur de l'écran, et le défaut le plus fréquent du relevé touche\n" +
@@ -5693,9 +6282,11 @@ Aucun écart : la demande a été suivie à la lettre.
         `une décision, et ${regle} accuse la décision réelle : ` + (new RegExp(`"${regle}"[\\s\\S]{0,160}`).exec(r1338v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S30"[^}]*FAIL/.test(r1338r.stdout))
     casse.push("TF-1338 : la MÊME décision citée, sa tête privée de numéro, passe S30 — la correction a fait perdre la décision au lieu de la trouver");
+  }
   // 26/09 — TF-1339 : un désignateur ENTRE ACCENTS GRAVES, glosé à son premier emploi, est glosé.
   // Vert : S23 PASS. Rouge : le MÊME désignateur, deux emplois, sans glose — S23 l'accuse toujours.
-  const T4 = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
+  if (veut(23, 1339, 85, 86, 71, 1949)) {
+  var T4 = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
   const s1339v = verte.replace(T4, T4 + "\n- Reprise `RAF-073` (entrée du registre des reprises qui tient cette décision ouverte) close — preuve : 18 tests rejoués.\n- Reprise `RAF-073` rejouée sur la version publiée — preuve : 0 finding.");
   const s1339r = verte.replace(T4, T4 + "\n- Reprise `RAF-073` close — preuve : 18 tests rejoués.\n- Reprise `RAF-073` rejouée sur la version publiée — preuve : 0 finding.");
   const f1339v = join(dir, "tf1339-designateur-cite-glose.md");
@@ -5709,18 +6300,20 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S23"[\s\S]{0,160}/.exec(r1339v.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S23"[^}]*FAIL/.test(r1339r.stdout))
     casse.push("TF-1339 : le MÊME désignateur entre accents graves, employé deux fois SANS glose, passe S23 — l'accent de fermeture a emporté la règle");
+  }
   // 16/09 — S46 DANS SES TROIS SENS (TF-1045). Le lexique est celui du PRODUIT : les fixtures
   // vivent donc sous un faux socle de produit, avec son `forge\LEXIQUE.json`. Sans lexique — le cas
   // de toutes les autres fixtures et du pilot lui-même —, la règle rend SANS_OBJET et le DIT.
+  if (veut(2302, 2304, 115, 46, 1045, 1150, 23, 51, 791, 25, 1189, 18, 1427, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1580, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 4, 1429, 1467, 45, 70, 71, 72, 1708, 1709, 1711, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 2137, 88, 1979, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 1982, 1987, 85, 86, 1949, 55, 56, 1493, 1498)) {
   mkdirSync(join(dir, "produit", "forge"), { recursive: true });
   writeFileSync(join(dir, "produit", "forge", "LEXIQUE.json"), JSON.stringify({
     format: "pilot/lexique-produit@1",
     termes: [{ proscrit: "grain", remplacer_par: "granularite", depuis: "2026-09-08",
       preuve: "retour humain du 08/09/2026, redemande le 10/09 (ledger seq 99)" }],
   }), "utf8");
-  const B4lex = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
-  const s46r = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré au grain quotidien — preuve : 12 mesures, exit 0.");
-  const s46v = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré à la granularite quotidienne — preuve : 12 mesures, exit 0.");
+  var B4lex = "- Garde de précondition sur le pan qualif — preuve : 18 tests, 0 finding quand la garde s'active.";
+  var s46r = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré au grain quotidien — preuve : 12 mesures, exit 0.");
+  var s46v = verte.replace(B4lex, B4lex + "\n- Modèle sémantique livré à la granularite quotidienne — preuve : 12 mesures, exit 0.");
   const f46r = join(dir, "produit", "s46-terme-proscrit.md");
   const f46v = join(dir, "produit", "s46-terme-retenu.md");
   writeFileSync(f46r, s46r, "utf8");
@@ -5738,11 +6331,13 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S46 : sans lexique dans le socle du projet, la règle devrait rendre SANS_OBJET et le DIRE — " +
       "un produit sans lexique n'est jamais PASS par silence : " +
       (/"S46"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 17/09 — S46 ET LE LEXIQUE TRANSVERSE, DANS SES DEUX SENS (TF-1150). LE FAIT reproduit ici est
   // celui du 16/09 : le lexique du CLIENT est VIDE — il ne porte que le vocabulaire de son propre
   // lecteur, et ce produit-ci n'a encore rien remonté — et c'est la liste TRANSVERSE, décidée par
   // l'humain pour tous les produits, qui doit mordre. Sans le cumul, le terme repart en livraison
   // pour la troisième fois.
+  if (veut(46, 1150)) {
   mkdirSync(join(dir, "produit-tr", "forge"), { recursive: true });
   writeFileSync(join(dir, "produit-tr", "forge", "LEXIQUE.json"), JSON.stringify({
     format: "pilot/lexique-produit@1", termes: [],
@@ -5768,10 +6363,12 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S46"[^}]*PASS/.test(rtrV.stdout))
     casse.push("S46 : la MÊME restitution avec le terme retenu est accusée sous lexique transverse : " +
       (/"S46"[\s\S]{0,200}/.exec(rtrV.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 17/09 — S48 DANS SES QUATRE SENS (TF-1166, D-3 (a)). Un produit se reconnaît à son `forge\retours\` :
   // les fixtures vivent sous un faux socle qui le porte. Les quatre ne diffèrent que d'UNE ligne.
+  if (veut(48, 1166, 1643, 1982, 1987, 2137, 2305, 2429)) {
   mkdirSync(join(dir, "produit48", "forge", "retours"), { recursive: true });
-  const jouer48 = (nom, ajout) => {
+  var jouer48 = (nom, ajout) => {
     const f = join(dir, "produit48", nom);
     writeFileSync(f, verte + ajout, "utf8");
     return spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
@@ -5794,10 +6391,12 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S48"[^}]*SANS_OBJET/.test(rv.stdout))
     casse.push("S48 : hors d'un produit (pilot, forge), la règle devrait rendre SANS_OBJET et le DIRE : " +
       (/"S48"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 14/10 — S36 DANS SES DEUX SENS (TF-1653). Le bloc 4 recopie un prompt réécrit, dans un bloc de
   // code, qui nomme le schéma HTML À LIRE, et une ligne le cite comme source : S36 PASS. Le MÊME
   // schéma présenté comme LIVRÉ, sans critique d'implémentation : S36 FAIL. Les deux ne diffèrent
   // que de la façon dont la page est présentée.
+  if (veut(36, 1653)) {
   const PROMPT36 = "\n- Prompt réécrit, recopié tel quel — preuve : 412 mots, 7 sections :\n\n```text\nLis le schéma output/Client-A - Schema Run apres MEP - 20261013a.html puis rédige l'étape Run.\n```\n\n"
     + "- Source lue : `output/Client-A - Schema Run apres MEP - 20261013a.html` (3 couloirs relus).\n";
   const f36src = join(dir, "s36-page-source.md");
@@ -5812,9 +6411,11 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S36"[\s\S]{0,200}/.exec(r36src.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S36"[^}]*FAIL/.test(r36liv.stdout))
     casse.push("S36 (TF-1653) : la MÊME page présentée comme LIVRÉE sans critique d'implémentation passe — l'exclusion des sources aurait désarmé la règle");
+  }
   // 14/10 — S69 DANS SES DEUX SENS (TF-1646). La MÊME verte, dont l'en-tête porte « 2026-08-14 à
   // 15h48 », jugée à deux horloges : à 13:00 ce jour-là, l'heure est composée (2 h 48 dans le futur)
   // et S69 FAIL ; à 16:00, elle est passée et S69 PASS. Seule l'horloge change.
+  if (veut(69, 1646)) {
   const f69 = join(dir, "s69-heure-en-tete.md");
   writeFileSync(f69, verte, "utf8");
   const r69futur = spawnSync(process.execPath, [moi, f69, "--horloge", "2026-08-14T13:00:00"], { encoding: "utf8" });
@@ -5823,36 +6424,42 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S69 (TF-1646) : une heure d'en-tête postérieure de 2 h 48 au moment du jugement passe — l'heure composée du 12/10 passerait encore");
   if (!/"S69"[^}]*PASS/.test(r69passe.stdout))
     casse.push("S69 (TF-1646) : une heure d'en-tête passée est accusée : " + (/"S69"[\s\S]{0,200}/.exec(r69passe.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // Troisième sens : la MÊME heure suivie de « (UTC+02:00) », forme courante des en-têtes, se lit avec
   // son décalage — 15h48 à UTC+2 vaut 13:48 UTC, passé à 16:00 heure du poste en été.
+  if (veut(69, 1646)) {
   const f69z = join(dir, "s69-heure-decalage.md");
   writeFileSync(f69z, verte.replace("15h48 (Europe/Paris)", "15h48 (UTC+02:00)"), "utf8");
   const r69z = spawnSync(process.execPath, [moi, f69z, "--horloge", "2026-08-14T16:00:00+02:00"], { encoding: "utf8" });
   if (!/"S69"[^}]*PASS/.test(r69z.stdout))
     casse.push("S69 (TF-1646) : « 15h48 (UTC+02:00) » est lu comme de l'UTC pur et accusé de deux heures de trop : " + (/"S69"[\s\S]{0,200}/.exec(r69z.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 14/10 — S48 SECOND SENS, DANS SES TROIS SENS (TF-1643). Le tour CORRIGE une erreur de la session
   // (la forme exacte du 12/10 : « Correction d'une restitution précédente », heures d'en-tête) : « rien
   // à remonter » FAIL ; le MÊME tour qui nomme son lot PASS ; le MÊME qui garde le retour au produit et
   // dit pourquoi PASS. Le quatrième sens est déjà au banc : « rien à remonter » sans correction PASS.
-  const CORR48 = "\n- Correction d'une restitution précédente : l'en-tête donnait de 14h50 à 15h15, l'heure relevée était 14:29.\n";
-  const r48corrRien = jouer48("s48-correction-rien.md", CORR48 + "- Remontée à la factory : rien à remonter.\n");
-  const r48corrLot = jouer48("s48-correction-lot.md", CORR48 + "- Remontée à la factory : lot « Produit-99 - RETOURS - 20261012f » remis.\n");
+  if (veut(48, 1643, 1982, 1987, 2137, 2305)) {
+  var CORR48 = "\n- Correction d'une restitution précédente : l'en-tête donnait de 14h50 à 15h15, l'heure relevée était 14:29.\n";
+  var r48corrRien = jouer48("s48-correction-rien.md", CORR48 + "- Remontée à la factory : rien à remonter.\n");
+  var r48corrLot = jouer48("s48-correction-lot.md", CORR48 + "- Remontée à la factory : lot « Produit-99 - RETOURS - 20261012f » remis.\n");
+  }
   // 29/10 — TF-1982 : « reste au produit » suppose un RUN OUVERT au ledger du produit (`forge/ledger.jsonl` : un `run_open` que nul `run_close` ne suit). Trois produits de banc :
   // un run ouvert, un run clos, un run rouvert ; `produit48`, lui, n'a aucun ledger.
-  const LEDGER48 = (...types) => types.map((t, i) => JSON.stringify({ seq: i + 1, ts: `2026-10-26T10:0${i}:00+01:00`, type: t })).join("\n") + "\n";
+  if (veut(1982, 2137, 1987, 2305, 2429)) {
+  var LEDGER48 = (...types) => types.map((t, i) => JSON.stringify({ seq: i + 1, ts: `2026-10-26T10:0${i}:00+01:00`, type: t })).join("\n") + "\n";
   for (const [sous, types] of [["produit48-run-ouvert", ["run_open", "etape_open"]], ["produit48-run-clos", ["run_open", "etape_open", "run_close"]], ["produit48-run-rouvert", ["run_open", "run_close", "run_open"]]]) {
     mkdirSync(join(dir, sous, "forge", "retours"), { recursive: true });
     writeFileSync(join(dir, sous, "forge", "ledger.jsonl"), LEDGER48(...types), "utf8");
   }
-  const c48 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S48") || {}; } catch { return {}; } };   // `constatDe` est défini plus bas
-  const jouer48Dans = (sous, nom, ajout) => {
+  var c48 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S48") || {}; } catch { return {}; } };   // `constatDe` est défini plus bas
+  var jouer48Dans = (sous, nom, ajout) => {
     const f = join(dir, sous, nom);
     writeFileSync(f, verte + ajout, "utf8");
     return spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
   };
   const RESTE48 = CORR48
     + "- Remontée à la factory : reste au produit, parce que l'heure fausse venait d'une note locale du produit, sans règle de la factory en cause.\n";
-  const r48corrReste = jouer48Dans("produit48-run-ouvert", "s48-correction-reste.md", RESTE48);
+  var r48corrReste = jouer48Dans("produit48-run-ouvert", "s48-correction-reste.md", RESTE48);
   const r48resteSansLedger = jouer48("s48-reste-sans-ledger.md", RESTE48);
   const r48resteRunClos = jouer48Dans("produit48-run-clos", "s48-reste-run-clos.md", RESTE48);
   const r48resteRunRouvert = jouer48Dans("produit48-run-rouvert", "s48-reste-run-rouvert.md", RESTE48);
@@ -5865,8 +6472,68 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`S48 (TF-1982) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
   if (!/aucun run n'est ouvert/.test(c48(r48resteSansLedger).message || "") || !/ledger\.jsonl absent/.test(c48(r48resteSansLedger).message || ""))
     casse.push("S48 (TF-1982) : le constat sans ledger doit dire qu'aucun run n'est ouvert ET que le ledger est absent : " + String(c48(r48resteSansLedger).message || "").slice(0, 200));
+  }
+  // 05/11 — TF-2137 (RT-42) : un motif « reste au produit » qui NOMME un retour le lit comme un fait. Rouge : « le retour sera consigné avec A-2 » (le cas du 04/11), « consigné (seq 2) » alors
+  // que l'entrée 2 du ledger n'est pas un retour, « consigné au ledger » sans aucun retour au ledger. Vert : le MÊME motif devant un ledger qui porte l'entrée `type: retour` (le remède joué),
+  // et un retour écrit qui annonce seulement sa remise future (« sera remonté dans le lot de clôture »).
+  if (veut(2137)) {
+  mkdirSync(join(dir, "produit48-retour", "forge", "retours"), { recursive: true });
+  writeFileSync(join(dir, "produit48-retour", "forge", "ledger.jsonl"), LEDGER48("run_open", "retour"), "utf8");
+  const reste48 = (motif) => `\n- Remontée à la factory : reste au produit, parce que ${motif}\n`;
+  const r48futur = jouer48Dans("produit48-run-ouvert", "s48-reste-retour-futur.md", reste48("le retour sera consigné avec A-2."));
+  const r48seqAbsent = jouer48Dans("produit48-run-ouvert", "s48-reste-retour-seq-absent.md", reste48("le retour est consigné au ledger (seq 2)."));
+  const r48sansRetour = jouer48Dans("produit48-run-ouvert", "s48-reste-retour-sans-entree.md", reste48("le retour est consigné au ledger."));
+  const r48seqPresent = jouer48Dans("produit48-retour", "s48-reste-retour-ecrit.md", reste48("le retour est consigné au ledger (seq 2)."));
+  const r48ecritPuisRemis = jouer48Dans("produit48-retour", "s48-reste-retour-ecrit-remis-plus-tard.md", reste48("le retour est consigné (seq 2) et sera remonté dans le lot de clôture."));
+  for (const [r, statut, quoi] of [
+    [r48futur, "FAIL", "« reste au produit, parce que le retour sera consigné avec A-2 » passe — le cas du 04/11, un retour promis au futur et écrit nulle part"],
+    [r48seqAbsent, "FAIL", "un motif qui cite l'entrée seq 2 comme un retour passe alors que l'entrée 2 du ledger n'en est pas un"],
+    [r48sansRetour, "FAIL", "un motif qui dit le retour consigné au ledger passe alors que le ledger ne porte aucune entrée type: retour"],
+    [r48seqPresent, "PASS", "le MÊME motif devant un ledger dont l'entrée seq 2 est un retour (le remède joué) est accusé"],
+    [r48ecritPuisRemis, "PASS", "un retour écrit qui annonce sa seule remise future (« sera remonté dans le lot de clôture ») est accusé"],
+  ]) if (c48(r).statut !== statut)
+    casse.push(`S48 (TF-2137) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
+  if (!/n'est pas écrit/.test(c48(r48futur).message || "") || !/TF-2137/.test(c48(r48futur).message || ""))
+    casse.push("S48 (TF-2137) : le constat du retour promis au futur doit dire que le retour n'est pas écrit et citer TF-2137 : " + String(c48(r48futur).message || "").slice(0, 200));
+  }
+  // 12/11 — TF-2429, S135 DANS SES SENS. Rouge : une phrase du bloc 4 promet « le lot de clôture du run » chez un produit dont le run est clos, ou qui n'a pas de ledger. Verts : le MÊME texte chez un
+  // produit dont un run est ouvert ; le remède (le lot nommé et remis) ; une phrase qui nie la promesse ; l'expression citée entre « » ; la ligne « Remontée à la factory » (S48 la juge, S135 la laisse) ;
+  // hors de tout produit (SANS_OBJET).
+  if (veut(2429)) {
+  const c135 = (r) => { try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === "S135") || {}; } catch { return {}; } };
+  const PROMESSE135 = "\n- Les deux retours consignés au ledger (seq 3 et 4) partent avec le lot de clôture du run.\n";
+  const r135clos = jouer48Dans("produit48-run-clos", "s135-run-clos.md", PROMESSE135);
+  const r135sansLedger = jouer48("s135-sans-ledger.md", PROMESSE135);
+  const r135ouvert = jouer48Dans("produit48-run-ouvert", "s135-run-ouvert.md", PROMESSE135);
+  const r135remede = jouer48Dans("produit48-run-clos", "s135-remede.md", "\n- Les deux retours consignés au ledger (seq 3 et 4) sont compilés dans le lot « Produit-99 - RETOURS - 20261112a », remis au pilot.\n");
+  const r135nie = jouer48Dans("produit48-run-clos", "s135-niee.md", "\n- Le lot part dans le tour, plus avec le lot de clôture du run.\n");
+  const r135cite = jouer48Dans("produit48-run-clos", "s135-citee.md", "\n- La règle S135 refuse la promesse « le lot de clôture du run » quand aucun run n'est ouvert.\n");
+  const r135remontee = jouer48Dans("produit48-run-clos", "s135-remontee.md", "\n- Remontée à la factory : reste au produit, parce que les deux retours partent avec le lot de clôture du run.\n");
+  mkdirSync(join(dir, "hors-produit135"), { recursive: true });
+  const f135hors = join(dir, "hors-produit135", "s135-hors-produit.md");
+  writeFileSync(f135hors, verte + PROMESSE135, "utf8");
+  const r135hors = spawnSync(process.execPath, [moi, f135hors], { encoding: "utf8" });
+  for (const [r, statut, quoi] of [
+    [r135clos, "FAIL", "« partent avec le lot de clôture du run » chez un produit dont le run est clos passe — une clôture qui ne viendra pas"],
+    [r135sansLedger, "FAIL", "la même promesse chez un produit sans ledger passe"],
+    [r135ouvert, "PASS", "la même promesse chez un produit dont un run est ouvert est accusée — la clôture viendra"],
+    [r135remede, "PASS", "le remède (le lot nommé et remis, sans « lot de clôture ») est accusé"],
+    [r135nie, "PASS", "une phrase qui nie la promesse (« plus avec le lot de clôture ») est accusée"],
+    [r135cite, "PASS", "l'expression citée entre « » est prise pour une promesse"],
+    [r135remontee, "PASS", "la ligne « Remontée à la factory » est lue par S135 alors que S48 la juge"],
+    [r135hors, "SANS_OBJET", "hors de tout produit, la règle devrait être déclarée hors de portée"],
+  ]) if (c135(r).statut !== statut)
+    casse.push(`S135 (TF-2429) : ${quoi} — attendu ${statut} : ` + String(c135(r).message || "sortie illisible").slice(0, 200));
+  if (!/aucun run n'est ouvert/.test(c135(r135clos).message || "") || !/ledger\.jsonl sans run_open en cours/.test(c135(r135clos).message || "") || !/oracle-lot\.mjs/.test(c135(r135clos).message || ""))
+    casse.push("S135 (TF-2429) : le constat doit dire qu'aucun run n'est ouvert et nommer la commande qui remet le lot : " + String(c135(r135clos).message || "").slice(0, 240));
+  if (!/ledger\.jsonl absent/.test(c135(r135sansLedger).message || ""))
+    casse.push("S135 (TF-2429) : le constat sans ledger doit dire que le ledger est absent : " + String(c135(r135sansLedger).message || "").slice(0, 240));
+  // S48 garde sa ligne : la remontée « reste au produit » sans run ouvert reste refusée par S48, S135 ne la double pas.
+  if (c48(r135remontee).statut !== "FAIL") casse.push("S135 (TF-2429) : le témoin de la ligne de remontée n'est plus refusé par S48 — la répartition S48/S135 ne tient plus : " + String(c48(r135remontee).message || "").slice(0, 200));
+  }
   // 29/10 — TF-1987 : UNE CORRECTION D'INFRASTRUCTURE EST UNE CORRECTION. Le cas réel du 24/10 : le tour recrée le conteneur d'un moteur avec un volume (`docker rm`, `docker run -v`),
   // puis déclare « rien à remonter ». FAIL ; le MÊME qui nomme son lot PASS ; une commande de lecture (`docker ps`) n'est pas une correction.
+  if (veut(1987)) {
   const INFRA48 = "\n- Conteneur du moteur recréé avec un volume : `docker rm -f nodeodm` puis `docker run -d -v nodeodm-data:/var/www/data opendronemap/nodeodm` — preuve : le conteneur répond sur le port 3000.\n";
   const r48infraRien = jouer48("s48-infra-rien.md", INFRA48 + "- Remontée à la factory : rien à remonter.\n");
   const r48infraLot = jouer48("s48-infra-lot.md", INFRA48 + "- Remontée à la factory : lot « Produit-99 - RETOURS - 20261024a » remis.\n");
@@ -5886,9 +6553,29 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S48"[^}]*PASS/.test(r48corrReste.stdout))
     casse.push("S48 (TF-1643) : « reste au produit, parce que <motif> » est une réponse qui tranche et elle est accusée : " +
       (/"S48"[\s\S]{0,200}/.exec(r48corrReste.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
+  // 09/11 — TF-2305 : UN DÉFAUT CONSTATÉ SUR SOI, ÉCRIT PAR LE TOUR, EST UNE CORRECTION. Le cas réel du 09/11 : une voie manuelle proposée alors que la session pouvait automatiser le geste (loi n° 5),
+  // puis « rien à remonter ». FAIL ; le MÊME tour qui nomme son lot PASS ; « j'aurais dû » FAIL ; une action manuelle proposée sans contradiction (un arbitrage) et un « aurait dû » dit d'un tiers PASS.
+  if (veut(2305)) {
+  const SOI48 = "\n- Accès à la base de dev : j'ai proposé une voie manuelle au porteur (écrire à un tiers, passer par le portail) alors que je pouvais exécuter le geste moi-même, `az sql server ad-admin create` — preuve : exit 0 une fois joué (loi n° 5).\n";
+  const r48soiRien = jouer48("s48-defaut-sur-soi-rien.md", SOI48 + "- Remontée à la factory : rien à remonter.\n");
+  const r48soiLot = jouer48("s48-defaut-sur-soi-lot.md", SOI48 + "- Remontée à la factory : lot « Produit-99 - RETOURS - 20261109a » remis.\n");
+  const r48auraisDu = jouer48("s48-aurais-du-rien.md", "\n- Le script de rangement a été relancé — preuve : exit 0 ; j'aurais dû le lancer avant la publication.\n- Remontée à la factory : rien à remonter.\n");
+  const r48manuelle = jouer48("s48-action-manuelle-sans-defaut-rien.md", "\n- Signature du contrat laissée au porteur : j'ai proposé une action manuelle, motif decision — preuve : `contrat.md` relu.\n- Remontée à la factory : rien à remonter.\n");
+  const r48tiers = jouer48("s48-aurait-du-tiers-rien.md", "\n- Le fournisseur aurait dû livrer le fichier avant jeudi — preuve : bon de livraison du 06/11, 3 jours de retard.\n- Remontée à la factory : rien à remonter.\n");
+  for (const [r, statut, quoi] of [
+    [r48soiRien, "FAIL", "« j'ai proposé une voie manuelle alors que je pouvais exécuter le geste » puis « rien à remonter » passe — le cas du 09/11, un défaut constaté sur soi et non remonté"],
+    [r48soiLot, "PASS", "le MÊME tour qui nomme son lot est accusé"],
+    [r48auraisDu, "FAIL", "« j'aurais dû » puis « rien à remonter » passe"],
+    [r48manuelle, "PASS", "une action manuelle proposée sans contradiction (un arbitrage) est prise pour un défaut sur soi"],
+    [r48tiers, "PASS", "un « aurait dû » dit d'un tiers (un fournisseur) est pris pour un défaut de la session"],
+  ]) if (c48(r).statut !== statut)
+    casse.push(`S48 (TF-2305) : ${quoi} — attendu ${statut} : ` + String(c48(r).message || "sortie illisible").slice(0, 200));
+  }
   // 14/10 — S48 ET `--racine` DANS LEURS DEUX SENS (TF-1644). Le hook juge un fichier TEMPORAIRE :
   // le même message muet, posé hors de tout produit, rend SANS_OBJET seul et FAIL quand `--racine`
   // nomme le produit du tour. Sans ce cas, la règle redevient muette au seul endroit où elle joue.
+  if (veut(48, 1644)) {
   mkdirSync(join(dir, "hors-produit48"), { recursive: true });
   const f48tmp = join(dir, "hors-produit48", "s48-message-temporaire.md");
   writeFileSync(f48tmp, verte, "utf8");
@@ -5899,15 +6586,19 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S48"[^}]*FAIL/.test(r48racine.stdout))
     casse.push("S48 : `--racine` nomme un produit et le message muet passe encore — le hook, qui juge un fichier " +
       "temporaire, ne verrait jamais la règle (TF-1644)");
+  }
   // 17/09 — LE POINT D'ÉTAPE DANS SES QUATRE SENS (TF-1182). Les quatre fixtures sortent de la
   // VERTE et ne diffèrent d'elle que par ce que la forme change : la mention au bloc 1 et le titre
   // du bloc 2. C'est la seule façon de prouver que ce qui est jugé est la FORME, et non un reste
   // du document. Le premier sens est celui qui manquait au 17/09 : un point d'étape écrit à la
   // lettre du gabarit doit être ACCEPTÉ, là où il rendait S1 et S3 FAIL — les deux bloquantes.
-  const EN_TETE_V = "## 1. En-tête\nCampagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, l'intention est servie.";
-  const VERDICT_V = "## 2. Verdict\nRecette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
+  if (veut(2302, 2304, 115, 1182, 23, 51, 791, 25, 1189, 18, 1427, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1580, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 4, 1429, 1467, 45, 70, 71, 72, 1708, 1709, 1711, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 2137, 88, 1979, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 1982, 1987, 85, 86, 1949, 55, 56, 1493, 1498)) {
+  var EN_TETE_V = "## 1. En-tête\nCampagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, l'intention est servie.";
+  var VERDICT_V = "## 2. Verdict\nRecette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
+  }
   // La glose de « S-01 » vit dans la ligne de verdict que la forme remplace : elle se reporte dans
   // la ligne de mesure, sinon la fixture échouerait sur S23 et non sur ce qu'on prétend prouver.
+  if (veut(2302, 2304, 115, 23, 51, 791, 25, 1189, 18, 1427, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1580, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 4, 1429, 1467, 45, 70, 71, 72, 1708, 1709, 1711, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 2137, 88, 1979, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 1982, 1987, 85, 86, 1949, 55, 56, 1493, 1498)) {
   const MESURE = "Reste à mesurer : la recette S-01 (banc rouge de la forge de tests) rejouée sur la version déployée — par `node oracles\\self-tests.mjs`, au retour du déploiement lancé à 15h44.";
   const pe = verte
     .replace(EN_TETE_V, "## 1. En-tête\nPoint d'étape · forge-tests · déploiement lancé le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot"
@@ -5916,7 +6607,7 @@ Aucun écart : la demande a été suivie à la lettre.
     .replace(VERDICT_V, "## 2. Ce qui reste à mesurer, et par quoi\n" + MESURE);
   const peSansMesure = pe.replace(MESURE, "La recette S-01 (banc rouge de la forge de tests) semble bien partie, on regardera demain matin.");
   const peSansTraite = pe.replace(B4lex, "- Rien encore : le déploiement n'a pas rendu la main.");
-  const jouerPe = (nom, contenu) => {
+  var jouerPe = (nom, contenu) => {
     const f = join(dir, nom);
     writeFileSync(f, contenu, "utf8");
     return spawnSync(process.execPath, [moi, f], { encoding: "utf8" });
@@ -5941,9 +6632,11 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S50"[^}]*FAIL/.test(rPeT.stdout))
     casse.push("S50 : un point d'étape dont le bloc 4 ne porte RIEN passe — la mention au bloc 1 deviendrait une " +
       "exemption déguisée en forme jugée, exactement ce que TF-0979 existe pour empêcher");
+  }
   // 17/09 — S51 DANS SES TROIS SENS (TF-0791). Les trois fixtures ne diffèrent que par la FIN de
   // la ligne d'en-tête : les deux pièces, l'intention seule, aucune des deux. C'est la seule forme
   // qui prouve que la règle juge ce qu'elle prétend juger et non le reste du bloc 1.
+  if (veut(51, 791)) {
   const INTENTION = " · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit "
     + "attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, "
     + "l'intention est servie.";
@@ -5966,13 +6659,15 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S50"[^}]*SANS_OBJET/.test(rv.stdout))
     casse.push("S50 : hors d'un point d'étape déclaré, la règle devrait rendre SANS_OBJET et le DIRE : " +
       (/"S50"[\s\S]{0,160}/.exec(rv.stdout) || [""])[0].replace(/\s+/g, " "));
+  }
   // 19/09 — S25 DANS SES TROIS SENS (TF-1189). Les trois fixtures ne diffèrent que par la ligne
   // ajoutée au bloc 5, et la troisième est celle qui prouve que la règle juge la PREUVE et non le
   // mot : elle porte la formule fautive MOT POUR MOT et passe, parce que ses appels couvrent deux
   // familles. La rouge est le texte du 18/09 — quatre appels tous sous `…/myorg/groups/…`, fermés
   // par « il n'existe aucun autre chemin » —, et c'est lui qui a fait écrire un constat faux dans
   // deux synthèses jugées PASS.
-  const B5cible = "- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.";
+  if (veut(25, 1189, 68, 1580, 1985, 89, 1984, 2302, 2304, 115)) {
+  var B5cible = "- Regroupement par cause racine : motif — sa cause est traitée, critère de réouverture écrit.";
   const S25_MEME_FAMILLE = "GET /v1.0/myorg/groups/{idEspace}/reports rend 401, "
     + "GET /v1.0/myorg/groups/{idEspace}/reports/{idRapport} rend 401, "
     + "GET /v1.0/myorg/groups/{idEspace}/reports/{idRapport}/pages rend 401, "
@@ -6007,6 +6702,7 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/"S25"[^}]*FAIL/.test(rr.stdout))
     casse.push("S25 : « je ne peux pas deployer d'ici, le CLI rend Unauthorized » — le cas fondateur de TF-0606, sans " +
       "second chemin ni appel cité — passe : le durcissement du 19/09 a emporté la règle d'origine");
+  }
   // 28/09 — TF-1427 DANS SES QUATRE SENS. Le bloc 8 de la verte devient un tableau, et seule varie
   // la ligne A-1. Une barre NUE dans la cellule « Comment » coupe la ligne : S18 le dit en nommant la
   // barre à échapper, et S12 reste PASS — le motif s'affiche à sa place, le refus d'hier accusait la
@@ -6014,24 +6710,25 @@ Aucun écart : la demande a été suivie à la lettre.
   // entier, c'est le remède que le constat recommande, joué ici (TF-1013). Une barre posée AVANT la
   // colonne du motif le déplace : S12 refuse, et son constat nomme la coupure comme cause. Une
   // cellule absente est l'autre sens de la même règle.
-  const constatDe = (r, regle) => {
+  if (veut(2302, 2304, 115, 18, 1427, 1982, 2137, 1987, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 1467, 70, 71, 72, 1708, 1709, 1711, 85, 86, 1949, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 88, 1979, 23, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 55, 56, 1493, 1498, 45, 4)) {
+  var constatDe = (r, regle) => {
     try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === regle) || {}; } catch { return {}; }
   };
-  const echecsDe = (r) => {
+  var echecsDe = (r) => {
     try { return (JSON.parse(r.stdout).findings || []).filter((f) => f.statut === "FAIL").map((f) => f.regle).join(", "); }
     catch { return (r.stderr || "sortie illisible").slice(0, 200); }
   };
   const ENTETE_1427 = "| Sél. | Action | Acteur | Id | Motif | Comment | Si rien n'est fait |" + nl + "|---|---|---|---|---|---|---|";
-  const ligneA1_1427 = (action, comment) => `| **A-1** | ${action} | \`manuelle_dev\` | TF-0220 | \`acces\` — appel TENTÉ le 25/09, `
+  var ligneA1_1427 = (action, comment) => `| **A-1** | ${action} | \`manuelle_dev\` | TF-0220 | \`acces\` — appel TENTÉ le 25/09, `
     + `\`HTTP 403 Authorization_RequestDenied\` | ${comment} | le compteur reste inconnu |`;
-  const A2_1427 = "| **A-2** | Trancher le périmètre du lot suivant | `manuelle_utilisateur` | TF-0221 | `decision` — arbitrage métier"
+  var A2_1427 = "| **A-2** | Trancher le périmètre du lot suivant | `manuelle_utilisateur` | TF-0221 | `decision` — arbitrage métier"
     + " | répondre « D-1 (a) » ; écran « Publier la version » | le lot suivant ne démarre pas |";
-  const A3_1427 = "| **A-3** | Regrouper les constats par cause racine | `auto_ia` | TF-0222 | `dependance_bloc_3` — attend D-1"
+  var A3_1427 = "| **A-3** | Regrouper les constats par cause racine | `auto_ia` | TF-0222 | `dependance_bloc_3` — attend D-1"
     + " | `node todo\\regrouper.mjs` | les constats restent listés un par un |";
   const bloc8Tableau = (a1) => verte.replace(/## 8\. Prochaines actions[\s\S]*$/, "## 8. Prochaines actions" + nl + nl
     + "Les actions sont triées, celles de l'IA d'abord, parce qu'elles n'attendent personne." + nl + nl
     + [ENTETE_1427, a1, A2_1427, A3_1427].join(nl) + nl);
-  const RELEVER = "Relever le compteur de la cible de dev";
+  var RELEVER = "Relever le compteur de la cible de dev";
   const r1427nue = jouerPe("tf1427-barre-nue.md", bloc8Tableau(ligneA1_1427(RELEVER, "`az pipelines runs list 2>/dev/null || echo 0`")));
   const r1427ech = jouerPe("tf1427-barre-echappee.md", bloc8Tableau(ligneA1_1427(RELEVER, "`az pipelines runs list 2>/dev/null \\|\\| echo 0`")));
   const r1427avant = jouerPe("tf1427-barre-avant-motif.md",
@@ -6056,11 +6753,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c18manque.statut !== "FAIL" || !/il en manque/.test(c18manque.message || ""))
     casse.push("TF-1427 : une ligne à qui manque une cellule — ce qui suit glisse sous l'en-tête voisin — passe S18 : "
       + String(c18manque.message || c18manque.statut || "").slice(0, 200));
+  }
   // 02/10 — TF-1469 : LA MÊME LIGNE, SOUS L'EN-TÊTE QUE PRESCRIT LE GABARIT TODO-PRODUIT. La
   // colonne « Motif » de TF-1427 devient « Pourquoi pas IA » (gabarits\docs-projet\TODO-PRODUIT.md
   // l.64) : la cellule et son vocabulaire fermé entre accents graves ne changent pas. Sans la
   // colonne retrouvée par son en-tête, la lecture retombe sur `horsCode` du groupe ENTIER — qui
   // ÔTE les citations entre accents graves — et le mot du vocabulaire fermé disparaît avec elles.
+  if (veut(1469, 1427)) {
   const ENTETE_1469 = "| Sél. | Action | Acteur | Id | Pourquoi pas IA | Comment | Si rien n'est fait |" + nl + "|---|---|---|---|---|---|---|";
   const bloc8Tableau1469 = (a1) => verte.replace(/## 8\. Prochaines actions[\s\S]*$/, "## 8. Prochaines actions" + nl + nl
     + "Les actions sont triées, celles de l'IA d'abord, parce qu'elles n'attendent personne." + nl + nl
@@ -6073,7 +6772,9 @@ Aucun écart : la demande a été suivie à la lettre.
       + "sous l'en-tête « Pourquoi pas IA » prescrit par gabarits\\docs-projet\\TODO-PRODUIT.md l.64 — S12 ne lit pas la "
       + "colonne : " + String(c12_1469.message || c12_1469.statut || "sortie illisible").slice(0, 200));
 
+  }
   // 02/10 — TF-1503 : S57, LE DOCUMENT TENU OUVERT, DANS SES TROIS SENS.
+  if (veut(57, 1503)) {
   const r57sansObjet = jouerPe("tf1503-sans-objet.md", verte);
   const c57so = constatDe(r57sansObjet, "S57");
   if (c57so.statut !== "SANS_OBJET")
@@ -6100,8 +6801,10 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("TF-1503 : la forme PRESCRITE (bloc 8, auto_ia, dependance_externe, application nommée, rejoué au tour "
       + "suivant), ni posée en décision ni comptée bloquante, est accusée : " + String(c57f.message || c57f.statut || "").slice(0, 200));
 
+  }
   // 02/10 — TF-1496 : S58, LE GARDE-FOU DE PLATEFORME EN EXCLUSIONS, DANS SES TROIS SENS.
-  const r58sansObjet = jouerPe("tf1496-sans-objet.md", verte);
+  if (veut(58, 1496, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 91, 89, 1984, 70, 71, 72, 1708, 1709, 1711, 75, 76, 1766, 1802, 55, 56, 1493, 1498, 79, 85, 86, 1949)) {
+  var r58sansObjet = jouerPe("tf1496-sans-objet.md", verte);
   const c58so = constatDe(r58sansObjet, "S58");
   if (c58so.statut !== "SANS_OBJET")
     casse.push("TF-1496 : S58 devrait rendre SANS_OBJET hors de toute mention d'un garde-fou de plateforme, et le dire : "
@@ -6122,11 +6825,13 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("TF-1496 : la MÊME restitution, l'option du bloc 3 citant désormais GFP-001, est encore accusée : "
       + String(c58c.message || c58c.statut || "").slice(0, 200));
 
+  }
   // 12/10 — TF-1567 : S61, `decision` POUR L'EXÉCUTION D'UN CHOIX RENDU, DANS SES QUATRE SENS. Le
   // cas fondateur (lot Produit-02 du 01/10) : déposer des exclusions déjà arrêtées au plan, sous
   // `decision`, sans que la voie automatique ait été essayée. Les quatre lignes ne diffèrent que
   // par la trace, par le choix nommé ou par le gate : c'est ce qui prouve que la règle juge ce
   // qu'elle prétend juger.
+  if (veut(61, 1567)) {
   const A4_1567 = (pourquoi) => "- **A-4** — déposer les 92 exclusions et les 2 plafonds du plan dans le compte publicitaire (TF-1567) (manuelle_utilisateur).\n"
     + `  - pourquoi pas l'IA : decision — ${pourquoi} ;\n`
     + "  - où : `donnees\\exclusions.csv`, écran « Mots clés à exclure ».\n"
@@ -6156,9 +6861,11 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("TF-1567 : la MÊME action dont le motif nomme un GATE (R-38, feu vert) est accusée — un gate reste humain "
       + "par doctrine : " + String(c59g.message || c59g.statut || "").slice(0, 200));
 
+  }
   // 12/10 — TF-1262 : S62, LE VERDICT CITÉ SUR UN PÉRIMÈTRE RÉDUIT, DANS SES QUATRE SENS. La phrase
   // fondatrice du 14/09 (« PASS à 1920 px »), la MÊME qui dit son périmètre, la MÊME CITÉE entre
   // guillemets dans un constat, et le verdict au périmètre par défaut énuméré en six largeurs.
+  if (veut(62, 1262)) {
   const avecB4_1262 = (puce) => verte.replace("## 5. Non traité", "- " + puce + "\n\n## 5. Non traité");
   const r60so = jouerPe("tf1262-sans-objet.md", verte);
   if (constatDe(r60so, "S62").statut !== "PASS")
@@ -6185,10 +6892,12 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(r60six, "S62").statut !== "PASS")
     casse.push("TF-1262 : un verdict cité sur les six largeurs ÉNUMÉRÉES — le périmètre par défaut — est accusé : "
       + String(constatDe(r60six, "S62").message || "").slice(0, 200));
+  }
   // 12/10 — TF-1582 : S63, LA CITATION D'UNE PAGE TIERCE, DANS SES TROIS SENS. La rouge cite « mot pour
   // mot » une page d'aide à l'adresse donnée, sans trace d'une recherche exacte dans le texte brut ; la
   // MÊME citation portant la trace qu'indique le message (le remède joué, TF-1013) passe ; la verte, qui
   // ne cite aucune page tierce, rend SANS_OBJET (déjà vérifié par r58sansObjet plus haut, qui joue la verte).
+  if (veut(63, 1582)) {
   const CITATION_59 = "\n- La page d'aide https://support.google.com/google-ads/answer/6167118 dit : « lorsque la limite de dépense quotidienne de 20 € est atteinte, la diffusion s'arrête ».";
   const r63rouge = jouerPe("tf1582-citation-sans-trace.md", verte.replace("## 5. Non traité", CITATION_59.trimStart() + "\n\n## 5. Non traité"));
   const c63r = constatDe(r63rouge, "S63");
@@ -6206,11 +6915,13 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("TF-1582 : S63 devrait rendre SANS_OBJET hors de toute citation d'une page tierce, et le dire : "
       + String(c63so.message || c63so.statut || "").slice(0, 200));
 
+  }
   // 13/10 — TF-1632 : S64, LE BLOC RÉDUIT À SON TITRE, DANS SES QUATRE SENS. La mutation du banc
   // (le bloc 7 vidé sous son titre) FAIL sur S64 alors que S1 reste PASS — c'est le trou mesuré ; la
   // MÊME restitution dont le bloc 7 dit son vide en une ligne PASS en entier (le remède que le message
   // recommande, TF-1013) ; la MÊME qui le dit sur la ligne du titre PASS ; la verte PASS.
   // Le bloc 7 jusqu'au bloc qui le suit : le 9 dans la verte depuis T2 (TF-1947), placé avant le 8.
+  if (veut(64, 1, 1632)) {
   const BLOC7_V = /## 7\. Risques[\s\S]*?(?=## [89]\.)/;
   const r64vide = jouerPe("tf1632-bloc-7-vide.md", verte.replace(BLOC7_V, "## 7. Risques\n\n"));
   const c64v = constatDe(r64vide, "S64");
@@ -6229,9 +6940,11 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(r58sansObjet, "S64").statut !== "PASS")
     casse.push("TF-1632 : la verte, dont chaque bloc porte du contenu, est accusée par S64 : " + String(constatDe(r58sansObjet, "S64").message || "").slice(0, 160));
 
+  }
   // 13/10 — TF-1514 : S65, L'ÉNUMÉRATION DES VOIES AUTOMATIQUES, DANS SES DEUX SENS. La verte nomme deux
   // familles pour son motif `acces` (l'API, par son code de retour, et le compte de l'agent) : PASS. La
   // MÊME privée de sa seconde clause ne nomme plus qu'une voie : FAIL. Une clause sépare les deux.
+  if (veut(65, 1514)) {
   const CLAUSE_SESSION = " ; le compte de l'agent ne porte aucun rôle sur le portail";
   const r65une = jouerPe("tf1514-une-seule-voie.md", verte.replace(CLAUSE_SESSION, ""));
   const c65u = constatDe(r65une, "S65");
@@ -6241,9 +6954,11 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(r58sansObjet, "S65").statut !== "PASS")
     casse.push("TF-1514 : la verte, qui nomme deux voies essayées, est accusée par S65 : " + String(constatDe(r58sansObjet, "S65").message || "").slice(0, 200));
 
+  }
   // 13/10 — TF-1565 : S66, L'INVRAISEMBLANCE PRÉSENTÉE EN CHOIX, DANS SES TROIS SENS. Une concentration
   // chiffrée sur une seule période glissée dans une décision FAIL ; la MÊME présentée en anomalie avec sa
   // cause probable PASS ; la verte, sans aucune mesure de ce genre, PASS.
+  if (veut(66, 1565)) {
   const FIN_D1 = "et personne d'autre n'en profite tant qu'on attend.";
   const r66choix = jouerPe("tf1565-concentration-en-choix.md", verte.replace(FIN_D1,
     FIN_D1 + " Date de détection retenue : la plus ancienne trace, soit 12 défauts sur 19 en 2026-08, à confirmer."));
@@ -6259,10 +6974,12 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(r58sansObjet, "S66").statut !== "PASS")
     casse.push("TF-1565 : la verte, sans mesure concentrée ni invraisemblable, est accusée par S66 : " + String(constatDe(r58sansObjet, "S66").message || "").slice(0, 200));
 
+  }
   // 13/10 — TF-1579 : S67, LA PROMESSE DE PRÉVENIR, DANS SES TROIS SENS. Une veille de fond de la
   // session promise par « je vous préviens » FAIL ; la MÊME portée par une tâche planifiée qui survit à
   // la session PASS ; la verte, qui ne promet rien, PASS.
-  const VEILLE = (porteur) => verte.replace("## 5. Non traité", "- Veille des impressions lancée " + porteur
+  if (veut(67, 1579, 55, 56, 1493, 1498, 79)) {
+  var VEILLE = (porteur) => verte.replace("## 5. Non traité", "- Veille des impressions lancée " + porteur
     + " (18 relevés à 20 min) — preuve : premier relevé à 0 impression ; je vous préviens à la première impression.\n\n## 5. Non traité");
   const r67fond = jouerPe("tf1579-veille-de-fond.md", VEILLE("en tâche de fond"));
   const c67f = constatDe(r67fond, "S67");
@@ -6276,19 +6993,23 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(r58sansObjet, "S67").statut !== "PASS")
     casse.push("TF-1579 : la verte, qui ne promet aucun avis, est accusée par S67 : " + String(constatDe(r58sansObjet, "S67").message || "").slice(0, 200));
 
+  }
   // 13/10 — TF-1580 : S68, L'ABSENCE DÉCLARÉE SANS L'ESSAI DISPONIBLE, DANS SES QUATRE SENS. Une
   // donnée « non mesurable » parce que publiée en image FAIL, la MÊME après lecture des images PASS ;
   // des faits « introuvables sur le site » FAIL, les MÊMES après lecture du plan du site PASS.
-  const B5_68 = (ligne) => verte.replace(B5cible, B5cible + "\n" + ligne);
-  const r68img = jouerPe("tf1580-image-non-lue.md", B5_68("- Jour de collecte : motif — non mesurable, publié en tableaux image."));
-  const r68imgLue = jouerPe("tf1580-image-lue.md", B5_68("- Jour de collecte : motif — non mesurable, publié en tableaux image ; "
+  if (veut(68, 1580, 1985, 89, 1984, 2302, 2304, 115)) {
+  var B5_68 = (ligne) => verte.replace(B5cible, B5cible + "\n" + ligne);
+  var r68img = jouerPe("tf1580-image-non-lue.md", B5_68("- Jour de collecte : motif — non mesurable, publié en tableaux image."));
+  var r68imgLue = jouerPe("tf1580-image-lue.md", B5_68("- Jour de collecte : motif — non mesurable, publié en tableaux image ; "
     + "les 4 images lues avec l'outil de lecture d'image, recadrées, ne portent pas la ligne."));
-  const r68site = jouerPe("tf1580-site-sans-plan.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant."));
-  const r68plan = jouerPe("tf1580-site-plan-lu.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant, "
+  var r68site = jouerPe("tf1580-site-sans-plan.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant."));
+  var r68plan = jouerPe("tf1580-site-plan-lu.md", B5_68("- Horaires du sauna : motif — introuvables sur le site de l'exploitant, "
     + "`sitemap.xml` lu et 24 pages relues."));
+  }
   // 29/10 — TF-1985 : S68 ÉTENDUE À UN 200 AU CORPS VIDE, DANS SES QUATRE SENS. Le cas réel du 26/10 (build ADO 17724) : `GET APP-IA/_apis/serviceendpoint/endpoints/a13c860e`
   // rend 200 et `null`, la session conclut que la connexion n'existe plus ; le même appel dans le projet POC-IA la rend vivante. (a) la conclusion nue FAIL ; (b) la MÊME
   // après l'essai dans le projet voisin PASS ; (c) la MÊME qui cite un 404 PASS ; (d) un 200 qui rend la ressource, déclarée à jour, n'est pas une absence — PASS.
+  if (veut(68, 1985)) {
   const CONCLUSION_200 = "- Connexion de service a13c860e : motif — le GET sur APP-IA/_apis/serviceendpoint/endpoints/a13c860e rend 200 et null, la connexion n'existe plus ; on recommande de remplacer le sujet de la règle fédérée.";
   const r68vide = jouerPe("tf1985-200-vide-sans-essai.md", B5_68(CONCLUSION_200));
   const r68voisin = jouerPe("tf1985-200-vide-projet-voisin-essaye.md", B5_68(CONCLUSION_200.replace("on recommande", "le même appel dans le projet POC-IA la rend pourtant vivante (200 usages), donc elle existe : on recommande de garder le sujet, et d'")
@@ -6308,7 +7029,68 @@ Aucun écart : la demande a été suivie à la lettre.
   for (const [r, statut, quoi] of attendu68)
     if (constatDe(r, "S68").statut !== statut)
       casse.push(`S68 (TF-1580, TF-1985) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S68").message || "sortie illisible").slice(0, 160));
+  }
+  // 09/11 — TF-2302 : S68 ÉTENDUE AUX DROITS, DANS SES CINQ SENS. Le cas réel du 09/11 : `az role assignment list --all --assignee …` sans `--include-groups` ne rend que les attributions directes ; la session
+  // conclut à une absence de droit sur l'abonnement, alors que l'utilisateur était Contributor par un groupe. Aucun identifiant réel dans les fixtures (`<utilisateur-fictif>`). (a) la conclusion nue FAIL ;
+  // (b) la MÊME après `--include-groups` PASS ; (c) la MÊME qui dit avoir lu les droits effectifs par les groupes PASS ; (d) un relevé direct sans conclusion d'absence PASS ; (e) une conclusion d'absence qui se
+  // dit tirée des seules attributions directes, sans la commande, FAIL.
+  if (veut(2302)) {
+  const RELEVE_DIRECT = "- Accès à l'abonnement : motif — `az role assignment list --all --assignee <utilisateur-fictif>` ne rend aucune attribution Contributor ; l'utilisateur n'a aucun droit sur l'abonnement, la demande part à l'administrateur.";
+  const r68dDirect = jouerPe("tf2302-droits-directs.md", B5_68(RELEVE_DIRECT));
+  const r68dGroupes = jouerPe("tf2302-droits-avec-groupes.md", B5_68(RELEVE_DIRECT.replace("--all --assignee", "--all --include-groups --assignee")));
+  const r68dEffectifs = jouerPe("tf2302-droits-effectifs.md", B5_68(RELEVE_DIRECT.replace("ne rend aucune attribution Contributor", "ne rend aucune attribution directe, mais les droits effectifs lus par les groupes de l'utilisateur ne portent aucun rôle Contributor")));
+  const r68dSansAbsence = jouerPe("tf2302-droits-sans-conclusion.md", B5_68("- Accès à l'abonnement : motif — `az role assignment list --all --assignee <utilisateur-fictif>` rend 2 attributions directes (Reader sur deux groupes de ressources), le reste reste à lire."));
+  const r68dProse = jouerPe("tf2302-droits-directs-en-prose.md", B5_68("- Accès à l'abonnement : motif — seules les attributions directes ont été relevées, l'utilisateur n'a aucun rôle sur l'abonnement."));
+  if (RELEVE_DIRECT.includes("--include-groups")) casse.push("S68 (TF-2302) : la fixture rouge porte déjà --include-groups — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r68dDirect, "FAIL", "une absence de droit conclue d'un `az role assignment list` sans `--include-groups` passe — le cas du 09/11, un Contributor hérité d'un groupe"],
+    [r68dGroupes, "PASS", "la MÊME conclusion après `--include-groups` (le remède joué) est accusée"],
+    [r68dEffectifs, "PASS", "la MÊME qui dit avoir lu les droits effectifs par les groupes est accusée"],
+    [r68dSansAbsence, "PASS", "un relevé direct qui ne conclut à aucune absence est accusé"],
+    [r68dProse, "FAIL", "une absence de rôle conclue de « seules les attributions directes » passe sans lecture de l'héritage de groupe"],
+  ]) if (constatDe(r, "S68").statut !== statut)
+    casse.push(`S68 (TF-2302) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S68").message || "sortie illisible").slice(0, 200));
+  if (!/--include-groups/.test(constatDe(r68dDirect, "S68").message || "") || !/TF-2302/.test(constatDe(r68dDirect, "S68").message || "") || !/loi n° 5/.test(constatDe(r68dDirect, "S68").message || ""))
+    casse.push("S68 (TF-2302) : le constat doit nommer `--include-groups`, la loi n° 5 et TF-2302 : " + String(constatDe(r68dDirect, "S68").message || "").slice(0, 200));
+  }
+  // 09/11 — TF-2304 : S115, UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (loi n° 5), DANS SES HUIT SENS. La verte porte l'action A-2 (`manuelle_utilisateur`, motif `acces`) ; elle reçoit
+  // la commande du geste (« désigner l'administrateur de la base de dev ») dans son « où », et la MÊME commande est donnée ailleurs, au bloc 4, comme préparée par la session. (a) sans aucun code de retour d'échec
+  // (le portail « a refusé », en mots) FAIL — le cas du 09/11 ; (b) la MÊME commande jouée, avec son code `HTTP 403 Forbidden` au bloc 4 PASS ; (c) la commande dans la seule action manuelle, nulle part ailleurs PASS ;
+  // (d) la MÊME double présence sous un motif d'arbitrage (`decision`) PASS ; (e) le remède : l'action devient `auto_ia` PASS ; (f) la verte, sans commande d'action manuelle, PASS. Serveur et administrateur fictifs.
+  if (veut(2304, 115)) {
+  const CMD115 = "az sql server ad-admin create --server <serveur-fictif> --display-name <admin-fictif>";
+  const A2_TRACE = "publication TENTÉE le 14/08, `HTTP 403 Authorization_RequestDenied` ; le compte de l'agent ne porte aucun rôle sur le portail";
+  const B4_115 = (suite) => `- Commande préparée pour la base de dev : \`${CMD115}\` — preuve : ${suite}.\n\n## 5. Non traité`;
+  const base115 = verte.replace("bouton `Publier`.", `bouton \`Publier\`, ou \`${CMD115}\`.`);
+  const sansCode115 = base115.replace(A2_TRACE, "publication TENTÉE le 14/08, refusée par le portail");
+  if (base115 === verte || sansCode115 === base115) casse.push("S115 : une ancre de la verte n'a pas été trouvée — les cas ne prouvent plus rien");
+  const r115rouge = jouerPe("s115-commande-ailleurs-sans-code.md", sansCode115.replace("## 5. Non traité", B4_115("relue, non jouée")));
+  const r115code = jouerPe("s115-commande-ailleurs-avec-code.md", sansCode115.replace("## 5. Non traité", B4_115("jouée par la session, HTTP 403 Forbidden (l'identité de la session n'a pas le droit)")));
+  const r115seule = jouerPe("s115-commande-seule.md", sansCode115);
+  const r115arbitrage = jouerPe("s115-commande-ailleurs-arbitrage.md", sansCode115.replace("acces — publication TENTÉE le 14/08, refusée par le portail", "decision — arbitrage sur la désignation, qui attribue un droit à distance")
+    .replace("## 5. Non traité", B4_115("relue, non jouée")));
+  const groupeA2 = /- \*\*A-2\*\*[\s\S]*?(?=\n- \*\*A-3\*\*)/;
+  const r115auto = jouerPe("s115-remede-auto-ia.md", sansCode115.replace(groupeA2, "- **A-2** — ensuite TF-0221 (auto_ia) — désigner l'administrateur de la base de dev.\n  - motif de non-exécution : dependance_bloc_3 — attend la décision de publication ci-dessus.\n"
+    + `  - où : \`${CMD115}\`.\n  - si rien n'est fait : l'accès à la base de dev reste fermé.`).replace("## 5. Non traité", B4_115("relue, non jouée")));
+  // (g) et (h) — les deux faux positifs mesurés à l'entrée sur le corpus, joués dans leur forme : une commande LOCALE (`git pull`) et une commande d'une action écrite pour l'AUTRE POSTE.
+  const r115git = jouerPe("s115-commande-locale-git.md", sansCode115.replace(`\`${CMD115}\``, "`git pull --ff-only`").replace("## 5. Non traité", "- Dépôt à jour : `git pull --ff-only` — preuve : relu, non joué.\n\n## 5. Non traité"));
+  const r115autrePoste = jouerPe("s115-commande-autre-poste.md", sansCode115.replace("ou `" + CMD115 + "`.", "puis, sur l'autre poste, `" + CMD115 + "`.").replace("## 5. Non traité", B4_115("relue, non jouée")));
+  for (const [r, statut, quoi] of [
+    [r115git, "PASS", "une commande locale (`git pull`) donnée aussi ailleurs dans le texte est accusée — le faux positif mesuré sur 12 synthèses du corpus"],
+    [r115autrePoste, "PASS", "une commande d'une action écrite pour « l'autre poste », que la session n'atteint pas, est accusée"],
+    [r115rouge, "FAIL", "une action manuelle `acces` qui porte `az sql server ad-admin create`, la même commande préparée par la session au bloc 4, sans code de retour d'échec, passe — le cas du 09/11"],
+    [r115code, "PASS", "la MÊME commande jouée, avec son code HTTP 403 au bloc 4 (le remède), est accusée"],
+    [r115seule, "PASS", "la commande présente dans la seule action manuelle est accusée"],
+    [r115arbitrage, "PASS", "la double présence sous un motif d'arbitrage (`decision`) est accusée"],
+    [r115auto, "PASS", "l'action devenue `auto_ia` (le remède) est accusée"],
+    [rv, "PASS", "la verte, sans commande d'action manuelle, est accusée"],
+  ]) if (constatDe(r, "S115").statut !== statut)
+    casse.push(`S115 (TF-2304) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S115").message || "sortie illisible").slice(0, 200));
+  if (!/az sql server ad-admin create/.test(constatDe(r115rouge, "S115").message || "") || !/loi n° 5/.test(constatDe(r115rouge, "S115").message || "") || !/TF-2304/.test(constatDe(r115rouge, "S115").message || ""))
+    casse.push("S115 (TF-2304) : le constat doit nommer la commande, la loi n° 5 et TF-2304 : " + String(constatDe(r115rouge, "S115").message || "").slice(0, 200));
+  }
   // 30/10 — S91, UNE ACTION DIT CE QU'ELLE FAIT, DANS SES SENS : un tableau sans colonne « Action » FAIL (le cas du 30/10) ; la colonne vide ou réduite à un chemin FAIL ; une phrase PASS ; une action en liste PASS.
+  if (veut(91)) {
   const B8_91 = (corps) => verte.replace(/## 8\. Prochaines actions[\s\S]*?(?=\n## |\s*$)/, "## 8. Prochaines actions\n\nD'abord le gate, parce qu'il protège la production.\n\n" + corps + "\n");
   const LIGNE_91 = "| A-1 | neuve | auto_ia | `borne_atteinte` : durée du tour | `gate.py` | une page passe le gate |";
   const r91sans = jouerPe("s91-sans-colonne.md", B8_91("| Sélecteur | Item | Acteur | Motif | Chemin ou commande | Coût de ne pas la faire |\n|---|---|---|---|---|---|\n" + LIGNE_91));
@@ -6322,10 +7104,12 @@ Aucun écart : la demande a été suivie à la lettre.
   ]) if (constatDe(r, "S91").statut !== statut)
     casse.push(`S91 : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S91").message || "sortie illisible").slice(0, 200));
 
+  }
   // 29/10 — S89, UN ÉCART ENTRE DEUX RÉFÉRENCES GIT SE LIT AVEC SON STATUT DE FICHIER (TF-1984), DANS SES SENS. Le cas réel du 21/10 : « env/uat contient 3 fichiers qui ne sont pas
   // dans main » ; `git diff --name-status` rend M pour les 3 (empreintes main 35618ba, env/uat db5274d). (a) La constatation nue FAIL ; (b) la MÊME après `git diff --name-status`,
   // qui dit M et déplace la préconisation, PASS ; (c) une autre tournure (« manquent à main ») FAIL ; (d) la même avec `--diff-filter=A` PASS ; (e) des fichiers absents d'un
   // dossier de sortie, sans référence git, n'ont rien à voir — PASS.
+  if (veut(89, 1984)) {
   const CONSTAT_GIT = "- Constat 4 : motif — la branche env/uat contient 3 fichiers qui ne sont pas dans main (main 35618ba, env/uat db5274d) ; il faut les ajouter à main.";
   const r89nu = jouerPe("s89-absent-de-main-sans-statut.md", B5_68(CONSTAT_GIT));
   const r89statut = jouerPe("s89-absent-de-main-avec-name-status.md", B5_68(CONSTAT_GIT.replace("; il faut les ajouter à main.",
@@ -6347,9 +7131,11 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(r58sansObjet, "S68").statut !== "PASS")
     casse.push("TF-1580 : la verte, qui ne déclare aucune absence, est accusée par S68 : " + String(constatDe(r58sansObjet, "S68").message || "").slice(0, 200));
 
+  }
   // 12/10 — TF-1588 : S52 ET LA LANGUE DE L'ÉCRAN, DANS SES TROIS SENS. Une action d'écran dont la
   // source officielle datée porte `hl=en` est accusée ; la MÊME en `hl=fr` passe ; la MÊME en `hl=en`
   // qui dit s'appuyer sur une capture de l'écran du jour passe (la capture prime sur l'aide).
+  if (veut(52, 1588)) {
   const LANGUE_52 = (adresse, plus = "") => verte + ACTION_INTERFACE + saut
     + `  - source : \`${adresse}\`, lue le 24/09/2026${plus}.` + saut;
   const r52en = jouerPe("tf1588-source-en.md", LANGUE_52("https://support.google.com/google-ads/answer/1?hl=en"));
@@ -6367,6 +7153,7 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("TF-1588 : une source `hl=en` appuyée sur une capture de l'écran du jour, qui prime sur l'aide, est accusée : "
       + String(c52cap.message || c52cap.statut || "").slice(0, 200));
 
+  }
   // 28/09 — TF-1428 ET TF-1449. Registre produit, en tableau : la MÊME ligne avec « A-18 » dans sa
   // colonne Registre (PASS), avec un tiret (FAIL), avec un tiret et un RENVOI « après A-12 » dans
   // son texte (FAIL : un renvoi n'est pas un registre), et dans un tableau dont la colonne « Id »
@@ -6374,6 +7161,7 @@ Aucun écart : la demande a été suivie à la lettre.
   // « registre A-01 » PASS, un « A-01 » nu FAIL, « RT-2 » PASS. La mention « neuve » : déclarée entre
   // accents graves PASS, lue seulement dans « un clone neuf » FAIL. Et S39 : une remontée du bloc 4
   // qui porte son numéro de lot « RT-2 » PASS ; la même sans rien reste FAIL (remontee-nue).
+  if (veut(1428, 1449)) {
   const ENTETE_REG = "| A-N | Action | Acteur | Motif | Comment | Si rien n'est fait | Registre |" + nl + "|---|---|---|---|---|---|---|";
   const ligneReg = (action, registre) => `| **A-1** | ${action} | \`manuelle_utilisateur\` | \`decision\` — arbitrage métier`
     + ` | répondre dans \`forge\\LOTS.md\` | le lot suivant ne démarre pas | ${registre} |`;
@@ -6418,29 +7206,33 @@ Aucun écart : la demande a été suivie à la lettre.
   if (constatDe(rRt39, "S39").statut !== "PASS")
     casse.push("S39 (TF-1449) : une remontée qui porte son numéro de lot « RT-2 » est accusée d'être sans identifiant : "
       + String(constatDe(rRt39, "S39").message || "").slice(0, 160));
+  }
   // 28/09 — TF-1429 DANS SES CINQ SENS. Le bloc 3 de la verte est remplacé par des lignes de RAPPEL.
   // Une ligne complète (sélecteur, sujet, heure de pose, « inchangée ») : S4 PASS, et la restitution
   // PASS en entier, la forme étant prescrite. Deux rappels : PASS, les deux sélecteurs nommés. La
   // ligne réellement refusée chez le produit le 25/09 (« à décider : D-6, posée à 14:20 ») : FAIL, et
   // le constat nomme ce qui lui manque. Un rappel sans sujet : FAIL. Un rappel posé à côté d'une
   // décision NOUVELLE sans choix fermé : FAIL, la voie du rappel n'exempte que ce qui est rappel.
+  if (veut(4, 1429, 1467, 45)) {
   const RAPPEL_D6 = "- **D-6** : publication de la branche du pilot, posée le 25/09 à 14:20, inchangée.";
   const RAPPEL_D4 = "- **D-4** : renommage du dépôt de la forge de tests, posée le 25/09 à 09:12, inchangée.";
-  const bloc3Rappel = (corps) => verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/,
+  var bloc3Rappel = (corps) => verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/,
     "## 3. Décisions attendues" + nl + nl + corps + nl + nl);
-  const rRap = jouerPe("tf1429-rappel.md", bloc3Rappel(RAPPEL_D6));
-  const rRap2 = jouerPe("tf1429-deux-rappels.md", bloc3Rappel(RAPPEL_D6 + nl + RAPPEL_D4));
-  const rRapLot = jouerPe("tf1429-ligne-du-lot.md", bloc3Rappel("à décider : D-6, posée à 14:20"));
-  const rRapMuet = jouerPe("tf1429-rappel-sans-sujet.md", bloc3Rappel("- **D-6** : posée le 25/09 à 14:20, inchangée."));
-  const rRapNeuve = jouerPe("tf1429-rappel-et-decision-nouvelle.md", bloc3Rappel(RAPPEL_D6 + nl
+  var rRap = jouerPe("tf1429-rappel.md", bloc3Rappel(RAPPEL_D6));
+  var rRap2 = jouerPe("tf1429-deux-rappels.md", bloc3Rappel(RAPPEL_D6 + nl + RAPPEL_D4));
+  var rRapLot = jouerPe("tf1429-ligne-du-lot.md", bloc3Rappel("à décider : D-6, posée à 14:20"));
+  var rRapMuet = jouerPe("tf1429-rappel-sans-sujet.md", bloc3Rappel("- **D-6** : posée le 25/09 à 14:20, inchangée."));
+  var rRapNeuve = jouerPe("tf1429-rappel-et-decision-nouvelle.md", bloc3Rappel(RAPPEL_D6 + nl
     + "- **D-7 —** Faut-il renommer le dépôt de la forge de tests maintenant ? Le nom actuel porte encore le préfixe retiré le 20/09."));
+  }
   // TF-1467 (28/09/2026, campagne D-32 (a)) — L'OUVERTURE PAR « AUCUNE » NE COUVRE QUE CE QU'ELLE
   // COUVRE. Distinct de rRapNeuve ci-dessus (un RAPPEL suivi d'une décision nouvelle) : ici le bloc
   // n'ouvre par AUCUN rappel, il ouvre par une déclaration d'absence, et une vraie décision suit —
   // mesuré sur le corpus : 55 des 204 synthèses passaient S4 par cette seule voie.
-  const rAbsenceNeuve = jouerPe("tf1467-absence-et-decision-nouvelle.md", bloc3Rappel("Aucune décision nouvelle." + nl + nl
+  if (veut(1467, 45, 4)) {
+  var rAbsenceNeuve = jouerPe("tf1467-absence-et-decision-nouvelle.md", bloc3Rappel("Aucune décision nouvelle." + nl + nl
     + "- **D-7 —** Faut-il renommer le dépôt de la forge de tests maintenant ? Le nom actuel porte encore le préfixe retiré le 20/09."));
-  const c4 = (r) => constatDe(r, "S4");
+  var c4 = (r) => constatDe(r, "S4");
   if (c4(rRap).statut !== "PASS" || !/rappel/.test(c4(rRap).message || ""))
     casse.push("S4 (TF-1429) : un bloc 3 qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — "
       + "est refusé : la seule autre issue serait de la reposer en entier, ou d'écrire une absence fausse : "
@@ -6459,8 +7251,10 @@ Aucun écart : la demande a été suivie à la lettre.
   if (c4(rRapNeuve).statut !== "FAIL")
     casse.push("S4 (TF-1429) : une décision NOUVELLE sans choix fermé passe parce qu'un rappel l'accompagne — la voie du rappel "
       + "exempterait ce qui n'est pas rappel");
+  }
   // 02/10/2026 — l'inventaire des bloquants que S45 exige ne fait pas échouer S4 ; une décision
   // glissée en puce après lui reste jugée.
+  if (veut(45, 4)) {
   const rAbsenceInventaire = jouerPe("s4-absence-et-inventaire-bloquants.md", bloc3Rappel("Aucune décision attendue de l'humain dans ce tour." + nl + nl
     + "Inventaire des bloquants — ce qui est bloqué, ce qui le lève, et ce qui se passe sinon :" + nl + nl
     + "- la clôture des décisions restantes : la fin des agents en cours ; sans elle, elles restent ouvertes."));
@@ -6478,6 +7272,7 @@ Aucun écart : la demande a été suivie à la lettre.
       + "décision sans choix fermé suit — le contrôle ne lisait que la 1re ligne ou les 120 premiers caractères du bloc, "
       + "jamais ce qui vient après le mot d'ouverture");
 
+  }
   // 15/10 — TF-1708, TF-1709, TF-1711 : S70, S71 ET S72, LA LIVRAISON DÉCLARÉE, DANS LEURS DEUX SENS. Les
   // fixtures reprennent les trois restitutions contestées du 14/10 chez un produit. (a) Un service annoncé
   // déployé au bloc 0 sans adresse ni geste : S70 FAIL ; le MÊME avec son adresse et le geste au verdict :
@@ -6485,21 +7280,22 @@ Aucun écart : la demande a été suivie à la lettre.
   // S72 FAIL ; la MÊME avec ce qu'un utilisateur peut faire à l'instant, ce qui reste et « 34 exigences sur
   // 35 tenues, une non tenue » : PASS. (c) « 25 exigences sur 35 » sans rien de ce qui manque : S72 FAIL.
   // (d) La restitution qui dit le produit NON livré n'est pas accusée. La verte, sans rien de tout cela, PASS.
-  const FIN_OUV = "ce qui prouve que la surveillance fonctionne.";
-  const VERDICT_70 = "Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
-  const ouv70 = (phrase) => verte.replace(FIN_OUV, FIN_OUV + " " + phrase);
-  const ADRESSE_70 = VERDICT_70 + nl + nl + "Adresse du tableau de bord : https://recette-exemple.up.railway.app — ouvrez-la dans un navigateur ; "
+  if (veut(70, 71, 72, 1708, 1709, 1711, 85, 86, 1949, 75, 76, 1766, 1802)) {
+  var FIN_OUV = "ce qui prouve que la surveillance fonctionne.";
+  var VERDICT_70 = "Recette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
+  var ouv70 = (phrase) => verte.replace(FIN_OUV, FIN_OUV + " " + phrase);
+  var ADRESSE_70 = VERDICT_70 + nl + nl + "Adresse du tableau de bord : https://recette-exemple.up.railway.app — ouvrez-la dans un navigateur ; "
     + "identifiant de connexion dans le coffre de l'équipe.";
   const DEPLOYE_70 = "Le tableau de bord de la recette est déployé sur Railway.";
   const r70sans = jouerPe("tf1708-adresse-absente.md", ouv70(DEPLOYE_70));
   const r70avec = jouerPe("tf1708-adresse-au-verdict.md", ouv70(DEPLOYE_70).replace(VERDICT_70, ADRESSE_70));
-  const BRIEF_71 = "Le service de recette est déployé sur Railway, et le brief est mené jusqu'au bout.";
+  var BRIEF_71 = "Le service de recette est déployé sur Railway, et le brief est mené jusqu'au bout.";
   const r71sans = jouerPe("tf1709-livre-sans-usage.md", ouv70(BRIEF_71).replace(VERDICT_70, ADRESSE_70));
-  const USAGE_71 = ADRESSE_70 + nl + nl + "Ce qu'un utilisateur peut faire à l'instant : ouvrir le portail et lire sa consommation ; il reste à saisir "
+  var USAGE_71 = ADRESSE_70 + nl + nl + "Ce qu'un utilisateur peut faire à l'instant : ouvrir le portail et lire sa consommation ; il reste à saisir "
     + "les clés des fournisseurs. 34 exigences sur 35 tenues, la trente-cinquième non tenue et nommée au bloc 5.";
-  const r71avec = jouerPe("tf1709-livre-avec-usage.md", ouv70(BRIEF_71).replace(VERDICT_70, USAGE_71));
+  var r71avec = jouerPe("tf1709-livre-avec-usage.md", ouv70(BRIEF_71).replace(VERDICT_70, USAGE_71));
   const r72partiel = jouerPe("tf1711-livre-compte-partiel.md", ouv70("Le produit est livré : 25 exigences sur 35, et vous pouvez ouvrir le portail."));
-  const r72nie = jouerPe("tf1711-produit-non-livre.md", ouv70("Le produit n'est pas livré : il ne sert qu'un modèle de test."));
+  var r72nie = jouerPe("tf1711-produit-non-livre.md", ouv70("Le produit n'est pas livré : il ne sert qu'un modèle de test."));
   const attendu7x = [
     [r70sans, "S70", "FAIL", "un service annoncé déployé au bloc 0 sans adresse ni geste au bloc 0 ni au verdict passe — c'est la restitution du 14/10 « l'URL n'est même pas fournie »"],
     [r70avec, "S70", "PASS", "le MÊME service avec son adresse et le geste d'accès au verdict est accusé — le remède du message échoue"],
@@ -6517,6 +7313,7 @@ Aucun écart : la demande a été suivie à la lettre.
   for (const regle of ["S70", "S71", "S72", "S73", "S74"])
     if (constatDe(r58sansObjet, regle).statut !== "PASS")
       casse.push(`${regle} : la verte, qui n'annonce ni déploiement, ni livraison, ni sortie automatisée, est accusée : ` + String(constatDe(r58sansObjet, regle).message || "").slice(0, 160));
+  }
   // 26/10 — T4 (TF-1949, D-69 (a) et D-79 (c)) : S85 ET S86, LE VERROU « LIVRÉ », DANS LEURS DEUX SENS, REMÈDES JOUÉS. Un produit
   // jetable (`forge/retours/`) porte ou non sa trace `forge/mobilisation.jsonl` ; la restitution est celle de S71 (livraison avec
   // usage et compte d'exigences), datée du 2026-10-27, posée sous le produit. (a) Sans trace : S86 FAIL, S85 SANS_OBJET. (b) Trace
@@ -6524,6 +7321,7 @@ Aucun écart : la demande a été suivie à la lettre.
   // S85 PASS. (d) L'autre remède : DOSSIER-MEP.md absent, une nouvelle ligne écarte ops avec son motif : S85 PASS. (e) La livraison
   // sans compte d'exigences sous le verrou : S72 AVERT, jamais FAIL. (f) Non rétroactif : la MÊME datée d'août, SANS_OBJET. (g) Une
   // clôture « le run est clos » sans trace : S86 FAIL. (h) La verte datée du 27/10 sous le produit, sans livraison : PASS. (i) Hors produit : SANS_OBJET.
+  if (veut(85, 86, 71, 1949)) {
   {
     const DATE_AOUT = "terminée le 2026-08-14 à 15h48", DATE_T4 = "terminée le 2026-10-27 à 15h48";
     if (!verte.includes(DATE_AOUT)) casse.push("S85 (T4) : la date de la verte a changé — les fixtures datées du verrou ne prouvent plus rien");
@@ -6534,7 +7332,7 @@ Aucun écart : la demande a été suivie à la lettre.
     const base85 = mkdtempSync(join(tmpdir(), "verrou-livre-"));
     const produit85 = (nom) => { const p = join(base85, nom); mkdirSync(join(p, "forge", "retours"), { recursive: true }); return p; };
     const FORGES85 = ["conception", "design", "development", "tests", "ops", "agents", "agents-security", "seo-geo", "organization", "audit", "data", "observability", "websec"];
-    const ligne85 = (mobilisees, ts) => JSON.stringify({ ts, schema: "forge/mobilisation@1", type: "produit-neuf", types: ["produit-neuf"],
+    const ligne85 = (mobilisees, ts, session = null) => JSON.stringify({ ts, schema: "forge/mobilisation@1", ...(session ? { session } : {}), type: "produit-neuf", types: ["produit-neuf"],
       verdicts: Object.fromEntries(FORGES85.map((f) => [f, { verdict: mobilisees.includes(f) ? "mobilisee" : "ecartee", motif: `motif écrit pour la forge ${f}` }])) }) + nl;
     const NEUF = ["conception", "design", "development", "tests", "ops"];
     const poser = (p, rel) => { mkdirSync(dirname(join(p, rel)), { recursive: true }); writeFileSync(join(p, rel), "x", "utf8"); };
@@ -6557,6 +7355,39 @@ Aucun écart : la demande a été suivie à la lettre.
     const rD1 = jouer85(pD, "t4-dossier-mep-absent.md", LIVRE_85);
     writeFileSync(join(pD, "forge", "mobilisation.jsonl"), ligne85(NEUF, "2026-10-27T09:00:00.000Z") + ligne85(NEUF.filter((f) => f !== "ops"), "2026-10-27T10:00:00.000Z"), "utf8");
     const rD2 = jouer85(pD, "t4-ops-ecartee-par-une-nouvelle-ligne.md", LIVRE_85);
+    // (j) TF-2045 (02/11/2026) : deux sessions d'un produit écrivent le même fichier ; la dernière ligne est jugée PAR SESSION. La session A
+    // mobilise un produit neuf dont les livrables manquent (09:00) ; la session B écrit APRÈS elle une ligne qui n'exige rien (10:00). Avant
+    // la correction, A était jugée sur la ligne de B et passait. Les cas sont hermétiques : --session explicite, CLAUDE_CODE_SESSION_ID retirée.
+    const jouerSession85 = (p, nom, contenu, session) => {
+      const f = join(dir, nom); writeFileSync(f, contenu, "utf8");
+      const env = { ...process.env }; delete env.CLAUDE_CODE_SESSION_ID;
+      return spawnSync(process.execPath, [moi, f, "--racine", p, ...(session ? ["--session", session] : [])], { encoding: "utf8", env });
+    };
+    const pJ = produit85("produit85-deux-sessions");
+    writeFileSync(join(pJ, "forge", "mobilisation.jsonl"), ligne85(NEUF, "2026-10-27T09:00:00.000Z", "sess-A") + ligne85([], "2026-10-27T10:00:00.000Z", "sess-B"), "utf8");
+    const rJA = jouerSession85(pJ, "tf2045-session-a.md", LIVRE_85, "sess-A");
+    const rJB = jouerSession85(pJ, "tf2045-session-b.md", LIVRE_85, "sess-B");
+    const rJC = jouerSession85(pJ, "tf2045-session-c.md", LIVRE_85, "sess-C");
+    const rJN = jouerSession85(pJ, "tf2045-session-inconnue.md", LIVRE_85, null);
+    const pL = produit85("produit85-ligne-ancienne");
+    writeFileSync(join(pL, "forge", "mobilisation.jsonl"), ligne85(NEUF, "2026-10-27T09:00:00.000Z"), "utf8");
+    const rJL = jouerSession85(pL, "tf2045-ligne-ancienne.md", LIVRE_85, "sess-A");
+    for (const [r, regle, statut, quoi] of [
+      [rJA, "S85", "FAIL", "(j) la session A, dont la ligne exige des livrables absents, est jugée sur la ligne que la session B a écrite après elle et passe"],
+      [rJB, "S85", "PASS", "(j) la session B, dont la ligne n'exige rien, est jugée sur la ligne de A"],
+      [rJC, "S86", "FAIL", "(j) une session qui n'a écrit aucune ligne est jugée sur la ligne d'une autre session"],
+      [rJC, "S85", "SANS_OBJET", "(j) une session sans ligne propre voit S85 déduire des livrables de la ligne d'une autre"],
+      [rJN, "S86", "PASS", "(j) sans identifiant de session, la dernière ligne du fichier n'est plus jugée (repli déclaré)"],
+      [rJL, "S86", "PASS", "(j) la ligne d'avant l'identifiant n'est pas reprise en repli pour une session qui n'a rien écrit"],
+      [rJL, "S85", "FAIL", "(j) le repli sur la ligne ancienne ne juge pas ses livrables"],
+    ]) if (constatDe(r, regle).statut !== statut)
+      casse.push(`${regle} (TF-2045) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+    if (!/ne porte aucune ligne de cette session \(sess-C\) : 2 ligne\(s\) d'autres sessions/.test(constatDe(rJC, "S86").message || ""))
+      casse.push("S86 (TF-2045) : le refus d'une session sans ligne propre doit dire combien de lignes d'autres sessions existent : " + String(constatDe(rJC, "S86").message || "").slice(0, 200));
+    if (!/REPLI DÉCLARÉ : aucune session n'est identifiée/.test(constatDe(rJN, "S86").message || ""))
+      casse.push("S86 (TF-2045) : sans identifiant de session, le repli sur la dernière ligne du fichier doit être DIT : " + String(constatDe(rJN, "S86").message || "").slice(0, 200));
+    if (!/REPLI DÉCLARÉ : cette session n'a écrit aucune ligne/.test(constatDe(rJL, "S86").message || "") || !/REPLI DÉCLARÉ/.test(constatDe(rJL, "S85").message || ""))
+      casse.push("S85/S86 (TF-2045) : le repli sur une ligne ancienne sans identifiant doit être DIT par S86 comme par S85 : " + String(constatDe(rJL, "S85").message || "").slice(0, 200));
     for (const [r, regle, statut, quoi] of [
       [rA, "S86", "FAIL", "(a) une livraison déclarée chez un produit sans trace de mobilisation passe"],
       [rA, "S85", "SANS_OBJET", "(a) sans trace, S85 ne peut pas déduire les livrables exigés et doit le dire"],
@@ -6583,11 +7414,13 @@ Aucun écart : la demande a été suivie à la lettre.
     try { if (JSON.parse(rE.stdout).verdict !== "PASS" && echecsDe(rE).split(", ").includes("S72")) casse.push("S72 (T4) : sous le verrou, S72 fait encore échouer le verdict"); }
     catch { casse.push("S72 (T4) : sortie illisible sur la livraison sans compte sous verrou"); }
   }
+  }
   // 15/10 — TF-1694 ET TF-1695 : S73 ET S74, LA SORTIE AUTOMATISÉE ET SA VERSION AMÉLIORÉE, DANS LEURS DEUX
   // SENS. Les chiffres sont ceux du lot du produit. (a) « 97 % des fichiers sont rangés » sans justesse : S73
   // FAIL ; la MÊME avec la justesse mesurée sur l'échantillon étiqueté PASS ; la MÊME avec « justesse non
   // mesurée » PASS. (b) Un gain de 2,7 points sur l'échantillon, seul : S74 FAIL ; avec ses changements
   // dans la population mais sans l'existant : FAIL, l'existant nommé ; avec les deux : PASS.
+  if (veut(73, 74, 1694, 1695)) {
   const TRAITE_7X = (ligne) => verte.replace("## 5. Non traité", ligne + nl + nl + "## 5. Non traité");
   const RANGE_73 = "- Classement des pièces reçues : 97 % des fichiers sont rangés — preuve : portes de forme vertes sur les 9 662 fichiers";
   const r73sans = jouerPe("tf1694-part-rangee-seule.md", TRAITE_7X(RANGE_73 + "."));
@@ -6611,10 +7444,12 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`${regle} (TF-1694, TF-1695) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
   if (!/existant/.test(constatDe(r74pop, "S74").message || ""))
     casse.push("S74 (TF-1695) : le gain contrôlé dans la population mais pas sur l'existant doit NOMMER l'existant qui manque : " + String(constatDe(r74pop, "S74").message || "").slice(0, 160));
+  }
   // 15/10 — TF-1736 : S77, LE TRANSPORT ENTRE POSTES, DANS SES QUATRE SENS. Un produit jetable porte son
   // `forge/REPRISE.json`. (a) L'action A-2 laissée à l'humain demande de copier les entrants sur l'autre
   // poste par le Drive : FAIL. (b) La MÊME passée en auto_ia, le remède : PASS. (c) La MÊME hors de tout
   // produit qui déclare un canal : SANS_OBJET dit à voix haute. (d) La verte sous canal déclaré : PASS.
+  if (veut(77, 1736)) {
   mkdirSync(join(dir, "produit75", "forge"), { recursive: true });
   writeFileSync(join(dir, "produit75", "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { chemins: ["G:/Mon Drive/Produit - Reprise"] }, elements: ["input"] }), "utf8");
   const A2_75 = "- **A-2** — ensuite TF-0221 (manuelle_utilisateur) — décision normative, impact sur 19 citations.";
@@ -6635,6 +7470,7 @@ Aucun écart : la demande a été suivie à la lettre.
     [r75verte, "PASS", "la verte, qui ne demande aucun transport, est accusée sous canal déclaré"],
   ]) if (!new RegExp(`"S77"[^}]*${statut}`).test(r.stdout))
     casse.push(`S77 (TF-1736) : ${quoi} — attendu ${statut} : ` + ((/"S77"[\s\S]{0,200}/.exec(r.stdout) || ["sortie illisible"])[0]).replace(/\s+/g, " "));
+  }
   // 17/10 — S78, LE FORMAT B, DANS SES QUATRE SENS. (a) La décision au format B — trois lignes titrées,
   // recommandation sourcée, tableau « Option | Ce qui se passe | Coût | Retour arrière », « Sans réponse »
   // — passe S78 ET les règles qu'elle aurait pu heurter : S15 (le numéro de sujet en fin de titre), S16,
@@ -6642,7 +7478,8 @@ Aucun écart : la demande a été suivie à la lettre.
   // décision en citation de l'ancien format (d3-citation) FAIL et nomme les trois libellés manquants.
   // (c) La MÊME décision B privée de sa colonne « Retour arrière » FAIL et nomme le retour arrière.
   // (d) La verte, dont la décision est en puce, SANS_OBJET dit à voix haute.
-  const FORMAT_B = [
+  if (veut(78, 88, 1979, 23, 49, 80, 1847)) {
+  var FORMAT_B = [
     "> **D-7 — Publie-t-on maintenant la version corrigée de la forge de tests ? (TF-0221)**",
     ">",
     "> - **De quoi s'agit-il** : la version 1.12.0 de la forge de tests, qui corrige la garde de précondition du pan qualif.",
@@ -6657,12 +7494,12 @@ Aucun écart : la demande a été suivie à la lettre.
     "",
     "> **Sans réponse** : (b), rien n'est publié.",
   ].join(String.fromCharCode(10));
-  const enFormatB = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, `## 3. Décisions attendues\n\n${FORMAT_B}\n\n`);
+  var enFormatB = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, `## 3. Décisions attendues\n\n${FORMAT_B}\n\n`);
   const sansRetour = enFormatB.replace("| Option | Ce qui se passe | Coût | Retour arrière |\n|---|---|---|---|", "| Option | Ce qui se passe | Coût |\n|---|---|---|")
     .replace(" | Possible, par une version suivante |", " |").replace(" | Nul | Sans objet |", " | Nul |");
-  const r78b = jouerPe("format-b.md", enFormatB);
-  const r78ancien = jouerPe("format-b-ancien.md", enCitation);
-  const r78sansRetour = jouerPe("format-b-sans-retour.md", sansRetour);
+  var r78b = jouerPe("format-b.md", enFormatB);
+  var r78ancien = jouerPe("format-b-ancien.md", enCitation);
+  var r78sansRetour = jouerPe("format-b-sans-retour.md", sansRetour);
   if (enFormatB === verte || sansRetour === enFormatB) casse.push("S78 : une fixture n'a pas été modifiée — le cas ne prouve plus rien");
   for (const [r, regle, statut, quoi] of [
     [r78b, "S78", "PASS", "la décision au format B est accusée — le format retenu le 17/10 est refusé par son propre juge"],
@@ -6676,10 +7513,71 @@ Aucun écart : la demande a été suivie à la lettre.
     [rv, "S78", "SANS_OBJET", "la verte, dont la décision est en puce, devrait être déclarée hors de portée"],
   ]) if (constatDe(r, regle).statut !== statut)
     casse.push(`${regle} (format B, 17/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+  // TF-2273 (06/11/2026) — S104 DANS SES SENS. Rouge : « Pourquoi vous » donne une raison de confort, qu'aucun des six motifs de R-58 ne porte. Vert : la ligne d'origine (publication) et
+  // une ligne qui déclare un arbitrage. Le remède que le message prescrit — exécuter et rendre pour information, donc ne pas poser la décision — se joue : sans décision en citation, SANS_OBJET.
+  const POURQUOI_VOUS = "> - **Pourquoi vous** : publier hors du poste vous revient.";
+  const s104 = (ligne) => enFormatB.replace(POURQUOI_VOUS, ligne);
+  const r104confort = jouerPe("s104-confort.md", s104("> - **Pourquoi vous** : c'est plus simple de vous demander avant de continuer."));
+  const r104arbitrage = jouerPe("s104-arbitrage.md", s104("> - **Pourquoi vous** : c'est un arbitrage entre deux options que rien dans les données ne tranche."));
+  if (s104("x") === enFormatB) casse.push("S104 : l'ancre « Pourquoi vous » du format B n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r104confort, "FAIL", "« c'est plus simple de vous demander » (aucun motif de R-58) passe — le cas D-480 du 06/11"],
+    [r78b, "PASS", "la ligne d'origine (publication) est refusée"],
+    [r104arbitrage, "PASS", "une ligne qui déclare un arbitrage est refusée"],
+    [rv, "SANS_OBJET", "le remède (ne pas poser la décision : la verte n'en porte aucune en citation) devrait être déclaré hors de portée"],
+  ]) if (constatDe(r, "S104").statut !== statut)
+    casse.push(`S104 (TF-2273) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S104").message || "sortie illisible").slice(0, 200));
+  if (!/D-480|R-58/.test(String(constatDe(r104confort, "S104").message || "")) || !/pour information/.test(String(constatDe(r104confort, "S104").message || "")))
+    casse.push("S104 : le constat doit nommer R-58 et le remède (exécuter, rendre pour information) : " + String(constatDe(r104confort, "S104").message || "").slice(0, 200));
+  // TF-2332 (10/11/2026) — S125 DANS SES SENS. Rouge : la décision D-179 du 09/11, « corriger tout, une partie, ou rien » sur des défauts sans arbitrage. Vert : la même décision sans
+  // cette ligne (le remède : corriger dans le tour, ne poser que la publication) ; et une décision qui parle de défauts mais offre un VRAI choix entre deux corrections incompatibles.
+  const LIGNE_DEFAUTS = "> - **Les défauts** : la revue a trouvé des solutions laissées dans le kit, des durées qui divergent et un pied de page ; corriger tout, corriger une partie, ou ne rien corriger.";
+  const r125rouge = jouerPe("s125-rouge.md", enFormatB.replace(POURQUOI_VOUS, `${POURQUOI_VOUS}\n${LIGNE_DEFAUTS}`));
+  const r125choix = jouerPe("s125-choix.md", enFormatB.replace(POURQUOI_VOUS, `${POURQUOI_VOUS}\n> - **Les défauts** : la durée du module diverge entre 90 et 120 minutes ; aligner sur 90 ou sur 120 retire deux séances au programme, et la revue ne peut pas trancher.`));
+  if (enFormatB.replace(POURQUOI_VOUS, `${POURQUOI_VOUS}\n${LIGNE_DEFAUTS}`) === enFormatB) casse.push("S125 : l'ancre « Pourquoi vous » n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r125rouge, "FAIL", "« corriger tout, une partie, ou rien » sur des défauts passe — c'est la décision D-179 du 09/11"],
+    [r78b, "PASS", "la décision sans ligne de défauts (le remède : corriger dans le tour) est refusée"],
+    [r125choix, "PASS", "un vrai choix entre deux corrections incompatibles est refusé — la règle crie sur une décision humaine"],
+    [rv, "SANS_OBJET", "la verte, sans décision en citation, devrait être déclarée hors de portée"],
+  ]) if (constatDe(r, "S125").statut !== statut)
+    casse.push(`S125 (TF-2332) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S125").message || "sortie illisible").slice(0, 200));
+  // TF-2331 (10/11/2026) — S34 ET LA RELECTURE DE FOND. Rouge : l'action A-1 du 26/10, relecture de fond par l'humain, sans relecture par agent au bloc 4. Vert : la même action quand le
+  // bloc 4 cite la relecture par des relecteurs neufs (le remède du message se joue) ; vert aussi, la relecture d'un natif, qui n'est pas de fond et que la verte du bloc 7 porte déjà.
+  const ACTION_RELECTURE = "## 8. Prochaines actions\n\n- d'abord faire la relecture de fond des supports (manuelle_utilisateur) — parce que c'est le seul contrôle de contenu restant ;\n  - pourquoi pas l'IA : decision — le fond d'un support se juge à la lecture ;\n  - où : `docs/supports/guide.md`.\n  - si rien n'est fait : les supports partent sans relecture de fond.\n";
+  const avecRelecture = verte.replace(/## 8\. Prochaines actions[\s\S]*$/, ACTION_RELECTURE);
+  const relectureJouee = avecRelecture.replace("## 4. Traité", "## 4. Traité\n\n- La relecture de fond des supports a été jouée par trois relecteurs neufs, un par rôle de lecteur — preuve : 3 rapports, 11 défauts corrigés.");
+  const r34nu = jouerPe("s34-relecture-nue.md", avecRelecture);
+  const r34jouee = jouerPe("s34-relecture-jouee.md", relectureJouee);
+  if (avecRelecture === verte || relectureJouee === avecRelecture) casse.push("S34 (relecture) : une ancre de fixture n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r34nu, "FAIL", "une relecture de fond laissée à l'humain, sans relecture par agent au bloc 4, passe — c'est l'action A-1 du 26/10"],
+    [r34jouee, "PASS", "la même action quand le bloc 4 cite la relecture par des relecteurs neufs est refusée — le remède échoue"],
+    [rv, "PASS", "la verte, sans relecture de fond, est accusée"],
+  ]) if (constatDe(r, "S34").statut !== statut)
+    casse.push(`S34 (TF-2331) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S34").message || "sortie illisible").slice(0, 200));
+  // TF-2342 (10/11/2026) — S9 COMPTE LES MOTS APRÈS LE RETRAIT DE L'EN-TÊTE. Fautif : un en-tête YAML plus long que la synthèse titrée, un titre qui porte « D-19 (a) » ; la synthèse de
+  // 72 mots (ici celle de la verte) était écartée, puis l'en-tête retiré, et S9 lisait 0 mot. Conforme : le même texte sans « (a) ». Et le message d'un vrai défaut nomme la lecture faite.
+  const ENTETE_LONG = `---\ndestinataire: humain\nsource: ${"mot ".repeat(90).trim()}\n---\n\n`;
+  const titreeEnteteLong = `${ENTETE_LONG}${titree.replace("# Restitution — campagne de test", "# Restitution — campagne de test, décision D-19 (a)")}`;
+  const r9entete = jouerPe("s9-entete-long-a.md", titreeEnteteLong);
+  const r9sansA = jouerPe("s9-entete-long-sans-a.md", titreeEnteteLong.replace(" (a)", ""));
+  const r9vide = jouerPe("s9-ouverture-vide.md", `${ENTETE_LONG}# Restitution — campagne de test\n\n### 0. Synthèse d'ouverture\n\nTrop court.\n\n${titree.slice(titree.indexOf("## 1. En-tête"))}`);
+  if (titreeEnteteLong === titree) casse.push("S9 (TF-2342) : l'ancre du titre n'a pas été trouvée — le cas ne prouve plus rien");
+  for (const [r, statut, quoi] of [
+    [r9entete, "PASS", "un en-tête YAML plus long que la synthèse titrée, avec « D-19 (a) » au titre, fait lire 0 mot à S9"],
+    [r9sansA, "PASS", "le même texte sans « (a) » est accusé"],
+    [r9vide, "FAIL", "une ouverture réellement trop courte passe S9"],
+  ]) if (constatDe(r, "S9").statut !== statut)
+    casse.push(`S9 (TF-2342) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S9").message || "sortie illisible").slice(0, 200));
+  if (!/titre d'ouverture « 0\. Synthèse d'ouverture/.test(String(constatDe(r9vide, "S9").message || "")) && !/en tête/.test(String(constatDe(r9vide, "S9").message || "")))
+    casse.push("S9 (TF-2342) : le message ne nomme pas la lecture faite (en tête ou sous le titre d'ouverture) : " + String(constatDe(r9vide, "S9").message || "").slice(0, 200));
+  }
   // 29/10 — S36 ET S38, LA CRITIQUE JOUABLE EN ACTION (TF-1981, récidive de TF-0775). Le cas réel du 26/10 : une page HTML livrée au bloc 4, la critique d'implémentation
   // forge-design laissée en A-1 `auto_ia` `hors_mandat`. (a) Rouge : la critique n'apparaît qu'en action exemptée — S36 FAIL (le mot n'est pas un verdict) ET S38 FAIL (une
   // critique jouable s'exécute). (b) Vert : le MÊME tour a joué la critique, son verdict est au bloc 4 — S36 PASS, S38 PASS. (c) Vert : la critique en action bloquée par
   // `dependance_bloc_3` — S38 PASS, la règle ne mord pas sur un obstacle réel. (d) Rouge : la critique proposée en OPTION de décision (bloc 3) n'est pas un verdict non plus.
+  if (veut(36, 38, 1981, 775)) {
   {
     const PAGE36 = "\n- Page `output/Client-A - Schema Run apres MEP - 20261026a.html` livrée — preuve : check_html PASS, 21 règles.\n";
     const ACTION_CRITIQUE = (motif) => "- **A-3** — enfin TF-0222 (auto_ia) — jouer la critique d'implémentation forge-design de la page livrée.\n"
@@ -6705,10 +7603,42 @@ Aucun écart : la demande a été suivie à la lettre.
     ]) if (constatDe(r, regle).statut !== statut)
       casse.push(`${regle} (critique en action, TF-1981, 29/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 200));
   }
+  }
+  // 05/11 — S11 ET LA CONSIGNATION D'UN RETOUR (TF-2137, RT-42). (a) Rouge : « consigner le retour au ledger du produit » laissée en `auto_ia` sous `hors_mandat` — le cas du 04/11, où le porteur
+  // a dû réclamer la remontée. (b) Vert : la même action sous `dependance_externe`, un obstacle réel. (c) Vert : `hors_mandat` sur une action qui ne consigne aucun retour. (d) Vert : ingérer des
+  // lots au registre du pilot, un autre mandat. (e) Vert : « allers-retours » n'est pas un retour. (f) Rouge : « Signaler à forge-audit l'écart », dont le comment est « entrée de type retour ».
+  if (veut(11, 2137)) {
+  {
+    const ACTION_RETOUR = (texte, motif, comment = "") => `- **A-3** — enfin TF-0222 (auto_ia) — ${texte}.\n`
+      + `  - motif de non-exécution : ${motif} — l'écriture est jouable.\n${comment ? `  - où : ${comment}.\n` : ""}`
+      + "  - si rien n'est fait : l'écart reste au produit et n'est remonté à personne.\n";
+    const avec = (texte, motif, comment) => verte.replace(/- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/, ACTION_RETOUR(texte, motif, comment));
+    const TEXTE_RETOUR = "consigner le retour au ledger du produit avec `python forge/ledger.py retour --resume \"écart au gabarit\"`";
+    const s11a = jouerPe("s11-retour-hors-mandat.md", avec(TEXTE_RETOUR, "hors_mandat"));
+    const s11b = jouerPe("s11-retour-dependance-externe.md", avec(TEXTE_RETOUR, "dependance_externe"));
+    const s11c = jouerPe("s11-hors-mandat-sans-retour.md", avec("regrouper les constats par cause racine", "hors_mandat"));
+    const s11d = jouerPe("s11-hors-mandat-ingestion-pilot.md", avec("ingérer les lots de retours au registre du pilot avec `node todo\\ingerer-lot.mjs`", "hors_mandat"));
+    const s11e = jouerPe("s11-hors-mandat-allers-retours.md", avec("instruire les candidats remontés par les produits, qui coûtent des allers-retours", "hors_mandat"));
+    const s11f = jouerPe("s11-signaler-entree-de-type-retour.md", avec("signaler à forge-audit l'écart entre ses contrôles et son gabarit", "hors_mandat", "`forge/ledger.jsonl`, entrée de type retour"));
+    if (avec(TEXTE_RETOUR, "hors_mandat") === verte) casse.push("S11 (TF-2137) : la fixture n'a pas été modifiée — le cas ne prouve plus rien");
+    for (const [r, statut, quoi] of [
+      [s11a, "FAIL", "une action qui consigne un retour, laissée non exécutée sous `hors_mandat`, passe — le cas du 04/11"],
+      [s11b, "PASS", "la même action sous `dependance_externe` est accusée — S11 mordrait sur un obstacle réel"],
+      [s11c, "PASS", "`hors_mandat` sur une action qui ne consigne aucun retour est accusé"],
+      [s11d, "PASS", "`hors_mandat` sur l'ingestion de lots au registre du pilot, un autre mandat, est accusé"],
+      [s11e, "PASS", "« allers-retours » est pris pour un retour à consigner"],
+      [s11f, "FAIL", "« Signaler à forge-audit l'écart », dont le comment est « entrée de type retour », passe sous `hors_mandat`"],
+    ]) if (constatDe(r, "S11").statut !== statut)
+      casse.push(`S11 (consignation d'un retour, TF-2137, 05/11) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S11").message || "sortie illisible").slice(0, 200));
+    if (!/TF-2137/.test(constatDe(s11a, "S11").message || "") || !/consigne un retour/.test(constatDe(s11a, "S11").message || ""))
+      casse.push("S11 (TF-2137) : le constat doit dire que `hors_mandat` ne couvre pas une action qui consigne un retour : " + String(constatDe(s11a, "S11").message || "").slice(0, 200));
+  }
+  }
   // 29/10 — S88, « DE QUOI S'AGIT-IL » DIT CE QU'EST L'OBJET AVANT SON NOM INTERNE (TF-1979), DANS SES SENS. Le champ de FORMAT_B est la forme de référence : S88 PASS. (a) Rouge :
   // le champ s'ouvre par `forge_tests@1.12.0`, sans glose — le nom avant la raison d'être. (b) Vert : le MÊME nom suivi de sa glose (« , la version … qui corrige … »). (c) Vert : la raison
   // d'être d'abord, le nom entre parenthèses ensuite. (d) Rouge : une énumération de cinq identifiants sur la ligne du champ. (e) Vert : la MÊME énumération mise en liste de
   // sous-puces — le remède joué. (f) Vert : trois identifiants en ligne, sous le seuil. (g) Un mot ordinaire en tête, entre accents graves, n'est pas un identifiant.
+  if (veut(88, 1979)) {
   {
     const CHAMP_B = "> - **De quoi s'agit-il** : la version 1.12.0 de la forge de tests, qui corrige la garde de précondition du pan qualif.";
     const avecChamp = (champ) => enFormatB.replace(CHAMP_B, champ);
@@ -6738,13 +7668,17 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S78 : le constat sur l'ancien format doit NOMMER les libellés manquants : " + String(constatDe(r78ancien, "S78").message || "").slice(0, 160));
   if (!/retour arrière/.test(constatDe(r78sansRetour, "S78").message || ""))
     casse.push("S78 : le constat sans retour arrière doit le NOMMER : " + String(constatDe(r78sansRetour, "S78").message || "").slice(0, 160));
+  }
   // 26/10 — T2 (TF-1947, D-68 (a) et D-75 (c), gabarit 2.50.0) : LE COMPTE RENDU COMPLET ALLÉGÉ, DANS SES SEPT SENS. La verte
   // privée de ses blocs 2, 6 et 7 → S1 PASS, S3 SANS_OBJET, et la restitution PASS en entier : leur absence n'est plus un
   // défaut. Privée de son bloc 9, de son bloc 0 ou de son bloc 4 → S1 FAIL en nommant le bloc. Une décision au format B privée
   // de son tableau d'options → S4 FAIL en nommant le tableau ; la MÊME avec son tableau → S4 PASS.
-  const retirer = (texte, n) => texte.replace(new RegExp(`## ${n}\\.[^\\n]*\\n[\\s\\S]*?(?=## \\d\\.|$)`), "");
+  if (veut(1, 3, 1947, 23)) {
+  var retirer = (texte, n) => texte.replace(new RegExp(`## ${n}\\.[^\\n]*\\n[\\s\\S]*?(?=## \\d\\.|$)`), "");
+  }
   // La glose de « S-01 » ne vit qu'au bloc 2 de la verte : elle se reporte au bloc 8, sans quoi S23 (avertissante) accuserait
   // à raison un désignateur devenu nu — un effet du texte de la verte, pas de l'absence du bloc.
+  if (veut(23)) {
   const allegee = [2, 6, 7].reduce(retirer, verte).replace("relancer la recette S-01.", "relancer la recette S-01 (banc rouge de la forge de tests).");
   const sans9 = retirer(verte, 9), sans4 = retirer(verte, 4);
   const sans0 = verte.replace(/\n\nLe contrôle complet[\s\S]*?ci-dessous\./, "");
@@ -6768,11 +7702,13 @@ Aucun écart : la demande a été suivie à la lettre.
   if (!/9\. Traces/.test(constatDe(rT2b, "S1").message || "")) casse.push("T2 : le constat S1 doit NOMMER le bloc 9 absent : " + String(constatDe(rT2b, "S1").message || "").slice(0, 160));
   if (!/0\. Synthèse d'ouverture/.test(constatDe(rT2c, "S1").message || "")) casse.push("T2 : le constat S1 doit NOMMER le bloc 0 absent : " + String(constatDe(rT2c, "S1").message || "").slice(0, 160));
   if (!/TABLEAU d'options/.test(constatDe(rT2e, "S4").message || "")) casse.push("T2 : le constat S4 doit NOMMER le tableau d'options : " + String(constatDe(rT2e, "S4").message || "").slice(0, 160));
+  }
   // 29/10 — LA LIGNE « Livré : » DU BLOC 0 (TF-1973 et TF-2016, S87, gabarit 2.53.0), DANS SES SENS. Le bloc 0 se clôt par `Livré : [nom](chemin%20relatif)` : le nom
   // du fichier, sa date `20261029b` et sa cible lui sont propres, et S9 les accusait (chemin ou nom de fichier, sha). (a) La ligne du cas réel — un guide sous
   // output/04-cadrages, espaces en %20 — PASS en entier. (b) La même en puces sous « Livré : » PASS en entier. (c) Le même nom de fichier dans la PROSE du bloc 0, à côté de la
   // ligne : S9 FAIL — l'exemption est précise. (d) « Livré : » suivi d'un chemin nu, sans lien : S9 FAIL. (e) Un span de code ajouté à la ligne après ses liens : S9 FAIL.
   // La PRÉSENCE de la ligne (le tour a écrit le fichier, le bloc 0 le lie) est jugée au hook de fin de tour, dans sa recette.
+  if (veut(87, 9, 1973, 2016)) {
   const LIEN_GUIDE = "[Produit - Guide - Lot 0](output/04-cadrages/Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b.md)";
   const LIEN_NOTE = "[Note de cadrage](output/03-etudes/2026-10/20261029-note-de-cadrage.md)";
   const avecLivre = (ligne, prose = "") => verte.replace("\n\n## 1. En-tête", `${prose}\n\n${ligne}\n\n## 1. En-tête`);
@@ -6794,9 +7730,137 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`S9 (S87, 29/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S9").message || "sortie illisible").slice(0, 200));
   for (const [r, nom] of [[rLivreLigne, "la ligne"], [rLivrePuces, "les puces"], [rLivrePlusieurs, "les deux liens"]])
     if (r.status !== 0) casse.push(`S87 : la verte avec ${nom} « Livré : » n'est pas PASS en entier : ` + echecsDe(r));
+  }
+  // 03/11 — S92 (TF-2077, RT-32, gabarit 2.59.0) : L'ADRESSE D'UN SERVICE À OUVRIR, PENDANT DE « Livré : », DANS SES SENS. Quand une action
+  // manuelle_utilisateur du bloc 8 porte une adresse http(s), le bloc 0 se clôt par « À ouvrir : [nom](adresse) ». (a) La ligne présente, avec
+  // une adresse qui PORTERAIT un nom de fichier (accueil.html) : PASS en entier, S9 l'exempte comme « Livré : ». (b) La MÊME adresse au bloc 8
+  // sans la ligne : S92 FAIL. (c) La MÊME adresse dans la PROSE du bloc 0 : S9 FAIL — l'exemption ne couvre que la ligne « À ouvrir : ». La verte,
+  // dont aucune action manuelle_utilisateur ne porte d'adresse, rend S92 « rien à juger » (PASS).
+  if (veut(92, 2077)) {
+  const URL_92 = "https://service-chiffrage.example.net/accueil.html";
+  const OU_92_AVANT = "  - où : écran « Publier la version », bouton `Publier`.";
+  const OU_92_APRES = "  - où : écran « Publier la version » à l'adresse " + URL_92 + ", bouton `Publier`.";
+  const verteUrl92 = verte.replace(OU_92_AVANT, OU_92_APRES);
+  if (verteUrl92 === verte) casse.push("S92 : l'ancre « où » de l'action A-2 du bloc 8 n'a pas été trouvée — le cas ne prouve plus rien");
+  const s92Ligne = verteUrl92.replace("\n## 1. En-tête", `\n\nÀ ouvrir : [le service de chiffrage](${URL_92})\n\n## 1. En-tête`);
+  const s92Prose = verteUrl92.replace("décision de publication ci-dessous.", `décision de publication ci-dessous, à l'adresse ${URL_92}.`);
+  const rS92Ligne = jouerPe("s92-a-ouvrir-ligne.md", s92Ligne);
+  const rS92Sans = jouerPe("s92-sans-ligne.md", verteUrl92);
+  const rS92Prose = jouerPe("s92-url-en-prose.md", s92Prose);
+  if (constatDe(rS92Ligne, "S92").statut !== "PASS")
+    casse.push("S92 : une adresse http(s) au bloc 8 ET sa ligne « À ouvrir : [nom](adresse) » en fin de bloc 0 est accusée : " + String(constatDe(rS92Ligne, "S92").message || "sortie illisible").slice(0, 160));
+  if (rS92Ligne.status !== 0)
+    casse.push("S92 : la verte avec sa ligne « À ouvrir : » (adresse portant accueil.html) n'est pas PASS en entier — l'exemption de S9 ne joue pas : " + echecsDe(rS92Ligne));
+  if (constatDe(rS92Sans, "S92").statut !== "FAIL")
+    casse.push("S92 : une adresse http(s) dans une action manuelle_utilisateur SANS ligne « À ouvrir : » au bloc 0 passe — l'adresse reste au seul bloc 8, le lecteur ne la lit pas en tête (TF-2077)");
+  if (constatDe(rS92Prose, "S9").statut !== "FAIL")
+    casse.push("S92 (exemption de S9) : une adresse http(s) écrite dans la PROSE du bloc 0, hors ligne « À ouvrir : », passe S9 — l'exemption couvre toute l'ouverture au lieu de la seule ligne étiquetée");
+  if (constatDe(rv, "S92").statut !== "PASS")
+    casse.push("S92 : la verte, dont aucune action manuelle_utilisateur ne porte d'adresse http(s), est accusée au lieu de « rien à juger »");
+  if (constatDe(ria, "S92").statut !== "PASS")
+    casse.push("S92 : l'action d'import vers l'interface d'une plateforme tierce (Google Ads), guidée en tête (S52/S53), est accusée — S92 doit s'effacer devant S52/S53 pour une plateforme de la liste : " + String(constatDe(ria, "S92").message || "sortie illisible").slice(0, 140));
+  }
+  // 06/11 — S93, S94 ET S95 (gabarit 2.63.0), chacune dans ses sens, avec le remède joué.
+  if (veut(93, 94, 95)) {
+  {
+    const base93 = mkdtempSync(join(tmpdir(), "s93-s95-"));
+    const produit93 = (nom) => { const p = join(base93, nom); mkdirSync(join(p, "forge", "retours"), { recursive: true }); mkdirSync(join(p, "output"), { recursive: true }); return p; };
+    const jouerRacine = (p, nom, contenu) => { const f = join(dir, nom); writeFileSync(f, contenu, "utf8"); return spawnSync(process.execPath, [moi, f, "--racine", p], { encoding: "utf8" }); };
+    const il93 = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
+    const ledger93 = (p, entrees) => writeFileSync(join(p, "forge", "ledger.jsonl"), entrees.map((e) => JSON.stringify(e)).join(nl) + nl, "utf8");
+    const POSEE_90 = (jours) => ({ seq: 305, ts: il93(jours), type: "question_humain", decisions_posees: { "D-90": "Supprime-t-on le réseau vide créé en Europe du Nord ?" }, reservee_par: "reserver-decision.mjs" });
+    const ANCRE_93 = "  - sans décision : rien n'est publié.";
+    const rappel93 = verte.replace(ANCRE_93, ANCRE_93 + nl + "- Rappel : D-90 — Supprime-t-on le réseau vide créé en Europe du Nord ?, posée il y a deux jours, sans réponse.");
+    if (rappel93 === verte) casse.push("S93 : l'ancre « sans décision » du bloc 3 n'a pas été trouvée — le cas ne prouve plus rien");
+    const pOuverte = produit93("s93-ouverte"); ledger93(pOuverte, [POSEE_90(2)]);
+    const pRepondue = produit93("s93-repondue"); ledger93(pRepondue, [POSEE_90(2), { seq: 306, ts: il93(1), type: "reponse_humain", decision: "D-90", reponse: "a", texte: "« 90a »" }]);
+    const pAncienne = produit93("s93-ancienne"); ledger93(pAncienne, [POSEE_90(20)]);
+    const pDeuxFormes = produit93("s93-decision-singulier"); ledger93(pDeuxFormes, [{ seq: 1, ts: il93(1), type: "question_humain", decision: "D-90", question: "Supprime-t-on le réseau vide ?" }]);
+    const rS93Rouge = jouerRacine(pOuverte, "s93-ouverte-non-rappelee.md", verte);
+    const rS93Rappel = jouerRacine(pOuverte, "s93-ouverte-rappelee.md", rappel93);
+    const rS93Repondue = jouerRacine(pRepondue, "s93-repondue.md", verte);
+    const rS93Ancienne = jouerRacine(pAncienne, "s93-ancienne.md", verte);
+    const rS93Singulier = jouerRacine(pDeuxFormes, "s93-decision-singulier.md", verte);
+    const rS93Hors = jouerPe("s93-hors-produit.md", verte);
+    for (const [r, statut, quoi] of [
+      [rS93Rouge, "FAIL", "une décision posée au ledger il y a 2 jours, sans réponse, absente du bloc 3 (le cas D-48 du 03/11) passe"],
+      [rS93Rappel, "PASS", "la MÊME décision rappelée au bloc 3 (le remède) est accusée"],
+      [rS93Repondue, "PASS", "une décision répondue (reponse_humain qui la nomme) est accusée"],
+      [rS93Ancienne, "PASS", "une décision posée il y a 20 jours, hors de la fenêtre de 14 jours, est accusée"],
+      [rS93Singulier, "FAIL", "la forme `decision: \"D-N\"` d'une question_humain n'est pas lue"],
+      [rS93Hors, "SANS_OBJET", "hors d'un produit, S93 ne le dit pas à voix haute"],
+    ]) if (constatDe(r, "S93").statut !== statut)
+      casse.push(`S93 (TF-2214) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S93").message || "sortie illisible").slice(0, 200));
+    if (!/D-90/.test(String(constatDe(rS93Rouge, "S93").message || "")) || !/seq 305/.test(String(constatDe(rS93Rouge, "S93").message || "")))
+      casse.push("S93 : le constat doit nommer D-90 et son numéro de séquence au ledger : " + String(constatDe(rS93Rouge, "S93").message || "").slice(0, 200));
+    // TF-2266 (06/11/2026) — LE REMÈDE DE S93 SE JOUE AVEC S4. Rouge d'origine : S93 prescrivait « > **D-N — <la question ?>** posée le <jour>, sans réponse », que S4 (bloquante) refusait
+    // (question, pas d'heure, pas de « inchangée »). Ici la ligne est EXTRAITE du message de S93, son sujet rempli, puis posée seule au bloc 3 : S93 et S4 doivent passer ensemble.
+    const ligne93 = (String(constatDe(rS93Rouge, "S93").message || "").match(/« (D-90 : <son sujet, trois mots au moins>, posée le \d{2}\/\d{2} à \d{2}:\d{2}, inchangée) »/) || [])[1];
+    if (!ligne93) casse.push("S93 (TF-2266) : le message ne prescrit pas la ligne « D-N : <sujet>, posée le JJ/MM à HH:MM, inchangée » que S4 lit comme un rappel : " + String(constatDe(rS93Rouge, "S93").message || "").slice(0, 260));
+    else {
+      const remede93 = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, `## 3. Décisions attendues\n\n- ${ligne93.replace("<son sujet, trois mots au moins>", "suppression du réseau vide")}\n\n`);
+      const rS93Remede = jouerRacine(pOuverte, "s93-remede-prescrit.md", remede93);
+      for (const regle of ["S93", "S4"]) if (constatDe(rS93Remede, regle).statut !== "PASS")
+        casse.push(`S93 (TF-2266) : la ligne que S93 prescrit (« ${ligne93} ») est refusée par ${regle} — le remède se heurte à une règle : ` + String(constatDe(rS93Remede, regle).message || "sortie illisible").slice(0, 220));
+    }
+    const ancien93 = verte.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, "## 3. Décisions attendues\n\n> **D-90 — Supprime-t-on le réseau vide créé en Europe du Nord ?** posée le 03/11, sans réponse\n\n");
+    if (constatDe(jouerRacine(pOuverte, "s93-ancien-remede.md", ancien93), "S4").statut !== "FAIL")
+      casse.push("S93 (TF-2266) : l'ancienne forme « Rappel : D-90 — <question ?>, posée il y a deux jours, sans réponse » doit rester refusée par S4 (c'est la raison du changement de remède)");
+    // S94 — un livrable lié « Livré » puis réécrit. Le sceau est posé comme le fait le hook de fin de tour : `verifier-jugement.mjs <fichier> --sceller`.
+    const outil94 = join(dirname(moi), "..", "scripts", "verifier-jugement.mjs");
+    const p94 = produit93("s94");
+    const livre94 = (nomFichier) => verte.replace("\n## 1. En-tête", `${nl}${nl}Livré : [L'étude remise](output/${encodeURIComponent(nomFichier).replace(/%2F/g, "/")})${nl}${nl}## 1. En-tête`);
+    const etudeB = "Produit - Etude - 20261105b.md", etudeC = "Produit - Etude - 20261105c.md";
+    writeFileSync(join(p94, "output", etudeB), "# Étude" + nl + nl + "Première version remise." + nl, "utf8");
+    const rS94Aucun = jouerRacine(p94, "s94-sans-sceau.md", livre94(etudeB));
+    const scelle94 = spawnSync(process.execPath, [outil94, join(p94, "output", etudeB), "--sceller"], { encoding: "utf8" });
+    if (scelle94.status !== 0) casse.push("S94 : le sceau du livrable d'essai n'a pas pu être posé par verifier-jugement.mjs --sceller : " + String(scelle94.stdout || scelle94.stderr).slice(0, 200));
+    const rS94Intact = jouerRacine(p94, "s94-intact.md", livre94(etudeB));
+    writeFileSync(join(p94, "output", etudeB), "# Étude" + nl + nl + "Version réécrite en place après trois remarques." + nl, "utf8");
+    const rS94Ecrase = jouerRacine(p94, "s94-reecrit-en-place.md", livre94(etudeB));
+    writeFileSync(join(p94, "output", etudeC), "# Étude" + nl + nl + "Version réécrite en place après trois remarques." + nl, "utf8");
+    const rS94Indice = jouerRacine(p94, "s94-indice-suivant.md", livre94(etudeC));
+    const rS94SansLigne = jouerRacine(p94, "s94-sans-ligne-livre.md", verte);
+    for (const [r, statut, quoi] of [
+      [rS94Aucun, "PASS", "un livrable lié sans sceau (état, pas défaut) est accusé"],
+      [rS94Intact, "PASS", "un livrable lié, scellé et inchangé est accusé"],
+      [rS94Ecrase, "FAIL", "un livrable déjà scellé, réécrit en place puis lié de nouveau « Livré » passe (le cas de l'étude 20261105b)"],
+      [rS94Indice, "PASS", "la version réécrite sous l'indice suivant (le remède) est accusée"],
+      [rS94SansLigne, "SANS_OBJET", "une restitution sans ligne « Livré : » ne rend pas SANS_OBJET"],
+    ]) if (constatDe(r, "S94").statut !== statut)
+      casse.push(`S94 (TF-2191) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S94").message || "sortie illisible").slice(0, 200));
+    if (!/20261105c/.test(String(constatDe(rS94Ecrase, "S94").message || "")))
+      casse.push("S94 : le constat doit nommer l'indice suivant à prendre (20261105c) : " + String(constatDe(rS94Ecrase, "S94").message || "").slice(0, 240));
+    // S95 — une décision qui en remplace une autre.
+    const ANCRE_95 = "## 4. Traité" + nl;
+    const avec95 = (lignes) => verte.replace(ANCRE_95, ANCRE_95 + lignes.join(nl) + nl);
+    const REMPLACE_95 = "- D-49 remplace D-46 b : la machine Azure cède la place à l'environnement Docker du poste.";
+    const LISTE_95 = "- Artefacts de D-46 : 11 ressources Azure (retirées), E-108 et E-109 (retirés), contrôles de smoke (conservés jusqu'à la prochaine recette).";
+    const rS95Rouge = jouerPe("s95-remplace-sans-liste.md", avec95([REMPLACE_95]));
+    const rS95Passif = jouerPe("s95-remplacee-par-sans-liste.md", avec95(["- D-46 est remplacée par D-49 : la machine Azure cède la place à l'environnement Docker du poste."]));
+    const rS95Liste = jouerPe("s95-remplace-avec-liste.md", avec95([REMPLACE_95, LISTE_95]));
+    const rS95SansSort = jouerPe("s95-liste-sans-sort.md", avec95([REMPLACE_95, "- Artefacts de D-46 : 11 ressources Azure, E-108 et E-109, contrôles de smoke."]));
+    const rS95Aucun = jouerPe("s95-aucun-artefact.md", avec95([REMPLACE_95, "- Artefacts de D-46 : aucun artefact, la machine n'avait rien créé."]));
+    const rS95Autre = jouerPe("s95-liste-d-une-autre.md", avec95([REMPLACE_95, "- Artefacts de D-12 : 3 fichiers (retirés)."]));
+    const rS95Rien = jouerPe("s95-sans-remplacement.md", avec95(["- D-49 tranche l'hébergement du poste ; D-46 reste ouverte."]));
+    for (const [r, statut, quoi] of [
+      [rS95Rouge, "FAIL", "« D-49 remplace D-46 b » sans liste des artefacts (le cas RP-26) passe"],
+      [rS95Passif, "FAIL", "« D-46 est remplacée par D-49 » sans liste passe"],
+      [rS95Liste, "PASS", "la liste des artefacts de D-46 avec le sort de chacun (le remède) est accusée"],
+      [rS95SansSort, "FAIL", "une liste d'artefacts sans aucun sort (conservé, retiré, à décider) passe"],
+      [rS95Aucun, "PASS", "« Artefacts de D-46 : aucun artefact » est accusé"],
+      [rS95Autre, "FAIL", "la liste des artefacts d'une AUTRE décision (D-12) couvre le remplacement de D-46"],
+      [rS95Rien, "PASS", "une phrase qui ne remplace aucune décision est accusée"],
+    ]) if (constatDe(r, "S95").statut !== statut)
+      casse.push(`S95 (TF-2206, TF-2210) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S95").message || "sortie illisible").slice(0, 200));
+    if (constatDe(rv, "S93").statut !== "SANS_OBJET" || constatDe(rv, "S94").statut !== "SANS_OBJET" || constatDe(rv, "S95").statut !== "PASS")
+      casse.push(`S93 à S95 sur la verte (hors produit, sans ligne « Livré : », sans remplacement) → attendu SANS_OBJET, SANS_OBJET, PASS, obtenu ${constatDe(rv, "S93").statut} ${constatDe(rv, "S94").statut} ${constatDe(rv, "S95").statut}`);
+  }
+  }
   // 18/10 — S49, S80 ET LA MISE EN PAGE PRESCRITE (TF-1847). La décision au format B dont l'option (b) commande un
   // geste porte « Comment faire (b) : » puis une liste numérotée SOUS le tableau des options, en pleine largeur : elle
   // passe S49 (le geste est compté et de quoi l'exécuter est là), S80 et S78 ; la MÊME décision sans la liste FAIL S49.
+  if (veut(49, 80, 1847)) {
   const OPTION_B_ATTENDRE = "| (b) Attendre le prochain lot | Les 26 commits restent sur ce poste | Nul | Sans objet |";
   const OPTION_B_GESTE = "| (b) Se connecter au portail soi-même et saisir le code reçu | Vous rouvrez la connexion ; rien n'est publié d'ici là | Faible × court | Possible |";
   const LISTE_COMMENT_FAIRE = nl + nl + "Comment faire (b) :" + nl + nl + "1. Ouvrir un terminal." + nl
@@ -6817,11 +7881,13 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`${regle} (format B, TF-1847) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 200));
   if (!/commandant un geste humain, chacune exécutable/.test(constatDe(r49bListe, "S49").message || ""))
     casse.push("S49 (format B) : la verte ne passe que parce qu'aucune option ne commande de geste — le geste n'est pas compté : " + String(constatDe(r49bListe, "S49").message || "").slice(0, 200));
+  }
   // 15/10 — TF-1766 ET TF-1802 : S75 ET S76, DANS LEURS DEUX SENS. (a) La livraison de r71avec (portail,
   // adresse, usage, compte) ne dit d'aucun parcours qu'il a été joué dans un navigateur : S75 FAIL ; la
   // MÊME avec « parcours joués dans un navigateur sur l'adresse publique » : PASS ; avec l'aveu « parcours
   // non joué dans un navigateur » : PASS (le manque est dit). (b) « L'agent de collecte rapporte 13 087
   // établissements » sans recompte : S76 FAIL ; la MÊME avec le recompte en base : PASS.
+  if (veut(75, 76, 1766, 1802)) {
   const TRACE_75 = USAGE_71 + nl + nl + "Les 5 parcours des personas ont été joués dans un navigateur, sur l'adresse publique, le 2026-10-15, avec une saisie inattendue par formulaire.";
   const r75avec = jouerPe("tf1766-parcours-navigateur.md", ouv70(BRIEF_71).replace(VERDICT_70, TRACE_75));
   const r75aveu = jouerPe("tf1766-parcours-non-joue.md", ouv70(BRIEF_71).replace(VERDICT_70, USAGE_71 + nl + nl + "Parcours non joué dans un navigateur : la recette appelle le portail par le réseau privé."));
@@ -6841,34 +7907,42 @@ Aucun écart : la demande a été suivie à la lettre.
   for (const [r, regle, statut, quoi] of attendu75)
     if (constatDe(r, regle).statut !== statut)
       casse.push(`${regle} (TF-1766, TF-1802) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, regle).message || "sortie illisible").slice(0, 160));
+  }
   // 18/10 — D-23 (a) : S79, LA RELECTURE D'INTENTION AU BLOC 4, DANS SES DIX CAS. Toutes les fixtures sortent de la verte, qui porte
   // la ligne « sert » ; chacune ne diffère de la verte que par cette ligne. (a) La verte, et la même en gras : PASS. (b) La ligne
   // ôtée : FAIL — c'est le tour qui n'a pas été relu. (c) « sans objet, <motif> » : PASS ; « sans objet » sans motif : FAIL ; une
   // valeur hors vocabulaire : FAIL. (d) « dérive » sans décision qui la nomme au bloc 3 : FAIL ; la MÊME avec la décision : PASS.
   // (e) Le bloc 4 absent : SANS_OBJET dit à voix haute (S1 porte le défaut). (f) La restitution datée avant le 2026-10-18 : SANS_OBJET, avec ou sans la ligne.
-  const L79 = "- Relecture d'intention : sert — la demande citée mot pour mot est tenue à la lettre comme à l'intention.";
+  if (veut(79, 82, 1866)) {
+  var L79 = "- Relecture d'intention : sert — la demande citée mot pour mot est tenue à la lettre comme à l'intention.";
   if (!verte.includes(L79)) casse.push("S79 : la verte ne porte plus la ligne « Relecture d'intention » — les fixtures de S79 ne prouvent plus rien");
+  }
   // La verte est datée du 2026-08-14, antérieure à l'essai : les fixtures qui jugent la ligne sont datées du 2026-10-18, premier jour de l'essai.
-  const AOUT = "terminée le 2026-08-14 à 15h48", PREMIER_JOUR = "terminée le 2026-10-18 à 15h48", AVANT_ESSAI = "terminée le 2026-10-17 à 15h48";
+  if (veut(79, 82, 1866)) {
+  var AOUT = "terminée le 2026-08-14 à 15h48", PREMIER_JOUR = "terminée le 2026-10-18 à 15h48", AVANT_ESSAI = "terminée le 2026-10-17 à 15h48";
   if (!verte.includes(AOUT)) casse.push("S79 : la date de la verte a changé — les fixtures datées de S79 ne prouvent plus rien");
-  const verte79 = verte.replace(AOUT, PREMIER_JOUR);
-  const f79 = (nom, ligne) => jouerPe(nom, verte79.replace(L79, ligne));
-  const r79gras = f79("s79-ligne-en-gras.md", "- **Relecture d'intention :** sert — la demande citée est tenue.");
-  const r79sans = f79("s79-ligne-absente.md", "");
-  const r79sansObjet = f79("s79-sans-objet-motif.md", "- Relecture d'intention : sans objet, le tour n'a rien écrit ni lancé.");
-  const r79sansMotif = f79("s79-sans-objet-sans-motif.md", "- Relecture d'intention : sans objet");
-  const r79inconnu = f79("s79-valeur-hors-vocabulaire.md", "- Relecture d'intention : peut-être");
-  const r79derive = f79("s79-derive-sans-decision.md", "- Relecture d'intention : dérive — la consigne passée à l'agent restreignait « pour chaque liste » à « dès 8 lignes ».");
-  const DECISION_79 = "\n- **Décision 2 —** Corriger la dérive d'intention relevée par la relecture ? Option (a) : reprendre la consigne telle que vous l'avez écrite ; option (b) : garder la restriction.";
-  const r79deriveDecision = jouerPe("s79-derive-posee-en-decision.md", verte79.replace(L79, "- Relecture d'intention : dérive — la consigne passée à l'agent restreignait « pour chaque liste » à « dès 8 lignes ».")
+  var verte79 = verte.replace(AOUT, PREMIER_JOUR);
+  var f79 = (nom, ligne) => jouerPe(nom, verte79.replace(L79, ligne));
+  var r79gras = f79("s79-ligne-en-gras.md", "- **Relecture d'intention :** sert — la demande citée est tenue.");
+  var r79sans = f79("s79-ligne-absente.md", "");
+  var r79sansObjet = f79("s79-sans-objet-motif.md", "- Relecture d'intention : sans objet, le tour n'a rien écrit ni lancé.");
+  var r79sansMotif = f79("s79-sans-objet-sans-motif.md", "- Relecture d'intention : sans objet");
+  var r79inconnu = f79("s79-valeur-hors-vocabulaire.md", "- Relecture d'intention : peut-être");
+  var r79derive = f79("s79-derive-sans-decision.md", "- Relecture d'intention : dérive — la consigne passée à l'agent restreignait « pour chaque liste » à « dès 8 lignes ».");
+  var DECISION_79 = "\n- **Décision 2 —** Corriger la dérive d'intention relevée par la relecture ? Option (a) : reprendre la consigne telle que vous l'avez écrite ; option (b) : garder la restriction.";
+  var r79deriveDecision = jouerPe("s79-derive-posee-en-decision.md", verte79.replace(L79, "- Relecture d'intention : dérive — la consigne passée à l'agent restreignait « pour chaque liste » à « dès 8 lignes ».")
     .replace("  - sans décision : rien n'est publié.", "  - sans décision : rien n'est publié." + DECISION_79));
-  const r79sansBloc4 = jouerPe("s79-sans-bloc-4.md", verte79.replace(/## 4\. Traité[\s\S]*?(?=## 5\. Non traité)/, ""));
+  var r79sansBloc4 = jouerPe("s79-sans-bloc-4.md", verte79.replace(/## 4\. Traité[\s\S]*?(?=## 5\. Non traité)/, ""));
+  }
   // (f) La borne de l'essai : la MÊME restitution sans la ligne, datée de la VEILLE de l'essai ou d'août, est hors de portée (SANS_OBJET dit à voix haute).
-  const r79veille = jouerPe("s79-veille-de-l-essai.md", verte.replace(AOUT, AVANT_ESSAI).replace(L79, ""));
-  const r79ancienne = jouerPe("s79-restitution-d-aout.md", verte.replace(L79, ""));
+  if (veut(79)) {
+  var r79veille = jouerPe("s79-veille-de-l-essai.md", verte.replace(AOUT, AVANT_ESSAI).replace(L79, ""));
+  var r79ancienne = jouerPe("s79-restitution-d-aout.md", verte.replace(L79, ""));
+  }
   // (g) D-26 (a) du 18/10/2026, LA BOUCLE DE CORRECTION : une alerte levée en 1 ou 2 passes se dit « sert après N passe(s) » et ne devient PAS
   // une décision (la verte n'en pose aucune) ; au-delà de 2 passes, sans nombre ou avec zéro, la ligne est refusée ; un écart qui demeure après
   // 2 passes reste une « dérive » : refusée sans décision au bloc 3, acceptée posée en décision (le remède du message joué).
+  if (veut(79)) {
   const L79DERIVE_PASSES = "- Relecture d'intention : dérive après 2 passes — l'écart résiste à la correction de la consigne, il est posé en décision.";
   const r79sert1 = f79("s79-sert-apres-1-passe.md", "- Relecture d'intention : sert après 1 passe — l'écart signalé sur la consigne a été corrigé puis relu.");
   const r79sert2 = f79("s79-sert-apres-2-passes.md", "- Relecture d'intention : sert après 2 passes — l'écart signalé sur la consigne a été corrigé puis relu.");
@@ -6904,6 +7978,7 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S79 : le constat sur la ligne absente doit NOMMER la ligne attendue et la commande qui prépare la relecture : " + String(constatDe(r79sans, "S79").message || "").slice(0, 200));
   if (!/au plus 2 passes/.test(constatDe(r79sert3, "S79").message || "") || !/sert après 1 passe/.test(constatDe(r79sert3, "S79").message || ""))
     casse.push("S79 : le constat sur « sert après 3 passes » doit dire la borne (au plus 2 passes) et la forme attendue : " + String(constatDe(r79sert3, "S79").message || "").slice(0, 200));
+  }
   // 18/10 — TF-1866 (RT-126, D-29 (a)) : S82, UNE AFFIRMATION D'EXHAUSTIVITÉ PORTE SA LIGNE « Mesuré sur ». Toutes les fixtures sortent de la verte
   // datée du 2026-10-18 (premier jour de la règle) et ne diffèrent d'elle que par la phrase d'affirmation et la ligne de mesure.
   // ROUGES : (a) le cas réel du 15/10, « tout le site en ligne est à jour » fondé sur 273 pages, sans « Mesuré sur » ; (b) la même avec « Mesuré contre »
@@ -6911,6 +7986,7 @@ Aucun écart : la demande a été suivie à la lettre.
   // (d) sans l'heure de relecture ; (e) sans nombre au périmètre ; (f) quatre autres formes de l'affirmation (entièrement, rien oublié, collection complète,
   // exhaustive) sans ligne. VERTES : le REMÈDE du message joué (source amont relue, heure, périmètre chiffré) en puce et en gras ; une restitution sans affirmation ;
   // l'affirmation niée, conditionnelle, ou citée entre guillemets ; la même affirmation datée d'avant la règle (SANS_OBJET).
+  if (veut(82, 1866)) {
   const AFF82 = "Tout le site en ligne est à jour : 273 pages balayées, aucune ne porte l'ancienne formulation.";
   const SUR82 = "Mesuré sur : conditions générales du 15/10 du produit amont (docs/cgv-20261015d.md), relue à 14:32, périmètre 273 pages";
   const aff82 = (extra) => verte79.replace("pytest 365.", "pytest 365. " + extra);
@@ -6956,11 +8032,13 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S82 : le constat sur « Mesuré contre » doit dire que la formule est « Mesuré sur » : " + String(constatDe(r82contre, "S82").message || "").slice(0, 200));
   if (!/liste de contrôle écrite par l'auteur/.test(constatDe(r82liste, "S82").message || ""))
     casse.push("S82 : le constat sur « mes marqueurs » doit dire que la liste de l'auteur n'est pas une source de vérité : " + String(constatDe(r82liste, "S82").message || "").slice(0, 200));
+  }
   // 21/10 — TF-1936 (RP-22) : S83, UNE DEMANDE D'AVIS PORTE LE LIEN DU CONTENU. ROUGES : (a) le cas réel du 19/10 recopié mot pour mot,
   // la ligne A-11 en tableau, « guide de mon message de 21:45 » ; (b) la même action en puce ; (c) une option du bloc 3 « relire d'abord la
   // fiche de version » sans lien. VERTES : le REMÈDE du constat joué (le chemin des textes entre accents graves), une adresse, un bloc de la
   // restitution cité ; et ce que la règle écarte exprès : l'agent sujet (« je relis »), un constat de fait (« vérifier que… »), un geste
   // (« valider le moyen de paiement »).
+  if (veut(83, 1936)) {
   const LIGNE_A11 = "| A-11 | `reprise` | relire la semaine 2 et répondre « ok semaine 2 » | manuelle_utilisateur | decision : D-94 (a) prévoit votre relecture avant chaque semaine | guide de mon message de 21:45 | rien ne part lundi 26/10 |";
   const FIN_A3 = "  - si rien n'est fait : les constats restent listés un par un, sans leur cause commune.\n";
   if (!verte.endsWith(FIN_A3)) casse.push("S83 : la verte ne finit plus par l'action A-3 — les fixtures de S83 ne prouvent plus rien");
@@ -6990,10 +8068,12 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`S83 (TF-1936) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S83").message || "sortie illisible").slice(0, 200));
   if (!/message précédent n'en tient pas lieu/.test(constatDe(r83cas, "S83").message || "") || !/chemin du fichier/.test(constatDe(r83cas, "S83").message || ""))
     casse.push("S83 : le constat du cas réel doit dire que le renvoi au message ne vaut pas lien, et nommer le remède : " + String(constatDe(r83cas, "S83").message || "").slice(0, 200));
+  }
   // 21/10 — TF-1938 (RP-24, récidive de TF-1646) : S84, L'HEURE ET LA DURÉE DU BLOC 1 SE RELÈVENT. ROUGES : (a) le cas réel du 20/10,
   // « Quand : 20/10/2026 19:52 heure de Paris, durée 4 min », aucun relevé dans le tour : heure ET durée accusées ; (b) la verte (15h48,
   // durée 12 min) avec UN seul relevé : la durée n'est l'écart d'aucune paire. VERTES : la MÊME avec deux relevés à 15:36 et 15:48 (le
   // remède) ; la MÊME, un seul relevé et la durée omise. SANS_OBJET dit à voix haute quand l'oracle est joué sans relevés.
+  if (veut(84, 1938, 1646)) {
   const jouerAvec = (nom, contenu, args) => { const f = join(dir, nom); writeFileSync(f, contenu, "utf8"); return spawnSync(process.execPath, [moi, f, ...args], { encoding: "utf8" }); };
   const QUAND84 = "terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min";
   if (!verte.includes(QUAND84)) casse.push("S84 : l'en-tête de la verte a changé — les fixtures de S84 ne prouvent plus rien");
@@ -7015,6 +8095,7 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push("S84 : le constat du cas réel doit nommer l'heure et la durée composées : " + String(constatDe(r84cas, "S84").message || "").slice(0, 200));
   if (!/relevés d'horloge du tour inconnus/.test(constatDe(r84sans, "S84").message || "") || !/S69/.test(constatDe(r84sans, "S84").message || ""))
     casse.push("S84 : sans relevés, le SANS_OBJET doit dire ce que la règle ne peut pas juger et ce qui juge à sa place : " + String(constatDe(r84sans, "S84").message || "").slice(0, 200));
+  }
   // 27/09 — LE COMPTE DE CAS SE MESURE. Le bilan portait « 39/39 » écrit à la main ; le harnais le lit
   // comme un CLIQUET (I5, `lib-baseline-recettes.mjs` : premier « N PASS », sinon le ratio N/N), et il
   // n'avait pas bougé quand deux paires se sont ajoutées le 26/09. Retiré seul, il a laissé le
@@ -7022,10 +8103,16 @@ Aucun écart : la demande a été suivie à la lettre.
   // réellement écrites et jugées dans le dossier de ce banc, et il ouvre le bilan.
   const compterFixtures = (d) => readdirSync(d, { withFileTypes: true })
     .reduce((n, e) => n + (e.isDirectory() ? compterFixtures(join(d, e.name)) : (/\.md$/i.test(e.name) ? 1 : 0)), 0);
+  if (filtre.actif) {
+    // TF-2256 : une recette filtrée ne rend jamais « N/N PASS » — le cliquet du nombre de cas le lirait comme un compte complet.
+    const c = conclureFiltre("oracle-synthese --self-test", filtre, casse);
+    (c.code === 0 ? console.log : console.error)(c.ligne);
+    process.exit(c.code);
+  }
   const nCas = compterFixtures(dir);
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; gabarit 2.54.0 (29/10) : S88 dans ses SEPT sens (TF-1979 : le champ « De quoi s'agit-il » ouvert par un nom interne sans glose FAIL, le même glosé ou la raison d'être d'abord PASS, cinq identifiants en ligne FAIL, mis en liste PASS, trois PASS, un mot ordinaire en code PASS), S89 dans ses CINQ sens (TF-1984 : « 3 fichiers qui ne sont pas dans main » sans `git diff --name-status` FAIL — le cas du 21/10 —, la même avec le statut M ou `--diff-filter` PASS, sans référence git PASS), S36 et S38 dans leurs SIX sens (TF-1981 : la critique d'implémentation citée seulement en action `hors_mandat` ou en option de décision FAIL, jouée au bloc 4 PASS, bloquée par une décision PASS), S68 étendue dans ses QUATRE sens (TF-1985 : une ressource déclarée supprimée sur un 200 au corps vide, lu dans un seul projet, FAIL — le cas du 26/10 —, après l'essai du projet voisin ou un 404 PASS, un 200 au corps plein PASS), S48 dans ses SEPT sens de plus (TF-1982 : « reste au produit » sans ledger ou run clos FAIL, run ouvert ou rouvert PASS ; TF-1987 : un conteneur recréé par `docker rm` et `docker run -v` suivi de « rien à remonter » FAIL, avec son lot PASS, `docker ps` seul PASS) ; T4, le verrou « livré », dans ses QUATORZE cas (TF-1949, 26/10 : une livraison sans trace de mobilisation S86 FAIL et S85 SANS_OBJET, « le run est clos » sans trace S86 FAIL ; un produit neuf sans ses livrables S85 FAIL en nommant EXIGENCES.json, les livrables produits PASS, ops écartée par une nouvelle ligne de trace PASS, DOSSIER-MEP.md seul manquant nommé seul ; une livraison sans compte d'exigences sous le verrou S72 AVERT ; la même datée d'août SANS_OBJET, la verte sans livraison sous un produit PASS, une livraison hors produit SANS_OBJET) ; T2 dans ses SEPT sens (TF-1947, 26/10 : la verte sans ses blocs 2, 6 et 7 PASS en entier, S3 SANS_OBJET ; sans son bloc 9, son bloc 0 ou son bloc 4 FAIL sur S1 en nommant le bloc ; une décision au format B sans son tableau d'options FAIL sur S4 en le nommant, la même avec son tableau PASS) ; S83 dans ses DIX cas (TF-1936, RP-22 : la ligne A-11 du 19/10 « relire la semaine 2 » renvoyée au « guide de mon message de 21:45 » FAIL — le cas réel —, la même en puce FAIL, une option « relire d'abord la fiche » sans lien FAIL ; le chemin des textes (le remède), une adresse, un bloc cité PASS ; l'agent sujet, un « vérifier que… », un « valider le moyen de paiement » et la verte PASS) ; S84 dans ses CINQ cas (TF-1938, RP-24 : « 19:52, durée 4 min » sans relevé FAIL — le cas réel —, une durée sur un seul relevé FAIL, l'heure lue et la durée égale à l'écart de deux relevés PASS, la durée omise PASS, l'oracle joué sans relevés SANS_OBJET dit à voix haute) ; S82 dans ses SEIZE cas (TF-1866, D-29 (a) du 18/10 : « tout le site en ligne est à jour » fondé sur 273 pages sans ligne « Mesuré sur » FAIL — le cas réel du 15/10 —, la formule « Mesuré contre » FAIL, la source « mes marqueurs » FAIL, l'heure manquante FAIL, le périmètre sans nombre FAIL, quatre autres formes de l'affirmation (entièrement, rien oublié, inventaire complet, exhaustive) FAIL, le REMÈDE joué (source amont relue, heure, périmètre chiffré) PASS en puce comme en gras, la restitution sans affirmation PASS, l'affirmation niée, conditionnelle ou citée entre « » PASS, la restitution d'août SANS_OBJET) ; S79 dans ses DIX cas (D-23 du 18/10 : la ligne « Relecture d'intention : sert » du bloc 4 PASS, en gras PASS, « sans objet, <motif> » PASS ; la ligne absente FAIL en nommant la ligne attendue et la commande qui prépare la relecture, « sans objet » sans motif FAIL, une valeur hors vocabulaire FAIL, une dérive sans décision qui la nomme au bloc 3 FAIL et la MÊME dérive posée en décision PASS, le bloc 4 absent SANS_OBJET dit à voix haute, et la restitution datée de la veille de l'essai ou d'août SANS_OBJET : la règle ne juge pas ce qui l'a précédée ; avertissante ; et, pour la boucle de correction (D-26 (a)) : « sert après 1 passe » et « sert après 2 passes » PASS sans décision au bloc 3, « sert après 3 passes », « sert après 0 passe » et « sert après correction » FAIL, un écart qui demeure après 2 passes FAIL sans décision et PASS posé en décision) ; S80 dans ses sens (TF-1847, E-11 : « Comment faire : 1) … 2) … 3) » en ligne FAIL, la MÊME option en liste numérotée PASS S49 ET S80, une énumération en cellule FAIL en le disant, deux éléments et une citation entre guillemets français PASS) ; S81 dans ses quatre sens (guide à une sous-puce par geste PASS, étape de trois gestes en paragraphe FAIL en les comptant, clôture avant le dernier geste FAIL, sous-puce qui enchaîne FAIL) ; S78 dans ses QUATRE sens (format B du 17/10 : la décision au format B PASS sur S78, S15, S16, S30, S31 et S32 ; l'ancien format en citation FAIL en nommant les libellés manquants ; la MÊME décision B sans retour arrière FAIL ; la verte en puce SANS_OBJET dit à voix haute) ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 117 caracteres — 151 avec les 34 du sidecar d oracle, 26 jusqu au 01/10 — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS ; et TF-1500 dans ses QUATRE sens sous le forge d un produit : un chemin `forge/` cite de 117 caracteres FAIL, le meme a 116 PASS, le fichier juge sous un dossier `forge` mesure comme `forge/<nom>`, FAIL a 117 et PASS a 116) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S55 et S56 dans leurs QUATRE sens (TF-1493, TF-1498 : un guide de LANCEMENT et un feu vert au verdict sans ligne « Ne vérifie pas » et sur un audit des dependances date de la VEILLE FAIL sur les deux regles, la MEME bornee aux deux endroits et portant ses portes du jour chiffrees PASS en entier, le feu vert que l agent ATTEND de l humain ne declenche rien, et une chaine qui DECLARE n avoir aucune porte a base externe PASS — taux mesure a la mise en service : 0 sur les 215 syntheses d output\\04-plans\\, 10 et 9 sur les 142 restitutions des produits du poste : avertissantes) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit ; TF-1644 : le MEME message muet pose hors de tout produit rend SANS_OBJET seul et FAIL quand `--racine` nomme le produit, forme que le hook de fin de tour emploie ; TF-1643 dans ses TROIS sens : un tour qui CORRIGE une erreur de la session et declare « rien a remonter » FAIL, le MEME qui nomme son lot PASS, le MEME qui dit « reste au produit, parce que <motif> » PASS) ; S36 dans ses DEUX sens (TF-1653 : un schema HTML nomme par un prompt recopie dans un bloc de code et cite comme source lue PASS, le MEME schema presente comme livre sans critique d implementation FAIL) ; S69 dans ses DEUX sens (TF-1646 : la MEME verte dont l en-tete porte 15h48 jugee a 13:00 ce jour-la FAIL, heure composee dans le futur, et a 16:00 PASS ; et la MEME heure suivie de « (UTC+02:00) » lue avec son decalage, PASS) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
+    : `Self-test restitution : ${nCas}/${nCas} PASS — fixtures de restitution écrites et jugées, comptées sur le disque du banc` + " (verte PASS ; gabarit 2.65.0 (09/11) : S115 dans ses HUIT sens (TF-2304, loi n° 5 : une action manuelle `acces` qui porte `az sql server ad-admin create`, la même commande préparée par la session au bloc 4, sans code de retour d'échec FAIL — le cas du 09/11 —, la même commande jouée avec son HTTP 403 PASS, la commande dans la seule action manuelle PASS, la double présence sous un motif d'arbitrage PASS, l'action devenue auto_ia PASS, la verte PASS, une commande locale `git pull` PASS, une commande d'une action écrite pour l'autre poste PASS), S68 étendue aux droits dans ses CINQ sens (TF-2302 : une absence de droit conclue d'un `az role assignment list` sans `--include-groups` FAIL — le cas du 09/11, un Contributor hérité d'un groupe —, la même après `--include-groups` PASS, après la lecture des droits effectifs PASS, un relevé direct sans conclusion d'absence PASS, « seules les attributions directes » suivi d'une absence de rôle FAIL), S48 pour le défaut constaté sur soi dans ses CINQ sens (TF-2305 : « j'ai proposé une voie manuelle alors que je pouvais… » puis « rien à remonter » FAIL, avec son lot PASS, « j'aurais dû » FAIL, une action manuelle sans contradiction PASS, un « aurait dû » dit d'un tiers PASS), S13 dans ses DEUX sens de plus (TF-2310 : l'adresse https à ouvrir PASS, le mot « http » sans adresse FAIL) ; gabarit 2.63.0 (06/11) : S93 dans ses SIX sens (TF-2214 : une décision posée il y a 2 jours sans réponse et absente du bloc 3 FAIL — le cas D-48 —, la même rappelée PASS, répondue PASS, ancienne de 20 jours PASS, la forme `decision` au singulier lue, hors produit SANS_OBJET), S94 dans ses CINQ sens (TF-2191 : un livrable scellé puis réécrit en place et lié de nouveau FAIL en nommant l'indice suivant — le cas de l'étude 20261105b —, intact PASS, sans sceau PASS, la version à l'indice suivant PASS, sans ligne « Livré : » SANS_OBJET), S95 dans ses SEPT sens (TF-2206, TF-2210 : « D-49 remplace D-46 » sans liste FAIL, « D-46 est remplacée par D-49 » FAIL, la liste avec le sort PASS, sans sort FAIL, « aucun artefact » PASS, la liste d'une autre décision FAIL, aucun remplacement PASS) ; gabarit 2.59.0 (03/11) : S92 dans ses CINQ sens (TF-2077, RT-32 : une adresse http(s) au bloc 8 ET sa ligne « À ouvrir : [nom](adresse) » en fin de bloc 0 PASS en entier, S9 l'exemptant comme « Livré : » même quand l'adresse porte un nom de fichier ; la MÊME adresse au bloc 8 sans la ligne FAIL sur S92 ; la MÊME adresse dans la PROSE du bloc 0 FAIL sur S9, l'exemption ne couvrant que la ligne étiquetée ; la verte sans adresse manuelle_utilisateur « rien à juger » ; l'action d'import vers l'interface d'une plateforme tierce (Google Ads), guidée en tête, « rien à juger » — S92 s'efface devant S52/S53) ; gabarit 2.54.0 (29/10) : S88 dans ses SEPT sens (TF-1979 : le champ « De quoi s'agit-il » ouvert par un nom interne sans glose FAIL, le même glosé ou la raison d'être d'abord PASS, cinq identifiants en ligne FAIL, mis en liste PASS, trois PASS, un mot ordinaire en code PASS), S89 dans ses CINQ sens (TF-1984 : « 3 fichiers qui ne sont pas dans main » sans `git diff --name-status` FAIL — le cas du 21/10 —, la même avec le statut M ou `--diff-filter` PASS, sans référence git PASS), S36 et S38 dans leurs SIX sens (TF-1981 : la critique d'implémentation citée seulement en action `hors_mandat` ou en option de décision FAIL, jouée au bloc 4 PASS, bloquée par une décision PASS), S68 étendue dans ses QUATRE sens (TF-1985 : une ressource déclarée supprimée sur un 200 au corps vide, lu dans un seul projet, FAIL — le cas du 26/10 —, après l'essai du projet voisin ou un 404 PASS, un 200 au corps plein PASS), S48 dans ses SEPT sens de plus (TF-1982 : « reste au produit » sans ledger ou run clos FAIL, run ouvert ou rouvert PASS ; TF-1987 : un conteneur recréé par `docker rm` et `docker run -v` suivi de « rien à remonter » FAIL, avec son lot PASS, `docker ps` seul PASS) ; T4, le verrou « livré », dans ses QUATORZE cas (TF-1949, 26/10 : une livraison sans trace de mobilisation S86 FAIL et S85 SANS_OBJET, « le run est clos » sans trace S86 FAIL ; un produit neuf sans ses livrables S85 FAIL en nommant EXIGENCES.json, les livrables produits PASS, ops écartée par une nouvelle ligne de trace PASS, DOSSIER-MEP.md seul manquant nommé seul ; une livraison sans compte d'exigences sous le verrou S72 AVERT ; la même datée d'août SANS_OBJET, la verte sans livraison sous un produit PASS, une livraison hors produit SANS_OBJET) ; T2 dans ses SEPT sens (TF-1947, 26/10 : la verte sans ses blocs 2, 6 et 7 PASS en entier, S3 SANS_OBJET ; sans son bloc 9, son bloc 0 ou son bloc 4 FAIL sur S1 en nommant le bloc ; une décision au format B sans son tableau d'options FAIL sur S4 en le nommant, la même avec son tableau PASS) ; S83 dans ses DIX cas (TF-1936, RP-22 : la ligne A-11 du 19/10 « relire la semaine 2 » renvoyée au « guide de mon message de 21:45 » FAIL — le cas réel —, la même en puce FAIL, une option « relire d'abord la fiche » sans lien FAIL ; le chemin des textes (le remède), une adresse, un bloc cité PASS ; l'agent sujet, un « vérifier que… », un « valider le moyen de paiement » et la verte PASS) ; S84 dans ses CINQ cas (TF-1938, RP-24 : « 19:52, durée 4 min » sans relevé FAIL — le cas réel —, une durée sur un seul relevé FAIL, l'heure lue et la durée égale à l'écart de deux relevés PASS, la durée omise PASS, l'oracle joué sans relevés SANS_OBJET dit à voix haute) ; S82 dans ses SEIZE cas (TF-1866, D-29 (a) du 18/10 : « tout le site en ligne est à jour » fondé sur 273 pages sans ligne « Mesuré sur » FAIL — le cas réel du 15/10 —, la formule « Mesuré contre » FAIL, la source « mes marqueurs » FAIL, l'heure manquante FAIL, le périmètre sans nombre FAIL, quatre autres formes de l'affirmation (entièrement, rien oublié, inventaire complet, exhaustive) FAIL, le REMÈDE joué (source amont relue, heure, périmètre chiffré) PASS en puce comme en gras, la restitution sans affirmation PASS, l'affirmation niée, conditionnelle ou citée entre « » PASS, la restitution d'août SANS_OBJET) ; S79 dans ses DIX cas (D-23 du 18/10 : la ligne « Relecture d'intention : sert » du bloc 4 PASS, en gras PASS, « sans objet, <motif> » PASS ; la ligne absente FAIL en nommant la ligne attendue et la commande qui prépare la relecture, « sans objet » sans motif FAIL, une valeur hors vocabulaire FAIL, une dérive sans décision qui la nomme au bloc 3 FAIL et la MÊME dérive posée en décision PASS, le bloc 4 absent SANS_OBJET dit à voix haute, et la restitution datée de la veille de l'essai ou d'août SANS_OBJET : la règle ne juge pas ce qui l'a précédée ; avertissante ; et, pour la boucle de correction (D-26 (a)) : « sert après 1 passe » et « sert après 2 passes » PASS sans décision au bloc 3, « sert après 3 passes », « sert après 0 passe » et « sert après correction » FAIL, un écart qui demeure après 2 passes FAIL sans décision et PASS posé en décision) ; S80 dans ses sens (TF-1847, E-11 : « Comment faire : 1) … 2) … 3) » en ligne FAIL, la MÊME option en liste numérotée PASS S49 ET S80, une énumération en cellule FAIL en le disant, deux éléments et une citation entre guillemets français PASS) ; S81 dans ses quatre sens (guide à une sous-puce par geste PASS, étape de trois gestes en paragraphe FAIL en les comptant, clôture avant le dernier geste FAIL, sous-puce qui enchaîne FAIL) ; S78 dans ses QUATRE sens (format B du 17/10 : la décision au format B PASS sur S78, S15, S16, S30, S31 et S32 ; l'ancien format en citation FAIL en nommant les libellés manquants ; la MÊME décision B sans retour arrière FAIL ; la verte en puce SANS_OBJET dit à voix haute) ; TF-1427 dans ses QUATRE sens (une barre verticale NUE dans une cellule du bloc 8 coupe la ligne : S18 FAIL en nommant la barre à échapper, S12 PASS parce que le motif s'affiche à sa place ; la MÊME barre ÉCHAPPÉE lue comme un caractère, restitution PASS en entier ; une barre AVANT la colonne du motif : S12 FAIL et son constat nomme la coupure ; une cellule absente : S18 FAIL) ; TF-1428 et TF-1449 (S14 : « A-18 » dans la colonne Registre et « registre A-01 » en prose PASS, « RT-2 » PASS ; une colonne Registre vide, un renvoi « après A-12 », le sélecteur posé dans une colonne « Id » et un « A-01 » nu FAIL ; « un clone neuf » n'est plus lu comme la mention « neuve », déclarée « `neuve` » elle PASS ; S39 : une remontée portant son numéro de lot « RT-2 » PASS) ; TF-1429 dans ses CINQ sens (S4 : une ligne qui RAPPELLE une décision déjà posée — sélecteur, sujet, heure de pose, « inchangée » — comptée rappelée et la restitution PASS en entier, deux rappels comptés deux ; « à décider : D-6, posée à 14:20 » FAIL en nommant ce qui lui manque, un rappel sans sujet FAIL, et une décision NOUVELLE sans choix fermé posée à côté d'un rappel FAIL) ; TF-1338 dans ses DEUX sens (une ligne citée qui CONTINUE son paragraphe — « > **171** paragraphes », « > décision D-3 » — n'ouvre plus de décision : S30, S16 et S32 PASS sur la décision réelle, et la MÊME tête privée de numéro reste FAIL sur S30) ; TF-1339 dans ses DEUX sens (un désignateur entre accents graves glosé à son premier emploi PASS S23, le MÊME employé deux fois sans glose FAIL) ; le LEXIQUE TRANSVERSE dans ses DEUX sens (TF-1150 : le lexique du CLIENT est VIDE et le terme que l humain a proscrit POUR TOUS les produits est quand meme accuse, le constat disant son origine transverse ; la MEME restitution avec le terme retenu PASS) ; S51 dans ses TROIS sens (TF-0791 : un bloc 1 SANS l'intention initiale de la demande FAIL, le MÊME portant l'intention mais PAS son test rétro FAIL et nommant la pièce manquante, la verte qui porte les deux PASS — taux mesuré à 94,6 % sur les 148 synthèses d'output\\04-plans\\ à la mise en service, le champ datant de la veille : avertissante) ; le POINT D'ÉTAPE dans ses QUATRE sens (TF-1182 : la forme écrite À LA LETTRE du gabarit — mention au bloc 1, bloc 2 titré « ce qui reste à mesurer, et par quoi » — est ACCEPTÉE là où elle rendait S1 et S3 FAIL, les deux bloquantes ; la MÊME sans sa ligne de mesure ni aucun fait mesurable FAIL sur S3 ; la MÊME dont le bloc 4 ne porte RIEN FAIL sur S50 ; et S50 SANS_OBJET dit à voix haute hors d'un point d'étape déclaré) ; S21 lit un mot accentué en fin de mot — « tenté », « refusé » — grâce à la frontière Unicode (TF-0805) ; ouverture titrée lue (TF-0567) ; ouverture titrée mais technique FAIL ; les QUATRE mises en page d'une même décision au bloc 3 rendent le même verdict (TF-0568) ; la CINQUIÈME, la décision en BLOC DE CITATION qui est la forme de référence, est LUE — S4, S15, S16, S30, S31 et S32 PASS, là où deux décisions fusionnaient en une seule sans numéro et un chapeau de quatre mots au-dessus d'un tableau reste FAIL ; un CHAPEAU COMMUN de 40 mots abaisse le rappel dû par décision (TF-0573) et son absence le rétablit ; rouge FAIL sur S2 horodatage, S3 verdict non factuel, S5 reste sans motif, S9 ouverture absente, S10 coût en jours, S11 auto_ia sans motif, S12 action humaine sans raison, S13 action humaine non exécutable, S14 action sans identifiant, S15 décision sans rappel de son sujet, S16 décision sans recommandation sourcée, S17 renvoi par position, S18 deux formes de tableau dans un bloc, S19 action sans conséquence, S20 jargon sans glose, S21 motif `acces` sans trace de la tentative, S22 négatif externe prononcé d'une seule sonde, S23 désignateur employé plusieurs fois sans glose, S24 absence conclue d'une recherche par nom, S30 décision sans numéro, S33 action sans sélecteur ; S30 dans ses DEUX sens (aucun numéro, puis deux décisions portant le même) et la forme « D-5 — » ADMISE, celle que la doctrine prescrit ; S31 dans ses DEUX sens (options nues FAIL, options portant coût et exclusion PASS) ; S32 dans ses DEUX sens (décision sans option par défaut FAIL, décision la nommant PASS) ; S29 dans ses DEUX sens : un risque declare NON COUVERT avec un bloc 8 vide echoue, le meme risque avec la main passee passe ; S33 dans ses DEUX sens (deux actions portant le meme selecteur FAIL, la verte et ses A-1/A-2/A-3 PASS) ; et le DURCISSEMENT de S30 du 01/09 : le numero NU « 1. », qu'elle acceptait, FAIL desormais — c'est par cette tolerance que le « 3 » d'une action se lisait comme la decision 3 ; S38 dans ses DEUX sens (une action de TEST `auto_ia` esquivee sous `hors_mandat` FAIL, le MEME test bloque par `dependance_bloc_3` PASS) ; S39 dans ses DEUX sens (une remontee du bloc 4 sans identifiant FAIL, la MEME remontee avec le sien PASS) — les deux paires ne different que d'un mot, seule forme qui prouve que la regle juge ce qu'elle pretend juger ; S40 dans ses DEUX sens (le prefixe date « AAAAMMJJ- » cite sous output\\04-plans\\ FAIL, le MEME nom cite sous output\\03-etudes\\ — chez lui — PASS) ; S41 dans ses DEUX sens (une decision sur une version REMPLACEE sourcee par un fichier du chantier FAIL, la MEME sourcee par REGLES-PROJET.md regle 7 PASS) ; S24 dans ses DEUX sens (TF-0998 : la ligne du bloc 5 portant le libelle « — motif : » que le GABARIT impose PASS, la MEME regle restant FAIL sur une vraie recherche par nom qui conclut l'absence de la CHOSE — preuve que le mot a ete BORNE et non supprime) ; S42 dans ses DEUX sens (TF-1015 : un chemin de livrable cite long de 117 caracteres — 151 avec les 34 du sidecar d oracle, 26 jusqu au 01/10 — FAIL, le MEME chemin a UN caractere de moins, soit exactement 150, PASS ; et TF-1500 dans ses QUATRE sens sous le forge d un produit : un chemin `forge/` cite de 117 caracteres FAIL, le meme a 116 PASS, le fichier juge sous un dossier `forge` mesure comme `forge/<nom>`, FAIL a 117 et PASS a 116) : c est ce depassement qui a fait echouer le checkout d un clone de verification le 10/09, 22 fichiers refuses et depot sans arbre de travail) ; S21 dans ses DEUX sens (TF-0987 : une action de motif `decision` citant une COLONNE nommee `presence` dans son « ou » PASS, la MEME action portant reellement le motif `presence` sans trace FAIL) ; S37 dans ses DEUX sens (TF-0992 : une preuve citant `corriges: []`, sortie VERTE qui declare l absence de correction, PASS, une prose annoncant « est corrige » sans classe ni controle FAIL) ; S8 dans ses DEUX sens (TF-1125 : « la ou elle AURAIT FAIT echouer la publication » PASS, « a FAIT echouer la publication » sans preuve dans sa puce FAIL) — les trois paires ne different que par la nature du fragment ou le TEMPS du verbe) ; S44 dans ses DEUX sens (TF-0988 : une demande citee portant « uniquement » sans declaration de ce qu il y a EN PLUS FAIL, la MEME avec « elle ne contient rien d autre » PASS ; et TF-1489 dans ses QUATRE sens : le mot se cherche dans la seule demande citee, un « seulement » de l auteur apres la fleche PASS, le MEME dans la demande FAIL, et en tableau la cellule « J ai fait » PASS, la cellule de la demande FAIL) ; S54 dans ses TROIS sens (TF-1494 : l ouverture coupee a la main sur 4 lignes source FAIL et localisee, la MEME sur une ligne PASS, et une liste continuee, un bloc de code et une citation PASS — taux d accusation mesure sur les 215 syntheses d output\\04-plans\\ a la mise en service : 42,3 %, dont 83,7 % des restitutions a bloc 0 titre : avertissante) ; S55 et S56 dans leurs QUATRE sens (TF-1493, TF-1498 : un guide de LANCEMENT et un feu vert au verdict sans ligne « Ne vérifie pas » et sur un audit des dependances date de la VEILLE FAIL sur les deux regles, la MEME bornee aux deux endroits et portant ses portes du jour chiffrees PASS en entier, le feu vert que l agent ATTEND de l humain ne declenche rien, et une chaine qui DECLARE n avoir aucune porte a base externe PASS — taux mesure a la mise en service : 0 sur les 215 syntheses d output\\04-plans\\, 10 et 9 sur les 142 restitutions des produits du poste : avertissantes) ; S45 dans ses DEUX sens (TF-1127 : un element bloque par `dependance_externe` au bloc 5 sans inventaire en tete du bloc 3 FAIL, le MEME bloquant inventorie et enonce sur place PASS) ; S46 dans ses TROIS sens (TF-1045 : une restitution employant un terme proscrit par le lexique du destinataire FAIL, la MEME avec le terme retenu PASS, et SANS_OBJET dit a voix haute quand le projet n a pas de lexique) ; S48 dans ses QUATRE sens (TF-1166 : chez un produit, un tour muet sur ce qu il remonte FAIL, « rien a remonter » PASS, un lot nomme PASS, une ligne qui ne tranche pas FAIL, et SANS_OBJET dit hors d un produit ; TF-1644 : le MEME message muet pose hors de tout produit rend SANS_OBJET seul et FAIL quand `--racine` nomme le produit, forme que le hook de fin de tour emploie ; TF-1643 dans ses TROIS sens : un tour qui CORRIGE une erreur de la session et declare « rien a remonter » FAIL, le MEME qui nomme son lot PASS, le MEME qui dit « reste au produit, parce que <motif> » PASS) ; S36 dans ses DEUX sens (TF-1653 : un schema HTML nomme par un prompt recopie dans un bloc de code et cite comme source lue PASS, le MEME schema presente comme livre sans critique d implementation FAIL) ; S69 dans ses DEUX sens (TF-1646 : la MEME verte dont l en-tete porte 15h48 jugee a 13:00 ce jour-la FAIL, heure composee dans le futur, et a 16:00 PASS ; et la MEME heure suivie de « (UTC+02:00) » lue avec son decalage, PASS) ; S49 dans ses TROIS sens (TF-1172 : une option commandant « se connecter … puis saisir le code » sans mode operatoire FAIL, la MEME option avec sa ligne « Comment faire » et sa commande sur place PASS, et la verte d origine — aucune option ne commandant de geste — PASS) ; S52 et S53 dans leurs TROIS sens (D-24 (b), TF-1362, TF-1361 : une action d import dans l ecran d une plateforme tierce sans source officielle datee ni guide FAIL, la MEME action sourcee et guidee en tete PASS et la restitution PASS en entier, une decision qui dit « publier sur GitHub vous revient » laissee tranquille) ; S25 dans ses TROIS sens (TF-1189 : QUATRE appels d une MEME famille (`…/myorg/groups/…`) refermes par « aucun autre chemin » FAIL, la MEME incapacite adossee aux codes de retour de DEUX familles distinctes — espace de travail et scope personnel — PASS, et la MEME formule fautive mot pour mot au-dessus de ces deux familles PASS ; le cas fondateur de TF-0606, sans appel cite, reste FAIL) — taux d accusation mesure sur les 149 syntheses d output\\04-plans\\ avant durcissement : 0,0 % (0 fichier, aucune incapacite declaree dans le corpus) — taux d accusation mesure sur les 148 syntheses d output\\04-plans\\ avant mise en service : 2,0 % (3 fichiers) ; taux d accusation mesure sur les 207 documents du depot avant ecriture : S44 4,8 %, S45 7,7 %, et le second declencheur propose pour S45 — toute ligne `auto_ia` non executee — a ete ECARTE parce qu il aurait accuse la quasi-totalite du corpus)");
   process.exit(casse.length ? 1 : 0);
 }
 
@@ -7037,7 +8124,7 @@ const findings = juger(readFileSync(arg, "utf8"), arg);   // le chemin : S42 jug
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({
   oracle: "oracle-synthese",
-  version: "1.3.0",
+  version: "1.4.0",
   cible: arg,
   verdict,
   findings,
@@ -7065,6 +8152,12 @@ console.log(JSON.stringify({
     "S84 (TF-1938) ne juge que sur les relevés que le hook lui passe : joué seul sur un fichier, il rend SANS_OBJET. Un relevé est une sortie qui MONTRE l'heure courante ; une heure relevée puis mal recopiée, ou une heure lue dans un tour antérieur et reprise, n'est pas distinguée d'une heure juste quand le tour porte au moins un relevé",
     "S85 et S86 (26/10/2026, T4, TF-1949) jugent la PRÉSENCE des livrables que la carte exige des forges mobilisées à la DERNIÈRE ligne de `forge/mobilisation.jsonl` : que cette ligne soit celle de la demande livrée, que le livrable présent soit à jour, complet ou juste, et une livraison que le bloc 0 et le verdict taisent ne sont pas jugés ; un chemin de livrable marqué `etabli: false` dans la carte est une convention posée par elle",
     "S87 (29/10/2026, TF-1973 et TF-2016) : ici seule l'EXEMPTION de la ligne « Livré : » à S9 est jouée, et elle exige un lien Markdown sur la ligne ou dans les puces dessous ; que le livrable existe, qu'il ait été écrit dans le tour et que le lien mène au fichier ne sont pas jugés. La PRÉSENCE de la ligne se juge au hook de fin de tour, qui lit les écritures du tour dans la transcription",
+    "S93 (06/11/2026, TF-2214) rappelle au bloc 3 les décisions posées au ledger d'un produit depuis 14 jours sans réponse nommée. Elle ne juge pas une réponse que le produit n'a pas consignée avec son numéro (elle compte comme absente), une décision plus ancienne, le pilot (son registre `decisions\\REGISTRE.jsonl` ne consigne que des réservations de numéro, jamais une réponse : vérifié le 09/11/2026 sur ses 184 lignes ; la réponse d'une D-N du pilot ne vit que dans le champ `decideur` des événements de `todo\\TODO.jsonl` — 83 des 119 décisions posées depuis le 26/10/2026 — et dans les transcriptions non versionnées des deux profils du poste — 92 sur 119, 106 par l'une ou l'autre ; relevé du 09/11/2026 par `numerosDeDecision`, sans relecture à la main : sur les 36 décisions sans réponse au registre des tâches, 23 en avaient une dans une transcription, donc un rappel lu au seul registre des tâches se tromperait 23 fois sur 36), ni que le rappel dise la bonne question",
+    "S115 (09/11/2026, TF-2304) compare, dans le seul texte de la restitution, la commande d'une action manuelle (hors arbitrage) à celles que le reste du texte donne : une commande lancée dans le tour et jamais citée, un geste donné en prose sans commande, une approbation groupée posée avant l'exécution, et la vérité d'un code de retour cité ne sont pas jugés. Deux commandes qui ne diffèrent que par leur premier argument (une branche, un nom de ressource) ne sont pas la même commande",
+    "S68 pour les droits (09/11/2026, TF-2302) ne voit une absence de droit que dans un paragraphe qui cite `az role assignment list` ou se dit lu sur des attributions « directes » : un relevé d'un autre outil qui ne le dit pas n'est pas jugé, et l'héritage de groupe n'est que cité, jamais vérifié. S48 pour le défaut constaté sur soi (TF-2305) ne lit que ce que le tour écrit à la première personne : un défaut que la session connaît et n'écrit pas reste invisible, comme le motif de `--prejuger` dont le lot cité (TF-2303) n'est pas vérifié",
+    "S94 (06/11/2026, TF-2191) refuse un livrable lié « Livré » dont le contenu a changé depuis le sceau posé au PASS de la restitution précédente. Elle ne juge pas un livrable lié avant la pose du sceau, un nom hors convention `<nom> - AAAAMMJJx.md|html|pdf`, ni la qualité de la nouvelle version",
+    "S95 (06/11/2026, TF-2206, TF-2210) exige la liste des artefacts d'une décision remplacée, avec leur sort. Elle ne juge pas que la liste soit complète ni que le sort soit le bon, ni une substitution écrite sans numéro de décision",
+    "S92 (03/11/2026, TF-2077, RT-32) exige la ligne « À ouvrir : [<nom>](<adresse>) » en bloc 0 dès qu'une action manuelle_utilisateur du bloc 8 porte une adresse http(s) HORS plateforme tierce de la liste (celles-là relèvent de S52/S53, guidées en tête), et exempte cette ligne de S9 comme « Livré : ». Elle ne juge pas que l'adresse de la ligne soit celle du bloc 8, que l'adresse réponde, ni qu'un seul lien suffise quand plusieurs services sont à ouvrir ; une adresse portée par une action auto_ia ou manuelle_dev, ou vivant hors du bloc 8, n'est pas vue",
     "S73 et S74 (15/10/2026, R-63) jugent une MENTION : S73 qu'une justesse, un échantillon de référence ou « justesse non mesurée » figure dans une restitution qui rapporte une part traitée, jamais que l'échantillon soit indépendant ni la mesure juste (PC-2 à PC-6 non jugés) ; S74 que le contrôle des changements dans la population et l'effet sur l'existant sont nommés, jamais qu'ils aient été faits, ni le test rouge sur le code précédent ni la règle d'arrêt",
   ],
 }, null, 1));

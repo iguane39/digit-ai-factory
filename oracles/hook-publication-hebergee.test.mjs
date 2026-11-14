@@ -84,6 +84,27 @@ check("remède joué — une entrée `go_publication` complète au ledger du run
   if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.out}`);
   rmSync(D, { recursive: true, force: true });
 });
+// TF-2038 (02/11/2026) : la session s'est déplacée dans un sous-dossier ; le GO reste au ledger de la racine.
+check("TF-2038 vert — une session dans un sous-dossier lit le feu vert du ledger à la racine du dépôt", () => {
+  const D = dossierVide();
+  mkdirSync(join(D, ".git"));
+  mkdirSync(join(D, "forge"));
+  mkdirSync(join(D, "src", "pages"), { recursive: true });
+  writeFileSync(join(D, "forge", "ledger.jsonl"),
+    JSON.stringify({ seq: 1, type: "go_publication", r38: true, citation: "D-12 (a) du 03/10" }) + "\n", "utf8");
+  const env = { ...ENV_PROPRE }; delete env.CLAUDE_PROJECT_DIR;
+  const r = jouer(artefact(undefined, join(D, "src", "pages")), env);
+  if (r.code !== 0) throw new Error(`exit ${r.code} : ${r.out}`);
+  rmSync(D, { recursive: true, force: true });
+});
+check("TF-2038 rouge — le même sous-dossier sans feu vert au ledger reste refusé", () => {
+  const D = dossierVide();
+  mkdirSync(join(D, ".git"));
+  mkdirSync(join(D, "src"));
+  const env = { ...ENV_PROPRE }; delete env.CLAUDE_PROJECT_DIR;
+  if (jouer(artefact(undefined, join(D, "src")), env).code !== 2) throw new Error("publication acceptée sans feu vert");
+  rmSync(D, { recursive: true, force: true });
+});
 check("vert — lecture, liste, ouverture, retrait : jamais refusés, GO ou non", () => {
   const D = dossierVide();
   for (const a of ["list", "read", "open", "comments", "status", "quickstart", "read_db", "delete", "unpin"]) {

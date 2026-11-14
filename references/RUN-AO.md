@@ -59,9 +59,15 @@ règles propres :
 3. **Produire (A3)** — le pipeline de propale de forge-agents, dans cet ordre et sous
    frontières : contenu (`digit-ai-propale`, presets de `digit-ai-communication`), chiffrage
    (`digit-ai-propale`, règles dures : aucun montant inventé, placeholders nommés), rendu au
-   **format que le règlement impose** — PPTX par `digit-ai-pptx`, DOCX ou PDF à trame imposée
-   par le skill OOXML de TF-1027 sous les gates de `PRODUCTION-OOXML.md` —, tous consommant le
-   système de marque de l'émetteur (jamais des valeurs en dur). Barre externe du livrable
+   **format que le règlement impose** — PPTX par `digit-ai-pptx`, DOCX à trame imposée par
+   `digit-ai-docx` (le skill OOXML de TF-1027) sous les gates de `PRODUCTION-OOXML.md` —, tous
+   consommant le système de marque de l'émetteur (jamais des valeurs en dur). Aucun skill ne
+   rend un PDF sur trame : `digit-ai-docx` ne rend que du DOCX (« Le PDF : exporter depuis Word
+   ou un convertisseur, puis juger le PDF avec son propre contrôle », TF-2032). Quand le
+   règlement exige un PDF, deux voies réelles : une trame Word se rend en DOCX, s'exporte en
+   PDF, et le PDF produit est relu par `oracles\verifier-pdf.mjs` de forge-audit ; une trame
+   déjà PDF, à champs ou plate, se remplit par `digit-ai-pdf` (`formulaire.py remplir`), qui
+   enchaîne `oracle-formulaire-pdf` et dont le rendu se regarde avant remise. Barre externe du livrable
    (`la-barre`, TF-1028) chargée en pré-vol.
 4. **Recetter (A4)** — trois gates, chacune un oracle exécuté et son verdict au ledger :
    traçabilité `oracle-exigences-ao` (X1 exigences tracées, X2 rubriques à l'identique, X3

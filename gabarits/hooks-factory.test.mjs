@@ -87,8 +87,9 @@ try {
   copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie, "bootstrap.mjs"));
   // TF-1528 : le hook des droits accordés rejoue `scripts/verifier-droits-accordes.mjs` et sa table datée.
   // TF-1947 : le hook de fin de tour lit les écritures par commande avec `scripts/relecture-intention.mjs` (et son import).
+  // TF-2483 : le hook des gestes distants résout la racine de configuration par `scripts/lib-config-installee.mjs`, comme le pilot réel.
   for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs",
-    "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs"]) {
+    "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs", "scripts/lib-config-installee.mjs"]) {
     mkdirSync(join(copie, dirname(f)), { recursive: true });
     copyFileSync(join(PILOT, f), join(copie, f));
   }
@@ -248,8 +249,11 @@ try {
   // est refusé (exit 2) avec le remède du PRODUIT ; `--poser` par le lanceur, entrée standard ouverte, écrit le lot
   // sous forge/ et la même commande passe ; une lecture passe sans lot.
   const envG = { ...env, CLAUDE_PROJECT_DIR: P };
+  // D-195 (b) : l'accord du lot se lit mot pour mot dans un message tapé par l'humain, dans la transcription que le harnais donne au hook.
+  const tG = join(base, "transcription-gestes.jsonl");
+  writeFileSync(tG, JSON.stringify({ type: "user", origin: { kind: "human" }, promptSource: "sdk", turnOrigin: "human", message: { role: "user", content: "78a : approuvé, toute la liste" } }) + "\n", "utf8");
   const geste = (command) => spawnSync(process.execPath, [lanceur, "gestes-distants"], { encoding: "utf8", cwd: P, env: envG,
-    input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command } }) });
+    input: JSON.stringify({ tool_name: "Bash", cwd: P, transcript_path: tG, tool_input: { command } }) });
   const gSans = geste("az group delete --name rg-essai --yes"), gLecture = geste("az group show --name rg-essai");
   check("14 gestes distants : `az group delete` sans lot refusé par le lanceur, remède du produit nommé (TF-1959)",
     gSans.status === 2 && /TF-1959/.test(gSans.stderr) && /forge\\hooks\\factory\.mjs gestes-distants --poser/.test(gSans.stderr), gSans.stdout + gSans.stderr);
@@ -258,7 +262,7 @@ try {
   writeFileSync(lotG, JSON.stringify({ decision: "D-78", reponse_humaine: "78a : approuvé, toute la liste", gestes: [
     { commande: "az group delete --name rg-essai --yes", cible: "groupe rg-essai", effet: "supprime le groupe", retour_arriere: "aucun, se recrée par terraform apply" }] }), "utf8");
   const poseG = await new Promise((ok) => {
-    const c = spawn(process.execPath, [lanceur, "gestes-distants", "--poser", "--lot", lotG], { cwd: P, env: envG, stdio: ["pipe", "pipe", "pipe"] });
+    const c = spawn(process.execPath, [lanceur, "gestes-distants", "--poser", "--lot", lotG, "--transcript", tG], { cwd: P, env: envG, stdio: ["pipe", "pipe", "pipe"] });
     let out = "", err = "";
     c.stdout.on("data", (d) => { out += d; }); c.stderr.on("data", (d) => { err += d; });
     const minuteur = setTimeout(() => { c.kill(); ok({ fini: false, out, err }); }, 30000);
@@ -318,10 +322,176 @@ try {
   const r16 = spawnSync(process.execPath, [lanceur, "restitution"], { encoding: "utf8", cwd: P, env: { ...env },
     input: JSON.stringify({ session_id: "test-heritage-livre", transcript_path: t16, stop_hook_active: false, cwd: P }) });
   let c16 = null; try { c16 = JSON.parse(r16.stdout || "null"); } catch { c16 = { brut: r16.stdout }; }
+  // La version attendue se lit dans le gabarit, jamais en dur : figée à v2.58.0, le cas a rougi dès la montée en v2.59.0 du 03/11/2026 (TF-2077).
+  const VERSION_RESTITUTION16 = (/\*\*version (\d+\.\d+\.\d+),/.exec(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "RESTITUTION.md"), "utf8")) || [])[1] || "inconnue";
   check("16 livré, le guide écrit sous output/ et non lié au bloc 0 : S87 est dite au hook du pilot atteint par le lanceur (TF-1973, TF-2016)",
-    c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && /\(v2\.56\.0\)/.test(c16.reason || ""), JSON.stringify(c16)?.slice(0, 300));
+    c16?.decision === "block" && /à corriger au passage, non bloquant : [^)]*\bS87\b/.test(c16.reason || "") && (c16.reason || "").includes(`(v${VERSION_RESTITUTION16})`), JSON.stringify(c16)?.slice(0, 300));
+
+  // 17 — TF-2126 (04/11/2026), verrou de mutation par le lanceur : un `git commit` chez un produit dont la racine porte
+  // `.forge-tests-mutation-en-cours` est refusé (exit 2) avec les fichiers mutés nommés ; le verrou retiré (fenêtre fermée),
+  // la même commande passe ; une lecture passe pendant le verrou.
+  const verrou17 = join(P, ".forge-tests-mutation-en-cours");
+  writeFileSync(verrou17, JSON.stringify({ pid: process.pid, depuis: new Date().toISOString(), fichiers: ["app/audit.py", "app/egress.py"],
+    message: "mutation forge-tests en cours — sources alterees par un mutant, ne pas commiter" }), "utf8");
+  const mut = (command) => spawnSync(process.execPath, [lanceur, "mutation-en-cours"], { encoding: "utf8", cwd: P, env: { ...env, CLAUDE_PROJECT_DIR: P },
+    input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command } }) });
+  const mCommit = mut("git commit -m x"), mLecture = mut("git status");
+  rmSync(verrou17);
+  const mApres = mut("git commit -m x");
+  check("17 mutation : `git commit` refusé par le lanceur tant que le verrou existe, fichiers mutés nommés (TF-2126)",
+    mCommit.status === 2 && /TF-2126/.test(mCommit.stderr) && /app\/audit\.py, app\/egress\.py/.test(mCommit.stderr), mCommit.stdout + mCommit.stderr);
+  check("17 bis mutation : `git status` passe pendant le verrou", mLecture.status === 0, mLecture.stdout + mLecture.stderr);
+  check("17 ter mutation : le verrou retiré, la même commande `git commit` passe", mApres.status === 0, mApres.stdout + mApres.stderr);
+
+  // 18 — TF-2084 (04/11/2026), registre des gestes distants en cours par le lanceur : `--ouvrir` (entrée standard OUVERTE,
+  // jamais lue) inscrit le banc de la session A sous forge/ ; la session B qui lance une commande visant la même ressource
+  // est avertie (exit 0) en nommant A ; `--clore` par A lève l'avertissement.
+  const P18 = produit("produit-gestes-en-cours", false);
+  const env18 = { ...env, CLAUDE_PROJECT_DIR: P18 };
+  const lanceur18 = join(P18, "forge", "hooks", "factory.mjs");
+  const ouvrir18 = await new Promise((ok) => {
+    const c = spawn(process.execPath, [lanceur18, "gestes-distants", "--ouvrir", "--ressource", "wrangler r2 bucket rapports", "--session", "A"], { cwd: P18, env: env18, stdio: ["pipe", "pipe", "pipe"] });
+    let out = "", err = "";
+    c.stdout.on("data", (d) => { out += d; }); c.stderr.on("data", (d) => { err += d; });
+    const minuteur = setTimeout(() => { c.kill(); ok({ fini: false, out, err }); }, 30000);
+    c.on("exit", (code) => { clearTimeout(minuteur); ok({ fini: true, code, out, err }); });
+  });
+  const geste18 = (session) => spawnSync(process.execPath, [lanceur18, "gestes-distants"], { encoding: "utf8", cwd: P18, env: env18,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P18, session_id: session, hook_event_name: "PreToolUse", tool_input: { command: "wrangler r2 bucket create rapports" } }) });
+  const b18 = geste18("B");
+  await new Promise((ok) => {
+    const c = spawn(process.execPath, [lanceur18, "gestes-distants", "--clore", "--ressource", "wrangler r2 bucket rapports", "--session", "A"], { cwd: P18, env: env18, stdio: ["pipe", "pipe", "pipe"] });
+    const minuteur = setTimeout(() => { c.kill(); ok(); }, 30000);
+    c.on("exit", () => { clearTimeout(minuteur); ok(); });
+  });
+  const c18 = spawnSync(process.execPath, [lanceur18, "gestes-distants"], { encoding: "utf8", cwd: P18, env: env18,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P18, session_id: "C", hook_event_name: "PreToolUse", tool_input: { command: "wrangler r2 bucket create rapports" } }) });
+  check("18 gestes en cours : `--ouvrir` par le lanceur (entrée standard ouverte) inscrit le geste de A sous forge/",
+    ouvrir18.fini && ouvrir18.code === 0 && /geste ouvert/.test(ouvrir18.out) && existsSync(join(P18, "forge", "gestes-en-cours.jsonl")), JSON.stringify(ouvrir18));
+  check("18 bis gestes en cours : la session B visant la même ressource est avertie par le lanceur (exit 0), A nommée (TF-2084)",
+    b18.status === 0 && /TF-2084/.test(b18.stdout) && /session A/.test(b18.stdout), b18.stdout + b18.stderr);
+  check("18 ter gestes en cours : `--clore` par A lève l'avertissement, la session C n'est pas avertie de A",
+    c18.status === 0 && !/session A/.test(c18.stdout), c18.stdout + c18.stderr);
+
+  // 19 — TF-2150 (04/11/2026), la leçon rappelée au geste par le lanceur : chez un produit, un `git push` filtré reçoit
+  // la leçon L-002 de la table du pilot, citée comme une donnée, et le rappel s'écrit à forge/lecons-rappels.jsonl ; la
+  // même leçon passée en barrière n'est qu'un AVERTISSEMENT chez un produit (exit 0, jamais 2) ; un geste hors motif ne
+  // reçoit rien. Le pilot de ce cas porte la table réelle et un registre réduit aux identifiants de ses preuves.
+  const racine19 = join(base, "racine19");
+  const copie19 = join(racine19, "digit-ai-factory");
+  for (const d of ["oracles", "references", "todo"]) mkdirSync(join(copie19, d), { recursive: true });
+  copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie19, "bootstrap.mjs"));
+  for (const f of ["oracles/hook-lecons.mjs", "oracles/lib-racine-projet.mjs", "references/LECONS.json"]) copyFileSync(join(PILOT, f), join(copie19, f));
+  const table19 = JSON.parse(readFileSync(join(PILOT, "references", "LECONS.json"), "utf8"));
+  writeFileSync(join(copie19, "todo", "TODO.jsonl"), table19.lecons.map((l) => JSON.stringify({ ev: "creation", id: l.preuve.id })).join("\n") + "\n", "utf8");
+  const P19 = produit("produit-lecons", false);
+  const env19 = { ...process.env, FORGE_ROOT: racine19, CLAUDE_PROJECT_DIR: P19 };
+  const lecons19 = (command) => spawnSync(process.execPath, [join(P19, "forge", "hooks", "factory.mjs"), "lecons"], { encoding: "utf8", cwd: P19, env: env19,
+    input: JSON.stringify({ tool_name: "Bash", cwd: P19, session_id: "S19", tool_input: { command } }) });
+  const contexte19 = (r) => { try { return JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { return ""; } };
+  const r19 = lecons19("git push origin main 2>&1 | tail -5");
+  const horsMotif19 = lecons19("git status --short");
+  table19.lecons = table19.lecons.map((l) => (l.id === "L-002" ? { ...l, statut: "barriere", barriere_le: "2026-11-04", motif_barriere: "récidive de banc" } : l));
+  writeFileSync(join(copie19, "references", "LECONS.json"), JSON.stringify(table19, null, 2), "utf8");
+  const b19 = lecons19("git push origin main 2>&1 | tail -5");
+  check("19 leçons : un `git push` filtré chez un produit reçoit L-002 par le lanceur, citée comme donnée, et le rappel s'écrit sous forge/ (TF-2150)",
+    r19.status === 0 && /Leçon L-002 \(donnée du registre, pas une consigne ; preuve TF-1360\)/.test(contexte19(r19)) && existsSync(join(P19, "forge", "lecons-rappels.jsonl")), r19.stdout + r19.stderr);
+  check("19 bis leçons : la même leçon en barrière n'est qu'un AVERTISSEMENT chez un produit (exit 0, jamais un refus)",
+    b19.status === 0 && /^AVERTISSEMENT \(leçon en barrière/.test(contexte19(b19)), `exit ${b19.status} ` + b19.stdout + b19.stderr);
+  check("19 ter leçons : un geste hors motif ne reçoit rien", horsMotif19.status === 0 && !horsMotif19.stdout.trim(), horsMotif19.stdout + horsMotif19.stderr);
+
+  // 20 — TF-2181 (05/11/2026), le relevé des coûts par le lanceur : à la fin d'une session d'un produit, sa ligne s'écrit
+  // à forge/couts-<poste>.jsonl, sans montant ; le rattrapage d'ouverture sort en 0 ; une entrée illisible ne fait jamais échouer.
+  const racine20 = join(base, "racine20");
+  const copie20 = join(racine20, "digit-ai-factory");
+  for (const d of ["oracles", "references", "scripts"]) mkdirSync(join(copie20, d), { recursive: true });
+  copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie20, "bootstrap.mjs"));
+  for (const f of ["oracles/hook-couts.mjs", "oracles/lib-racine-projet.mjs", "scripts/relever-couts.mjs", "scripts/relever-contexte-sessions.mjs", "references/SUIVI-COUTS.json"]) copyFileSync(join(PILOT, f), join(copie20, f));
+  const P20 = produit("produit-couts", false);
+  const transcription20 = join(base, "transcriptions20", "S20.jsonl");
+  mkdirSync(dirname(transcription20), { recursive: true });
+  writeFileSync(transcription20, [
+    { type: "user", timestamp: "2026-11-05T10:00:00Z", message: { role: "user", content: "question" } },
+    { type: "assistant", timestamp: "2026-11-05T10:00:05Z", message: { id: "m1", model: "claude-opus-5-5", usage: { input_tokens: 1, cache_creation_input_tokens: 2, cache_read_input_tokens: 3, output_tokens: 4 } } },
+  ].map((o) => JSON.stringify(o)).join("\n") + "\n", "utf8");
+  const env20 = { ...process.env, FORGE_ROOT: racine20, CLAUDE_PROJECT_DIR: P20 };
+  const couts20 = (args, input) => spawnSync(process.execPath, [join(P20, "forge", "hooks", "factory.mjs"), "couts", ...args], { encoding: "utf8", cwd: P20, env: env20, input });
+  const entree20 = JSON.stringify({ session_id: "S20", transcript_path: transcription20, cwd: P20 });
+  const r20 = couts20([], entree20);
+  const ligne20 = (() => { try { return JSON.parse(readFileSync(join(P20, "forge", readdirSync(join(P20, "forge")).find((f) => /^couts-.+\.jsonl$/.test(f))), "utf8").trim().split("\n").at(-1)); } catch { return null; } })();
+  check("20 coûts : la session qui se ferme est relevée par le lanceur à forge/couts-<poste>.jsonl, 10 jetons, aucun montant (TF-2181)",
+    r20.status === 0 && ligne20?.sessionId === "S20" && ligne20?.jetons?.total === 10 && !/usd|\$/i.test(JSON.stringify(ligne20)), r20.stdout + r20.stderr);
+  const ratt20 = couts20(["--rattraper"], entree20);
+  const illisible20 = couts20([], "pas du JSON");
+  check("20 bis coûts : le rattrapage et une entrée illisible sortent en 0", ratt20.status === 0 && illisible20.status === 0, ratt20.stderr + illisible20.stderr);
+
+  // 21 — TF-2211 (06/11/2026), les contrôles PROPRES du produit joués par le lanceur à l'écriture d'un run_open et d'un run_close :
+  // la clé `controles_produit` de forge/PROFIL.json désigne des commandes (tableau, jamais une chaîne de shell). Le run_open joue
+  // celles qui le demandent, le run_close celles qui le demandent (dont un contrôle rouge), une déclaration mal formée est nommée
+  // et jamais jouée, une autre commande ne joue rien, un produit sans la clé reste muet. Le hook ne bloque jamais (exit 0).
+  const racine21 = join(base, "racine21");
+  const copie21 = join(racine21, "digit-ai-factory");
+  for (const d of ["oracles"]) mkdirSync(join(copie21, d), { recursive: true });
+  copyFileSync(join(PILOT, "bootstrap.mjs"), join(copie21, "bootstrap.mjs"));
+  for (const f of ["oracles/hook-controles-produit.mjs", "oracles/lib-racine-projet.mjs"]) copyFileSync(join(PILOT, f), join(copie21, f));
+  const P21 = produit("produit-controles", false);
+  writeFileSync(join(P21, "forge", "PROFIL.json"), JSON.stringify({ schema: "forge/profil@1", signaux: {}, controles_produit: [
+    { nom: "hygiene-ouverture", commande: [process.execPath, "-e", "process.exit(0)"], quand: ["run_open", "run_close"] },
+    { nom: "hygiene-cloture", commande: [process.execPath, "-e", "console.error('trace de poste dans un journal'); process.exit(3)"], quand: ["run_close"] },
+    { nom: "mal-forme", commande: "python -m pytest -q" },
+  ] }), "utf8");
+  const env21 = { ...process.env, FORGE_ROOT: racine21, CLAUDE_PROJECT_DIR: P21 };
+  const ledger21 = (command, outil = "Bash") => spawnSync(process.execPath, [join(P21, "forge", "hooks", "factory.mjs"), "controles-produit"], { encoding: "utf8", cwd: P21, env: env21,
+    input: JSON.stringify({ tool_name: outil, cwd: P21, hook_event_name: "PostToolUse", tool_input: { command } }) });
+  const contexte21 = (r) => { try { return JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { return ""; } };
+  const ouv21 = ledger21("python forge/ledger.py run_open --run_id essai");
+  const clo21 = ledger21("python forge/ledger.py run_close --statut pret_production");
+  const mjs21 = ledger21(`node ledger.mjs append forge/ledger.jsonl '{"type":"run_close","statut":"echec"}'`);
+  const autre21 = ledger21("git status --short");
+  const verif21 = ledger21("python forge/ledger.py --verifier");
+  const ps21 = ledger21("python forge/ledger.py run_open --run_id x", "PowerShell");
+  check("21 contrôles du produit : à l'écriture d'un run_open, le lanceur joue le contrôle déclaré pour l'ouverture (PASS) et nomme la déclaration mal formée sans la jouer (TF-2211)",
+    ouv21.status === 0 && /hygiene-ouverture : PASS/.test(contexte21(ouv21)) && !/hygiene-cloture/.test(contexte21(ouv21)) && /mal-forme : « commande » doit être un tableau/.test(contexte21(ouv21)), ouv21.stdout + ouv21.stderr);
+  check("21 bis contrôles du produit : à l'écriture d'un run_close, le contrôle rouge est dit FAIL avec son code de sortie et sa trace, et la clôture « prêt » est déconseillée",
+    clo21.status === 0 && /hygiene-cloture : FAIL \(exit 3\) — trace de poste dans un journal/.test(contexte21(clo21)) && /ne pas déclarer le run « prêt »/.test(contexte21(clo21)), clo21.stdout + clo21.stderr);
+  check("21 ter contrôles du produit : un run_close écrit par ledger.mjs (charge utile en ligne) ou sous PowerShell est reconnu", /hygiene-cloture : FAIL/.test(contexte21(mjs21)) && /hygiene-ouverture : PASS/.test(contexte21(ps21)), mjs21.stdout + ps21.stdout);
+  check("21 quater contrôles du produit : une autre commande, ou la vérification du ledger, ne joue rien et n'écrit rien", !autre21.stdout.trim() && !verif21.stdout.trim() && autre21.status === 0 && verif21.status === 0, autre21.stdout + verif21.stdout);
+  const P21b = produit("produit-sans-controles", false);
+  writeFileSync(join(P21b, "forge", "PROFIL.json"), JSON.stringify({ schema: "forge/profil@1", signaux: {} }), "utf8");
+  const nu21 = spawnSync(process.execPath, [join(P21b, "forge", "hooks", "factory.mjs"), "controles-produit"], { encoding: "utf8", cwd: P21b, env: { ...env21, CLAUDE_PROJECT_DIR: P21b },
+    input: JSON.stringify({ tool_name: "Bash", cwd: P21b, tool_input: { command: "python forge/ledger.py run_close --statut pret" } }) });
+  check("21 quinquies contrôles du produit : un produit dont PROFIL.json ne porte pas la clé reste muet (exit 0)", nu21.status === 0 && !nu21.stdout.trim(), nu21.stdout + nu21.stderr);
+
+  // 22 — TF-2213 et TF-2215 (06/11/2026), les journaux que les hooks de la factory écrivent sous forge/ ne se commitent jamais et se
+  // déclarent à tout balayage de secrets du produit : `forge/lecons-rappels.jsonl` recopie les commandes de session, `forge/gestes-approuves.jsonl`
+  // porte un chemin d'abonnement cloud ; non ignorés, un contrôle d'hygiène du produit les a lus comme des secrets (E-082 de Produit-86).
+  // Le contrat d'héritage les nomme (clé `journaux_de_hooks`) ; la recette les fait écrire par leurs hooks, ou à la main quand le hook n'est
+  // pas rejouable ici, dans un dépôt git qui porte le `.gitignore` du gabarit, et exige que git ne les voie ni suivis ni non suivis.
+  const heritage22 = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
+  const journaux22 = (heritage22.journaux_de_hooks || []).map((j) => j.chemin);
+  check("22 journaux de hooks : le contrat d'héritage nomme les journaux écrits par les hooks, et chacun est cité par une source de hook du pilot",
+    journaux22.length >= 4 && ["forge/lecons-rappels.jsonl", "forge/gestes-approuves.jsonl", "forge/gestes-en-cours.jsonl", "forge/frictions.jsonl"].every((c) => journaux22.includes(c))
+      && journaux22.every((c) => ["oracles/hook-lecons.mjs", "oracles/hook-gestes-distants.mjs", "scripts/lecons.mjs", "oracles/lib-gestes-en-cours.mjs"]
+        .some((f) => { try { return readFileSync(join(PILOT, f), "utf8").includes(c.split("/").pop()); } catch { return false; } })),
+    JSON.stringify(journaux22));
+  const gitignore22 = (texte) => {
+    const d = mkdtempSync(join(base, "git22-"));
+    spawnSync("git", ["init", "-q"], { cwd: d });
+    writeFileSync(join(d, ".gitignore"), texte, "utf8");
+    mkdirSync(join(d, "forge"), { recursive: true });
+    for (const c of journaux22) writeFileSync(join(d, ...c.split("/")), JSON.stringify({ commande: "az account show --subscription 00000000-0000-0000-0000-000000000000" }) + "\n", "utf8");
+    const visibles = spawnSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: d, encoding: "utf8" }).stdout.split("\n").filter((l) => /forge\/.*\.jsonl/.test(l));
+    return visibles;
+  };
+  const gabaritGitignore = readFileSync(join(ICI, "gitignore-produit"), "utf8");
+  const visibles22 = gitignore22(gabaritGitignore);
+  check("22 bis journaux de hooks : avec le .gitignore du gabarit, git ne voit aucun journal de hook (ni suivi, ni non suivi)", journaux22.length > 0 && visibles22.length === 0, visibles22.join(" | "));
+  const rouge22 = gitignore22(gabaritGitignore.replace(/^forge\/gestes-approuves\.jsonl\r?\n/m, ""));
+  check("22 ter journaux de hooks : sans le motif de forge/gestes-approuves.jsonl, git voit ce journal (le témoin sait échouer)", rouge22.some((l) => /gestes-approuves/.test(l)) && rouge22.length === 1, rouge22.join(" | "));
+  const motifs22 = (heritage22.artefacts.find((a) => a.source === "gabarits/gitignore-produit") || {}).motifs_exiges || [];
+  check("22 quater journaux de hooks : chaque journal déclaré est un motif EXIGÉ du .gitignore (l'ouverture l'ajoute à un produit qui l'a perdu)", journaux22.length > 0 && journaux22.every((c) => motifs22.includes(c)), journaux22.filter((c) => !motifs22.includes(c)).join(", "));
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b))`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b))`);

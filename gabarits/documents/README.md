@@ -4,13 +4,15 @@ Les gabarits de **livrables** que la factory propose à un projet, quel que soit
 un projet qui doit rendre un rapport de données, un diagnostic, un rapport d'audit ou une
 fiche de sécurité prend le gabarit de sa famille plutôt que d'inventer une forme.
 
-La bibliothèque est autant un **index** qu'un atelier. Sur ses **quarante-six** familles (recomptées
-sur `catalogue.jsonl` le 18/10/2026 : 22 `ok`, 17 `porte_ailleurs`, 7 `a_extraire`, dont `tableau-de-bord-pilotage`
-née ce jour-là du retour RP-15 et de la décision D-31 (a), `fiche-constat-precos`
+La bibliothèque est autant un **index** qu'un atelier. Sur ses **quarante-neuf** familles (recomptées
+sur `catalogue.jsonl` le 10/11/2026 : 25 `ok`, 18 `porte_ailleurs`, 6 `a_extraire`, dont `dossier-de-competences-anonyme` née ce jour-là du lot 20261109c du produit marketing (TF-2337) ; le 06/11/2026 le compte annoncé ici était de quarante-huit familles, 24 `ok`, et `etude-reprise-activite` née ce jour-là du retour RT-51 ; le 02/11/2026 le compte annoncé ici était de quarante-sept familles, 23 `ok`, et `cadrage-reprise` née
+ce jour-là du retour RT-31 ; le 18/10/2026 le compte annoncé ici était de quarante-six familles, 22 `ok`, 17
+`porte_ailleurs` et 7 `a_extraire`, et `tableau-de-bord-pilotage`
+était née ce jour-là du retour RP-15 et de la décision D-31 (a), `fiche-constat-precos`
 et `cascade-produit` nées le 14/10 des retours RT-36 et RS-30, et `fiche-produit` et `presentation-restitution-audit` nées le 13/10 des
 retours RP-8 et RP-61 ; le 24/09/2026 le compte
 annoncé ici était resté à celui du 20/09, trente-huit familles dont 9 `ok`, alors que des familles
-avaient été extraites depuis), **dix-sept**
+avaient été extraites depuis), **dix-huit**
 sont des formes qu'une forge produit déjà : pour celles-là elle ne réécrit rien — elle dit où elles
 vivent, par quel outil les obtenir, et quel oracle les juge. **Écrire un gabarit est le cas
 minoritaire**, et c'est voulu : le doublon coûte plus cher que le renvoi.
@@ -118,7 +120,7 @@ recommandée :
 
 | Pièce | Où | Ce qu'elle fait |
 |---|---|---|
-| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G4** — et cette ligne a annoncé un « G8 » que rien n'implémentait jusqu'au 14/09/2026 (TF-1256) |
+| **Le fil** | l'en-tête de chaque document produit | il porte `gabarit` (id de famille) et `version_du_gabarit`. Sans ce couple, « il manquait une section » ne se rattache à rien. Exigé des gabarits par **G4**, rendu dans la page — sauf pour une famille de documents remis à un tiers à propos d'une personne, qui déclare `couple_en_meta: true` au catalogue et le porte dans la balise `<meta name="digit-ai:gabarit">` (TF-2338) — et cette ligne a annoncé un « G8 » que rien n'implémentait jusqu'au 14/09/2026 (TF-1256) |
 | **La demande** | `gabarits\RETOURS-FORGES.md`, section « Retours sur les documents produits » | quatre colonnes, par ordre d'utilité : ce qui a été **ajouté à la main**, ce qui a **gêné le lecteur**, ce qui a **manqué**, la **portée** |
 | **Le refus** | `ingerer-lot.mjs` et **B7** de `oracle-boite-entree` | un lot du 22/08 ou après qui ne porte pas la section est refusé à l'ingestion, registre intact (R-46) |
 

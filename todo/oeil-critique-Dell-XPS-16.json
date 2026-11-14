@@ -1,81 +1,81 @@
 {
  "poste": "Dell-XPS-16",
- "debut": "2026-10-26T15:15:00+01:00",
- "fin": "2026-10-29T19:37:00+01:00",
- "ts": "2026-10-29T18:37:50.127Z",
+ "debut": "2026-10-29T19:37:00+01:00",
+ "fin": "2026-11-05T00:00:00+01:00",
+ "ts": "2026-11-10T10:57:43.543Z",
  "palier": null,
  "indicateurs": {
-  "demandes": 62,
-  "reprises": 36,
-  "consignes_repetees": 12,
-  "messages_hors_demande": 87,
-  "refus_hook": 51,
-  "duree_tour_mediane_min": 3,
-  "duree_tour_p90_min": 21.4,
-  "decisions_reservees": 23,
-  "jetons_relectures": 1568082
+  "demandes": 59,
+  "reprises": 21,
+  "consignes_repetees": 11,
+  "messages_hors_demande": 171,
+  "refus_hook": 49,
+  "duree_tour_mediane_min": 4.6,
+  "duree_tour_p90_min": 66.9,
+  "decisions_reservees": 71,
+  "jetons_relectures": 10222385
  },
  "evolution": {
   "demandes": {
-   "avant": 122,
-   "apres": 62,
-   "ecart": -60
+   "avant": 62,
+   "apres": 59,
+   "ecart": -3
   },
   "reprises": {
-   "avant": 47,
-   "apres": 36,
-   "ecart": -11
+   "avant": 36,
+   "apres": 21,
+   "ecart": -15
   },
   "consignes_repetees": {
-   "avant": 13,
-   "apres": 12,
+   "avant": 12,
+   "apres": 11,
    "ecart": -1
   },
   "messages_hors_demande": {
-   "avant": 76,
-   "apres": 87,
-   "ecart": 11
+   "avant": 87,
+   "apres": 171,
+   "ecart": 84
   },
   "refus_hook": {
-   "avant": 73,
-   "apres": 51,
-   "ecart": -22
+   "avant": 51,
+   "apres": 49,
+   "ecart": -2
   },
   "duree_tour_mediane_min": {
-   "avant": null,
-   "apres": 3,
-   "ecart": null
+   "avant": 3,
+   "apres": 4.6,
+   "ecart": 1.6
   },
   "duree_tour_p90_min": {
-   "avant": null,
-   "apres": 21.4,
-   "ecart": null
+   "avant": 21.4,
+   "apres": 66.9,
+   "ecart": 45.5
   },
   "decisions_reservees": {
-   "avant": null,
-   "apres": 23,
-   "ecart": null
+   "avant": 23,
+   "apres": 71,
+   "ecart": 48
   },
   "jetons_relectures": {
-   "avant": null,
-   "apres": 1568082,
-   "ecart": null
+   "avant": 1568082,
+   "apres": 10222385,
+   "ecart": 8654303
   },
   "reprises_par_demande": {
-   "avant": 0.385,
-   "apres": 0.581
+   "avant": 0.581,
+   "apres": 0.356
   }
  },
  "sortie": [
-  "Analyse faite le 29/10/2026, poste Dell-XPS-16, période du 26/10 15:15 au 29/10 19:37 : 74 sessions dont 42 d'appel automatique (juge LLM), 7 lots d'agents et 3 agents de relevé et de revue ; 1,16 M jetons d'agents, au-delà du plafond de 1 M.",
-  "Indicateurs : 62 demandes, 36 reprises (0,58 par demande, méthode non comparable au 26/10 qui comptait les appels automatiques), 12 consignes répétées, 87 hors demande, 51 refus de hook ; tours médiane 3 min, 90e centile 21,4 min ; 23 décisions réservées ; 1,57 M jetons de relecture en 4 jours.",
-  "Refus de hook : S1 et S4 dans presque tous, 17 sur 51 après une réponse sans écriture, doublon à l'écran récurrent.",
-  "Forges : 20 demandes sur 62 sans une forge attendue (ops 8, websec ou agents-security 7, data 5, design 4) ; 39 produits sur 40 sans trace de mobilisation.",
-  "Revue de code : 6 contournements confirmés des gardes d'identité sortante et de gestes distants ; 2 défauts du gate supabase de forge-development ; le scan de workflow d'agent accepte une négation.",
-  "Automatiques faites : sessions automatiques écartées (oeil-critique 1.3.2), nettoyage qui garde fichiers ignorés et copies récentes, appelants git et workflows, casse du rappel de lettre, CI2 sans copies de travail, oracle des caractères de contrôle de forge-design.",
-  "Automatiques en attente : gate supabase de forge-development (dossier test, appel sur plusieurs lignes), 7 échecs préexistants du self-test de forge-design (5 oracle-dtcg, 2 run-oracles-design).",
-  "Majeures posées : D-98 à D-102, recommandations scellées (todo/oeil-critique-scelles.jsonl).",
-  "Majeures en attente : suppression de hook-droits-accordes, avertissements sans porteur, variance du juge LLM, coût du hook des produits intacts, réponses de décision hors format acceptées, scan de workflow d'agent.",
-  "Écartés : 42 sessions automatiques (contexte de test), la fiche DPO interrompue 3 fois (contexte de tâche)."
+  "Analyse faite le 10/11/2026, poste Dell-XPS-16, première moitié de la période due : du 29/10 19:37 au 05/11 00:00 (5,2 jours sur 11,6) ; 39 sessions, 58 sessions d'appel automatique écartées, 6 lots d'agents, 1 agent de relevés, 1 de revue de code ; 1,33 million de jetons d'agents, au-delà du plafond de 1 million. La suite, du 05/11 au 10/11, se lit à l'exécution suivante par --jusqu.",
+  "Indicateurs : 59 demandes, 21 reprises (0,36 par demande contre 0,58), 11 consignes répétées, 171 messages hors demande, 49 refus de hook ; tours médiane 4,6 min, 90e centile 66,9 min (contre 3 et 21,4) ; 71 décisions réservées en 5,2 jours (contre 23 en 3,5) ; 10,2 millions de jetons de relecture du 29/10 au 04/11 (contre 1,57 en 4 jours), lus au relevé de flotte : le relevé du skill rend null sur un délai dépassé.",
+  "Refus de hook : 49 sur 49 portent sur la forme, aucun sur un défaut du livrable ; la réponse refusée reste affichée en double ; un mkdir ou un lancement d'agent compte encore comme écriture après la correction du 30/10.",
+  "Revue de code : 12 contournements des gardes de gestes distants et d'identité sortante rejoués après leur durcissement du 30/10 ; accord humain fabricable (5 caractères, commande « * ») ; scan de workflow d'agent qui accepte « != OWNER » pour la 2e exécution ; caviardage qui laisse X-API-Key en clair.",
+  "Produits : 3 gestes sans décision chez 2 produits (droits de contournement accordés, production lue par le secret du dépôt, arrêt de tous les processus Node), 1 de plus à vérifier chez un 3e.",
+  "Automatiques faites : rappel de relecture daté juste (cbe02985), dévoilement de la recommandation D-106, borne --jusqu de l'extraction (oeil-critique 1.4.1, 4351679), rappel de relecture ramené de 894 à 501 caractères (f09f3b6f, cible de 450 manquée).",
+  "Automatiques en attente : 2, consignées avec leur empreinte. Le relevé silencieux qui écrit null sans cause (sources.mjs du skill), non écrit parce qu une autre session modifiait ce fichier ; le repère qui compare à lui-même un second avancement sur la même fin (repere.mjs).",
+  "Majeures posées : D-194 à D-198, recommandations scellées ; rappelées : D-104, D-105, D-107, D-108, sans réponse depuis le 29/10.",
+  "Majeures en attente : contrôle des secrets en échec à chaque fin de tour sur un porteur sans secret retiré de la pointe (462 fois), Stop de hook-produits-intacts sans aucun blocage en 402 sorties (suppression), relevé des forges aveugles faux pour 3 forges Python, nom de dossier de second niveau resté en clair dans le relevé silencieux.",
+  "Écartés : 42 constats de contexte de tâche sur les 6 lots ; 1 agent a écrit un fichier de travail dans un dossier temporaire du système, supprimé ensuite."
  ]
 }

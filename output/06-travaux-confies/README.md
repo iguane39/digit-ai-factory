@@ -17,5 +17,6 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | [`2026-09\`](2026-09/README.md) | dossier (30 fichiers) | — | Livrables de la famille `06-travaux-confies\` du mois clos 2026-09, classés par `node scripts\ranger-dossiers.mjs` ; le mois en cours reste à la racine de la fa… |
+| `Digit-AI - Skill - digit-ai-page-html 1.42.0 pour le compte Claude - 20261102a.zip` | fichier | 905,6 Ko | ZIP |
 
-_0 fichier(s), 1 sous-dossier(s)_
+_1 fichier(s), 1 sous-dossier(s)_

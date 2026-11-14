@@ -1,0 +1,287 @@
+{
+  "schema": "lecons@1",
+  "version": "1.2.0",
+  "date": "2026-11-13",
+  "_commentaire": "Table des leçons génériques du pilot (TF-2150, décision humaine D-172 (a) du 04/11/2026, étude « Apprentissage des erreurs par les produits et la Factory » 20261104b, option O2). Lue au moment du geste par oracles/hook-lecons.mjs (PreToolUse sur Bash, PowerShell, Write, Edit, MultiEdit, Agent et Task ; `declencheur.sur` vaut `commande`, `chemin` ou `agent`, ce dernier jugeant la description d'un lancement d'agent, TF-1947), au pilot et chez chaque produit par `forge/hooks/factory.mjs lecons` ; rien n'est chargé à l'ouverture. Une leçon générique entre ici après décision au registre, avec une preuve qui se vérifie : le hook la revérifie avant chaque rappel et tait la leçon dont la preuve ne se vérifie plus. Jugée par `node scripts/lecons.mjs --verifier` ; passée de `rappel` à `barriere` par `--appliquer` quand elle récidive après son rappel (BOUCLE-AMELIORATION.md, section T1). Champs facultatifs : `declencheur.chaines` (`retirees` par défaut, `interpretees`, `gardees` : ce que le motif voit d'une commande, voir l'en-tête du hook), `barriere_le` et `motif_barriere` (écrits par --appliquer), `mesure` (calibrage du motif sur les gestes réels des transcriptions du poste).",
+  "lecons": [
+    {
+      "id": "L-001",
+      "classe": "regle-ecrite-sans-oracle-qui-la-joue",
+      "symptome": "Un heredoc Bash long ou porteur d'antislashs (chemin Windows, antislash doublé) peut arriver tronqué ou amputé d'un antislash, sans erreur : le 22/09/2026, une mesure a ainsi rendu 0 sur 20 au lieu de 17",
+      "declencheur": {
+        "outils": [
+          "Bash"
+        ],
+        "sur": "commande",
+        "chaines": "gardees",
+        "motif": "(?<!<)<<(?!<)-?[ \\t]*\\\\?([\"']?)([A-Za-z_][\\w.-]*)\\1[^\\n]*(?:(?:(?!\\n[ \\t]*\\2[ \\t]*(?:\\n|$))[\\s\\S]){3000}|(?:(?!\\n[ \\t]*\\2[ \\t]*(?:\\n|$))[\\s\\S])*?(?:[A-Za-z]:\\\\|\\w{2,}\\\\\\w{2,}|\\\\\\\\))"
+      },
+      "solutions": [
+        {
+          "texte": "écrire le contenu avec l'outil Write, puis le passer par son chemin (`node f.mjs`, `git commit -F f.txt`)",
+          "condition": "tout contenu de plus de quelques lignes",
+          "preferee": true
+        },
+        {
+          "texte": "relire les octets écrits (`od -c`) avant de croire le résultat",
+          "condition": "heredoc déjà joué",
+          "preferee": false
+        },
+        {
+          "texte": "heredoc court à délimiteur cité (`<<'EOF'`)",
+          "condition": "sans antislash ni accent grave",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-1300"
+      },
+      "portee": "generique",
+      "statut": "rappel",
+      "revue_le": "2026-12-15",
+      "source": "TF-1300 (22/09/2026, défaut commis puis mesuré à l'octet) ; étude 20261104b, fait fondateur n° 1 : la même leçon, écrite dans la mémoire du poste dès la première fois, mordue 12 fois faute de rappel au geste",
+      "mesure": {
+        "le": "2026-11-05",
+        "periode": "2026-10-04 au 2026-11-05",
+        "gestes_juges": 22296,
+        "gestes_rappeles": 297,
+        "echantillon_relu": 15,
+        "faux_positifs_vus": 0,
+        "note": "heredoc dont le CORPS (borné par son délimiteur) dépasse 3 000 caractères ou porte un chemin Windows, un antislash entre deux mots ou un antislash doublé ; 1 461 heredocs au total sur la période, 780 avec un antislash quelconque ; le premier motif, non borné au corps, en retenait 322, dont 25 par du texte écrit après la fermeture du heredoc"
+      }
+    },
+    {
+      "id": "L-002",
+      "classe": "garde-contournee-par-sortie-rompue",
+      "symptome": "Un `git push` dont la sortie part dans un filtre (`| tail`, `| grep`, `| tee`) publie même si le hameçon pre-push refuse, dès que le filtre meurt : le 24/09/2026, 13 dépôts ont été publiés ainsi sans la porte des noms",
+      "declencheur": {
+        "outils": [
+          "Bash",
+          "PowerShell"
+        ],
+        "sur": "commande",
+        "motif": "(?:^|[\\s;&|(])git(?:\\.exe)?(?:[ \\t]+(?:-[Cc](?:[ \\t]+(?!push\\b)\\S+)?|--?[A-Za-z][\\w-]*(?:=\\S+)?))*[ \\t]+push\\b(?:[^\\n;&|]|[<>]&|&>)*\\|(?!\\|)"
+      },
+      "solutions": [
+        {
+          "texte": "sortie dans un fichier (`git push … > push.log 2>&1`), lire le fichier, puis vérifier l'envoi par `git rev-list --count origin/main..HEAD`",
+          "condition": "tout envoi",
+          "preferee": true
+        },
+        {
+          "texte": "laisser la sortie de `git push` entière, sans tuyau",
+          "condition": "sortie courte attendue",
+          "preferee": false
+        },
+        {
+          "texte": "vérifier que les hameçons portent `trap '' PIPE` (`installer-hamecon-publication.mjs --verifier`)",
+          "condition": "poste ou dépôt neuf",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-1360"
+      },
+      "portee": "generique",
+      "statut": "rappel",
+      "revue_le": "2026-12-15",
+      "source": "TF-1360 (24/09/2026, reproduit sur deux dépôts jetables ; parade `trap '' PIPE` posée dans les hameçons le 27/09)",
+      "mesure": {
+        "le": "2026-11-04",
+        "periode": "2026-10-04 au 2026-11-04",
+        "gestes_juges": 22784,
+        "gestes_rappeles": 2,
+        "echantillon_relu": 2,
+        "faux_positifs_vus": 0,
+        "note": "les 2 gestes relevés sont de vrais envois filtrés (02/11/2026 `| tail -6`, 29/10/2026 `| tee … | tail -5`) ; le premier motif, sans `git` en mot de commande, en comptait 42, dont des lectures de `.git/hooks/pre-push`"
+      }
+    },
+    {
+      "id": "L-003",
+      "classe": "regle-ecrite-sans-oracle-qui-la-joue",
+      "symptome": "Un accent grave que Bash lit hors guillemets simples (guillemets doubles, ou après une apostrophe comme `l'oracle` qui ferme la chaîne) est EXÉCUTÉ : le texte cité disparaît, ou une commande part (4 motifs amputés le 26/08/2026)",
+      "declencheur": {
+        "outils": [
+          "Bash"
+        ],
+        "sur": "commande",
+        "chaines": "interpretees",
+        "motif": "(?<!\\\\)`"
+      },
+      "solutions": [
+        {
+          "texte": "écrire le texte avec l'outil Write et le passer par fichier (`node f.mjs`, `git commit -F f.txt`)",
+          "condition": "texte à accent grave ou à apostrophe",
+          "preferee": true
+        },
+        {
+          "texte": "échapper chaque accent grave par un antislash",
+          "condition": "guillemets doubles",
+          "preferee": false
+        },
+        {
+          "texte": "guillemets simples",
+          "condition": "texte sans aucune apostrophe",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-0646"
+      },
+      "portee": "generique",
+      "statut": "rappel",
+      "revue_le": "2026-12-15",
+      "source": "TF-0646 (26/08/2026 : deux noms de fichier entre accents graves exécutés comme substitutions de commande, quatre motifs de dérogation consignés amputés au registre) ; même leçon que les messages de commit écrits dans un fichier et passés par `-F`",
+      "mesure": {
+        "le": "2026-11-04",
+        "periode": "2026-10-04 au 2026-11-04",
+        "gestes_juges": 22235,
+        "gestes_rappeles": 10,
+        "echantillon_relu": 10,
+        "faux_positifs_vus": 0,
+        "note": "10 commandes sur 10 portaient un accent grave que Bash exécute : 4 dans un `node -e \"…\"`, 6 après une apostrophe qui fermait la chaîne simple ; deux auraient lancé `node oracles/self-tests.mjs` (environ 30 minutes) dans une substitution"
+      }
+    },
+    {
+      "id": "L-004",
+      "classe": "horodatage-de-ledger-compose-a-la-main",
+      "symptome": "Le registre `todo/TODO.jsonl` écrit hors de son écrivain reçoit un horodatage composé à la main et une ligne que nul oracle n'a jugée : le 20/08/2026, des `ts` en avance de 2 h 40 à 7 h 30, aucune durée mesurable",
+      "declencheur": {
+        "outils": [
+          "Write",
+          "Edit",
+          "MultiEdit"
+        ],
+        "sur": "chemin",
+        "motif": "(?:^|/)todo/TODO(?:-ARCHIVE)?\\.jsonl$"
+      },
+      "solutions": [
+        {
+          "texte": "`node todo/journaliser.mjs` : il stampe le `ts`, joue oracle-todo et annule son écriture sur un échec",
+          "condition": "tout événement du registre",
+          "preferee": true
+        },
+        {
+          "texte": "`node todo/ingerer-lot.mjs`",
+          "condition": "lot de retours",
+          "preferee": false
+        },
+        {
+          "texte": "le constat va au rapport, le pilot écrit",
+          "condition": "agent de campagne, `gabarits/AGENT-CAMPAGNE.md`",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-0413"
+      },
+      "portee": "generique",
+      "statut": "rappel",
+      "revue_le": "2026-12-15",
+      "source": "TF-0413 (20/08/2026, horodatages du registre écrits à la main, en avance de 173 à 449 minutes sur l'heure réelle ; l'écrivain journaliser.mjs en est né)",
+      "mesure": {
+        "le": "2026-11-04",
+        "periode": "2026-10-04 au 2026-11-04",
+        "gestes_juges": 7910,
+        "gestes_rappeles": 0,
+        "echantillon_relu": 0,
+        "faux_positifs_vus": 0,
+        "note": "aucune écriture du registre par Write ou Edit sur la période : la leçon garde le geste le plus direct, sans coût mesuré"
+      }
+    },
+    {
+      "id": "L-005",
+      "classe": "horodatage-de-ledger-compose-a-la-main",
+      "symptome": "Une redirection ou un script qui ajoute à `todo/TODO.jsonl` contourne son écrivain : horodatage non stampé, ligne que nul oracle n'a jugée avant d'entrer, aucune annulation sur un échec (le 20/08/2026, des `ts` en avance de 2 h 40 à 7 h 30)",
+      "declencheur": {
+        "outils": [
+          "Bash",
+          "PowerShell"
+        ],
+        "sur": "commande",
+        "chaines": "gardees",
+        "motif": ">>[ \\t]*[\"']?(?:[^\\s\"'$]*[\\\\/])?todo[\\\\/]TODO(?:-ARCHIVE)?\\.jsonl|\\bAdd-Content\\b[^\\n;|]*todo[\\\\/]TODO(?:-ARCHIVE)?\\.jsonl|\\bappendFileSync\\(\\s*[\"'`][^\"'`]*todo[\\\\/]TODO(?:-ARCHIVE)?\\.jsonl"
+      },
+      "solutions": [
+        {
+          "texte": "`node todo/journaliser.mjs` : il stampe le `ts`, joue oracle-todo et annule son écriture sur un échec",
+          "condition": "tout événement du registre",
+          "preferee": true
+        },
+        {
+          "texte": "`node todo/ingerer-lot.mjs`",
+          "condition": "lot de retours",
+          "preferee": false
+        },
+        {
+          "texte": "le constat va au rapport, le pilot écrit",
+          "condition": "agent de campagne, `gabarits/AGENT-CAMPAGNE.md`",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-0413"
+      },
+      "portee": "generique",
+      "statut": "rappel",
+      "revue_le": "2026-12-15",
+      "source": "TF-0413 ; gestes du 26/10/2026 qui ajoutaient au registre par `>> todo/TODO.jsonl`, relevés le 04/11/2026 dans les transcriptions du poste",
+      "mesure": {
+        "le": "2026-11-04",
+        "periode": "2026-10-04 au 2026-11-04",
+        "gestes_juges": 22784,
+        "gestes_rappeles": 2,
+        "echantillon_relu": 2,
+        "faux_positifs_vus": 0,
+        "note": "les 2 gestes, d'une même session du 26/10/2026, ajoutaient des événements au registre par `>>` ; une première forme du motif comptait aussi 2 fixtures jetables `: > $T/todo/TODO.jsonl`, écartées (un chemin à variable n'est pas le registre)"
+      }
+    },
+    {
+      "id": "L-006",
+      "classe": "tour-clos-sur-une-attente",
+      "symptome": "Un tour qui a écrit (fichier, commit, registre) puis lance des agents se clôt sur un message d'attente ou une réponse courte, que le hook de fin de tour refuse : 36 refus sur 83, du 29/10 au 05/11/2026",
+      "declencheur": {
+        "outils": [
+          "Agent",
+          "Task"
+        ],
+        "sur": "agent",
+        "motif": "^(?!Relecture d'intention)"
+      },
+      "solutions": [
+        {
+          "texte": "se clore par la restitution complète (gabarits/RESTITUTION.md), préjugée par `node oracles/hook-restitution.mjs --prejuger <fichier>`, jamais par un message d'attente",
+          "condition": "tour qui a écrit, avant ou pendant le lancement des agents",
+          "preferee": true
+        },
+        {
+          "texte": "lancer l'attente d'emblée en arrière-plan, sa fin annoncée, et l'attendre par tranches bornées (une commande d'attente de 150 s au plus, rejouée jusqu'à la fin) dans le même tour, puis relire le résultat des agents avant de rendre la main (gabarits/AGENT-CAMPAGNE.md, TF-2463)",
+          "condition": "résultat d'agent dû dans le tour",
+          "preferee": false
+        }
+      ],
+      "preuve": {
+        "type": "registre",
+        "id": "TF-1947"
+      },
+      "portee": "generique",
+      "statut": "rappel",
+      "revue_le": "2026-12-15",
+      "source": "TF-1947 (mesure du 05/11/2026 : 83 refus du hook de fin de tour sur 515 transcriptions des 2 profils du poste, dont 36 d'un tour qui avait écrit puis s'était clos sur un message court, souvent une attente d'agents) ; fiche 20261105b, action A-2 ; la relecture d'intention, dont la description commence par « Relecture d'intention », est exemptée comme dans hook-flotte.mjs",
+      "mesure": {
+        "le": "2026-11-05",
+        "periode": "2026-10-05 au 2026-11-05",
+        "gestes_juges": 512,
+        "gestes_rappeles": 415,
+        "echantillon_relu": 0,
+        "faux_positifs_vus": null,
+        "note": "faux positifs non mesurés (aucun échantillon relu). 512 lancements d'agent (outil Agent ou Task) dans les 59 transcriptions des 2 profils du poste dont le dossier est celui du pilot, hors ses arbres de travail ; 97 relectures d'intention écartées par le motif, 415 rappels. Aucun échantillon relu : le hook ne sait pas si le tour a écrit, la leçon est donc servie à tout lancement d'agent et son texte pose la condition. Coût : environ 500 caractères par lancement servi"
+      }
+    }
+  ]
+}

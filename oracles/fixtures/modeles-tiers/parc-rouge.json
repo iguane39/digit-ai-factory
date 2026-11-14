@@ -1,0 +1,25 @@
+{
+  "_dit": "Parc jetable de la recette : { dépôt: { chemin: contenu } }. Chaque dépôt devient un dépôt git (git add, sans commit). Les identifiants sont ceux de referentiel-vert.json.",
+  "depot-a": {
+    "scripts/generer.mjs": "const REPLIS = [\"modele-a-arrete\", \"modele-b-bientot\"];\nexport default REPLIS;\n",
+    ".env.example": "MODELE_PAR_DEFAUT=modele-c-sans-date\n",
+    "config/fournisseurs.json": "{ \"modele\": \"alpha-4o\" }\n",
+    "src/ordre.py": "x = \"orbe3\"\n",
+    "src/point.mjs": "export const U = base + \"/v0/ancien-point\";\n",
+    "src/lointain.mjs": "export const M = \"modele-d-lointain\";\n",
+    "src/frontieres.mjs": "export const J = [\"modele-f-90j\", \"modele-g-89j\", \"modele-h-aujourdhui\"];\n",
+    "tests/cas.test.mjs": "check(\"modele-a-arrete\");\n",
+    "fixtures/donnees.json": "{ \"m\": \"modele-a-arrete\" }\n",
+    "docs/NOTE.md": "Le modele-a-arrete a ete retire.\n",
+    ".env": "MODELE_SECRET=modele-a-arrete\n"
+  },
+  "groupe/depot-b": {
+    "app.js": "const m = \"alpha-5\";\nconst voisin = \"alpha-5.6\";\nconst petit = \"alpha-4o-mini\";\n"
+  },
+  "n1/n2/n3/depot-limite": {
+    "limite.mjs": "const m = \"modele-a-arrete\";\n"
+  },
+  "n1/n2/n3/n4/depot-trop-profond": {
+    "profond.mjs": "const m = \"modele-a-arrete\";\n"
+  }
+}

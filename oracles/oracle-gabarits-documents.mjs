@@ -48,6 +48,11 @@
  *   G4 · le document REND son gabarit et sa version (`Gabarit : gd-… · version du gabarit x.y.z`),
  *        visiblement — jamais seulement en commentaire. Une instance périmée est invisible sur
  *        l'artefact, et la section R-46 des lots devient impossible à remplir sans lui (TF-0690).
+ *        Exception écrite (TF-2338) : une famille de documents remis à un tiers à propos d'une personne
+ *        déclare `couple_en_meta: true` au catalogue et porte le couple dans la balise
+ *        `<meta name="digit-ai:gabarit" content="gabarit : gd-… · version du gabarit x.y.z">` ;
+ *   G15 · un TYPE admis au registre des types d'organization sans famille au catalogue est nommé,
+ *        en avertissement (TF-2337) ;
  *   G7 · les sections que le CATALOGUE déclare obligatoires pour une famille (`sections_obligatoires`)
  *        sont présentes comme titres de sa doctrine (TF-1170). La règle ne juge que ce qu'une
  *        famille a DÉCLARÉ : une famille sans déclaration n'est jamais accusée ;
@@ -82,6 +87,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { cheminSkillsInstalles } from "../scripts/lib-config-installee.mjs";
+import { lecteurDeclare } from "./lib-lecteur-declare.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -254,8 +260,14 @@ export function resoudreFamille(nomFichier, catalogue) {
 const ROLES_PAGE_DUE = /^(proposition|trajectoire|etude|conseil)\b/i;
 const ENTREE_DOCTRINE = "20260907";   // TF-0895 — jour où la règle est devenue opposable
 
+// TF-2258 (06/11/2026) — LA PAGE N'EST DUE QU'À UNE FAMILLE QUI LIVRE DU HTML. Le rôle du nom ne suffisait pas : la famille neuve
+// `gd-etude-reprise-activite` (statut ok, formats ["md"]) rendait « aucune page homonyme » pour « Étude - Reprise d'activité du portail »
+// alors que son catalogue ne lui promet aucune page. Quand l'appelant fournit le catalogue, G9 résout la famille du nom ; une famille
+// de statut `ok` dont les formats ne portent pas `html` est SANS_OBJET, et le dit. Une famille `porte_ailleurs` ou `a_extraire` ne déclare
+// pas ses formats de livraison de façon opposable (le vide y est déclaré) : elle reste jugée sur le rôle, comme les études d'opportunité,
+// dont la décision humaine du 16/09/2026 veut la page. Sans catalogue fourni, rien ne change.
 /** G9 sur UN livrable Markdown : `{ regle, statut, ou, message }`. */
-export function jugerPageHomonyme(chemin, { existe = null, depuis = ENTREE_DOCTRINE } = {}) {
+export function jugerPageHomonyme(chemin, { existe = null, depuis = ENTREE_DOCTRINE, catalogue = null } = {}) {
   const nom = String(chemin).replace(/^.*[\\/]/, "");
   if (!/\.md$/i.test(nom) || /^(README|LISEZMOI)\.md$/i.test(nom)) {
     return { regle: "G9", statut: "SKIP", ou: nom, message: "ce n'est pas un livrable Markdown — la question ne se pose pas" };
@@ -270,6 +282,14 @@ export function jugerPageHomonyme(chemin, { existe = null, depuis = ENTREE_DOCTR
   if (!date || date < depuis) {
     return { regle: "G9", statut: "SANS_OBJET", ou: nom,
       message: `livrable antérieur au ${depuis} — la doctrine de la page homonyme lui est postérieure, et la règle 5 interdit de réécrire l'existant (antériorité DÉCLARÉE, jamais rattrapée en silence)` };
+  }
+  if (Array.isArray(catalogue) && catalogue.length) {
+    const r = resoudreFamille(nom, catalogue);
+    const fam = r.resolue ? catalogue.find((f) => f.id === r.id) : null;
+    if (fam && fam.statut === "ok" && Array.isArray(fam.formats) && !fam.formats.includes("html")) {
+      return { regle: "G9", statut: "SANS_OBJET", ou: nom,
+        message: `famille « ${fam.famille} » (${fam.id}, statut ok) livrée en ${fam.formats.join(", ")} sans html — la page homonyme n'est due qu'à une famille dont les formats portent html (TF-2258)` };
+    }
   }
   const cible = String(chemin).replace(/\.md$/i, ".html");
   const present = existe === null ? existsSync(cible) : existe;
@@ -688,6 +708,29 @@ export function detteTypesDeNom(familles, racineParc) {
   return constats;
 }
 
+// G15 (TF-2337, 10/11/2026) — UN TYPE ADMIS AU REGISTRE SANS FAMILLE AU CATALOGUE SE SIGNALE. G14 compte la dette dans un sens (un type de nom du
+// catalogue dont le mot de tête manque au registre) ; rien ne la comptait dans l'autre. Le type « CV » est admis au registre des types depuis le
+// 11/09/2026 (organization, décision D-5 (a)) et aucune famille du catalogue ne le couvrait : le produit a écrit le gabarit chez lui, en cinq versions
+// de 1.0.0 à 2.3.0 en deux jours, et le constat est resté sans suite jusqu'au 09/11/2026. Un type est « couvert » quand le mot de tête d'un type de nom
+// d'une famille du catalogue est le type, ou l'un de ses alias (même normalisation que G14). La règle avertit et n'échoue jamais : un type peut être
+// admis avant que son gabarit existe, mais la dette se compte et se nomme à chaque passage.
+export function typesAdmisSansFamille(familles, racineParc) {
+  const chemin = join(racineParc, "digit-ai-forge-organization", "registre-types.json");
+  if (!existsSync(chemin)) return [{ regle: "G15", statut: "SKIP", ou: "catalogue/types_admis", message:
+    `registre des types d'organization introuvable (${chemin}) — les types admis sans famille ne sont PAS mesurés` }];
+  let reg;
+  try { reg = JSON.parse(readFileSync(chemin, "utf8")); } catch { reg = null; }
+  if (!reg || !Array.isArray(reg.types)) return [{ regle: "G15", statut: "SKIP", ou: "catalogue/types_admis", message:
+    "registre des types d'organization illisible — les types admis sans famille ne sont PAS mesurés" }];
+  const tetes = new Set(familles.filter((f) => f && f.famille && Array.isArray(f.types_de_nom))
+    .flatMap((f) => f.types_de_nom.map((t) => normeTete(String(t).trim().split(/\s+/)[0]))));
+  const sans = reg.types.filter((t) => t && t.type && ![t.type, ...(t.alias || [])].some((x) => tetes.has(normeTete(String(x).trim().split(/\s+/)[0]))));
+  const version = reg.version ? ` ${reg.version}` : "";
+  return [{ regle: "G15", statut: sans.length ? "AVERTISSEMENT" : "PASS", ou: "catalogue/types_admis", message:
+    `${sans.length} type(s) sur ${reg.types.length} admis au registre des types${version} sans famille au catalogue` +
+    (sans.length ? ` — ${sans.map((t) => t.type).join(", ")} : chacun est un type de livrable que personne ne cadre ; déclarer la famille (champ \`types_de_nom\`) ou dire pourquoi il n'en a pas` : "") }];
+}
+
 export function juger(dossier, catalogue = lireCatalogue()) {
   const findings = [];
   const familles = existsSync(dossier)
@@ -746,19 +789,41 @@ export function juger(dossier, catalogue = lireCatalogue()) {
     // l'instance le prouve rendu. Un commentaire HTML ne compte pas : il ne se rend pas.
     const ID_GABARIT = /gabarit\s*:\s*(gd-[a-z0-9-]+)/i;
     const VERSION_GABARIT = /version[_ ]du[_ ]gabarit\s*:?\s*\d+\.\d+\.\d+/i;
+    // TF-2338 (10/11/2026) — LA BALISE META `digit-ai:gabarit` PORTE LE COUPLE D'UN DOCUMENT REMIS À UN TIERS. Pour un dossier de compétences
+    // anonymisé remis à un client, le porteur refuse toute mention de gabarit ou d'outil dans le rendu (décisions du 12/09/2026) : le produit a posé le
+    // couple en `<meta name="digit-ai:gabarit" content="gabarit : gd-… · version du gabarit x.y.z">`, que l'oracle acceptait sans que la règle écrite
+    // le dise (il lisait le texte hors commentaires, balise comprise) ; G4 était PASS par accident. La règle écrite et l'oracle disent désormais la même
+    // chose : le couple est RENDU, ou porté par cette balise dans une famille dont le catalogue déclare `couple_en_meta: true`. Une famille qui ne le
+    // déclare pas et dont le couple ne vit que dans la balise est refusée : la balise ne se rend pas, la dérogation se décide famille par famille.
+    const META_COUPLE = /<meta\s+name=["']digit-ai:gabarit["']\s+content=["']([^"']*)["'][^>]*>/gi;
+    const familleCat = Array.isArray(catalogue) ? catalogue.find((c) => c && c.famille === fam) : null;
+    const coupleEnMeta = familleCat?.couple_en_meta === true;
     for (const n of [...formes.map((e) => `SQUELETTE.${e}`), ...instances.map((e) => `INSTANCE.${e}`)]) {
       const texte = sansCommentaires(readFileSync(p(n), "utf8"));
-      const id = ID_GABARIT.exec(texte);
+      const meta = [...texte.matchAll(META_COUPLE)].map((m) => m[1]).join(" ");
+      const rendu = texte.replace(META_COUPLE, " ");
+      const id = ID_GABARIT.exec(rendu);
+      const versionRendue = VERSION_GABARIT.test(rendu);
+      const idMeta = ID_GABARIT.exec(meta);
+      const versionMeta = VERSION_GABARIT.test(meta);
       const manque = [!id && "l'identifiant `gabarit: gd-…`",
-        !VERSION_GABARIT.test(texte) && "la `version du gabarit x.y.z`"].filter(Boolean);
-      if (manque.length) {
+        !versionRendue && "la `version du gabarit x.y.z`"].filter(Boolean);
+      if (!manque.length) {
+        findings.push({ regle: "G4", statut: "PASS", ou: `${fam}/${n}`,
+          message: `porte ${id[1]} et sa version, visibles dans le rendu` });
+      } else if (idMeta && versionMeta && coupleEnMeta) {
+        findings.push({ regle: "G4", statut: "PASS", ou: `${fam}/${n}`,
+          message: `porte ${idMeta[1]} et sa version dans la balise meta digit-ai:gabarit (document remis à un tiers, \`couple_en_meta\` déclaré au catalogue, TF-2338)` });
+      } else if (idMeta && versionMeta) {
+        findings.push({ regle: "G4", statut: "FAIL", ou: `${fam}/${n}`, message:
+          `le couple ${idMeta[1]} + version ne vit que dans la balise meta digit-ai:gabarit, que le rendu n'affiche pas : seule une famille de documents remis à un tiers ` +
+          "peut l'y porter, en le déclarant au catalogue (`couple_en_meta: true`) ; sinon le couple se RETRANSCRIT dans le rendu (pied de page) (TF-0690, TF-2338)" });
+      } else {
         findings.push({ regle: "G4", statut: "FAIL", ou: `${fam}/${n}`, message:
           `le document ne rend pas ${manque.join(" ni ")} — une instance périmée est invisible ` +
           "sur l'artefact, et la section R-46 des lots de retours devient impossible à remplir. " +
-          "Le couple se RETRANSCRIT dans le rendu (pied de page), jamais seulement en commentaire (TF-0690)" });
-      } else {
-        findings.push({ regle: "G4", statut: "PASS", ou: `${fam}/${n}`,
-          message: `porte ${id[1]} et sa version, visibles dans le rendu` });
+          "Le couple se RETRANSCRIT dans le rendu (pied de page), jamais seulement en commentaire (TF-0690)" +
+          (coupleEnMeta ? ", ou se pose dans la balise `<meta name=\"digit-ai:gabarit\" content=\"gabarit : gd-… · version du gabarit x.y.z\">` (famille `couple_en_meta`, TF-2338)" : "") });
       }
     }
 
@@ -787,7 +852,9 @@ export function juger(dossier, catalogue = lireCatalogue()) {
       const LECTEUR = /^\s*(?:role_destinataire|lecteur)\s*:\s*\S/im;
       const FRONTIERE = /^\s*#{2,4}\s*[^\n]*document d['’]auteur/im;
       const texte = readFileSync(p("GABARIT.md"), "utf8");
-      const manque = [!LECTEUR.test(texte) && "la déclaration `role_destinataire` (qui lit, et pour quelle décision)",
+      // TF-2346 (10/11/2026) : la déclaration du lecteur se lit aussi dans un commentaire HTML (masqué par le rendu) ou dans le sidecar
+      // `GABARIT.md.lecteur.json` (lib-lecteur-declare.mjs) : un document remis à un tiers n'a pas à porter un en-tête d'auteur visible.
+      const manque = [!LECTEUR.test(texte) && !lecteurDeclare(texte, p("GABARIT.md")) && "la déclaration `role_destinataire` (qui lit, et pour quelle décision)",
         !FRONTIERE.test(texte) && "la section « Document d'auteur », qui nomme ce qui NE va PAS au lecteur"].filter(Boolean);
       if (manque.length) {
         findings.push({ regle: "G10", statut: "FAIL", ou: `${fam}/GABARIT.md`, message:
@@ -979,6 +1046,26 @@ if (args[0] === "--self-test") {
     casse.push("G7 : une famille qui ne déclare AUCUNE section obligatoire est jugée — la règle accuserait " +
       "les 38 familles du parc le jour de sa naissance, et se ferait désactiver le lendemain");
 
+  // G4 et la balise meta (TF-2338, 10/11/2026), dans ses QUATRE sens. Le fautif historique est le dossier de compétences remis à un client : pas de couple
+  // rendu, couple dans `<meta name="digit-ai:gabarit">`. PASS pour la famille qui déclare `couple_en_meta` ; FAIL pour la même instance dans une famille qui
+  // ne le déclare pas (la balise ne se rend pas) ; FAIL quand la balise est déclarée mais ne porte pas la version ; FAIL quand le couple n'est que dans un
+  // commentaire HTML, même chez la famille déclarée. Le couple rendu reste PASS partout (cas « verte » ci-dessus).
+  const META_OK = '<meta name="digit-ai:gabarit" content="gabarit : gd-recette · version du gabarit 1.0.0">';
+  poser("meta-declaree", { couple: META_OK });
+  poser("meta-non-declaree", { couple: META_OK });
+  poser("meta-sans-version", { couple: '<meta name="digit-ai:gabarit" content="gabarit : gd-recette">' });
+  poser("meta-en-commentaire", { couple: `<!-- ${META_OK} -->` });
+  const cat4 = [{ famille: "meta-declaree", couple_en_meta: true }, { famille: "meta-sans-version", couple_en_meta: true }, { famille: "meta-en-commentaire", couple_en_meta: true }];
+  f = juger(dir, cat4);
+  if (!g("G4", "meta-declaree").length || !g("G4", "meta-declaree").every((x) => x.statut === "PASS" && /balise meta/.test(x.message)))
+    casse.push("G4 refuse le couple porté par la balise meta digit-ai:gabarit dans une famille qui déclare couple_en_meta (document remis à un tiers) : " + JSON.stringify(g("G4", "meta-declaree")));
+  if (!g("G4", "meta-non-declaree").some((x) => x.statut === "FAIL" && /couple_en_meta/.test(x.message)))
+    casse.push("G4 laisse passer un couple qui ne vit que dans la balise meta chez une famille qui ne le déclare pas — la dérogation devient générale");
+  if (!g("G4", "meta-sans-version").some((x) => x.statut === "FAIL"))
+    casse.push("G4 laisse passer une balise meta sans la version du gabarit");
+  if (!g("G4", "meta-en-commentaire").some((x) => x.statut === "FAIL"))
+    casse.push("G4 compte un couple placé dans un commentaire HTML comme porté, même chez une famille couple_en_meta");
+
   // G10 (TF-1142, fixtures posées le 22/09/2026 sous TF-1256) — LE LECTEUR DÉCLARÉ ET LA FRONTIÈRE
   // LECTEUR/AUTEUR, DANS SES TROIS SENS. La règle était en service depuis le 16/09 SANS AUCUN CAS : la
   // recette ne la traversait ni en vert ni en rouge, et la famille « verte » ci-dessus — un GABARIT.md
@@ -1000,6 +1087,13 @@ if (args[0] === "--self-test") {
   poserG10("g10-tenue", `# doctrine\n\n${LECTEUR_G10}${FRONTIERE_G10}`);
   poserG10("g10-sans-frontiere", `# doctrine\n\n${LECTEUR_G10}`);
   poserG10("g10-sans-lecteur", `# doctrine\n${FRONTIERE_G10}`);
+  // TF-2346 (10/11/2026) : le lecteur se déclare aussi dans un commentaire HTML ou dans le sidecar GABARIT.md.lecteur.json. Le conforme passe, le
+  // sidecar illisible reste « sans lecteur » (le refus subsiste quand aucune des trois places ne répond).
+  poserG10("g10-lecteur-commentaire", `# doctrine\n\n<!-- role_destinataire : le client, qui lit sans exécuter -->\n${FRONTIERE_G10}`);
+  poserG10("g10-lecteur-sidecar", `# doctrine\n${FRONTIERE_G10}`);
+  writeFileSync(join(dir, "g10-lecteur-sidecar", "GABARIT.md.lecteur.json"), JSON.stringify({ lecteur: "le client, qui lit sans exécuter" }), "utf8");
+  poserG10("g10-sidecar-illisible", `# doctrine\n${FRONTIERE_G10}`);
+  writeFileSync(join(dir, "g10-sidecar-illisible", "GABARIT.md.lecteur.json"), "{ pas du json", "utf8");
   const f10 = juger(dir);
   const g10 = (ou) => f10.filter((x) => x.regle === "G10" && x.ou.startsWith(ou));
   if (!g10("g10-tenue").length || !g10("g10-tenue").every((x) => x.statut === "PASS"))
@@ -1009,6 +1103,11 @@ if (args[0] === "--self-test") {
       "d'arbitrages et l'historique des versions partent au lecteur (refus humain du 15/09/2026)");
   if (!g10("g10-sans-lecteur").some((x) => x.statut === "FAIL" && /role_destinataire/.test(x.message)))
     casse.push("G10 : un gabarit qui ne déclare pas son lecteur passe — la frontière n'a alors aucun lecteur à protéger");
+  for (const ou of ["g10-lecteur-commentaire", "g10-lecteur-sidecar"])
+    if (!g10(ou).length || !g10(ou).every((x) => x.statut === "PASS"))
+      casse.push(`G10 (TF-2346) : un lecteur déclaré hors de l'en-tête (${ou}) n'est pas lu : ${JSON.stringify(g10(ou))}`);
+  if (!g10("g10-sidecar-illisible").some((x) => x.statut === "FAIL" && /role_destinataire/.test(x.message)))
+    casse.push("G10 (TF-2346) : un sidecar de lecteur illisible compte comme une déclaration");
 
   // G3, avertissements (TF-1726), dans ses deux sens, sur des sorties de check_html écrites : un
   // marquage PASS sans rubrique d'avertissements ne publie que son PASS ; le même avec deux
@@ -1227,6 +1326,30 @@ if (args[0] === "--self-test") {
   if (g9("Digit-AI - Synthese Mandat - Sujet - 20260916a.md", { existe: false }).statut !== "SKIP")
     casse.push("G9 : une RESTITUTION est traitée comme une proposition — la page n'est due qu'aux propositions, " +
       "trajectoires, études et conseils remis à un humain");
+  // G9 (TF-2258) — LA FAMILLE QUI NE LIVRE PAS DE HTML. Quatre fixtures de catalogue qui ne diffèrent que par les formats et le statut
+  // de la famille, puis le catalogue RÉEL : la famille neuve en Markdown seul est exemptée, l'étude d'opportunité (porte_ailleurs) ne l'est pas.
+  {
+    const famG9 = (id, formats, statut) => ({ id, famille: id, statut, formats, types_de_nom: [id.replace(/^gd-/, "").replace(/-/g, " ")] });
+    const catG9 = [famG9("gd-etude-md-seul", ["md"], "ok"), famG9("gd-etude-avec-html", ["md", "html"], "ok"), famG9("gd-etude-ailleurs", ["md"], "porte_ailleurs")];
+    const nomG9 = (suffixe) => `Digit-AI - Etude ${suffixe} - 20261105a.md`;
+    const md = g9(nomG9("md seul"), { existe: false, catalogue: catG9 });
+    if (md.statut !== "SANS_OBJET" || !/sans html/.test(md.message))
+      casse.push(`G9 (TF-2258) : une famille de statut ok en Markdown seul, SANS page, est accusée — la page n'est due qu'à une famille dont les formats portent html : ${JSON.stringify(md)}`);
+    if (g9(nomG9("avec html"), { existe: false, catalogue: catG9 }).statut !== "FAIL")
+      casse.push("G9 (TF-2258) : une famille dont les formats portent html, SANS page, passe — l'exemption mord trop large");
+    if (g9(nomG9("avec html"), { existe: true, catalogue: catG9 }).statut !== "PASS")
+      casse.push("G9 (TF-2258) : la même famille html AVEC sa page est accusée");
+    if (g9(nomG9("ailleurs"), { existe: false, catalogue: catG9 }).statut !== "FAIL")
+      casse.push("G9 (TF-2258) : une famille porte_ailleurs en Markdown seul est exemptée — la décision du 16/09/2026 veut la page des études d'opportunité");
+    if (g9(nomG9("md seul"), { existe: false }).statut !== "FAIL")
+      casse.push("G9 (TF-2258) : sans catalogue fourni, le comportement d'avant a changé (la page est due par le rôle du nom)");
+    const reprise = g9("Digit-AI - Étude - Reprise d'activité du portail - 20261105c.md", { existe: false, catalogue: cat8 });
+    if (reprise.statut !== "SANS_OBJET")
+      casse.push(`G9 (TF-2258) : l'étude de reprise d'activité (gd-etude-reprise-activite, Markdown seul) rend ${reprise.statut} avec le catalogue réel : ${reprise.message}`);
+    const kit = g9("Digit-AI - Étude - Opportunité du kit - 20261105c.md", { existe: false, catalogue: cat8 });
+    if (kit.statut !== "FAIL")
+      casse.push(`G9 (TF-2258) : l'étude d'opportunité sans page rend ${kit.statut} avec le catalogue réel — l'exemption ne doit pas toucher gd-etude-opportunite`);
+  }
 
   // G6 (TF-1097) — LA FICHE DE CONCEPTION, DANS SES SIX SENS. Chaque cas rouge ne diffère du cas
   // vert que par UNE propriété : c'est la seule forme qui prouve que la règle juge ce qu'elle dit
@@ -1422,11 +1545,32 @@ if (args[0] === "--self-test") {
   if (g14Absent.length !== 1 || g14Absent[0].statut !== "SKIP")
     casse.push("G14 rend autre chose que SKIP quand le registre d'organization est absent : " + JSON.stringify(g14Absent));
 
+  // G15 (TF-2337) dans ses TROIS sens : un type admis dont un mot de tête de famille (ou un alias) le couvre → compté couvert ; un type admis sans famille
+  // → AVERTISSEMENT qui le NOMME (jamais FAIL) ; registre absent → SKIP. Le registre jetable est celui de G14 (Rapport, Synthèse/Compte) plus « CV » (alias
+  // « Dossier de competences »), le type du retour du 11/09/2026.
+  const parc15 = join(catDir, "parc15");
+  mkdirSync(join(parc15, "digit-ai-forge-organization"), { recursive: true });
+  writeFileSync(join(parc15, "digit-ai-forge-organization", "registre-types.json"), JSON.stringify({ version: "8.8.8",
+    types: [{ type: "Rapport" }, { type: "Synthèse", alias: ["Compte"] }, { type: "CV", alias: ["Curriculum", "Dossier de competences"] }] }), "utf8");
+  const g15Sans = typesAdmisSansFamille(fams14.filter((x) => x.famille !== "b-en-dette"), parc15);
+  if (g15Sans.length !== 1 || g15Sans[0].statut !== "AVERTISSEMENT" || !/1 type\(s\) sur 3 .*8\.8\.8 sans famille au catalogue — CV :/.test(g15Sans[0].message))
+    casse.push("G15 ne signale pas le type « CV » admis au registre sans famille au catalogue (attendu AVERTISSEMENT qui le nomme) : " + JSON.stringify(g15Sans));
+  const g15Couvert = typesAdmisSansFamille([...fams14, { famille: "dossier-de-competences-anonyme", types_de_nom: ["cv", "dossier de competences"] }], parc15);
+  if (g15Couvert.length !== 1 || g15Couvert[0].statut !== "PASS" || !/0 type\(s\) sur 3/.test(g15Couvert[0].message))
+    casse.push("G15 accuse un type admis qu'une famille couvre par son mot de tête (le remède de G15 doit PASSER) : " + JSON.stringify(g15Couvert));
+  const g15Alias = typesAdmisSansFamille([...fams14, { famille: "x", types_de_nom: ["curriculum vitae"] }], parc15);
+  if (g15Alias.some((x) => /CV :/.test(x.message)))
+    casse.push("G15 ignore l'alias du registre : un nom ouvert sur « curriculum » devrait couvrir le type CV : " + JSON.stringify(g15Alias));
+  if (g15Sans.some((x) => x.statut === "FAIL")) casse.push("G15 fait échouer sur une dette qu'il doit seulement publier");
+  const g15Absent = typesAdmisSansFamille(fams14, join(catDir, "parc-sans-organization"));
+  if (g15Absent.length !== 1 || g15Absent[0].statut !== "SKIP")
+    casse.push("G15 rend autre chose que SKIP quand le registre d'organization est absent : " + JSON.stringify(g15Absent));
+
   rmSync(catDir, { recursive: true, force: true, maxRetries: 5 });
   rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
   console.log(casse.length
     ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test gabarits-documents : 63/63 PASS (famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
+    : "Self-test gabarits-documents : 82/82 PASS (G4 et la balise meta (TF-2338) dans ses QUATRE sens, G10 hors de l'en-tête (TF-2346) dans ses TROIS sens, G15 (TF-2337) dans ses CINQ sens ; G9 dans ses SEPT sens de plus (TF-2258) : une famille de statut ok en Markdown seul sans page → SANS_OBJET, une famille html sans page → FAIL et avec sa page → PASS, une famille porte_ailleurs en Markdown seul sans page → FAIL, sans catalogue fourni le comportement d'avant → FAIL, puis sur le catalogue réel l'étude de reprise d'activité → SANS_OBJET et l'étude d'opportunité → FAIL ; famille complète et remplie → PASS ; squelette sans instance → FAIL ;" +
       "instance à trous → FAIL ; instance copie du squelette → FAIL ; classe posée sans règle CSS → FAIL au marquage ; " +
       "couple gabarit+version rendu → PASS G4 ; document sans le couple → FAIL G4 ; largeurs alternées sans " +
       "déclaration → FAIL G5 ; page « lecture » contredite → FAIL G5 ; page « lecture » tenue → PASS G5 ; " +
@@ -1455,7 +1599,7 @@ if (args.includes("--livrable")) {
       message: "usage : node oracle-gabarits-documents.mjs --livrable <chemin.md> [<chemin.md>…]" }, null, 1));
     process.exit(2);
   }
-  const f8 = vus.flatMap((c) => [jugerLivrable(c, cat), jugerPageHomonyme(c)]);
+  const f8 = vus.flatMap((c) => [jugerLivrable(c, cat), jugerPageHomonyme(c, { catalogue: cat })]);
   const v8 = f8.some((x) => x.statut === "FAIL") ? "FAIL" : "PASS";
   console.log(JSON.stringify({
     oracle: "oracle-gabarits-documents", mode: "livrable", version: "1.1.0", verdict: v8, findings: f8,
@@ -1464,6 +1608,7 @@ if (args.includes("--livrable")) {
       "la JUSTESSE de la famille résolue : un livrable nommé « Synthese … » qui serait en réalité une étude résout « restitution » et G8 ne le verra pas",
       "les livrables dont le nom ne suit NI R-4 NI la forme datée des études : leur radical entier sert de type, et la résolution échoue le plus souvent — c'est voulu, un nom hors convention est déjà un défaut R-4",
       "G9 ne juge que la PRÉSENCE de la page homonyme, jamais sa fraîcheur ni son contenu : une page générée puis laissée derrière une source corrigée la satisfait. Sa conformité au socle est le travail de check_html et render_page, joués séparément",
+      "G9 n'exempte (SANS_OBJET) que la famille de statut ok dont les formats ne portent pas html (TF-2258) : une famille porte_ailleurs ou a_extraire en Markdown seul (gd-etude-opportunite) reste jugée sur le rôle du nom, la décision humaine du 16/09/2026 voulant la page des études d'opportunité — l'ajout de html à ses formats, ou une exemption plus large, est une décision du pilot",
     ],
   }, null, 1));
   process.exit(v8 === "FAIL" ? 1 : 0);
@@ -1516,6 +1661,7 @@ const findings = [
   ...juger(dossierJuge),
   ...(catalogueJuge ? jugerCatalogue(catalogue, PARC) : []),
   ...(catalogueJuge ? detteTypesDeNom(lireCatalogue(catalogue), PARC) : []),
+  ...(catalogueJuge ? typesAdmisSansFamille(lireCatalogue(catalogue), PARC) : []),
 ];
 const verdict = verdictDe(findings);
 console.log(JSON.stringify({

@@ -1,0 +1,122 @@
+{
+ "schema": "l99-boucle@1",
+ "prompt": "Suivi d'avancement des agents toutes les 15 minutes",
+ "ouverture": "d office : le prompt réécrit lance un mandat qui écrit au pilot, et l'analyse a relevé un défaut bloquant",
+ "arbitre": {
+  "rubrique": "couches.md Ch1, 6 dimensions /100",
+  "arret": "0 bloquant et 0 majeur",
+  "seuil_score": null,
+  "gain_min": 3,
+  "borne": 3,
+  "garde_longueur": 0.15,
+  "retenue": "union_recomptee",
+  "verification_cloture": true,
+  "rejet_regression": true,
+  "recompte_notes": true,
+  "reprise_unique": true,
+  "score_de_passe": "le plus bas des 2 relecteurs, lecture à charge"
+ },
+ "passes": [
+  {
+   "n": 1,
+   "fichier": "prompt-p1.md",
+   "mots": 1257,
+   "relecteur": { "agent": "2 agents généraux neufs (Opus), A et B", "aveugle": true, "interdits": ["analyse", "passes précédentes", "journal de boucle"] },
+   "scores": { "A": 76, "B": 69 },
+   "score_mesure": 69,
+   "defauts": [
+    { "severite": "majeur", "defaut": "Le point au porteur n'est pas défini ni repérable dans un transcript", "citation": "(e) suivi tenu : un message au porteur au moins toutes les 17 minutes.", "vu_par": ["A", "B"], "statut": "retenu", "recompte": { "commande": "grep -F de la citation dans prompt-p1.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Un hook ne peut ni appeler Monitor ni écrire dans la conversation ; le réveil à 15 min n'est pas établi", "citation": "arme le guetteur", "vu_par": ["A", "B"], "statut": "retenu", "recompte": { "commande": "grep -F de la citation dans prompt-p1.md ; description de l'outil Monitor chargée par ToolSearch", "resultat": "citation présente ; Monitor est un outil de session, expiration 30 min au plus" } },
+    { "severite": "majeur", "defaut": "Tableau par dépôt publié au pilot public sans pseudonymisation", "citation": "Rends un tableau par dépôt : nombre de cas par cause.", "vu_par": ["A"], "statut": "retenu", "recompte": { "commande": "gh repo view <dépôt du pilot> --json visibility", "resultat": "PUBLIC" } },
+    { "severite": "majeur", "defaut": "Écriture dans ~/.claude non statuée ; agents réels non protégés pendant les bancs", "citation": "Produits : aucune écriture.", "vu_par": ["A"], "statut": "retenu", "recompte": { "commande": "grep -F de la citation et grep -c claude-b dans prompt-p1.md", "resultat": "citation présente ; aucune règle sur ~/.claude" } },
+    { "severite": "majeur", "defaut": "Périmètre de l'oracle de relevé non fixé ; agent sans point non échoué", "citation": "exit 1 au-delà de 17 minutes", "vu_par": ["A"], "statut": "retenu", "recompte": { "commande": "grep -F de la citation dans prompt-p1.md", "resultat": "citation présente, aucun périmètre" } },
+    { "severite": "majeur", "defaut": "Fenêtre de recherche de la demande d'origine trop étroite", "citation": "du 01/10 au 31/10/2026", "vu_par": ["A", "B"], "statut": "retenu", "recompte": { "commande": "grep -F de la citation ; find ~/.claude*/projects -maxdepth 2 -name '*.jsonl' -mtime +30", "resultat": "citation présente ; 0 fichier de session de plus de 30 jours" } },
+    { "severite": "majeur", "defaut": "Collision avec le hook Stop : chaque point clôt un tour", "citation": "un premier point à 15 minutes de course", "vu_par": ["B"], "statut": "retenu", "recompte": { "commande": "grep -n \"Deux points d'étape de suite\" gabarits/RESTITUTION.md", "resultat": "ligne 567 présente" } },
+    { "severite": "majeur", "defaut": "Bancs entièrement simulables", "citation": "Une horloge accélérée par variable d'environnement est admise", "vu_par": ["B"], "statut": "retenu", "recompte": { "commande": "grep -F de la citation dans prompt-p1.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Causes (b) à (d) sans règle de détection, indéterminé non borné", "citation": "se classe « indéterminé », jamais (e)", "vu_par": ["B"], "statut": "retenu", "recompte": { "commande": "grep -F de la citation dans prompt-p1.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "L'outil Workflow serait absent de la session", "citation": "et tout Workflow", "vu_par": ["B"], "statut": "ecarte", "dementi": true, "recompte": { "commande": "liste des outils de la session pilote", "resultat": "l'outil Workflow est présent dans la session pilote ; absent seulement du jeu du relecteur" } }
+   ],
+   "majeurs_clos": 0,
+   "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 2,
+   "fichier": "prompt-p2.md",
+   "mots": 1763,
+   "verification_cloture": {
+    "agent": "verificateur neuf",
+    "note": false,
+    "clotures": 7,
+    "defauts_crees": 5,
+    "clotures_detail": [
+     { "n": 1, "etat": "ferme" }, { "n": 2, "etat": "partiel" }, { "n": 3, "etat": "partiel" }, { "n": 4, "etat": "ferme" }, { "n": 5, "etat": "ferme" },
+     { "n": 6, "etat": "ferme" }, { "n": 7, "etat": "ferme" }, { "n": 8, "etat": "ferme" }, { "n": 9, "etat": "ferme" }
+    ],
+    "defauts_crees_detail": [
+     { "defaut": "banc arrêté : tué à 20 min, l'état à 30 min est silencieux, pas présumé arrêté", "corrige": "tué à 12 min" },
+     { "defaut": "point d'étape contre « rien de plus »", "corrige": "voie préférée et voie de repli nommées" },
+     { "defaut": "« les 4 items » pour 5 références", "corrige": "5 références" },
+     { "defaut": "agents factices contre vrai sous-agent", "corrige": "factice = vrai sous-agent lancé par le mandat" },
+     { "defaut": "définition du point contre relevé de secours en fichier", "corrige": "le relevé de secours n'est pas un point" }
+    ]
+   },
+   "notes_reprises": [
+    { "note": "relecteur B : transcripts sans fichier de plus de 30 jours", "source": "relecteur B passe 1", "recompte": { "commande": "find ~/.claude*/projects -maxdepth 2 -name '*.jsonl' -mtime +30 ; plus ancien fichier de session", "resultat": "0 fichier ; plus ancien du 13/10/2026 (fichiers de session seulement : profondeur 2, sous-agents non vus)" } },
+    { "note": "relecteur A : pilot public", "source": "relecteur A passe 1", "recompte": { "commande": "gh repo view <dépôt du pilot> --json visibility", "resultat": "PUBLIC" } }
+   ],
+   "relecteur": { "agent": "2 agents généraux neufs (Opus), C et D", "aveugle": true, "interdits": ["analyse", "passes précédentes", "journal de boucle"] },
+   "scores": { "C": 40, "D": 40 },
+   "score_mesure": 40,
+   "defauts": [
+    { "severite": "bloquant", "defaut": "Prémisse fausse : transcripts « conservés 30 jours, le plus ancien du 13/10 »", "citation": "conservés 30 jours, le plus ancien du 13/10/2026 dans les deux profils", "vu_par": ["C", "D"], "statut": "retenu", "recompte": { "commande": "find ~/.claude*/projects -path '*/subagents/*.jsonl', premier timestamp du plus ancien", "resultat": "~/.claude 745 fichiers depuis le 2026-10-11 ; ~/.claude-b 268 depuis le 2026-10-02" } }
+   ],
+   "majeurs_clos": 7,
+   "rejetee": true,
+   "decision": "rejeter",
+   "cause_regression": {
+    "nature": "defaut_cree",
+    "citation": "conservés 30 jours, le plus ancien du 13/10/2026 dans les deux profils",
+    "recompte": { "commande": "find ~/.claude*/projects -path '*/subagents/*.jsonl' et grep du premier timestamp", "resultat": "plus ancien 2026-10-02T08:15:19Z ; la note reprise avait été recomptée à la profondeur 2, sur les seuls fichiers de session" }
+   }
+  },
+  {
+   "n": 3,
+   "reprise": true,
+   "reprise_de": 2,
+   "fichier": "prompt-p2r.md",
+   "mots": 1795,
+   "verification_cloture": {
+    "agent": "verificateur neuf",
+    "note": false,
+    "clotures": 1,
+    "defauts_crees": 0,
+    "clotures_detail": [ { "n": 1, "etat": "ferme" } ],
+    "signalements_dementis": [ { "defaut": "980, 267 et 142 remesurés à 986, 273 et 146", "dementi": "glissement de la fenêtre de 30 jours depuis 17:37 ; le prompt date ses chiffres et les fait remesurer" } ]
+   },
+   "notes_reprises": [
+    { "note": "relecteurs C et D : plus anciens fichiers de sous-agents", "source": "relecteurs passe 2", "recompte": { "commande": "find ~/.claude*/projects -path '*/subagents/*.jsonl' ; grep du premier timestamp", "resultat": "745 depuis le 2026-10-11T15:10:50Z ; 268 depuis le 2026-10-02T08:15:19Z" } }
+   ],
+   "relecteur": { "agent": "2 agents généraux neufs (Opus), E et F", "aveugle": true, "interdits": ["analyse", "passes précédentes", "journal de boucle"] },
+   "scores": { "E": 82, "F": 40 },
+   "score_mesure": 40,
+   "defauts": [
+    { "severite": "bloquant", "defaut": "Dénominateur 37 qui inclut 2 fixtures exclues du numérateur ; 35 hors fixtures. Présent dès la passe 1", "citation": "18 produits en portent un, sur 37 dossiers `forge\\` hors forges", "vu_par": ["F"], "statut": "retenu", "recompte": { "commande": "find /c/dev -maxdepth 5 -type d -name forge sans node_modules, avec puis sans digit-ai-forge* ; grep -c dans prompt-p1, p2 et p2r", "resultat": "37 avec les fixtures, 35 sans ; la phrase figure dans les 3 passes" } },
+    { "severite": "majeur", "defaut": "Banc arrêté : un sous-agent arrêté par le harnais est fini, pas présumé arrêté", "citation": "Banc arrêté : le même agent, tué à 12 minutes.", "vu_par": ["E", "F"], "statut": "retenu", "recompte": { "commande": "grep -F dans prompt-p2r.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Un agent vivant en commande longue serait dit présumé arrêté", "citation": "l'âge de la dernière écriture dans son transcript est la preuve de vie", "vu_par": ["E"], "statut": "retenu", "recompte": { "commande": "grep -F dans prompt-p2r.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Survie de claude -p après son tour non mesurée, sans repli", "citation": "une vraie session `claude -p` sur l'abonnement lance un vrai sous-agent", "vu_par": ["E", "F"], "statut": "retenu", "recompte": { "commande": "grep -F dans prompt-p2r.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Contrat de sortie incomplet", "citation": "## Contrat de sortie", "vu_par": ["E"], "statut": "retenu", "recompte": { "commande": "comptage des points du contrat", "resultat": "6 points ; porteur, AGENT-CAMPAGNE, recette du hook Stop et inscription de l'oracle absents" } },
+    { "severite": "majeur", "defaut": "Sortie paresseuse : un réveil dépendant de la session peut être livré comme écart", "citation": "Si le réveil dépend encore d'un geste de la session, dis-le et mesure combien de fois il manque.", "vu_par": ["F"], "statut": "retenu", "recompte": { "commande": "grep -F dans prompt-p2r.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Aucun seuil d'acceptation du classement ni population unique", "citation": "Relis à la main 10 cas tirés au hasard et dis combien le script classe juste.", "vu_par": ["F"], "statut": "retenu", "recompte": { "commande": "grep -F dans prompt-p2r.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Preuve d'acceptation du hook Stop introuvable", "citation": "chacun accepté par le hook Stop (sortie citée)", "vu_par": ["F"], "statut": "retenu", "recompte": { "commande": "grep -F dans prompt-p2r.md", "resultat": "citation présente" } },
+    { "severite": "majeur", "defaut": "Amendement du juge sans recette de non-contournement", "citation": "Voie préférée : un amendement d'`oracle-synthese` et de `hook-restitution.mjs` reconnaît la forme", "vu_par": ["F"], "statut": "retenu", "recompte": { "commande": "grep -F dans prompt-p2r.md", "resultat": "citation présente" } }
+   ],
+   "majeurs_clos": 1,
+   "rejetee": true,
+   "decision": "rejeter"
+  }
+ ],
+ "arret": { "passe": 1, "raison": "regression" },
+ "score_affiche": { "valeur": 69, "nature": "mesure" },
+ "remarque": "La passe gardée 1 porte le même bloquant que la reprise (phrase « sur 37 dossiers », recomptée dans les 3 passes) : ses relecteurs ne l'ont pas vu. La version livrée à l'humain est la reprise corrigée de ses 9 défauts retenus, hors boucle et non mesurée ; le Ch8 de l'analyse le dit."
+}

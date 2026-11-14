@@ -16,20 +16,30 @@
  * La conformité du message « bon » est établie par oracle-synthese lui-même (pas par le test).
  * Joué par oracles/self-tests.mjs (I2).
  */
-import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync, utimesSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync, utimesSync, appendFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
 import { RESERVATION_BLOQUANTE_DES, RESERVATION_PILOT_BLOQUANTE_DES, analyserTranscript, comparerAffiche, controlerDetail, controlerReservation, controlerExplication, controlerGeste, controlerPossession, controlerProcedure, demandeProcedure, demandesDetail, syntheseDuTour,
   BLOQUANTES_DATEES, estBloquante, controlerCritique, critiqueDuTour, critiqueCouvre, ciblesDeCritique, fichierServi, verdictDeCritique,
-  livrablesEcrits, controlerLivre, cibleDuLivrable } from "./hook-restitution.mjs";
+  livrablesEcrits, controlerLivre, cibleDuLivrable, gainsDuTour, gainsSansReleve, avertsDeGains, nombresDuTour, releveRemontee, scellerLivrable, controlerLotDansLeTour } from "./hook-restitution.mjs";
+import { retoursDuTourSansLot } from "./lib-retours-produit.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "hook-restitution.mjs");
 const ORACLE = join(ICI, "oracle-synthese.mjs");
 const base = mkdtempSync(join(tmpdir(), "hook-rest-"));
 const echecs = [];
+// TF-2256 (06/11/2026) : `FORGE_CAS_RESTITUTION=66` (ou `65,66`, `60-66`) ne joue que les tranches de ces numéros de cas — voir
+// `lib-filtre-cas.mjs`. Sans la variable, tout se joue ; avec elle, la recette se dit PARTIELLE et n'écrit jamais son total.
+const filtre = creerFiltre("FORGE_CAS_RESTITUTION");
+const veut = (...ids) => filtre.veut(...ids);
+// TF-2257 (06/11/2026) : le journal des hooks est dérouté vers un fichier jetable PENDANT la recette. Le hook l'écrit à chaque jugement, et le cas 66
+// y pose en plus 30 lignes de session fictive : sans ce déroutement, chaque passage de la recette salissait `.claude\hooks-journal.jsonl` du dépôt qui
+// la joue. Posé avant `ENV_SANS_SESSION`, copie de l'environnement que reçoivent les hooks lancés plus bas ; le cas 69 prouve le déroutement.
+process.env.FORGE_HOOKS_JOURNAL = join(base, "hooks-journal.jsonl");
 // TF-1872 (18/10/2026) : le contrôle RÉSERVATION joue AUSSI au pilot, dont les sessions de cette recette portent le dossier de travail. Les cas qui n'ont
 // rien à voir avec lui (3, 6, 16, 31 à 37…) posent D-1 et D-12 : ils les trouvent au registre d'ESSAI que cette recette fabrique (jamais celui du pilot, que
 // l'environnement ci-dessous remplace) — le contrôle reste donc armé dans ces cas, et ne les accuse pas de ce qui n'est pas leur objet.
@@ -138,13 +148,15 @@ try {
   const ob = spawnSync(process.execPath, [ORACLE, fb], { encoding: "utf8" });
   if (ob.status !== 0) echecs.push(`fixture BON refusée par oracle-synthese : ${(ob.stdout.match(/"regle": "(S\d+)",\s*"statut": "FAIL"/g) || []).join(" ")}`);
 
+  if (veut(1)) {
   const r1 = lancer("mauvais", MAUVAIS, ["Write", "Bash"]);
   if (r1.decision?.decision !== "block") echecs.push(`1 : travail + hors format → attendu block, obtenu ${JSON.stringify(r1.decision)} ${r1.stderr.slice(0, 120)}`);
   else if (!/S1/.test(r1.decision.reason)) echecs.push("1 : le refus ne nomme pas la règle S1 (blocs absents)");
+  }
 
   // 6 (TF-0516) — forme RÉELLE d'un tour de travail : une phrase de transition, les outils, puis
   // la restitution. Le hook doit juger la RESTITUTION, pas la phrase.
-  {
+  if (veut(6)) {
     const q = join(base, "tour-complet.jsonl");
     writeFileSync(q, tourComplet(
       "14 restent. Je passe au lot suivant.", BON, ["Write", "Edit"]), "utf8");
@@ -160,7 +172,7 @@ try {
   // a donc aucun texte FINAL, et rien à juger. Avec la lecture « le plus long texte du tour », ce
   // cas rendait quatre échecs bloquants sur un message qui portait ses neuf titres — mesuré le
   // 23/08 sur un tour réel de 24 écritures, 90 commandes et VINGT textes de transition.
-  {
+  if (veut(6)) {
     const q = join(base, "tour-tronque.jsonl");
     writeFileSync(q, tourTronque("14 restent. Je passe au lot suivant.", ["Write", "Edit"]), "utf8");
     const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
@@ -170,6 +182,7 @@ try {
     if (d !== null) echecs.push(`6 bis : transcript sans texte final → attendu ne RIEN juger, obtenu ${JSON.stringify(d).slice(0, 200)}`);
   }
 
+  if (veut(2)) {
   const r2 = lancer("mauvais-actif", MAUVAIS, ["Write"], true);
   // TF-1739 (lot du 25/08, RV-2) : la garde anti-boucle laissait passer la réécriture SANS la juger
   // visiblement — refusée sur S1/S3/S4/S6, réécrite, acceptée, puis rejouée à la main : S15 et S16 FAIL.
@@ -178,33 +191,44 @@ try {
   if (r2.decision === null || r2.decision.decision === "block"
       || !/réécriture/.test(r2.decision.systemMessage || "") || !/S\d+/.test(r2.decision.systemMessage || ""))
     echecs.push(`2 : stop_hook_active → attendu pas de second refus ET verdict de la réécriture affiché (TF-1739), obtenu ${JSON.stringify(r2.decision)?.slice(0, 200)}`);
+  }
 
+  if (veut(3)) {
   const r3 = lancer("bon", BON, ["Write", "Edit"]);
   if (r3.decision !== null) echecs.push(`3 : travail + conforme → attendu laisser passer, obtenu ${JSON.stringify(r3.decision).slice(0, 200)}`);
+  }
 
+  if (veut(4)) {
   const r4 = lancer("lecture", MAUVAIS, ["Read", "Grep"]);
   if (r4.decision !== null) echecs.push("4 : tour de lecture → attendu non jugé");
+  }
 
   // 7 (TF-0904, 08/09) — UN VERDICT RENDU SANS ÉCRITURE EST UNE RESTITUTION. Le cas du 07/09 :
   // une question « la proposition a-t-elle été testée ? peut-on garantir… », une réponse en prose
   // portant un verdict, UNE commande, ZÉRO écriture. Hors critère « tour de travail » → jamais
   // jugée, alors que RESTITUTION.md régit « tout message de fin de traitement ».
+  if (veut(7)) {
   const VERDICT_LIBRE = "La proposition est conforme et je peux garantir qu'elle couvre le périmètre : "
     + "le mapping a été relu, les colonnes se correspondent, et rien ne manque à ma connaissance.";
   const r7 = lancer("verdict-sans-ecriture", VERDICT_LIBRE, ["Read"]);
   if (r7.decision?.decision !== "block")
     echecs.push(`7 : verdict rendu sans écriture → attendu block, obtenu ${JSON.stringify(r7.decision)}`);
+  }
 
   // 8 — SA CONTRE-ÉPREUVE, et sans elle la règle 7 désarmerait la conversation ordinaire : un
   // accusé de réception court, sans verdict, reste NON jugé (exemption écrite au §Portée).
+  if (veut(8)) {
   const r8 = lancer("accuse-reception", "C'est noté, je m'en occupe.", ["Read"]);
   if (r8.decision !== null)
     echecs.push(`8 : accusé de réception court → attendu non jugé, obtenu ${JSON.stringify(r8.decision).slice(0, 160)}`);
+  }
 
   // 9 — et une QUESTION rendue à l'humain (bloque_question) n'est pas une restitution non plus.
+  if (veut(9)) {
   const r9 = lancer("question", "Sur quel environnement dois-je mesurer, la recette ou la production ?", ["Read"]);
   if (r9.decision !== null)
     echecs.push(`9 : question rendue à l'humain → attendu non jugé, obtenu ${JSON.stringify(r9.decision).slice(0, 160)}`);
+  }
 
   // 21 et 22 (TF-0990, 16/09) — L'EXEMPTION « RIEN DE NEUF » ET SA BORNE, DANS LEURS DEUX SENS.
   // Le référentiel l'annonçait depuis la v2.18.0 et le juge l'ignorait : un accusé de trois phrases
@@ -212,6 +236,7 @@ try {
   // sur quatre constats bloquants, et la restitution complète écrite à la place faisait
   // quatre-vingt-dix lignes pour dire qu'il ne s'était rien passé. Elle est nommée, et bornée par
   // les TROIS absences : un message court qui POSE une décision demande un geste, donc il est jugé.
+  if (veut(21, 22)) {
   const RIEN_DE_NEUF = "La tâche de fond lancée hier s'est terminée à 06h12. Rien n'a changé dans le dépôt : "
     + "aucun fichier écrit, aucun contrôle rejoué. Rien n'est attendu de vous à ce stade.";
   const r21 = lancer("rien-de-neuf", RIEN_DE_NEUF, ["Read"]);
@@ -226,6 +251,7 @@ try {
     echecs.push("22 : un message court qui POSE une décision D-N passerait pour un accusé de réception — "
       + "l'exemption « rien de neuf » perdrait sa borne et s'appliquerait à un message qui demande un geste, "
       + `obtenu ${JSON.stringify(r22.decision)}`);
+  }
 
   // 38 et 39 (01/10/2026) — CITER UNE DÉCISION N'EST PAS LA POSER. LE FAIT : une réponse « Niveau :
   // Simple » de 129 mots, qui rappelait « la décision de départ (D-39) » au milieu d'une phrase, a
@@ -235,6 +261,7 @@ try {
   // « A-2 : », « | **A-1** | ») ou d'une option à choisir (« D-39 (a) », « D-39 a. »). Une mention
   // dans la prose reste une citation. Les cas 22 et 25 (« D-4 — … ? », « D-7 — … ? ») tiennent la
   // borne dans l'autre sens.
+  if (veut(38, 39)) {
   const CITE_UNE_DECISION = "Niveau : Simple\n\nOui, il y a une étape humaine récurrente : chaque "
     + "proposition entre en candidature et attend votre décision. Les autres sont espacées : la décision "
     + "de départ (D-39), puis les revues du 2026-10-15 et du 2026-10-29.\n\nSource : l'étude, ligne 251.";
@@ -247,6 +274,7 @@ try {
   if (r39.decision?.decision !== "block")
     echecs.push("39 : un message court qui demande un sélecteur « D-39 (a) » pose une décision et doit rester "
       + `jugé, obtenu ${JSON.stringify(r39.decision)}`);
+  }
 
   // 23 à 25 (TF-1182, 17/09) — LE RELAIS D'AVANCEMENT, ET LA BORNE QUI L'EMPÊCHE D'ÊTRE UN TROU.
   //
@@ -258,7 +286,7 @@ try {
   //
   // Les trois transcripts ne diffèrent QUE par ce que la règle regarde : ce qui s'est passé entre
   // les deux affichages (rien / une écriture), et ce que le relais porte (rien / une D-N).
-  {
+  if (veut(23, 24, 25)) {
     const deposee = join(base, "Synthese - Mandat - 20260917a.md");
     writeFileSync(deposee, "---\ndestinataire: humain\n---\n\n" + BON, "utf8");
     const RELAIS = "L'agent de campagne sur le juge de restitution vient d'émettre son avancement : "
@@ -304,6 +332,7 @@ try {
   // 5 — défaut de DÉTAIL seul : la structure tient, une puce du bloc 4 perd sa preuve.
   // S8 cherche un mot d'achèvement (« fait », « terminé », « clos », ✓) dans une puce SANS
   // preuve : on retire la preuve de la seule puce du bloc 4 et on garde le mot.
+  if (veut(5)) {
   const DETAIL = BON.replace(
     "- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
     "- la mise à jour du poste est terminée.");
@@ -314,12 +343,14 @@ try {
     echecs.push("5 : défaut de détail → ni blocage ni avertissement : le verdict serait muet");
   else if (!/S8/.test(r5.decision.systemMessage))
     echecs.push("5 : l'avertissement ne nomme pas la règle en cause");
+  }
 
   // 10 à 12 (TF-0891, 08/09) — L'AFFICHÉ REPREND LES BLOCS 3 ET 8 DU FICHIER JUGÉ.
   // Le fait du 07/09 : un fichier PASS S1-S37 paraphrasé à l'écran — bloc 3 sans tableau
   // d'options, bloc 8 avec « vous » et « IA » à la place du vocabulaire gelé. La comparaison du
   // 30/08 ne regardait que les numéros de décision et les lignes de repli : elle n'a rien vu.
   // Les trois sens se jouent sur le MÊME fichier de référence, seule la paraphrase change.
+  if (veut(10, 11, 12, 13, 14)) {
   const FICHIER = BON.replace(
     "  - (a) pousser maintenant — coût nul, exclut un dernier regard humain ; recommandé : le journal `recette.md` ne porte aucun défaut ouvert.",
     "\n| Option | Coût | Exclusions |\n|---|---|---|\n| (a) pousser maintenant | nul | un dernier regard humain |\n| (b) pousser demain | un poste périmé une nuit | la mise à disposition immédiate |\n");
@@ -362,6 +393,7 @@ try {
   const e14 = comparerAffiche(REFORMULE, AVEC_VERDICT);
   if (e14.some((x) => /VERDICT \(bloc 2\) affiché/.test(x)))
     echecs.push(`14 ter : identifiants, empreinte, date et version comptés comme des faits mesurés — écarts : ${e14.join(" | ")}`);
+  }
 
   // 15 à 18 (TF-1019, 11/09) — UNE DÉCISION RENDUE RÉCLAME LA PREUVE DU GESTE.
   // Le fait, mesuré sur une transcription de ce poste : l'humain écrit « 11a » à 07:05:01Z puis de
@@ -370,6 +402,7 @@ try {
   // deux fois. `oracle-synthese` juge la FORME d'un message, jamais son rapport au message humain
   // qui le précède : une restitution conforme rejouée à l'identique est, par construction,
   // conforme. Le geste demandé (le push) n'est venu que deux heures plus tard.
+  if (veut(15, 16, 17, 18)) {
   const FIXTURES = join(ICI, "fixtures");
   const lancerFichier = (p) => {
     const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8",
@@ -448,12 +481,14 @@ try {
     if (g.applicable)
       echecs.push(`18 bis : « ${texte.slice(0, 40)} » pris pour un sélecteur (${g.decision}) — la règle crierait sur une prose`);
   }
+  }
 
   // 40 et 41 (TF-1468, 28/09/2026) — LE MARQUEUR N'EST PAS LA FORME. Mesuré par l'agent « synthese » :
   // après la réponse « 6a », un rappel de D-6 en PUCE passait (non vu), la même ligne en CITATION
   // était refusée — alors que les deux posent à l'identique la question déjà tranchée. La forme qui
   // compte est COMPLÈTE : identifiant, tiret, question qui se termine par un point d'interrogation,
   // qu'elle vive sous `>` ou sous une puce ; le seul marqueur de tête de ligne ne suffit plus.
+  if (veut(40, 41)) {
   const d40 = controlerGeste({
     dernierHumain: "6a",
     dernierTexte: "## 3. Décisions attendues\n\n- D-6 — Faut-il publier la branche maintenant, ou "
@@ -470,11 +505,12 @@ try {
   });
   if (!d41.applicable || d41.verdict !== "PASS")
     echecs.push(`41 : « D-6 — exécutée » (identifiant et tiret SEULS, sans question) n'est pas une décision reposée — obtenu ${JSON.stringify(d41)}`);
+  }
 
   // 19 — LE MARQUEUR SE LIT EN TÊTE DE LIGNE (17/09/2026). Le gabarit de restitution CITE le marqueur dans
   // sa prose et s'appelle « restitution » : édité dans le même tour que la synthèse, il a été jugé à sa
   // place. Les deux fichiers ne diffèrent que par la POSITION du marqueur : champ, ou mot dans une phrase.
-  {
+  if (veut(19)) {
     const gabarit = join(base, "RESTITUTION.md");
     const synthese = join(base, "Marque - Synthese Mandat - Objet - 20260917a.md");
     writeFileSync(gabarit, "# Consigne de restitution\n\nLa synthèse naît avec `destinataire: humain` en frontmatter YAML.\n", "utf8");
@@ -489,7 +525,7 @@ try {
   // Le fait rejoué le 17/09 : la synthèse déposée a été renommée par `mv` pour tenir le plafond de
   // longueur de chemin (S42). Le hook ne connaît que les chemins passés aux outils d'écriture ; ce
   // jour-là le repli a tenu parce qu'un seul fichier marqué existait, et rien ne le garantissait.
-  {
+  if (veut(27, 28, 29)) {
     const d = join(base, "renomme");
     mkdirSync(d, { recursive: true });
     const ecrit = join(d, "Marque - Synthese Mandat - Un titre tres long qui depasse le plafond - 20260917a.md");
@@ -545,7 +581,7 @@ try {
   // produit : dépôt, redépôt, retouche à la main, tour qui relit sans écrire. C'est cette suite
   // qui prouve l'invariant — le sceau porte l'état exact que l'oracle vient de juger, et il ne se
   // pose que sur le fichier écrit dans le tour.
-  {
+  if (veut(31, 32, 33, 34)) {
     const d31 = join(base, "sceau");
     mkdirSync(d31, { recursive: true });
     const JUGEUR = join(ICI, "..", "scripts", "verifier-jugement.mjs");
@@ -627,6 +663,7 @@ try {
   // 35 — LA DEMANDE DE PROCÉDURE, RECONNUE SUR LA SOIRÉE RÉELLE (TF-1361). Les neuf messages de
   // l'annexe A du lot « Produit-02 - RETOURS - 20260922a », mot pour mot : les cinq demandes de
   // procédure sont reconnues, et aucun des quatre autres messages de la même soirée.
+  if (veut(35)) {
   for (const m of [
     "Détaille à partir de ma page Google Ads comment j'importe les campagnes pour les lancer.",
     "Fournis le descriptif pas à pas dans Google Ads sur le web pour poster les campagnes",
@@ -641,10 +678,11 @@ try {
     "ok, j'ai mis l'accès lecture, vérifie",
     "fais la mise à jour", "26a, 25a, 24b", "synchronise avec github",
   ]) if (demandeProcedure(m)) echecs.push(`35 bis : message pris à tort pour une demande de procédure : « ${m.slice(0, 70)} »`);
+  }
 
   // 36 — LE CONTRÔLE SEUL, DANS SES TROIS SENS : demande + S53 en échec → FAIL ; demande + S53
   // tenue → PASS ; aucune demande → hors contrôle, même avec S53 en échec (elle reste avertissante).
-  {
+  if (veut(36)) {
     const demande = "Fournis le descriptif pas à pas dans Google Ads sur le web pour poster les campagnes";
     const s53 = [{ regle: "S53", statut: "FAIL", message: "1 action(s) manuelle_utilisateur visent l'interface de Google Ads" }];
     const a = controlerProcedure({ dernierHumain: demande, fails: s53 });
@@ -659,7 +697,7 @@ try {
   // d'import dans l'écran de Google Ads : sans guide, il est refusé quand le dernier message humain
   // demande la procédure (rouge) ; le MÊME message, avec sa source datée et un guide en tête, passe
   // (vert) ; le rouge, sous un message humain qui ne demande rien, n'est qu'averti (borne).
-  {
+  if (veut(37)) {
     const ACTION_ADS = "- **A-3** — manuelle_utilisateur : neuve — importer les campagnes dans Google Ads : écran « Importations », "
       + "bouton « Aperçu » puis « Appliquer », sur `https://ads.google.com`.\n"
       + "  - pourquoi pas l'IA : acces — import TENTÉ le 22/09 par l'API de la plateforme avec l'identité de la session, `HTTP 403 PERMISSION_DENIED` ; seul le titulaire du compte y est connecté.\n"
@@ -721,7 +759,7 @@ try {
   // RAPPEL affiché par ce hook ne bouge : l'agent a lu une version périmée de la consigne au moment
   // précis où il devait se corriger (rattrapé en 92349b13, trois versions plus tard). Rien ne
   // comparait les deux numéros — ce cas le fait, sur les fichiers RÉELS du dépôt.
-  {
+  if (veut(42)) {
     const gabaritTexte = readFileSync(join(ICI, "..", "gabarits", "RESTITUTION.md"), "utf8");
     const versionGabarit = (gabaritTexte.match(/\*\*version (\d+\.\d+\.\d+),/) || [])[1];
     const hookTexte = readFileSync(HOOK, "utf8");
@@ -735,7 +773,7 @@ try {
   // Le 12/10/2026, oracle-chemin-prescrit (CP3) l'a trouvée prescrite et jouée par aucun cas : le
   // producteur était le premier à l'essayer. Simple court → exit 0 ; texte long sans restitution → exit 1 ;
   // forme Moyen tenue → exit 0 ; réponse Moyen au-delà de 150 mots → exit 1, l'écart nommé.
-  {
+  if (veut(43)) {
     // TF-1947 (26/10/2026) : sans l'identifiant de la session qui joue la recette — le pré-vol relit désormais la transcription
     // de la session pour savoir si le tour a écrit, et celle de la recette n'est pas celle de ce cas (cas 57 pour ce volet).
     const preVol = (texte) => {
@@ -761,7 +799,7 @@ try {
   // le jeton → FAIL, la valeur jamais recopiée ; la MÊME réponse sans aucune valeur de forme secrète dans
   // la conversation → PASS ; une réponse qui ne dit rien de tel → hors contrôle ; un chemin ou un sha
   // dans un message humain n'est pas une valeur secrète. Et le transcript rend bien TOUS les messages humains.
-  {
+  if (veut(44)) {
     const JETON = "pk.eyJ1IjoiZXhlbXBsZSIsImEiOiJjbDAwMDAwMDAifQ.Zz9fake0000";
     const REPONSE = "A-4 — déposer le jeton dans la variable secrète du pipeline (manuelle_utilisateur) — le jeton n'est qu'en votre possession.";
     const a = controlerPossession({ textesHumains: ["voici le jeton : " + JETON, "dépose-le"], dernierTexte: REPONSE });
@@ -786,7 +824,7 @@ try {
   // ni par la session ni par le porteur. Un tour de travail dans un produit (dossier courant portant
   // `forge\retours\`) dont la restitution conforme ne dit rien de sa remontée → BLOQUÉ, S48 nommée ; la
   // MÊME restitution portant « Remontée à la factory : rien à remonter. » → laissée passer.
-  {
+  if (veut(45)) {
     const produit = join(base, "produit-45");
     mkdirSync(join(produit, "forge", "retours"), { recursive: true });
     // TF-1849 : la D-1 de BON est inscrite au registre de ce produit (entrée question_humain), comme la règle l'exige d'un produit
@@ -817,7 +855,7 @@ try {
   // même verdict bloquant que le hook, avant l'affichage. (b) Un refus d'un tour SANS préjugement dit le
   // défaut distinct « PRÉJUGEMENT » ; le MÊME refus dans un tour qui a joué `--prejuger` ne le dit pas,
   // et le journal porte `prejuge` dans les deux sens.
-  {
+  if (veut(46)) {
     const prejuger = (nom, texte) => {
       const f = join(base, nom + ".md"); writeFileSync(f, texte, "utf8");
       // Sans l'identifiant de la session qui joue la recette : depuis TF-1720, --prejuger relit le
@@ -859,7 +897,7 @@ try {
   // écrit, lancé une recette en arrière-plan non revenue, et rend 2 lignes d'attente → NON jugé ; le
   // MÊME texte sans tâche lancée → jugé (bloqué) ; la MÊME tâche dont la notification de fin est au
   // transcript → jugé ; la MÊME attente qui porte un verdict → jugé.
-  {
+  if (veut(47)) {
     const ATTENTE_TXT = "La recette complète tourne en arrière-plan, environ 10 minutes.\nJe reprends la restitution dès son résultat.";
     const tour47 = (texte, { lancee = true, revenue = false } = {}) => [
       { type: "user", message: { role: "user", content: "corrige et rejoue la recette" } },
@@ -889,7 +927,7 @@ try {
   // les différentes pipelines » rendu en restitution complète sans fiche → FAIL (avertissement) ; le
   // MÊME tour qui écrit sa fiche → PASS ; la MÊME restitution qui cite sa fiche → PASS ; une demande de
   // travail (« fais la mise à jour ») → hors contrôle. Et le hook le dit sans bloquer.
-  {
+  if (veut(48)) {
     const DEMANDE = "Explique les différentes pipelines et ce qui est encore utile";
     const FICHE = "output/Client-A - Fiche Pipelines constat et precos - 20261014a.md";
     const a = controlerExplication({ dernierHumain: DEMANDE, dernierTexte: BON, fichiersMd: [] });
@@ -920,7 +958,7 @@ try {
   // perd sa ligne de repli est refusé sur AFFICHAGE. (c) `--prejuger` sur le MÊME brouillon, avec le
   // transcript, rend le même refus avant l'affichage ; (d) le brouillon identique à la synthèse passe ;
   // (e) sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit, sans refus.
-  {
+  if (veut(49)) {
     const MARQUEE = (t) => "---\ndestinataire: humain\n---\n\n" + t;
     const DOC_PROJET = MARQUEE("# Composants d'exploitation\n\nLe service tourne sur deux réplicas.\n");
     const SANS_REPLI = BON.replace("  - si rien n'est décidé : (a) s'applique.\n", "");
@@ -964,15 +1002,16 @@ try {
     if (d.code !== 0 || d.o?.affichage !== "PASS")
       echecs.push(`49 quater : le brouillon qui reprend la synthèse déposée → attendu exit 0 et affichage PASS, obtenu ${d.code} ${JSON.stringify(d.o).slice(0, 200)}`);
     const e = prejuger49("brouillon-49-sans-transcript", SANS_REPLI, null);
-    if (e.code !== 0 || !/non joué/.test(e.o?.affichage || ""))
-      echecs.push(`49 quinquies : sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit → attendu exit 0 et « non joué », obtenu ${e.code} ${JSON.stringify(e.o).slice(0, 200)}`);
+    // TF-2171 : le brouillon porte un avertissement (non motivé), l'exit suit `affichable` ; ce que 49 quinquies garde, c'est qu'aucun refus ne tient à l'AFFICHAGE non joué.
+    if ((e.o?.bloquants || []).length || !/non joué/.test(e.o?.affichage || ""))
+      echecs.push(`49 quinquies : sans transcript retrouvé, la comparaison n'est pas jouée et la sortie le dit → attendu aucun bloquant et « non joué », obtenu ${e.code} ${JSON.stringify(e.o).slice(0, 200)}`);
   }
   // 50 — TF-1847 (18/10/2026) : E-11 SUR LE MARKDOWN, S80 BLOQUANTE, dans ses quatre sens. (a) Une restitution
   // conforme dont le bloc 4 énumère « 1) … 2) … 3) » sur une ligne est REFUSÉE par `--prejuger` (exit 1) et par le
   // hook de fin de tour, S80 nommée ; c'est le retour du 17/10/2026, jugé affichable jusque-là. (b) La MÊME
   // information en liste (une ligne par élément) est affichable : le remède du message PASSE. (c) La forme montrée
   // entre guillemets français n'est pas commise. (d) Le guide en paragraphe n'est qu'AVERTI (S81), jamais refusé.
-  {
+  if (veut(50)) {
     const EN_LIGNE = BON.replace("- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
       "- bootstrap v2 livré en trois temps : 1) écriture ; 2) recette ; 3) enregistrement — preuve : bootstrap.test.mjs 7/7, recette 22/22.");
     const EN_LISTE = BON.replace("- bootstrap v2 livré — preuve : bootstrap.test.mjs 7/7, recette 22/22.",
@@ -981,9 +1020,9 @@ try {
       "- bootstrap v2 livré ; l'ancien gabarit écrivait « 1) écriture ; 2) recette ; 3) enregistrement » sur une ligne — preuve : bootstrap.test.mjs 7/7, recette 22/22.");
     const GUIDE_PARAGRAPHE = "## Guide — connecter le compte\n\nSource : `docs.exemple.org`, lue le 17/10/2026.\n\n"
       + "1. Ouvrez la console, choisissez le projet, cliquez sur « Activer ». Résultat attendu : l'API est active.\n\n## 0. Synthèse d'ouverture\n\n";
-    const prejuger50 = (nom, texte) => {
+    const prejuger50 = (nom, texte, ...autres) => {
       const fichier = join(base, nom + ".md"); writeFileSync(fichier, texte, "utf8");
-      const r = spawnSync(process.execPath, [HOOK, "--prejuger", fichier], { encoding: "utf8", env: ENV_SANS_SESSION });
+      const r = spawnSync(process.execPath, [HOOK, "--prejuger", fichier, ...autres], { encoding: "utf8", env: ENV_SANS_SESSION });
       let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
       return { code: r.status, o };
     };
@@ -1004,21 +1043,34 @@ try {
     // T2 (TF-1947, 26/10/2026) : S80 AVERTIT, elle ne refuse plus. Adapté : 50 et 50 bis attendaient un refus ; ils attendent
     // désormais l'avertissement S80 (préjugement affichable, S80 dite ; hook sans refus, S80 dite sous la réponse) ; 50 ter garde
     // le sens contraire : la MÊME information en liste n'est pas même avertie.
+    // TF-2171 (05/11/2026) : `affichable` ne vaut vrai que sans avertissement NON MOTIVÉ, et l'exit suit `affichable`. 50 attend donc l'avertissement S80 AVEC son message, le préjugement
+    // non affichable (exit 1) ; 50 sexies joue le remède (le motif à l'appel) et attend exit 0.
     const a = prejuger50("brouillon-50-en-ligne", EN_LIGNE);
-    if (a.code !== 0 || (a.o?.bloquants || []).some((x) => /^S80\b/.test(x)) || !(a.o?.avertissements || []).includes("S80"))
-      echecs.push(`50 : « 1) … 2) … 3) » sur une ligne du bloc 4 → attendu --prejuger exit 0 et S80 avertie (T2), obtenu ${a.code} ${JSON.stringify(a.o).slice(0, 240)}`);
+    if (a.code !== 1 || a.o?.affichable !== false || (a.o?.bloquants || []).some((x) => /^S80\b/.test(x)) || !(a.o?.avertissements || []).some((x) => /^S80 — .{20,}/.test(x)) || !(a.o?.avertissements_sans_motif || []).includes("S80"))
+      echecs.push(`50 : « 1) … 2) … 3) » sur une ligne du bloc 4 → attendu --prejuger exit 1 (avertissement non motivé), S80 dite avec son message (T2, TF-2171), obtenu ${a.code} ${JSON.stringify(a.o).slice(0, 240)}`);
     const h = hook50("tour-50-en-ligne", EN_LIGNE);
     if (h?.decision === "block" || !/S80 — /.test(h?.systemMessage || ""))
       echecs.push(`50 bis : le hook de fin de tour doit DIRE l'énumération en ligne en nommant S80, sans refus (T2), obtenu ${JSON.stringify(h).slice(0, 240)}`);
     const b = prejuger50("brouillon-50-en-liste", EN_LISTE);
-    if (b.code !== 0 || b.o?.affichable !== true || (b.o?.avertissements || []).includes("S80"))
+    if (b.code !== 0 || b.o?.affichable !== true || (b.o?.avertissements || []).some((x) => /^S80\b/.test(x)))
       echecs.push(`50 ter : la MÊME information en liste doit être affichable sans avertissement S80 (le remède du message), obtenu ${b.code} ${JSON.stringify(b.o).slice(0, 240)}`);
     const c = prejuger50("brouillon-50-citee", CITEE);
     if (c.code !== 0)
       echecs.push(`50 quater : la forme interdite montrée entre guillemets français ne doit pas être refusée, obtenu ${c.code} ${JSON.stringify(c.o).slice(0, 240)}`);
     const d = prejuger50("brouillon-50-guide-paragraphe", GUIDE_PARAGRAPHE + BON);
-    if ((d.o?.bloquants || []).some((x) => /^S81\b/.test(x)) || !(d.o?.avertissements || []).includes("S81"))
+    if ((d.o?.bloquants || []).some((x) => /^S81\b/.test(x)) || !(d.o?.avertissements || []).some((x) => /^S81\b/.test(x)))
       echecs.push(`50 quinquies : un guide dont l'étape enchaîne trois gestes doit être AVERTI par S81 sans être bloqué, obtenu ${d.code} ${JSON.stringify(d.o).slice(0, 240)}`);
+    // 50 sexies à 50 octies — TF-2171 (RT-74 de Produit-64) : le MÊME brouillon, trois sens. (sexies) le remède joué : S80 motivée à l'appel → affichable, exit 0, le motif revient dans
+    // avertissements_motives. (septies) un motif de deux mots ne dit pas pourquoi : ignoré, exit 1. (octies) le motif d'une AUTRE règle ne couvre pas S80 : exit 1.
+    const s80motive = prejuger50("brouillon-50-motive", EN_LIGNE, "--motif", "S80=la liste est un tableau de preuves citées telles quelles");
+    if (s80motive.code !== 0 || s80motive.o?.affichable !== true || !(s80motive.o?.avertissements_motives || []).some((m) => m.code === "S80" && /tableau de preuves/.test(m.motif)) || (s80motive.o?.avertissements_sans_motif || []).length)
+      echecs.push(`50 sexies : S80 motivée à l'appel (--motif S80=…) → attendu exit 0, affichable et le motif rendu, obtenu ${s80motive.code} ${JSON.stringify(s80motive.o).slice(0, 300)}`);
+    const s80court = prejuger50("brouillon-50-motif-court", EN_LIGNE, "--motif", "S80=voulu");
+    if (s80court.code !== 1 || s80court.o?.affichable !== false || !(s80court.o?.motifs_ignores || []).length)
+      echecs.push(`50 septies : un motif de deux mots (ou moins) ne dit pas pourquoi → attendu exit 1 et le motif ignoré, obtenu ${s80court.code} ${JSON.stringify(s80court.o).slice(0, 300)}`);
+    const s80autre = prejuger50("brouillon-50-motif-autre-regle", EN_LIGNE, "--motif", "S81=le guide est celui du produit tel quel");
+    if (s80autre.code !== 1 || s80autre.o?.affichable !== false || !(s80autre.o?.motifs_ignores || []).length)
+      echecs.push(`50 octies : le motif d'une autre règle (S81) ne couvre pas S80 → attendu exit 1 et le motif ignoré, obtenu ${s80autre.code} ${JSON.stringify(s80autre.o).slice(0, 300)}`);
   }
   // 51 — TF-1851 (18/10/2026) : UNE DEMANDE DE DÉTAIL L'EMPORTE SUR LE RAPPEL D'UNE LIGNE (S4), DANS SES SENS.
   // (a) La reconnaissance du message humain : « 51 détaille », « détaille D-51 », « détaille la 51 », « détaille la
@@ -1030,7 +1082,7 @@ try {
   // (c) De bout en bout par le hook de fin de tour : la restitution conforme qui rappelle D-51 en une ligne est
   // REFUSÉE (DÉTAIL nommé), la MÊME avec D-51 reposée en entier est acceptée, la MÊME sous un message qui ne demande
   // rien n'est pas refusée. (d) `--prejuger` avec le transcript rend le même refus avant l'affichage.
-  {
+  if (veut(51)) {
     const demande = (m) => demandesDetail(m).join(",");
     for (const m of ["51 détaille", "détaille D-51", "détaille la 51", "Détaille la décision 51", "peux-tu détailler la D-51 ?", "détaille-moi la 51", "le détail de la 51", "D-51, détaille"])
       if (demande(m) !== "51") echecs.push(`51 : « ${m} » est une demande de détail de D-51 → attendu "51", obtenu "${demande(m)}"`);
@@ -1103,7 +1155,7 @@ try {
     if (/DÉTAIL/.test(JSON.stringify(neutre.d || "")))
       echecs.push(`51 quater : le MÊME rappel sous un message qui ne demande aucun détail ne doit rien dire pour DÉTAIL, obtenu ${JSON.stringify(neutre.d).slice(0, 240)}`);
     const pr = prejuger51("brouillon-51-rappel", RAPPEL_UNE_LIGNE, rouge.p);
-    if (pr.code !== 0 || (pr.o?.bloquants || []).some((x) => /^DÉTAIL/.test(x)) || !(pr.o?.avertissements || []).some((x) => /^DÉTAIL/.test(x)))
+    if ((pr.o?.bloquants || []).length || (pr.o?.bloquants || []).some((x) => /^DÉTAIL/.test(x)) || !(pr.o?.avertissements || []).some((x) => /^DÉTAIL — .{20,}/.test(x)) || pr.code !== 1 || !(pr.o?.avertissements_sans_motif || []).includes("DÉTAIL"))
       echecs.push(`51 quinquies : --prejuger avec le transcript doit dire l'avertissement DÉTAIL avant l'affichage, sans refus (T2), obtenu ${pr.code} ${JSON.stringify(pr.o).slice(0, 240)}`);
     const pv = prejuger51("brouillon-51-entiere", D51_ENTIERE, rouge.p);
     if (pv.code !== 0 || pv.o?.detail !== "PASS")
@@ -1114,7 +1166,7 @@ try {
   // tard. Le registre est le `forge/ledger.jsonl` du produit ; chez le pilot il n'existe pas, le contrôle se tait et le dit. Avant
   // l'échéance (2026-11-01) la D-N non inscrite est un AVERTISSEMENT ; à l'échéance, un REFUS — la recette joue les deux états par
   // `FORGE_RESERVATION_BLOQUANTE_DES`. Le remède que le message recommande est JOUÉ (ledger.py du gabarit) et le refus tombe.
-  {
+  if (veut(52)) {
     const PYTHON52 = ["python", "python3", "py"].find((bin) => { const r = spawnSync(bin, ["--version"], { encoding: "utf8" }); return !r.error && r.status === 0; });
     const LEDGER_GABARIT = readFileSync(join(ICI, "..", "gabarits", "ledger.py"), "utf8");
     let nProduit = 0;
@@ -1153,6 +1205,20 @@ try {
     const rappel = cR(D61_RAPPEL, nu);
     if (rappel.verdict !== "PASS")
       echecs.push(`52 ter : un rappel d'une ligne (S4) n'est pas une D-N nouvelle → attendu PASS, obtenu ${JSON.stringify(rappel).slice(0, 200)}`);
+    // 52 ter bis — TF-2081 (RT-36, 03/11/2026) : UNE D-N NOUVELLE POSÉE EN PUCE, HORS DU FORMAT « > **D-N — …** », EST VUE. Le 29/10, D-1, D-2 et
+    // D-3 en puces (deux-points) passaient sous RÉSERVATION, et D-1 était déjà pris. Double sens : une puce à deux-points ET une puce sans séparateur,
+    // toutes deux closes par « ? », sont détectées (FAIL) ; le rappel S4 en puce à deux-points SANS « ? » reste épargné — le « ? » terminal discrimine.
+    const bloc3Puces = "## 3. Décisions attendues\n\n- **D-61 :** Faut-il publier maintenant la version corrigée du démarrage ?\n- **D-62** Faut-il enchaîner sur la forge-ops ce soir ?\n\n";
+    const D61_PUCES = BON.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, bloc3Puces) + "\n- Remontée à la factory : rien à remonter.\n";
+    const bloc3PuceRappel = "## 3. Décisions attendues\n\n- **D-61 :** publication de la version corrigée du démarrage, posée le 18/10 à 10:00, inchangée.\n\n";
+    const D61_PUCE_RAPPEL = BON.replace(/## 3\. Décisions attendues[\s\S]*?(?=## 4\.)/, bloc3PuceRappel) + "\n- Remontée à la factory : rien à remonter.\n";
+    if (D61_PUCES === BON || D61_PUCE_RAPPEL === BON) echecs.push("52 ter bis : une fixture en puces n'a pas été modifiée — le cas ne prouve plus rien");
+    const puces = cR(D61_PUCES, nu);
+    if (puces.verdict !== "FAIL" || !/D-61/.test((puces.ecarts || []).join(" ")) || !/D-62/.test((puces.ecarts || []).join(" ")))
+      echecs.push(`52 ter bis : D-61 (deux-points) et D-62 (sans séparateur) posées EN PUCE, nouvelles et absentes du registre → attendu FAIL nommant les deux (TF-2081), obtenu ${JSON.stringify(puces).slice(0, 280)}`);
+    const puceRappel = cR(D61_PUCE_RAPPEL, nu);
+    if (puceRappel.verdict !== "PASS")
+      echecs.push(`52 ter ter : un rappel S4 en puce à deux-points, SANS « ? », n'est pas une D-N nouvelle → attendu PASS (TF-2081 garde le « ? » terminal), obtenu ${JSON.stringify(puceRappel).slice(0, 200)}`);
     for (const [quoi, extra] of [["citée par le message précédent", { textePrecedent: "## 3\n- **D-61 —** Publier ? (a) oui (b) non" }],
       ["nommée par l'humain (« 61a »)", { dernierHumain: "61a" }], ["nommée par l'humain (« 61 détaille »)", { dernierHumain: "61 détaille" }]]) {
       const r = cR(D61, nu, extra);
@@ -1181,6 +1247,11 @@ try {
     const rSans = cR(D61, sansLedger);
     if (rSans.verdict !== "FAIL" || !/introuvable/.test((rSans.ecarts || []).join(" ")))
       echecs.push(`52 octies : sans forge/ledger.jsonl, la D-61 est non inscrite et le refus dit que le registre est introuvable, obtenu ${JSON.stringify(rSans).slice(0, 200)}`);
+    // 52 octies bis — TF-2223 (06/11/2026) : hors run, `reserver-decision.mjs` inscrit au journal `forge/hors-run.jsonl` ; la D-N qu'il y porte est réservée.
+    writeFileSync(join(sansLedger, "forge", "hors-run.jsonl"), JSON.stringify({ seq: 1, ts: "2026-10-18T10:00:01Z", type: "question_humain", hors_run: true, decisions_posees: { "D-61": "publication" }, reservee_par: "reserver-decision.mjs" }) + "\n", "utf8");
+    const rHorsRun = cR(D61, sansLedger, { maintenant: apres });
+    if (rHorsRun.verdict !== "PASS")
+      echecs.push(`52 octies bis : D-61 réservée au journal hors run (TF-2223) → attendu PASS même à l'échéance, obtenu ${JSON.stringify(rHorsRun).slice(0, 200)}`);
     // (3) hors produit ET hors pilot (une forge, un dossier quelconque) : SANS_OBJET, dit. Le pilot, lui, est jugé depuis TF-1872 (cas 53).
     const horsProduit = controlerReservation({ dernierTexte: D61, racine: join(base, "dossier-quelconque") });
     if (horsProduit.verdict !== "SANS_OBJET" || !/registre/.test(horsProduit.motif || ""))
@@ -1214,8 +1285,8 @@ try {
     if (pRefuse.code !== 1 || !(pRefuse.o?.bloquants || []).some((x) => /^RÉSERVATION/.test(x)))
       echecs.push(`52 duodecies : --prejuger chez le produit, à l'échéance, refuse avant l'affichage → attendu exit 1 et RÉSERVATION, obtenu ${pRefuse.code} ${JSON.stringify(pRefuse.o).slice(0, 220)}`);
     const pAvertit = prejuger52(produit52(), D61, "brouillon-52-avertit", LOIN);
-    if (pAvertit.code !== 0 || !(pAvertit.o?.avertissements || []).some((x) => /^RÉSERVATION/.test(x)))
-      echecs.push(`52 terdecies : --prejuger avant l'échéance → attendu exit 0 et un avertissement RÉSERVATION, obtenu ${pAvertit.code} ${JSON.stringify(pAvertit.o).slice(0, 220)}`);
+    if ((pAvertit.o?.bloquants || []).length || !(pAvertit.o?.avertissements || []).some((x) => /^RÉSERVATION/.test(x)) || pAvertit.code !== 1 || !(pAvertit.o?.avertissements_sans_motif || []).includes("RÉSERVATION"))
+      echecs.push(`52 terdecies : --prejuger avant l'échéance → attendu aucun bloquant, un avertissement RÉSERVATION non motivé (exit 1, TF-2171), obtenu ${pAvertit.code} ${JSON.stringify(pAvertit.o).slice(0, 220)}`);
     inscrire(dRefus, JSON.stringify({ seq: 2, ts: "2026-10-18T10:00:01Z", type: "question_humain", decision: "D-61", question: "Publier ?" }), ["question_humain", "--decision", "D-61", "--question", "Publier ?"]);
     const hVert = hook52(dRefus, D61, BLOQUE);
     if (hVert !== null) echecs.push(`52 quaterdecies : après l'inscription de D-61, la MÊME restitution à l'échéance passe sans rien dire, obtenu ${JSON.stringify(hVert).slice(0, 240)}`);
@@ -1232,7 +1303,7 @@ try {
   // NOUVELLE du bloc 3 qui n'y figure pas, ou qui y figure pour une AUTRE question, est refusée. Échéance choisie pour le pilot : 2026-10-25 (la plus longue session
   // du pilot mesurée dure 107 h, le 90e centile 31 h : au 25/10 toute session ouverte avant la règle a été rouverte). La recette joue les deux états par
   // `FORGE_RESERVATION_PILOT_BLOQUANTE_DES`, avec un registre d'ESSAI (`FORGE_REGISTRE_DECISIONS_PILOT`), jamais celui du pilot. Les remèdes que le refus recommande sont JOUÉS.
-  {
+  if (veut(53)) {
     const regP = join(base, "registre-pilot-53.jsonl");
     const Q30 = "Faut-il suivre le verdict de l'étude, une procédure au référentiel sans skill, plutôt que le skill que vous avez choisi ?";
     const Q31 = "Faut-il construire la famille « tableau de bord de pilotage », puis sa règle de lecture, comme l'étude le conclut ?";
@@ -1334,7 +1405,7 @@ try {
   // à « Est-ce que le reste du site a été mis à jour ? », « Oui, tout le site en ligne est à jour » rendu PASS sur 273 pages cherchées avec la liste de l'auteur.
   // Deux juges se complètent : S82 d'oracle-synthese juge le TEXTE (cas 54 a), le contrôle COMPLÉTUDE du hook lit le dernier message humain (54 b, c) — seul à savoir qu'un
   // « oui » répond à une question de complétude. Les deux sont BLOQUANTS. Les remèdes sont JOUÉS.
-  {
+  if (veut(54)) {
     const QCOMPLETUDE = "Est-ce que le reste du site a été mis à jour ?";
     const MESURE = "Mesuré sur : conditions générales du 15/10 du produit amont (docs/cgv-20261015d.md), relue à 14:32, périmètre 273 pages";
     const AFF = "Oui, tout le site en ligne est à jour : 273 pages relues. ";
@@ -1400,7 +1471,7 @@ try {
   // ROUGE : le cas réel du 19/10 — l'action A-11 « relire la semaine 2 et répondre « ok semaine 2 » », « guide de mon message de 21:45 »,
   // sans lien — est DITE en avertissement avec son échéance avant le 2026-10-28, et REFUSÉE à l'échéance (FORGE_S83_BLOQUANTE_DES passée).
   // VERTES : la MÊME action portant le chemin des textes et des photos (le remède du constat) passe en silence, avant comme après l'échéance.
-  {
+  if (veut(55)) {
     const cwd55 = mkdtempSync(join(base, "hors-55-"));
     const A11 = (ou) => BON.replace("- manuelle_dev : aucune.", `- **A-3** — manuelle_utilisateur : TF-0003 relire la semaine 2 et répondre « ok semaine 2 » (enfin, parce que rien ne part sans votre relecture).
   - pourquoi pas l'IA : decision — D-94 (a) prévoit votre relecture avant chaque semaine.
@@ -1435,7 +1506,7 @@ try {
   // VERTES : le tour qui a joué `date` deux fois et dont l'en-tête recopie l'heure lue et l'écart des deux relevés passe en silence, même à
   // l'échéance ; un transcript SANS horodatage ne se mesure pas (SANS_OBJET, aucune accusation) ; `--prejuger` sans transcription dit ce
   // que la règle ne peut pas juger.
-  {
+  if (veut(56)) {
     const cwd56 = mkdtempSync(join(base, "hors-56-"));
     const T0 = Date.parse("2026-10-20T18:00:30.000Z"), T1 = Date.parse("2026-10-20T18:30:38.000Z");
     const local = (ms) => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
@@ -1482,7 +1553,7 @@ try {
     const fb56 = join(base, "brouillon-56.md"); writeFileSync(fb56, ROUGE56, "utf8");
     const pj = spawnSync(process.execPath, [HOOK, "--prejuger", fb56, "--transcript", pRouge], { encoding: "utf8", cwd: cwd56, env: { ...ENV_SANS_SESSION, FORGE_S84_BLOQUANTE_DES: "2099-01-01" } });
     let pjo = null; try { pjo = JSON.parse(pj.stdout || "null"); } catch { /* illisible */ }
-    if (!/S84 jouée sur 0 relevé/.test(pjo?.horloge || "") || !(pjo?.avertissements || []).includes("S84"))
+    if (!/S84 jouée sur 0 relevé/.test(pjo?.horloge || "") || !(pjo?.avertissements || []).some((x) => /^S84 — .{20,}/.test(x)))
       echecs.push(`56 quinquies : --prejuger avec la transcription doit jouer S84 et la dire en avertissement, sans échéance (T2), obtenu ${JSON.stringify(pjo).slice(0, 320)}`);
     const pn = spawnSync(process.execPath, [HOOK, "--prejuger", fb56], { encoding: "utf8", cwd: cwd56, env: ENV_SANS_SESSION });
     let pno = null; try { pno = JSON.parse(pn.stdout || "null"); } catch { /* illisible */ }
@@ -1498,7 +1569,7 @@ try {
   // moins de 4 commandes) ; une redirection vers un fichier du dépôt est une écriture, vers le dossier temporaire non. Et une réponse
   // courte qui dit « oui » à une question de complétude sans « Mesuré sur » est refusée sur COMPLÉTUDE SANS exiger de restitution,
   // le remède (la ligne « Mesuré sur ») passe. Le pré-vol relit la transcription et le dit avant l'affichage, dans les deux sens.
-  {
+  if (veut(57)) {
     const cwd57 = mkdtempSync(join(base, "hors-57-"));
     const QUESTION = "est-ce que le rappel de revue part sans session ouverte ?";
     const COURTE = "Niveau : Simple\n\nNon, le rappel vient seulement à l'ouverture d'une session.\n- Après 7 jours sans revue, elle affiche « revue DUE ».\n"
@@ -1548,6 +1619,41 @@ try {
       "Oui, tout le site est à jour.\n\nMesuré sur : sitemap.xml du site en ligne, relue à 16:40, périmètre 273 pages");
     if (ouiMesure.o !== null)
       echecs.push(`57 octies : le MÊME « oui » avec sa ligne « Mesuré sur » (le remède) → attendu laissé passer, obtenu ${JSON.stringify(ouiMesure.o).slice(0, 300)}`);
+    // TF-2079 (04/11/2026, RT-34) : une SUPPRESSION dans le dossier temporaire de la session n'est pas une écriture du tour. Le 29/10, une
+    // question de procédure en lecture seule a été jugée tour de travail pour 2 JSON temporaires effacés, et la réponse courte refusée.
+    // VERTES : `rm` de deux chemins temporaires, `rm` relatif après un `cd` vers le dossier temporaire, `Remove-Item` à liste à virgules,
+    // `python -c` qui ne fait que supprimer des fichiers temporaires (même avec un `del` de Python), `cd` + redirection relative.
+    // ROUGES : la même suppression dans le dépôt, `..` qui sort du dossier temporaire, un `cd` vers le dépôt après le `cd` temporaire,
+    // un `python -c` qui supprime un chemin du dépôt, une écriture sous output/ (Write), une redirection relative sans `cd` temporaire.
+    const T57 = join(tmpdir(), "claude", "sess-57", "scratchpad").replace(/\\/g, "/");
+    const supprimeTemp = {
+      "rm de deux chemins temporaires": `rm ${T57}/a.json ${T57}/b.json`,
+      "rm relatif après cd temporaire": `cd ${T57} && rm a.json b.json`,
+      "Remove-Item à liste à virgules": `Remove-Item "${T57}\\a.json", "${T57}\\b.json" -Force`,
+      "python -c qui supprime des fichiers temporaires": `python -c "import os\nfor f in ['${T57}/a.json', '${T57}/b.json']:\n    os.remove(f)\n    del f"`,
+      "cd temporaire puis redirection relative": `cd ${T57} && git log -1 > rapport.txt`,
+    };
+    for (const [nom, cmd] of Object.entries(supprimeTemp)) {
+      const a = analyserTranscript(tour57(QUESTION, [bash(cmd)], COURTE));
+      if (a.travail) echecs.push(`57 duodecies : ${nom} n'est pas une écriture du tour (TF-2079), obtenu ${a.ecrituresDuTour.join(" ; ")}`);
+    }
+    const supprimeTempCourt = jouer57("suppression-temporaire", QUESTION, [bash(`rm ${T57}/a.json ${T57}/b.json`), bash(`cd ${T57} && rm c.json`), ...LECTURES.slice(0, 2).map(bash)], COURTE);
+    if (supprimeTempCourt.o !== null)
+      echecs.push(`57 terdecies : la réponse courte d'un tour dont la seule trace est la suppression de JSON temporaires (le cas du 29/10) → attendu laissée passer, obtenu ${JSON.stringify(supprimeTempCourt.o).slice(0, 300)}`);
+    const supprimeDepot = {
+      "rm dans le dépôt": "rm output/a.json",
+      "rm qui sort du dossier temporaire par ..": `cd ${T57} && rm ../../autre.json`,
+      "cd vers le dépôt après le cd temporaire": `cd ${T57} && rm a.json && cd C:/dev/produit-fictif && rm b.json`,
+      "python -c qui supprime un chemin du dépôt": "python -c \"import os; os.remove('C:/dev/produit-fictif/x.json'); del y\"",
+      "redirection relative sans cd temporaire": "git log -1 > rapport.txt",
+    };
+    for (const [nom, cmd] of Object.entries(supprimeDepot)) {
+      const a = analyserTranscript(tour57(QUESTION, [bash(cmd)], COURTE));
+      if (!a.travail) echecs.push(`57 quaterdecies : ${nom} reste une écriture du tour (TF-2079 ne relâche que le dossier temporaire), obtenu aucune`);
+    }
+    const sousOutput = analyserTranscript(tour57(QUESTION, [{ name: "Write", input: { file_path: "C:/dev/produit-fictif/output/a.md" } }, bash(`rm ${T57}/a.json`)], COURTE));
+    if (!sousOutput.travail || !sousOutput.ecrituresDuTour.some((x) => /output\/a\.md/.test(x)))
+      echecs.push(`57 quindecies : une écriture sous output/ compte toujours, même avec une suppression temporaire → attendu jugée, obtenu ${sousOutput.ecrituresDuTour.join(" ; ") || "aucune"}`);
     const pv57 = (p) => {
       const r = spawnSync(process.execPath, [HOOK, "--pre-vol", "--transcript", p], { encoding: "utf8", cwd: cwd57, env: ENV_SANS_SESSION, input: COURTE });
       let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* illisible */ }
@@ -1567,7 +1673,7 @@ try {
   // des actions sans ordre justifié (S6) ne sont plus qu'averties. ROUGES : BON privé de son bloc 9 est refusé sur S1, le bloc nommé ; la MÊME
   // décision au format B SANS son tableau est refusée sur S4, le tableau nommé ; un verdict sans fait mesuré reste refusé (S3,
   // exception qui protège un fait).
-  {
+  if (veut(58)) {
     const retirer58 = (texte, n) => texte.replace(new RegExp(`## ${n}\\.[^\\n]*\\n[\\s\\S]*?(?=## \\d\\.|$)`), "");
     const ALLEGEE = [2, 6, 7].reduce(retirer58, BON);
     const SANS9 = retirer58(BON, 9);
@@ -1611,7 +1717,7 @@ try {
   // VERTES : le MÊME tour avec la critique jouée APRÈS l'écriture (le remède du message, joué) passe en silence, avant comme après l'échéance ; un tour d'OUTILLAGE
   // (scripts .mjs, tests, fixtures, gabarits, node_modules, hooks, script Node) ne l'est pas. BORNES : un verdict ANTÉRIEUR à la dernière écriture, une critique d'une
   // AUTRE page, un SKIP et un plantage ne valent pas critique ; un verdict redirigé vers un fichier, si ; un brouillon du dossier temporaire n'est pas servi.
-  {
+  if (veut(59)) {
     const cwd59 = mkdtempSync(join(base, "hors-59-"));
     const RACINE59 = "C:\\dev\\produit-essai";   // un produit fictif, hors du dossier temporaire où tout fichier est un brouillon
     const PAGE = `${RACINE59}\\site\\x.html`, CSS = `${RACINE59}\\site\\assets\\x.css`;
@@ -1745,8 +1851,8 @@ try {
     };
     const pRouge = hook59("prejuger-rouge", [ecr(PAGE)], {}).p, pVert = hook59("prejuger-vert", [ecr(PAGE), crit(CRITIQUE("site/x.html"))], {}).p;
     const pjA = prejuger(pRouge, AVERTIT), pjB = prejuger(pRouge, BLOQUE), pjV = prejuger(pVert, BLOQUE);
-    if (pjA.code !== 0 || !(pjA.o?.avertissements || []).some((x) => /^CRITIQUE \(bloquante dès le 2099-01-01\) — /.test(x)) || pjA.o?.critique?.verdict !== "FAIL")
-      echecs.push(`59 unvicies : --prejuger avant l'échéance → attendu affichable avec l'avertissement CRITIQUE, obtenu ${pjA.code} ${JSON.stringify(pjA.o).slice(0, 300)}`);
+    if ((pjA.o?.bloquants || []).length || pjA.code !== 1 || !(pjA.o?.avertissements || []).some((x) => /^CRITIQUE \(bloquante dès le 2099-01-01\) — /.test(x)) || pjA.o?.critique?.verdict !== "FAIL" || !(pjA.o?.avertissements_sans_motif || []).includes("CRITIQUE"))
+      echecs.push(`59 unvicies : --prejuger avant l'échéance → attendu aucun bloquant et l'avertissement CRITIQUE non motivé (exit 1, TF-2171), obtenu ${pjA.code} ${JSON.stringify(pjA.o).slice(0, 300)}`);
     if (pjB.code !== 1 || !(pjB.o?.bloquants || []).some((x) => /^CRITIQUE — /.test(x)))
       echecs.push(`59 duovicies : --prejuger à l'échéance → attendu non affichable, CRITIQUE bloquante, obtenu ${pjB.code} ${JSON.stringify(pjB.o).slice(0, 300)}`);
     if (pjV.code !== 0 || (pjV.o?.bloquants || []).length || pjV.o?.critique?.verdict !== "PASS")
@@ -1757,7 +1863,7 @@ try {
   // n'est là → REFUSÉ sur S85, EXIGENCES.json nommé, par le hook comme par --prejuger ; sans trace, AVERTI sur S86 avant l'échéance, REFUSÉ
   // après. VERTS : le remède joué (les livrables produits) → aucun refus ; une livraison sans compte d'exigences sous le verrou → S72 avertie,
   // jamais refusée. L'échéance de RÉSERVATION est repoussée : seule le verrou est en jeu.
-  {
+  if (veut(60)) {
     const LIVRE60 = (avecCompte) => BON
       .replace("sur le moment de la publication.", "sur le moment de la publication. Le produit est livré : vous pouvez ouvrir le portail à l'instant ; il reste à saisir les clés des fournisseurs."
         + (avecCompte ? " 34 exigences sur 35 tenues, la dernière nommée au bloc 5." : ""))
@@ -1805,6 +1911,32 @@ try {
     const apres = hook60(pSans, "sans-trace-apres", LIVRE60(true), { FORGE_VERROU_LIVRE_BLOQUANT_DES: "2026-01-01" });
     if (apres?.decision !== "block" || !/S86 — /.test(apres.reason || "") || !/mobiliser\.mjs --preparer/.test(apres.reason || ""))
       echecs.push(`60 sexies : sans trace, à l'échéance → attendu REFUSÉ sur S86, l'écrivain nommé, obtenu ${JSON.stringify(apres).slice(0, 300)}`);
+    // 60 septies — TF-2221 (RP-41, 06/11/2026) : un livrable que la demande ne touche pas (le fichier de jetons d'un composant posé sur les jetons existants)
+    // se déclare INCHANGÉ avec son motif dans la ligne de trace. ROUGE : sans la déclaration, le fichier de jetons écrit avant la demande est périmé → REFUSÉ sur S85, jetons nommé.
+    // VERT : le remède que S85 prescrit, joué (la même ligne de trace avec `livrables_inchanges`), lève le refus. Un livrable absent n'est pas « inchangé » : refusé encore.
+    const produitInchange60 = (nom, inchanges, jetonsPresent = true) => {
+      const d = join(base, `produit-60-${nom}`);
+      mkdirSync(join(d, "forge", "retours"), { recursive: true });
+      const verdicts = Object.fromEntries(FORGES60.map((f) => [f, { verdict: f === "design" ? "mobilisee" : "ecartee", motif: `motif écrit pour la forge ${f}` }]));
+      if (inchanges) verdicts.design.livrables_inchanges = { jetons: "le composant utilise les jetons existants, aucun jeton ajouté" };
+      writeFileSync(join(d, "forge", "mobilisation.jsonl"), JSON.stringify({ ts: "2026-10-26T07:00:00.000Z", schema: "forge/mobilisation@1", type: "evolution", types: ["evolution"], verdicts }) + "\n", "utf8");
+      mkdirSync(join(d, "forge", "etapes", "design"), { recursive: true });
+      writeFileSync(join(d, "forge", "etapes", "design", "DESIGN.md"), "x", "utf8");
+      if (jetonsPresent) {
+        const tokens = join(d, "forge", "etapes", "design", "tokens.css"); writeFileSync(tokens, "x", "utf8");
+        const vieux = new Date("2026-10-01T00:00:00Z"); utimesSync(tokens, vieux, vieux);
+      }
+      return d;
+    };
+    const sansDecl = hook60(produitInchange60("jetons-sans-declaration", false), "jetons-sans-decl", LIVRE60(true));
+    if (sansDecl?.decision !== "block" || !/S85 — /.test(sansDecl.reason || "") || !/jetons/.test(sansDecl.reason || ""))
+      echecs.push(`60 septies : un fichier de jetons écrit avant la demande, sans déclaration d'inchangé → attendu REFUSÉ sur S85, jetons nommé, obtenu ${JSON.stringify(sansDecl).slice(0, 300)}`);
+    const avecDecl = hook60(produitInchange60("jetons-inchanges", true), "jetons-decl", LIVRE60(true));
+    if (avecDecl?.decision === "block")
+      echecs.push(`60 octies : le remède joué (jetons déclarés inchangés avec leur motif) doit lever le refus S85, obtenu ${String(avecDecl.reason).slice(0, 300)}`);
+    const absentDecl = hook60(produitInchange60("jetons-absents", true, false), "jetons-absents-decl", LIVRE60(true));
+    if (absentDecl?.decision !== "block" || !/S85 — /.test(absentDecl.reason || ""))
+      echecs.push(`60 nonies : un fichier de jetons ABSENT déclaré inchangé ne doit pas passer (rien à déclarer inchangé), obtenu ${JSON.stringify(absentDecl).slice(0, 300)}`);
   }
 
   // 61 — TF-1973 et TF-2016 (29/10/2026, S87, gabarit 2.53.0) : LE LIVRABLE ÉCRIT DANS LE TOUR SE LIE EN FIN DE BLOC 0, par la ligne « Livré : [nom](chemin%20relatif) ».
@@ -1813,7 +1945,7 @@ try {
   // VERTS : le MÊME tour dont le bloc 0 se clôt par la ligne liée (en ligne, en puces, bloc 0 titré) → silence, et le brouillon préjugé sans S87 ; un tour qui n'écrit que la
   // synthèse, des README, des sidecars, un fichier du dossier temporaire ou une retouche par Edit → rien à juger. BORNES : un lien vers un AUTRE fichier ne couvre pas ; une cible
   // nue qui porte des espaces n'est pas un lien ; la comparaison passe par le nom (séparateurs, %20, casse, accents composés) ; la synthèse retrouvée par le contrôle AFFICHAGE est exclue.
-  {
+  if (veut(61)) {
     const cwd61 = mkdtempSync(join(base, "hors-61-"));
     const RACINE61 = "C:\\dev\\produit-essai";
     const GUIDE = `${RACINE61}\\output\\04-cadrages\\Produit - Guide - Lot 0 - 20261029b.md`, NOTE = `${RACINE61}\\output\\03-etudes\\2026-10\\Produit - Note - 20261029c.md`;
@@ -1853,10 +1985,10 @@ try {
     if (rouge.o?.decision === "block" || !s87(rouge.o)
       || !/Livré : \[Produit - Guide - Lot 0 - 20261029b\]\(output\/04-cadrages\/Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b\.md\)/.test(rouge.o?.systemMessage || ""))
       echecs.push(`61 : un tour qui écrit le guide sous output/04-cadrages et dont le bloc 0 ne le lie pas → attendu l'avertissement S87 (sans refus) qui NOMME le fichier et donne la ligne « Livré : [nom](chemin%20relatif) », obtenu ${JSON.stringify(rouge.o).slice(0, 400)}`);
-    // ROUGE — par --prejuger : l'avertissement est dit, le verdict affichable reste (règle neuve, avertissante).
+    // ROUGE — par --prejuger : l'avertissement est dit avec son message ; règle avertissante, aucun bloquant, mais non affichable (exit 1) tant qu'il n'est pas corrigé ou motivé (TF-2171).
     const pj = prejuge61("rouge", rouge.p, BON);
-    if (pj.code !== 0 || pj.o?.affichable !== true || !(pj.o?.avertissements || []).some((a) => /^S87 — le tour a écrit 1 livrable/.test(a) && /Produit - Guide - Lot 0/.test(a)) || pj.o?.livre?.verdict !== "FAIL")
-      echecs.push(`61 bis : --prejuger sur le même brouillon → attendu exit 0, avertissement S87 qui nomme le guide et livre.verdict FAIL, obtenu exit ${pj.code} ${JSON.stringify(pj.o).slice(0, 400)}`);
+    if ((pj.o?.bloquants || []).length || pj.code !== 1 || pj.o?.affichable !== false || !(pj.o?.avertissements || []).some((a) => /^S87 — le tour a écrit 1 livrable/.test(a) && /Produit - Guide - Lot 0/.test(a)) || pj.o?.livre?.verdict !== "FAIL" || !(pj.o?.avertissements_sans_motif || []).includes("S87"))
+      echecs.push(`61 bis : --prejuger sur le même brouillon → attendu aucun bloquant, exit 1, avertissement S87 qui nomme le guide et livre.verdict FAIL, obtenu exit ${pj.code} ${JSON.stringify(pj.o).slice(0, 400)}`);
     // VERTS — le remède joué : la ligne « Livré : » liée, en ligne, en puces, en bloc 0 titré, avec deux livrables.
     for (const [nom, etapes, ligne, titre] of [
       ["ligne", [ecr61(GUIDE)], `Livré : ${LIEN_GUIDE}`, false],
@@ -1929,7 +2061,7 @@ try {
   // courant est `<projet>/site/src` était lu `scripts/app.js`, donc comme outillage du premier niveau, et la critique d'implémentation ne lui était pas exigée ; la racine
   // du projet (`.git` en remontant) le lit `site/src/scripts/app.js`, fichier servi. VERTS : le même tour dont le répertoire courant est la racine ; un script d'outillage réel
   // (`<projet>/scripts/outil.js`) écrit depuis le même sous-dossier reste de l'outillage ; CLAUDE_PROJECT_DIR prime sur le répertoire courant.
-  {
+  if (veut(62)) {
     // Le projet est celui de la recette (un dépôt, donc un `.git` en remontant) : le dossier temporaire ne convient pas, tout fichier y est un brouillon. Les sous-dossiers
     // `site/` et `site/src/` sont fictifs : aucun fichier n'est écrit, seuls les chemins du tour comptent.
     const PROJ62 = dirname(ICI);
@@ -1937,22 +2069,599 @@ try {
     const ecriture62 = (cwd, fichier, contenu) => [{ type: "assistant", cwd, timestamp: "2026-10-29T10:00:00.000Z",
       message: { role: "assistant", content: [{ type: "tool_use", id: "t62", name: "Write", input: { file_path: fichier, content: contenu } }] } }];
     const BROWSER62 = "document.addEventListener('click', () => { window.alert('x'); });";
+    // TF-2404 (12/11/2026) : ce cas juge la RACINE du projet, pas la règle du brouillon (cas 59 septendecies). Le projet d'essai est le dépôt qui joue la recette : quand
+    // cet arbre vit sous le dossier temporaire (arbre de travail d'une campagne), tout fichier y était un brouillon et 62, 62 bis et 62 quater rendaient 0 au lieu de 1.
+    // Les appels ci-dessous disent donc qu'aucun chemin n'est un brouillon, et 62 quinquies garde la règle réelle (un fichier du dossier temporaire reste un brouillon).
+    const aucunBrouillon = () => false;
     const sansVar = process.env.CLAUDE_PROJECT_DIR; delete process.env.CLAUDE_PROJECT_DIR;
     try {
-      const depuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), APP62, BROWSER62)).servis.length;
-      const depuisRacine = critiqueDuTour(ecriture62(PROJ62, APP62, BROWSER62)).servis.length;
-      const outilDepuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), OUTIL62, "import fs from 'node:fs';")).servis.length;
+      const depuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), APP62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
+      const depuisRacine = critiqueDuTour(ecriture62(PROJ62, APP62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
+      const outilDepuisSous = critiqueDuTour(ecriture62(join(PROJ62, "site", "src"), OUTIL62, "import fs from 'node:fs';"), { estBrouillon: aucunBrouillon }).servis.length;
       process.env.CLAUDE_PROJECT_DIR = PROJ62;
-      const parVariable = critiqueDuTour(ecriture62(join(base, "ailleurs-62"), APP62, BROWSER62)).servis.length;
+      const parVariable = critiqueDuTour(ecriture62(join(base, "ailleurs-62"), APP62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
       delete process.env.CLAUDE_PROJECT_DIR;
+      // 62 quinquies : la règle réelle tient (brouillon par défaut) et l'injection la lève, quel que soit l'emplacement du dépôt.
+      const BROUILLON62 = join(tmpdir(), "page-62.js");
+      const brouillonReel = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, BROWSER62)).servis.length;
+      const brouillonLeve = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
+      if (brouillonReel !== 0) echecs.push(`62 quinquies : un script de navigateur écrit dans le dossier temporaire, règle réelle → attendu 0 fichier servi (brouillon), obtenu ${brouillonReel}`);
+      if (brouillonLeve !== 1) echecs.push(`62 quinquies bis : le même fichier, règle du brouillon levée par l'appelant → attendu 1 fichier servi, obtenu ${brouillonLeve}`);
       if (depuisSous !== 1) echecs.push(`62 : un script de navigateur écrit sous src/scripts/ par un tour dont le cwd est src/ → attendu 1 fichier servi (la critique est exigée), obtenu ${depuisSous} : le hook a lu le sous-dossier comme racine`);
       if (depuisRacine !== 1) echecs.push(`62 bis : le même tour, cwd à la racine du projet → attendu 1 fichier servi, obtenu ${depuisRacine}`);
       if (outilDepuisSous !== 0) echecs.push(`62 ter : un script d'outillage du premier niveau (scripts/outil.js) écrit depuis site/src/ → attendu 0 fichier servi, obtenu ${outilDepuisSous}`);
       if (parVariable !== 1) echecs.push(`62 quater : CLAUDE_PROJECT_DIR posée, cwd dans un dossier sans rien → attendu 1 fichier servi, obtenu ${parVariable}`);
     } finally { if (sansVar === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = sansVar; }
   }
+
+  // 63 — D-131 (a) du 02/11/2026, TF-2056 : UN CHIFFRE D'UN GAIN ÉCRIT AU REGISTRE SE RELÈVE DANS LE TOUR, OU S'AVERTIT. Le fait : le 02/11, une clôture a écrit
+  // `gains_constates` « 813 Markdown suivis, 4 accusés » sans sortie à l'appui ; la mesure rejouée donnait 1 209 et 5. ROUGE : le même gain, écrit par un Write (le fichier
+  // passé à journaliser) devant une sortie qui dit 1 209 et 5, rend deux avertissements GAINS, un par chiffre ; il en va de même d'un gain écrit par une commande
+  // (heredoc, printf) et d'un gain composé par un script (`gains_constates: g`) que `journaliser` a imprimé, retrouvé au registre par son ts exact. VERTS : les mêmes chiffres
+  // lus dans une sortie du tour ; un gain qui n'en porte aucun ; un chiffre « rapporté par l'agent » ; un événement du registre qu'AUCUNE ligne imprimée du tour ne désigne (une
+  // autre session du pilot) ; et, de bout en bout, le hook ne REFUSE jamais : il dit GAINS sous la réponse conforme.
+  if (veut(63)) {
+    const GAIN63 = "813 Markdown suivis, 4 accusés";
+    const ecrit63 = (id, nom, saisie) => ({ type: "assistant", timestamp: "2026-11-02T10:00:00.000Z", message: { role: "assistant", content: [{ type: "tool_use", id, name: nom, input: saisie }] } });
+    const sortie63 = (texte) => ({ type: "user", timestamp: "2026-11-02T10:00:01.000Z", message: { role: "user", content: [{ type: "tool_result", content: texte }] } });
+    const humain63 = { type: "user", timestamp: "2026-11-02T09:59:00.000Z", message: { role: "user", content: "clos TF-2056" } };
+    const fichierEv = (g) => JSON.stringify([{ ev: "maj", id: "TF-2056", statut: "corrige", gains_constates: g }], null, 1);
+    const tour63 = (ecriture, sortie) => [humain63, ecriture, sortie63(sortie)];
+    const avertis = (entrees, registre) => {
+      const debut = 0; const gains = gainsDuTour(entrees, debut, null, registre);
+      return avertsDeGains(gainsSansReleve(gains, nombresDuTour(entrees, debut)));
+    };
+    const parWrite = ecrit63("w63", "Write", { file_path: join(dirname(ICI), "todo", "ev-63.json"), content: fichierEv(GAIN63) });
+    const rouge = avertis(tour63(parWrite, "Markdown suivis : 1 209\naccusés : 5"), null);
+    if (rouge.length !== 2 || rouge.some((a) => a.regle !== "GAINS" || a.statut !== "AVERT") || !/« 813 »/.test(rouge[0].message) || !/« 4 »/.test(rouge[1].message))
+      echecs.push(`63 : un gain « ${GAIN63} » écrit par un Write devant une sortie qui dit 1 209 et 5 → attendu 2 avertissements GAINS (813 et 4), obtenu ${JSON.stringify(rouge.map((a) => a.message.slice(0, 60)))}`);
+    if (!/le montre/.test(rouge[0]?.message || "") || !/D-131/.test(rouge[0]?.message || ""))
+      echecs.push(`63 bis : l'avertissement ne dit pas ce qui manque (la sortie du tour) ni sa décision, obtenu ${rouge[0]?.message}`);
+    const lu = avertis(tour63(parWrite, "Markdown suivis : 813\naccusés : 4"), null);
+    if (lu.length) echecs.push(`63 ter : les mêmes chiffres lus dans une sortie du tour → attendu aucun avertissement, obtenu ${lu.length}`);
+    const sansChiffre = avertis(tour63(ecrit63("w63b", "Write", { file_path: join(dirname(ICI), "todo", "ev-63.json"), content: fichierEv("la règle est écrite et rejouée") }), "ok"), null);
+    if (sansChiffre.length) echecs.push(`63 quater : un gain sans chiffre → attendu aucun avertissement, obtenu ${sansChiffre.length}`);
+    const rapporte = avertis(tour63(ecrit63("w63c", "Write", { file_path: join(dirname(ICI), "todo", "ev-63.json"), content: fichierEv("653 mutants jugés, rapporté par l'agent") }), "ok"), null);
+    if (rapporte.length) echecs.push(`63 quinquies : un chiffre marqué « rapporté par l'agent » → attendu aucun avertissement, obtenu ${rapporte.length}`);
+    // Les autres voies : une commande qui écrit le fichier, et un script qui compose le gain.
+    const parCommande = ecrit63("b63", "Bash", { command: `cat > "$S/ev.json" <<'EOF'\n[{"ev":"maj","id":"TF-2056","statut":"corrige","gains_constates":"${GAIN63}"}]\nEOF\nnode todo/journaliser.mjs --fichier "$S/ev.json"` });
+    const viaBash = avertis(tour63(parCommande, "ok"), null);
+    if (viaBash.length !== 2) echecs.push(`63 sexies : le gain écrit par un heredoc → attendu 2 avertissements, obtenu ${viaBash.length}`);
+    const registre63 = join(base, "TODO-63.jsonl");
+    writeFileSync(registre63, [
+      JSON.stringify({ ev: "maj", id: "TF-2056", statut: "corrige", gains_constates: GAIN63, ts: "2026-11-02T10:00:05.123Z" }),
+      JSON.stringify({ ev: "maj", id: "TF-2099", statut: "corrige", gains_constates: "999 fichiers d'une autre session", ts: "2026-11-02T10:00:06.456Z" }),
+    ].join("\n") + "\n", "utf8");
+    const parScript = ecrit63("w63d", "Write", { file_path: join(dirname(ICI), "todo", "clore-63.mjs"), content: "const ev = { ev: 'maj', id: 'TF-2056', statut: 'corrige', gains_constates: g };" });
+    const imprime = sortie63('{"outil":"journaliser","ecrits":["2026-11-02T10:00:05.123Z TF-2056 maj corrige"]}');
+    const viaRegistre = avertis([humain63, parScript, imprime], registre63);
+    if (viaRegistre.length !== 2 || !/registre \(TF-2056\)/.test(viaRegistre[0]?.message || ""))
+      echecs.push(`63 septies : un gain composé par un script, retrouvé au registre par le ts que journaliser a imprimé → attendu 2 avertissements nommant le registre, obtenu ${JSON.stringify(viaRegistre.map((a) => a.message.slice(0, 80)))}`);
+    if (viaRegistre.some((a) => /999/.test(a.message)))
+      echecs.push("63 octies : un événement du registre qu'aucune ligne imprimée du tour ne désigne (une autre session) est accusé");
+    const sansRegistre = avertis([humain63, parScript, imprime], join(base, "absent-63.jsonl"));
+    if (sansRegistre.length) echecs.push(`63 nonies : un registre introuvable → attendu aucune accusation, obtenu ${sansRegistre.length}`);
+    // De bout en bout : le hook de fin de tour ne refuse pas, il dit GAINS sous la réponse conforme.
+    const bout63 = (sortie) => {
+      const p = join(base, "gains-63.jsonl");
+      writeFileSync(p, [humain63, parWrite, sortie63(sortie), { type: "assistant", timestamp: "2026-11-02T10:01:00.000Z", message: { role: "assistant", content: [{ type: "text", text: BON }] } }]
+        .map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ session_id: "test-63", transcript_path: p, stop_hook_active: false }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* pas de JSON */ }
+      return d;
+    };
+    const dRouge = bout63("Markdown suivis : 1 209\naccusés : 5");
+    if (dRouge?.decision === "block") echecs.push(`63 decies : le hook REFUSE une réponse conforme pour un chiffre de gain — l'avertissement ne refuse jamais : ${String(dRouge.reason).slice(0, 200)}`);
+    else if (!/GAINS — gains_constates écrit avec « 813 »/.test(dRouge?.systemMessage || "") || !/GAINS — gains_constates écrit avec « 4 »/.test(dRouge?.systemMessage || ""))
+      echecs.push(`63 undecies : le hook ne dit pas les deux chiffres sous la réponse conforme — ${String(dRouge?.systemMessage).slice(0, 240)}`);
+    const dVert = bout63("Markdown suivis : 813\naccusés : 4");
+    if (/GAINS/.test(dVert?.systemMessage || "")) echecs.push(`63 duodecies : les chiffres lus dans le tour sont accusés de bout en bout — ${String(dVert.systemMessage).slice(0, 200)}`);
+  }
+  // 64 — TF-2078 (04/11/2026, RT-33) : UN LIVRABLE ÉCRIT À LA MAIN À CÔTÉ D'UN SKILL DE LA FACTORY SE REMONTE, IL NE SE DÉCLARE PAS « RIEN DE NEUF ». Le fait : le 03/11, un
+  // produit a construit, à la demande du porteur, une page autonome que le skill make-it-better n'avait pas, et sa restitution disait « rien de neuf ». ROUGE : un tour chez
+  // un produit qui lance le skill et écrit par Write un livrable sous output/ sans aucun retour au ledger reçoit l'avertissement REMONTÉE (nommant le skill, le livrable et
+  // le geste), sans refus, par le hook et par --prejuger. VERTS : le remède joué — une commande du tour qui écrit `type: retour`, ou une entrée `type: retour` du ledger
+  // datée après le message humain —, un skill qui n'est pas de la Factory, un skill sans livrable écrit à la main, un livrable sans skill, un projet qui n'est pas un produit.
+  // BORNES : un retour ANTÉRIEUR au message humain ne couvre pas ; lire le SKILL.md et jouer l'un de ses scripts valent « utiliser » ; l'avertissement ne refuse jamais.
+  if (veut(64)) {
+    const parc64 = mkdtempSync(join(base, "parc-64-"));
+    const skill64 = join(parc64, "digit-ai-forge-agents", ".claude", "skills", "make-it-better");
+    mkdirSync(skill64, { recursive: true });
+    writeFileSync(join(skill64, "SKILL.md"), "---\nname: make-it-better\n---\nExporte une page HTML autonome.\n", "utf8");
+    const produit64 = (nom, { retours = true, ledger = null } = {}) => {
+      const d = join(parc64, nom);
+      mkdirSync(retours ? join(d, "forge", "retours") : d, { recursive: true });
+      if (ledger) { mkdirSync(join(d, "forge"), { recursive: true }); writeFileSync(join(d, "forge", "ledger.jsonl"), ledger.map((o) => JSON.stringify(o)).join("\n") + "\n", "utf8"); }
+      return d;
+    };
+    // L'échéance de RÉSERVATION est repoussée (comme au cas 60) : seul REMONTÉE est en jeu, et FORGE_ROOT désigne le parc jetable des skills.
+    const ENV64 = { FORGE_RESERVATION_BLOQUANTE_DES: "2099-01-01", FORGE_ROOT: parc64 };
+    const RIEN64 = BON + "\n- Remontée à la factory : rien à remonter.\n";
+    const HUMAIN64 = { type: "user", timestamp: "2026-11-03T09:00:00.000Z", message: { role: "user", content: "fais-moi une page autonome de ce rapport" } };
+    const skillOutil = (skill = "make-it-better") => ({ name: "Skill", input: { skill } });
+    // Le chemin écrit est fictif et HORS du dossier temporaire, où tout fichier est un brouillon que le relevé écarte.
+    const livrable64 = () => ({ name: "Write", input: { file_path: "C:/dev/produit-essai/output/Produit - Rapport autonome - 20261103a.pdf", content: "x" } });
+    const tour64 = (etapes, final = RIEN64) => [HUMAIN64,
+      ...etapes.flatMap((o, i) => [
+        { type: "assistant", timestamp: "2026-11-03T09:01:00.000Z", message: { role: "assistant", content: [{ type: "tool_use", id: `t64-${i}`, name: o.name, input: o.input }] } },
+        { type: "user", timestamp: "2026-11-03T09:01:01.000Z", message: { role: "user", content: [{ type: "tool_result", tool_use_id: `t64-${i}`, content: "ok" }] } },
+      ]),
+      { type: "assistant", timestamp: "2026-11-03T09:05:00.000Z", message: { role: "assistant", content: [{ type: "text", text: final }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const hook64 = (nom, d, etapes) => {
+      const p = join(base, `tour-64-${nom}.jsonl`); writeFileSync(p, tour64(etapes), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: d, env: { ...ENV_SANS_SESSION, ...ENV64 },
+        input: JSON.stringify({ session_id: "t64", transcript_path: p, stop_hook_active: false, cwd: d }) });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { o = { brut: r.stdout }; }
+      return { o, p };
+    };
+    const remonte = (o) => /REMONTÉE — le tour a utilisé le skill de la Factory « make-it-better » \(lancé\) et écrit à la main 1 livrable \(Produit - Rapport autonome - 20261103a\.pdf\) sans consigner aucun retour au ledger du produit/.test(o?.systemMessage || "");
+    const aucune = (o) => !/REMONTÉE/.test(JSON.stringify(o));
+    const pRouge = produit64("rouge");
+    const rouge64 = hook64("rouge", pRouge, [skillOutil(), livrable64(pRouge)]);
+    if (rouge64.o?.decision === "block" || !remonte(rouge64.o) || !/type: retour/.test(rouge64.o?.systemMessage || "") || !/plutôt que « rien de neuf »/.test(rouge64.o?.systemMessage || ""))
+      echecs.push(`64 : un tour chez un produit qui lance make-it-better et écrit un livrable à la main sans retour au ledger → attendu l'avertissement REMONTÉE (skill, livrable, geste), sans refus, obtenu ${JSON.stringify(rouge64.o).slice(0, 500)}`);
+    const fb64 = join(base, "brouillon-64.md"); writeFileSync(fb64, RIEN64, "utf8");
+    const pj64 = spawnSync(process.execPath, [HOOK, "--prejuger", fb64, "--transcript", rouge64.p], { encoding: "utf8", cwd: pRouge, env: { ...ENV_SANS_SESSION, ...ENV64 } });
+    let pjo64 = null; try { pjo64 = JSON.parse(pj64.stdout || "null"); } catch { /* illisible */ }
+    if ((pjo64?.bloquants || []).length || pj64.status !== 1 || pjo64?.affichable !== false || !(pjo64?.avertissements || []).some((a) => /^REMONTÉE — le tour a utilisé le skill de la Factory « make-it-better »/.test(a)) || pjo64?.remontee?.verdict !== "FAIL" || !(pjo64?.avertissements_sans_motif || []).includes("REMONTÉE"))
+      echecs.push(`64 bis : --prejuger sur le même brouillon → attendu aucun bloquant, l'avertissement REMONTÉE non motivé (exit 1, TF-2171) et remontee.verdict FAIL, obtenu exit ${pj64.status} ${JSON.stringify(pjo64).slice(0, 400)}`);
+    // VERTS — le remède joué, de deux façons.
+    const pCmd = produit64("remede-commande");
+    const parCommande = hook64("remede-commande", pCmd, [skillOutil(), livrable64(pCmd), { name: "Bash", input: { command: "python forge/ledger.py retour --titre \"page autonome absente de make-it-better\" --test-generalite oui" } }]);
+    if (!aucune(parCommande.o)) echecs.push(`64 ter : un retour consigné par commande du tour (le remède) → attendu aucun avertissement REMONTÉE, obtenu ${JSON.stringify(parCommande.o).slice(0, 300)}`);
+    const pLedger = produit64("remede-ledger", { ledger: [{ seq: 1, type: "retour", ts: "2026-11-03T09:03:00.000Z", titre: "page autonome" }] });
+    const parLedger = hook64("remede-ledger", pLedger, [skillOutil(), livrable64(pLedger)]);
+    if (!aucune(parLedger.o)) echecs.push(`64 quater : une entrée type: retour du ledger datée après le message humain → attendu aucun avertissement REMONTÉE, obtenu ${JSON.stringify(parLedger.o).slice(0, 300)}`);
+    const pAncien = produit64("retour-ancien", { ledger: [{ seq: 1, type: "retour", ts: "2026-10-20T09:00:00.000Z", titre: "autre sujet" }] });
+    const ancien = hook64("retour-ancien", pAncien, [skillOutil(), livrable64(pAncien)]);
+    if (!remonte(ancien.o)) echecs.push(`64 quinquies : un retour ANTÉRIEUR au message humain ne couvre pas le tour → attendu l'avertissement REMONTÉE, obtenu ${JSON.stringify(ancien.o).slice(0, 300)}`);
+    // VERTS — ce qui n'est pas le cas visé.
+    const pAutres = produit64("autres");
+    for (const [nom, etapes] of [
+      ["skill-tiers", [skillOutil("skill-tiers-64"), livrable64(pAutres)]],
+      ["sans-livrable-a-la-main", [skillOutil(), { name: "Bash", input: { command: "node .claude/skills/make-it-better/scripts/exporter-page.mjs --espace e" } }]],
+      ["livrable-sans-skill", [livrable64(pAutres)]],
+      ["format-hors-liste", [skillOutil(), { name: "Write", input: { file_path: "C:/dev/produit-essai/output/Produit - Note - 20261103b.md", content: "x" } }]],
+    ]) {
+      const h = hook64(nom, pAutres, etapes);
+      if (!aucune(h.o)) echecs.push(`64 sexies (${nom}) : ce n'est pas le cas visé → attendu aucun avertissement REMONTÉE, obtenu ${JSON.stringify(h.o).slice(0, 300)}`);
+    }
+    const pHors = produit64("hors-produit", { retours: false });
+    const hors = hook64("hors-produit", pHors, [skillOutil(), livrable64(pHors)]);
+    if (!aucune(hors.o)) echecs.push(`64 septies : hors d'un produit (aucun forge/retours/) → attendu aucun avertissement REMONTÉE, obtenu ${JSON.stringify(hors.o).slice(0, 300)}`);
+    // Unitaires — ce qui compte comme « utiliser un skill » : lancer, lire le SKILL.md, jouer un script ; les formats retenus.
+    const segment = (...outils) => outils.map((o, i) => ({ type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id: `u64-${i}`, name: o.name, input: o.input }] } }));
+    const lu = releveRemontee(segment({ name: "Read", input: { file_path: "C:\\dev\\digit-ai-forge-agents\\.claude\\skills\\make-it-better\\SKILL.md" } },
+      { name: "Bash", input: { command: "node C:/dev/digit-ai-forge-agents/.claude/skills/la-boucle/scripts/lancer.mjs --x" } }, { name: "Skill", input: { skill: "plugin:digit-ai-pptx" } },
+      { name: "Read", input: { file_path: "C:\\dev\\produit\\README.md" } }));
+    if (JSON.stringify(lu.skills) !== JSON.stringify([{ nom: "make-it-better", via: "lu" }, { nom: "la-boucle", via: "joué" }, { nom: "digit-ai-pptx", via: "lancé" }]))
+      echecs.push(`64 octies : releveRemontee → attendu make-it-better lu, la-boucle joué, digit-ai-pptx lancé (préfixe de plugin retiré), pas un README, obtenu ${JSON.stringify(lu.skills)}`);
+    const formats = releveRemontee(segment(...["a.html", "b.pptx", "c.docx", "d.xlsx", "e.pdf", "f.svg", "g.md", "h.json", "i.png", "j.js"].map((n) => ({ name: "Write", input: { file_path: `C:\\dev\\produit\\output\\${n}`, content: "x" } })))).livrables;
+    if (JSON.stringify(formats.map((f) => f.split("\\").pop())) !== JSON.stringify(["a.html", "b.pptx", "c.docx", "d.xlsx", "e.pdf", "f.svg"]))
+      echecs.push(`64 nonies : les formats de page et de document retenus sont html, pptx, docx, xlsx, pdf et svg, jamais md, json, png ni js, obtenu ${JSON.stringify(formats)}`);
+  }
+  // 65 — TF-2182 (06/11/2026) : UNE FICHE ÉCRITE SELON UN GABARIT DE DOCUMENT N'EST PAS LA SYNTHÈSE DU TOUR. Le cas du 05/11 : « détaille A2 & A3 » appelle une fiche
+  // E-16 (`gabarit: gd-fiche-constat-precos`, `destinataire: humain`) ; le hook la retenait comme synthèse et refusait la restitution sur AFFICHAGE, la fiche ne portant
+  // aucune action A-N. (a) La fiche seule : le hook laisse passer. (b) Une synthèse NOMMÉE déposée dans le même tour reste comparée à l'écran. (c) Unitaire : la fiche
+  // n'est jamais retenue, un `gabarit:` écrit dans la PROSE d'une synthèse ne l'écarte pas. (d) `--prejuger` avec le transcript ne joue pas AFFICHAGE contre la fiche.
+  if (veut(65)) {
+    const FICHE65 = "---\ndestinataire: humain\nrole_destinataire: le porteur, qui choisit ce que la session traite\ngabarit: gd-fiche-constat-precos\nversion_du_gabarit: 1.0.0\n---\n\n# Actions A-2 et A-3 : constat et préconisations\n\nAucun sélecteur de décision ici.\n";
+    const SYNTHESE65 = "---\ndestinataire: humain\n---\n\n" + BON;
+    const SANS_REPLI65 = BON.replace("  - si rien n'est décidé : (a) s'applique.\n", "");
+    const PROSE65 = "---\ndestinataire: humain\n---\n\nLe champ `gabarit:` d'une fiche se lit dans son en-tête.\ngabarit: cité en prose, pas en en-tête\n";
+    const d65 = join(base, "produit-65"); mkdirSync(join(d65, "output"), { recursive: true });
+    const fiche65 = join(d65, "output", "Produit - Fiche - Actions A-2 et A-3 detaillees - 20261105b.md");
+    const synthese65 = join(d65, "output", "Produit - Note Synthese Run - 20261105c.md");
+    const prose65 = join(d65, "output", "Produit - Note Prose - 20261105d.md");
+    writeFileSync(fiche65, FICHE65, "utf8"); writeFileSync(synthese65, SYNTHESE65, "utf8"); writeFileSync(prose65, PROSE65, "utf8");
+    const tour65 = (ecrits, texteFinal) => [
+      { type: "user", message: { role: "user", content: "détaille A2 & A3" } },
+      { type: "assistant", message: { role: "assistant", content: ecrits.map((p) => ({ type: "tool_use", name: "Write", input: { file_path: p } })) } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const hook65 = (nom, ecrits, texteFinal) => {
+      const p = join(base, nom + ".jsonl"); writeFileSync(p, tour65(ecrits, texteFinal), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", env: ENV_SANS_SESSION, input: JSON.stringify({ session_id: "test-65", transcript_path: p, stop_hook_active: false }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* laisse passer */ }
+      return { d, p };
+    };
+    const a65 = hook65("fiche-e16-seule", [fiche65], BON);
+    if (a65.d?.decision === "block")
+      echecs.push(`65 : une fiche E-16 (gabarit: dans l'en-tête) écrite dans le tour ne doit pas être jugée à la place de la restitution → attendu laisser passer, obtenu ${JSON.stringify(a65.d).slice(0, 240)}`);
+    const b65 = hook65("fiche-e16-et-synthese", [fiche65, synthese65], SANS_REPLI65);
+    if (b65.d?.decision !== "block" || !/AFFICHAGE — ton message affiché/.test(b65.d.reason || "") || !(b65.d.reason || "").includes(synthese65))
+      echecs.push(`65 bis : la fiche écrite après une synthèse NOMMÉE ne la remplace pas → attendu block AFFICHAGE contre la synthèse, obtenu ${JSON.stringify(b65.d).slice(0, 240)}`);
+    if (syntheseDuTour([fiche65]) !== null || syntheseDuTour([synthese65, fiche65]) !== synthese65 || syntheseDuTour([prose65]) !== prose65)
+      echecs.push("65 ter : syntheseDuTour doit écarter la fiche (gabarit: en en-tête), garder la synthèse, et garder un fichier dont le seul « gabarit: » est en prose");
+    const f65 = join(base, "brouillon-65.md"); writeFileSync(f65, BON, "utf8");
+    const pj65 = spawnSync(process.execPath, [HOOK, "--prejuger", f65, "--transcript", a65.p], { encoding: "utf8", env: ENV_SANS_SESSION });
+    let o65 = null; try { o65 = JSON.parse(pj65.stdout || "null"); } catch { /* illisible */ }
+    if (o65?.synthese_deposee !== null || (o65?.bloquants || []).some((x) => /^AFFICHAGE/.test(x)))
+      echecs.push(`65 quater : --prejuger avec le transcript d'un tour qui n'a écrit qu'une fiche → attendu aucune synthèse déposée et aucun refus AFFICHAGE, obtenu ${JSON.stringify(o65).slice(0, 240)}`);
+  }
+  // 66 — TF-2193 (06/11/2026) : EN MODE NON INTERACTIF, LE MESSAGE D'ATTENTE D'UNE TÂCHE D'ARRIÈRE-PLAN N'EST PLUS EXEMPTÉ (`claude -p`). Le cas du 05/11 chez un produit : 17 agents
+  // lancés en arrière-plan, tour clos sur un message d'attente que l'exemption TF-1649 admettait ; la session s'arrête avec le tour et les agents sont coupés. La transcription d'une
+  // session `-p` date son message humain de `entrypoint: "sdk-cli"`. (a) Interactif : exempté comme avant (cas 47). (b) Non interactif, tâche non revenue : refus dédié, qui dit
+  // d'attendre au premier plan. (c) Non interactif, tâche revenue : le refus dédié n'a plus d'objet. (d) Non interactif, attente qui porte un verdict : jugée par le chemin ordinaire.
+  // (e) La borne : 30 refus comptés au journal pour la session, puis la session est laissée finir. (f) Unitaire : `analyserTranscript` lit le mode.
+  if (veut(66)) {
+    const ATTENTE66 = "Les agents de lecture tournent en arrière-plan, environ 10 minutes.\nJe reprends la restitution dès leur retour.";
+    const tour66 = (texte, { entrypoint = "sdk-cli", revenue = false, humain = {} } = {}) => [
+      { type: "user", entrypoint, ...humain, message: { role: "user", content: "lis les vingt pièces avec des agents de lecture" } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id: "ag66", name: "Task", input: { description: "lecture 1" } }] } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", tool_use_id: "ag66", content: "Async agent launched successfully.\nagentId: a66xyz (internal ID)" }] } },
+      ...(revenue ? [{ type: "queue-operation", operation: "enqueue", content: "<task-notification>\n<task-id>a66xyz</task-id>\n<status>completed</status>\n</task-notification>" }] : []),
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texte }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const hook66 = (nom, texte, o, session = "test-66") => {
+      const p = join(base, nom + ".jsonl"); writeFileSync(p, tour66(texte, o), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", env: ENV_SANS_SESSION, input: JSON.stringify({ session_id: session, transcript_path: p, stop_hook_active: false }) });
+      let d = null; try { d = JSON.parse(r.stdout || "null"); } catch { /* laisse passer */ }
+      return { d, p };
+    };
+    const dedie = (d) => d?.decision === "block" && /TF-2193/.test(d.reason || "") && /PREMIER PLAN/.test(d.reason || "");
+    const a66 = hook66("p-interactif", ATTENTE66, { entrypoint: "claude-vscode" });
+    if (a66.d !== null) echecs.push(`66 : en mode interactif, le message d'attente pendant une tâche non revenue reste exempté (TF-1649) → attendu non jugé, obtenu ${JSON.stringify(a66.d).slice(0, 200)}`);
+    const b66 = hook66("p-non-interactif", ATTENTE66);
+    if (!dedie(b66.d)) echecs.push(`66 bis : en mode non interactif (sdk-cli), la même attente avec une tâche non revenue → attendu un refus dédié (TF-2193, attendre au PREMIER PLAN), obtenu ${JSON.stringify(b66.d).slice(0, 240)}`);
+    const c66 = hook66("p-tache-revenue", ATTENTE66, { revenue: true });
+    if (dedie(c66.d)) echecs.push(`66 ter : la tâche est REVENUE, le refus dédié n'a plus d'objet → attendu pas de refus TF-2193, obtenu ${JSON.stringify(c66.d).slice(0, 200)}`);
+    const d66 = hook66("p-verdict", "Les agents tournent en arrière-plan ; le premier lot est PASS.\nJe reprends dès leur retour.");
+    if (dedie(d66.d)) echecs.push(`66 quater : une attente qui porte un verdict est jugée par le chemin ordinaire, pas par le refus dédié → obtenu ${JSON.stringify(d66.d).slice(0, 200)}`);
+    const journal66 = process.env.FORGE_HOOKS_JOURNAL, session66 = "test-66-borne-" + Date.now();
+    mkdirSync(dirname(journal66), { recursive: true });
+    appendFileSync(journal66, Array.from({ length: 30 }, () => JSON.stringify({ ts: new Date().toISOString(), hook: "restitution", session: session66, attente_arriere_plan: true })).join("\n") + "\n", "utf8");
+    const e66 = hook66("p-borne", ATTENTE66, {}, session66);
+    if (e66.d?.decision === "block") echecs.push(`66 quinquies : après 30 refus de la même session, elle est laissée finir (pas de boucle sans fin) → obtenu ${JSON.stringify(e66.d).slice(0, 200)}`);
+    const f66 = analyserTranscript(tour66(ATTENTE66)), g66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "cli" })), h66 = analyserTranscript(tour66(ATTENTE66).replace(/"entrypoint":"sdk-cli",/, ""));
+    if (f66.nonInteractif !== true || g66.nonInteractif !== false || h66.nonInteractif !== false)
+      echecs.push(`66 sexies : analyserTranscript doit lire le mode (sdk-cli → true ; cli → false ; champ absent → false), obtenu ${f66.nonInteractif} ${g66.nonInteractif} ${h66.nonInteractif}`);
+    // TF-2280 (09/11/2026) — formes RÉELLES relevées sur les transcriptions du poste (champs seuls, aucun contenu de conversation). Session `claude -p` lancée depuis l'extension : entrypoint hérité
+    // « claude-vscode », mais le message humain porte turnOrigin « sdk » et promptSource « sdk », sans `origin`. Session interactive de l'extension : turnOrigin « human », origin.kind « human »,
+    // ET promptSource « sdk » (243 sessions interactives sur 243 le portent : ce champ seul ne sépare rien, c'est le piège du cas rouge ci-dessous).
+    const SESSION_P66 = { permissionMode: "bypassPermissions", promptSource: "sdk", turnOrigin: "sdk", turnPosition: { promptIndex: 0, turnIndex: 1 }, userType: "external" };
+    const INTERACTIVE66 = { permissionMode: "bypassPermissions", origin: { kind: "human" }, promptSource: "sdk", turnOrigin: "human", turnPosition: { promptIndex: 1, turnIndex: 1 }, userType: "external" };
+    const NOTIF66 = { permissionMode: "bypassPermissions", origin: { kind: "task-notification", producer: "session-task" }, promptSource: "system", turnOrigin: "task_notification", userType: "external" };
+    const i66 = hook66("p-vscode-programmatique", ATTENTE66, { entrypoint: "claude-vscode", humain: SESSION_P66 });
+    if (!dedie(i66.d)) echecs.push(`66 septies : session \`claude -p\` lancée depuis l'extension (entrypoint hérité claude-vscode, turnOrigin sdk) avec une tâche non revenue → attendu le refus dédié (TF-2193, PREMIER PLAN), obtenu ${JSON.stringify(i66.d).slice(0, 240)}`);
+    const j66 = hook66("p-vscode-interactif-reel", ATTENTE66, { entrypoint: "claude-vscode", humain: INTERACTIVE66 });
+    if (j66.d !== null) echecs.push(`66 octies : session INTERACTIVE de l'extension (promptSource sdk comme toutes, turnOrigin human) → attendu exemptée (TF-1649), obtenu ${JSON.stringify(j66.d).slice(0, 240)} — lire promptSource ou querySource ferait refuser toutes les sessions de l'extension`);
+    const k66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: SESSION_P66 })), l66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: INTERACTIVE66 }));
+    const m66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: { promptSource: "sdk" } })); // CLI ancien : aucun turnOrigin, aucune origine
+    const n66 = analyserTranscript(tour66(ATTENTE66, { entrypoint: "claude-vscode", humain: SESSION_P66, revenue: true }).replace(/\n$/, "") + "\n" + JSON.stringify({ type: "user", entrypoint: "claude-vscode", ...NOTIF66, message: { role: "user", content: "<task-notification>\n<task-id>a66xyz</task-id>\n<status>completed</status>\n</task-notification>" } }) + "\n");
+    if (k66.nonInteractif !== true || l66.nonInteractif !== false || m66.nonInteractif !== false || n66.nonInteractif !== true)
+      echecs.push(`66 nonies : sessionProgrammatique (extension : turnOrigin sdk → true ; turnOrigin human → false ; aucun turnOrigin → false ; sdk suivi d'une notification de tâche → true), obtenu ${k66.nonInteractif} ${l66.nonInteractif} ${m66.nonInteractif} ${n66.nonInteractif}`);
+  }
+  // 68 — TF-2191 (06/11/2026) : UN LIVRABLE LIÉ « LIVRÉ » PAR UNE RESTITUTION PASS SE SCELLE, ET LA RÉÉCRITURE EN PLACE EST REFUSÉE (S94). Le cas du 05/11 : l'étude 20261105b, liée « Livré »,
+  // réécrite après trois remarques sous le même nom. (a) Le tour écrit l'étude et la lie : PASS, sceau posé (`.jugement.json`). (b) Un tour suivant la réécrit en place et la lie de
+  // nouveau : refus S94, l'indice suivant nommé. (c) Le remède : la version réécrite sous l'indice suivant, liée : PASS, sceau posé sur elle ; la version d'origine reste intacte.
+  // (d) Unitaires : `scellerLivrable` ne scelle ni sans convention d'indice, ni une synthèse, ni un fichier déjà scellé (il garde l'écart).
+  if (veut(68)) {
+    // Hors du dossier temporaire du poste : tout fichier qui s'y trouve est un brouillon que le relevé des livrables écarte (TEMPORAIRE) ; racine courte, jamais sous le dépôt (TF-1532).
+    const racine68 = process.platform === "win32" ? "C:/tmp" : "/var/tmp"; mkdirSync(racine68, { recursive: true });
+    const d68 = mkdtempSync(join(racine68, "hook-68-")); mkdirSync(join(d68, "forge", "retours"), { recursive: true }); mkdirSync(join(d68, "output"), { recursive: true });
+    writeFileSync(join(d68, "forge", "ledger.jsonl"), [{ seq: 1, type: "run_open", ts: "2026-11-05T09:00:00.000Z" },
+      { seq: 2, type: "question_humain", ts: "2026-11-05T09:01:00.000Z", decisions_posees: { "D-1": "Publier maintenant la version corrigée du démarrage, ou attendre demain matin ?" } }].map((o) => JSON.stringify(o)).join("\n") + "\n", "utf8");
+    const etude68 = (indice) => join(d68, "output", `Produit - Etude - 20261105${indice}.md`);
+    const final68 = (indice) => (BON + "\n- Remontée à la factory : rien à remonter.\n").replace("\n## 1. En-tête",
+      `\n\nLivré : [L'étude remise](output/${encodeURIComponent(`Produit - Etude - 20261105${indice}.md`)})\n\n## 1. En-tête`);
+    const hook68 = (nom, indice, contenu) => {
+      writeFileSync(etude68(indice), contenu, "utf8");
+      const p = join(base, nom + ".jsonl");
+      writeFileSync(p, [{ type: "user", message: { role: "user", content: "rédige l'étude" } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: { file_path: etude68(indice) } }] } },
+        { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: final68(indice) }] } }].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: d68, env: ENV_SANS_SESSION,
+        input: JSON.stringify({ session_id: "test-68", transcript_path: p, stop_hook_active: false, cwd: d68 }) });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { o = { brut: r.stdout }; }
+      return o;
+    };
+    const a68 = hook68("tour-68-a", "b", "# Étude\n\nPremière version remise.\n");
+    if (a68 !== null || !existsSync(etude68("b") + ".jugement.json"))
+      echecs.push(`68 : l'étude écrite et liée « Livré » par une restitution PASS → attendu aucune sortie du hook et le sceau posé, obtenu ${JSON.stringify(a68).slice(0, 300)}, sceau ${existsSync(etude68("b") + ".jugement.json")}`);
+    const b68 = hook68("tour-68-b", "b", "# Étude\n\nVersion réécrite en place après trois remarques.\n");
+    if (b68?.decision !== "block" || !/S94/.test(b68.reason || "") || !/20261105c/.test(b68.reason || ""))
+      echecs.push(`68 bis : l'étude déjà liée puis réécrite en place, liée de nouveau → attendu block S94 nommant l'indice 20261105c, obtenu ${JSON.stringify(b68).slice(0, 300)}`);
+    const c68 = hook68("tour-68-c", "c", "# Étude\n\nVersion réécrite en place après trois remarques.\n");
+    if (c68 !== null || !existsSync(etude68("c") + ".jugement.json"))
+      echecs.push(`68 ter : le remède (la version réécrite sous l'indice suivant, liée) → attendu aucune sortie et le sceau posé sur elle, obtenu ${JSON.stringify(c68).slice(0, 300)}`);
+    const u68 = join(base, "scelle-68"); mkdirSync(u68, { recursive: true });
+    const sansIndice = join(u68, "Note libre.md"), synthese = join(u68, "Produit - Note Synthese Run - 20261105a.md"), deja = join(u68, "Produit - Etude - 20261105a.md");
+    for (const f of [sansIndice, synthese, deja]) writeFileSync(f, "# x\n", "utf8");
+    writeFileSync(deja + ".jugement.json", "{}", "utf8");
+    const scelle = scellerLivrable(join(u68, "Produit - Autre - 20261105a.md"));
+    if (scellerLivrable(sansIndice) !== null || scellerLivrable(synthese) !== null || scellerLivrable(deja) !== null || scelle !== null || existsSync(sansIndice + ".jugement.json") || existsSync(synthese + ".jugement.json"))
+      echecs.push("68 quater : scellerLivrable ne scelle ni un nom hors convention d'indice, ni une synthèse, ni un fichier déjà scellé, ni un fichier absent");
+    try { rmSync(d68, { recursive: true, force: true }); } catch { /* toléré */ }
+  }
+  // 67 — TF-2203 (06/11/2026) : `--prejuger` SORT EN CODE NON NUL TANT QU'UN AVERTISSEMENT DE FORME DES BLOCS 2, 3 ET 8 SUBSISTE. Le 05/11, un préjugement avait rendu `affichable: true` avec 11 avertissements
+  // (S78, S31, S32, S16, S18) sur une restitution que le porteur a refusée. TF-2171 (05/11, 12:28) a fait de l'avertissement non motivé un code de sortie 1 ; ce cas verrouille cet acquis par bloc,
+  // et garde l'autre moitié de la décision : le hook de fin de tour ne refuse pas ces avertissements (TF-1947 vise moins de refus), il les dit sous la réponse.
+  if (veut(67)) {
+    const variantes67 = [
+      ["bloc 2", "S3", BON.replace("- Recette du pilot 22/22 verte, bootstrap 7/7.", "- Tout est vert."), true],
+      ["bloc 3 (recommandation)", "S16", BON.replace("; recommandé : le journal `recette.md` ne porte aucun défaut ouvert.", "."), false],
+      ["bloc 3 (option par défaut)", "S32", BON.replace("  - si rien n'est décidé : (a) s'applique.\n", ""), false],
+      ["bloc 8 (conséquence)", "S19", BON.replace("  - si rien n'est fait : la recette reste jouée sur l'état d'avant, donc son vert ne prouve rien.\n", ""), false],
+      ["bloc 8 (motif)", "S11", BON.replace("  - motif de non-exécution : dependance_bloc_3 — attend la décision ci-dessus.\n", ""), false],
+    ];
+    for (const [nom, code, texte, bloquante] of variantes67) {
+      if (texte === BON) { echecs.push(`67 (${nom}) : la variante n'a rien modifié de BON, le cas ne prouve plus rien`); continue; }
+      const f = join(base, `brouillon-67-${code}.md`); writeFileSync(f, texte, "utf8");
+      const r = spawnSync(process.execPath, [HOOK, "--prejuger", f], { encoding: "utf8", env: ENV_SANS_SESSION });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* illisible */ }
+      const dit = bloquante ? (o?.bloquants || []).some((x) => x.startsWith(code)) : (o?.avertissements_sans_motif || []).includes(code);
+      if (r.status !== 1 || o?.affichable !== false || !dit)
+        echecs.push(`67 (${nom}) : ${code} non corrigée → attendu --prejuger exit 1, affichable false, ${code} nommée ${bloquante ? "en bloquant" : "en avertissement non motivé"}, obtenu exit ${r.status} ${JSON.stringify(o).slice(0, 200)}`);
+      if (!bloquante) {
+        const hk = join(base, `tour-67-${code}.jsonl`); writeFileSync(hk, transcript(texte, ["Write"]), "utf8");
+        const rh = spawnSync(process.execPath, [HOOK], { encoding: "utf8", env: ENV_SANS_SESSION, input: JSON.stringify({ session_id: "test-67", transcript_path: hk, stop_hook_active: false }) });
+        let oh = null; try { oh = JSON.parse(rh.stdout || "null"); } catch { /* laisse passer */ }
+        if (oh?.decision === "block" || !new RegExp(code).test(oh?.systemMessage || ""))
+          echecs.push(`67 bis (${nom}) : le hook de fin de tour ne refuse pas ${code}, il la dit sous la réponse → obtenu ${JSON.stringify(oh).slice(0, 240)}`);
+      }
+    }
+  }
+  // 69 — TF-2257 (06/11/2026) : LE JOURNAL DES HOOKS D'UNE RECETTE N'EST PAS CELUI DU DÉPÔT. Le cas 66 posait 30 lignes de session fictive
+  // (« test-66-borne-… ») dans `.claude/hooks-journal.jsonl` du dépôt qui jouait la recette, et chaque cas jugé y ajoutait la sienne. Vert : le hook,
+  // lancé avec FORGE_HOOKS_JOURNAL comme le fait cette recette, écrit la ligne de sa session dans le fichier désigné et le journal du dépôt n'en porte
+  // aucune trace. La trace se cherche par l'identifiant UNIQUE de la session, jamais par la taille du fichier : une session vivante du dépôt peut le
+  // faire grandir pendant la recette. Rouge (ancien hook, qui ignore la variable) : la ligne manque au fichier désigné et figure au journal du dépôt.
+  if (veut(69)) {
+    const sess69 = "test-69-journal-" + Date.now();
+    const q69 = join(base, "journal-69.jsonl");
+    writeFileSync(q69, transcript(MAUVAIS, ["Write", "Bash"]), "utf8");
+    spawnSync(process.execPath, [HOOK], { encoding: "utf8", env: ENV_SANS_SESSION, input: JSON.stringify({ session_id: sess69, transcript_path: q69, stop_hook_active: false }) });
+    const depot69 = join(ICI, "..", ".claude", "hooks-journal.jsonl");
+    const dansDepot69 = existsSync(depot69) && readFileSync(depot69, "utf8").includes(sess69);
+    const dansJetable69 = existsSync(process.env.FORGE_HOOKS_JOURNAL) && readFileSync(process.env.FORGE_HOOKS_JOURNAL, "utf8").includes(sess69);
+    if (dansDepot69) echecs.push("69 : la session de la recette figure au journal des hooks du DÉPÔT — la recette le salit à chaque passage");
+    if (!dansJetable69) echecs.push("69 : la session de la recette ne figure pas au journal désigné par FORGE_HOOKS_JOURNAL — le déroutement ne s'applique pas");
+  }
+  // 70 — TF-2348 (10/11/2026, RP-211) : LE REPLI DU DISQUE NE RETIENT QUE CE QUI CORRESPOND AU CHEMIN DISPARU. Le fautif est le tour du 30/09/2026 : le chemin écrit avait disparu, le
+  // repli a retenu la restitution marquée la plus RÉCENTE du dossier, écrite par une autre session. Le conforme garde le cas de TF-1184 : le même livrable renommé pour tenir S42 (même
+  // jeton date-indice) reste retrouvé, même quand la synthèse étrangère est plus récente que lui.
+  if (veut(70)) {
+    const d70 = join(base, "repli-borne");
+    mkdirSync(d70, { recursive: true });
+    const MARQUEE = "---\ndestinataire: humain\n---\n\n# Synthèse\n";
+    const disparu70 = join(d70, "Marque - Synthese Mandat - Un titre tres long qui depasse le plafond - 20261110a.md");
+    const etrangere70 = join(d70, "Marque - Synthese Mandat - D'une autre session - 20261110b.md");
+    writeFileSync(etrangere70, MARQUEE, "utf8");
+    const o70 = syntheseDuTour([disparu70]);
+    if (o70 !== null) echecs.push(`70 : une synthèse marquée récente d'une AUTRE session (jeton 20261110b) est retenue à la place du chemin disparu (jeton 20261110a) — obtenu ${o70}`);
+    const renommee70 = join(d70, "Marque - Synthese Mandat - Court - 20261110a.md");
+    writeFileSync(renommee70, MARQUEE, "utf8");
+    const jadis70 = new Date(Date.now() - 3600000);
+    utimesSync(renommee70, jadis70, jadis70);
+    const r70 = syntheseDuTour([disparu70]);
+    if (r70 !== renommee70) echecs.push(`70 bis : le livrable RENOMMÉ (même jeton 20261110a), plus ancien que la synthèse étrangère, n'est plus retrouvé — le remède de TF-1184 est cassé, obtenu ${r70}`);
+  }
+  // 71 — TF-2348 : UN MESSAGE D'UNE AUTRE SESSION OUVRE UN SEGMENT COMME UN MESSAGE HUMAIN. Fautif : le tour d'accusé suivant un `<cross-session-message>` remontait à la demande
+  // humaine précédente et reprenait ses écritures (la restitution de l'autre tour). Conforme : sans message d'une autre session, le segment reste celui de la demande humaine.
+  if (veut(71)) {
+    const ecrit71 = join(base, "Marque - Synthese Mandat - Tour precedent - 20261110c.md");
+    const MSG = '<cross-session-message from="uds:LOCAL" from-name="session-voisine" from-mode="bypass">\nfin de tâche : le lot est prêt\n</cross-session-message>';
+    const tour71 = (avecAutreSession, meta) => [
+      { type: "user", message: { content: "fais la synthèse" } },
+      { type: "assistant", message: { content: [{ type: "tool_use", name: "Write", input: { file_path: ecrit71, content: "x" } }, { type: "text", text: "synthèse écrite" }] } },
+      ...(avecAutreSession ? [{ type: "user", isMeta: meta, message: { content: MSG } }, { type: "assistant", message: { content: [{ type: "text", text: "Bien reçu." }] } }]
+        : [{ type: "assistant", message: { content: [{ type: "text", text: "Bien reçu." }] } }]),
+    ].map((e) => JSON.stringify(e)).join("\n");
+    for (const meta of [false, true]) {
+      const an71 = analyserTranscript(tour71(true, meta));
+      if (!/^<cross-session-message/.test(an71.dernierHumain || "")) echecs.push(`71 (isMeta ${meta}) : le message d'une autre session n'ouvre pas de segment — dernier « humain » : ${String(an71.dernierHumain).slice(0, 60)}`);
+      if ((an71.fichiersMd || []).includes(ecrit71)) echecs.push(`71 bis (isMeta ${meta}) : le tour d'accusé reprend les écritures du tour d'avant (${ecrit71.split(/[\\/]/).pop()})`);
+    }
+    const sans71 = analyserTranscript(tour71(false, false));
+    if (sans71.dernierHumain !== "fais la synthèse" || !(sans71.fichiersMd || []).includes(ecrit71))
+      echecs.push("71 ter : sans message d'une autre session, le segment n'est plus celui de la demande humaine avec ses écritures");
+  }
+  // 72 à 76 — TF-2329 (10/11/2026, décision humaine D-191 (a), récidive de TF-1988) : LE LOT PART DANS LE TOUR OÙ UN RETOUR EST ÉCRIT, LE HOOK DE FIN DE TOUR D'UN PRODUIT LE REFUSE SINON.
+  // Le 09/11/2026, 104 retours étaient sans lot chez un produit, la plus ancienne de 59 jours ; l'alerte d'ouverture ne les a fait compiler à aucune des 7 sessions du jour.
+  // ROUGES : un retour écrit au ledger depuis le message humain du tour, qu'aucun lot de forge/retours/ ne cite → REFUSÉ (cas 72), par le hook, par --prejuger (cas 74) et sur une réponse
+  // courte (cas 76) ; un retour du journal hors run que le lot ne cite que par le seq du ledger → refusé encore (cas 73, les deux seq se confondent sinon).
+  // VERTS : le remède que le refus prescrit, joué (le lot cite le seq dans la forme du gabarit) → plus de refus (72 bis, 73 bis) ; un retour écrit AVANT le tour n'est pas accusé (72 ter) ; hors d'un
+  // produit, sans début de tour daté, ou sans ledger → sans objet (75) ; au second passage (stop_hook_active), l'écart est dit sans second refus (76 bis).
+  if (veut(72, 73, 74, 75, 76)) {
+    const DEBUT72 = "2026-11-10T18:00:00.000Z", AVANT72 = "2026-11-10T17:00:00Z", PENDANT72 = "2026-11-10T18:05:00Z";
+    const jsonl72 = (es) => es.map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const retour72 = (seq, ts, extra = {}) => ({ seq, ts, type: "retour", ...extra });
+    let n72 = 0;
+    const produit72 = ({ ledger = [], horsRun = [], lots = {} } = {}) => {
+      const d = join(base, `produit-72-${++n72}`);
+      mkdirSync(join(d, "forge", "retours"), { recursive: true });
+      if (ledger.length) writeFileSync(join(d, "forge", "ledger.jsonl"), jsonl72(ledger), "utf8");
+      if (horsRun.length) writeFileSync(join(d, "forge", "hors-run.jsonl"), jsonl72(horsRun), "utf8");
+      for (const [nom, texte] of Object.entries(lots)) writeFileSync(join(d, "forge", "retours", nom), texte, "utf8");
+      return d;
+    };
+    // Un tour de travail : le message humain DATÉ (le début du tour), un outil d'écriture, le texte final.
+    const tour72 = (texteFinal, { sansHorodatage = false } = {}) => [
+      { type: "user", ...(sansHorodatage ? {} : { timestamp: DEBUT72 }), message: { role: "user", content: "consigne le retour de ce que tu viens de voir" } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: {} }] } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const ENV72 = { ...ENV_SANS_SESSION, FORGE_RESERVATION_BLOQUANTE_DES: "2099-01-01" };
+    const REMONTEE72 = BON + "\n- Remontée à la factory : lot « Produit - RETOURS - 20261110a » remis.\n";
+    const lancer72 = (d, texte, { actif = false, sansHorodatage = false } = {}) => {
+      const p = join(base, `tour-72-${++n72}.jsonl`); writeFileSync(p, tour72(texte, { sansHorodatage }), "utf8");
+      const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: d, env: ENV72,
+        input: JSON.stringify({ session_id: "t72", transcript_path: p, stop_hook_active: actif, cwd: d }) });
+      try { return JSON.parse(r.stdout || "null"); } catch { return null; }
+    };
+    const lireJournal72 = (c) => { try { return readFileSync(c, "utf8").split(/\r?\n/).filter(Boolean).map((l) => JSON.parse(l)); } catch { return []; } };
+    const dit = (o) => `${o?.reason || ""} ${o?.systemMessage || ""}`;
+    const LOT_CITE = { "Produit - RETOURS - 20261110a.md": "# Retours\n\n- **Références ledger** : forge/ledger.jsonl seq 3 (entrées `type: retour`)\n- **Statut** : a_remettre\n" };
+
+    if (veut(72)) {
+      // ROUGE — un retour écrit pendant le tour, aucun lot.
+      const d = produit72({ ledger: [retour72(3, PENDANT72)] });
+      const a = lancer72(d, REMONTEE72);
+      if (a?.decision !== "block" || !/LOT — le tour a écrit 1 retour \(forge\/ledger\.jsonl seq 3\)/.test(a.reason || "")
+        || !/oracle-lot\.mjs "<lot>\.md" --remettre/.test(a.reason || "") || !/dans le tour où il est écrit/.test(a.reason || ""))
+        echecs.push(`72 : un retour écrit pendant le tour sans lot → attendu REFUSÉ sur LOT avec le seq, la commande oracle-lot --remettre et la règle, obtenu ${JSON.stringify(a).slice(0, 360)}`);
+      const jr = lireJournal72(process.env.FORGE_HOOKS_JOURNAL).filter((l) => l.session === "t72" && l.lot_dans_le_tour).pop();      if (jr?.lot_dans_le_tour?.verdict !== "FAIL" || jr.lot_dans_le_tour.retours?.[0] !== "seq 3" || jr.lot_dans_le_tour.via !== "ledger" || !(jr.bloquantes || []).includes("LOT"))
+        echecs.push(`72 bis (journal) : le refus doit s'inscrire au journal des hooks (verdict, seq, via, bloquante LOT), obtenu ${JSON.stringify(jr ?? null).slice(0, 300)}`);
+      // VERT — le remède joué : le lot cite le seq dans la forme que le refus prescrit.
+      const dLot = produit72({ ledger: [retour72(3, PENDANT72)], lots: { "Produit - RETOURS - 20261110a.md": "# Retours\n\nRéférences ledger : forge/ledger.jsonl seq 3\n" } });
+      const b = lancer72(dLot, REMONTEE72);
+      if (/LOT — /.test(dit(b))) echecs.push(`72 ter : le lot qui cite le seq (le remède du refus) doit lever le refus LOT, obtenu ${dit(b).slice(0, 300)}`);
+      // VERT — le retour d'AVANT le tour n'est pas accusé (l'alerte d'ouverture TF-1988 le dit), et seul le retour du tour l'est.
+      const dAvant = produit72({ ledger: [retour72(1, AVANT72)] });
+      const c = lancer72(dAvant, REMONTEE72);
+      if (/LOT — /.test(dit(c))) echecs.push(`72 quater : un retour écrit AVANT le tour ne doit pas être accusé, obtenu ${dit(c).slice(0, 300)}`);
+      const dMixte = produit72({ ledger: [retour72(1, AVANT72), retour72(2, AVANT72), retour72(4, PENDANT72)] });
+      const e = lancer72(dMixte, REMONTEE72);
+      if (e?.decision !== "block" || !/LOT — le tour a écrit 1 retour \(forge\/ledger\.jsonl seq 4\)/.test(e.reason || ""))
+        echecs.push(`72 quinquies : deux retours anciens et un retour du tour → attendu seul seq 4 accusé, obtenu ${JSON.stringify(e).slice(0, 300)}`);
+      // BORNES de la fonction : le ts du ledger est tronqué à la seconde (999 ms de tolérance), un début de tour illisible n'accuse personne.
+      const dBorne = produit72({ ledger: [retour72(5, "2026-11-10T18:00:00Z")] });
+      const tol = retoursDuTourSansLot(dBorne, join(ICI, ".."), { depuis: "2026-11-10T18:00:00.400Z" });
+      if (!tol || tol.length !== 1 || tol[0].seq !== 5) echecs.push(`72 sexies : un retour écrit dans la même seconde que le message humain (ts tronqué) doit être accusé, obtenu ${JSON.stringify(tol)}`);
+      const tard = retoursDuTourSansLot(dBorne, join(ICI, ".."), { depuis: "2026-11-10T18:00:02.000Z" });
+      if (!tard || tard.length !== 0) echecs.push(`72 septies : un retour de 2 s AVANT le message humain ne doit pas être accusé, obtenu ${JSON.stringify(tard)}`);
+      if (retoursDuTourSansLot(dBorne, join(ICI, ".."), { depuis: null }) !== null) echecs.push("72 octies : sans début de tour daté, la fonction doit rendre null (non relevé), pas une liste");
+    }
+
+    if (veut(73)) {
+      // Le journal hors run (TF-2260) : son seq repart de 1. Un lot qui cite « ledger seq 1 » ne couvre pas « hors-run seq 1 ».
+      const dHr = produit72({ horsRun: [retour72(1, PENDANT72, { hors_run: true })], lots: { "Produit - RETOURS - 20261110a.md": "# Retours\n\nRéférences ledger : forge/ledger.jsonl seq 1\n" } });
+      const a = lancer72(dHr, REMONTEE72);
+      if (a?.decision !== "block" || !/LOT — le tour a écrit 1 retour \(forge\/hors-run\.jsonl seq 1\)/.test(a.reason || ""))
+        echecs.push(`73 : un retour du journal hors run cité seulement par le seq du ledger → attendu REFUSÉ, hors-run nommé, obtenu ${JSON.stringify(a).slice(0, 300)}`);
+      const dHrLot = produit72({ horsRun: [retour72(1, PENDANT72, { hors_run: true })], lots: { "Produit - RETOURS - 20261110a.md": "# Retours\n\nRéférences hors run : forge/hors-run.jsonl seq 1 ;\n" } });
+      const b = lancer72(dHrLot, REMONTEE72);
+      if (/LOT — /.test(dit(b))) echecs.push(`73 bis : le lot qui cite « forge/hors-run.jsonl seq 1 ; » (la forme prescrite) doit lever le refus, obtenu ${dit(b).slice(0, 300)}`);
+    }
+
+    if (veut(74)) {
+      // --prejuger rend le MÊME refus avant l'affichage ; le remède joué le lève.
+      const prejuger74 = (d, texte, nom) => {
+        const f = join(base, `brouillon-${nom}.md`); writeFileSync(f, texte, "utf8");
+        const t = join(base, `tour-${nom}.jsonl`); writeFileSync(t, tour72(texte), "utf8");
+        const r = spawnSync(process.execPath, [HOOK, "--prejuger", f, "--transcript", t], { encoding: "utf8", cwd: d, env: ENV72 });
+        let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+        return { code: r.status, o };
+      };
+      const p1 = prejuger74(produit72({ ledger: [retour72(3, PENDANT72)] }), REMONTEE72, "74-rouge");
+      if (p1.code !== 1 || p1.o?.affichable !== false || !(p1.o?.bloquants || []).some((x) => /^LOT — le tour a écrit 1 retour/.test(x) && /--remettre/.test(x)) || p1.o?.lot_dans_le_tour?.verdict !== "FAIL")
+        echecs.push(`74 : --prejuger chez un produit dont le tour a écrit un retour sans lot → attendu exit 1, non affichable, bloquant LOT avec la commande, obtenu exit ${p1.code} ${JSON.stringify(p1.o).slice(0, 360)}`);
+      const p2 = prejuger74(produit72({ ledger: [retour72(3, PENDANT72)], lots: LOT_CITE }), REMONTEE72, "74-vert");
+      if ((p2.o?.bloquants || []).some((x) => /^LOT — /.test(x)) || p2.o?.lot_dans_le_tour?.verdict !== "PASS")
+        echecs.push(`74 bis : --prejuger avec le lot qui cite le seq → attendu aucun bloquant LOT et verdict PASS, obtenu ${JSON.stringify(p2.o).slice(0, 360)}`);
+      // Transcript introuvable : le début du tour est inconnu, le contrôle n'est pas joué et le dit.
+      const f3 = join(base, "brouillon-74-sans-transcript.md"); writeFileSync(f3, REMONTEE72, "utf8");
+      const r3 = spawnSync(process.execPath, [HOOK, "--prejuger", f3, "--transcript", join(base, "introuvable-74.jsonl")], { encoding: "utf8", cwd: produit72({ ledger: [retour72(3, PENDANT72)] }), env: ENV72 });
+      let o3 = null; try { o3 = JSON.parse(r3.stdout || "null"); } catch { /* sortie illisible */ }
+      if (!/^non jouée/.test(String(o3?.lot_dans_le_tour || ""))) echecs.push(`74 ter : sans transcript, --prejuger doit dire que le contrôle LOT n'est pas joué, obtenu ${JSON.stringify(o3?.lot_dans_le_tour)}`);
+    }
+
+    if (veut(75)) {
+      // SANS OBJET : hors d'un produit (un ledger sans forge/retours/), début du tour non daté, produit sans ledger.
+      const dHors = join(base, "dossier-75-hors-produit"); mkdirSync(join(dHors, "forge"), { recursive: true });
+      writeFileSync(join(dHors, "forge", "ledger.jsonl"), jsonl72([retour72(3, PENDANT72)]), "utf8");
+      const h = controlerLotDansLeTour({ racine: dHors, depuis: DEBUT72, tourEcrit: true });
+      if (h.verdict !== "SANS_OBJET" || h.applicable || !/ni un produit/.test(h.motif || "")) echecs.push(`75 : hors d'un produit → attendu SANS_OBJET, obtenu ${JSON.stringify(h).slice(0, 220)}`);
+      if (/LOT — /.test(dit(lancer72(dHors, REMONTEE72)))) echecs.push("75 bis : le hook ne doit pas accuser un dossier qui n'est pas un produit");
+      const dProd = produit72({ ledger: [retour72(3, PENDANT72)] });
+      const sh = controlerLotDansLeTour({ racine: dProd, depuis: null, tourEcrit: true });
+      if (sh.verdict !== "SANS_OBJET" || !/illisible/.test(sh.motif || "")) echecs.push(`75 ter : sans début de tour daté → attendu SANS_OBJET, obtenu ${JSON.stringify(sh).slice(0, 220)}`);
+      if (/LOT — /.test(dit(lancer72(dProd, REMONTEE72, { sansHorodatage: true })))) echecs.push("75 quater : une transcription sans horodatage du message humain n'accuse personne");
+      const sl = controlerLotDansLeTour({ racine: produit72(), depuis: DEBUT72, tourEcrit: true });
+      if (sl.verdict !== "SANS_OBJET") echecs.push(`75 quinquies : un produit sans ledger ni journal hors run → attendu SANS_OBJET (non relevé, pas zéro retour), obtenu ${JSON.stringify(sl).slice(0, 200)}`);
+      const pass = controlerLotDansLeTour({ racine: produit72({ ledger: [retour72(1, AVANT72)] }), depuis: DEBUT72, tourEcrit: true });
+      if (pass.verdict !== "PASS" || !pass.applicable) echecs.push(`75 sexies : un produit sans retour écrit dans le tour → attendu PASS, obtenu ${JSON.stringify(pass).slice(0, 200)}`);
+      // Un tour qui n'a RIEN écrit n'a pas écrit de retour : celui que le ledger date de ce tour vient d'une autre session du produit (deux sessions vivantes, TF-2329 non jugé (1)).
+      const lu = controlerLotDansLeTour({ racine: dProd, depuis: DEBUT72, tourEcrit: false });
+      if (lu.verdict !== "SANS_OBJET" || !/rien écrit/.test(lu.motif || "")) echecs.push(`75 septies : un tour qui n'a rien écrit ne doit pas être accusé du retour d'une autre session, obtenu ${JSON.stringify(lu).slice(0, 220)}`);
+      const lecture = join(base, "tour-75-lecture.jsonl");
+      writeFileSync(lecture, [{ type: "user", timestamp: DEBUT72, message: { role: "user", content: "où en est le produit ?" } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Read", input: { file_path: join(dProd, "forge", "ledger.jsonl") } }] } },
+        { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+        { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: "Le produit en est à sa première étape." }] } }].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+      const rl = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: dProd, env: ENV72, input: JSON.stringify({ session_id: "t75", transcript_path: lecture, stop_hook_active: false, cwd: dProd }) });
+      if (/LOT — /.test(rl.stdout || "")) echecs.push(`75 octies : un tour de lecture seule dans un produit dont le ledger date un retour de ce tour (autre session) ne doit pas être refusé, obtenu ${String(rl.stdout).slice(0, 240)}`);
+    }
+
+    if (veut(76)) {
+      // Un message NON jugé sur sa forme (le relais de trois lignes, TF-1182) n'échappe pas au lot dû : le tour a écrit un retour avant son premier affichage.
+      // Au second passage (stop_hook_active) l'écart est dit sans second refus.
+      const relais76 = (nom) => { const p = join(base, `tour-76-${nom}.jsonl`);
+        writeFileSync(p, [{ type: "user", timestamp: DEBUT72, message: { role: "user", content: "consigne le retour de ce que tu viens de voir" } },
+          { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Write", input: {} }] } },
+          { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+          { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: "Premier point fait." }] } },
+          { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Read", input: {} }] } },
+          { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+          { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: "Je poursuis." }] } }].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+        return p; };
+      const hook76 = (d, nom, actif = false) => { const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: d, env: ENV72,
+        input: JSON.stringify({ session_id: "t76", transcript_path: relais76(nom), stop_hook_active: actif, cwd: d }) });
+        try { return JSON.parse(r.stdout || "null"); } catch { return null; } };
+      const d = produit72({ ledger: [retour72(3, PENDANT72)] });
+      const a = hook76(d, "rouge");
+      if (a?.decision !== "block" || !/^\[hook restitution — lot dans le tour\]/.test(a.reason || "") || !/relais de/.test(a.reason || "") || !/LOT — le tour a écrit 1 retour/.test(a.reason || ""))
+        echecs.push(`76 : un relais (non jugé sur sa forme) dans un tour qui a écrit un retour sans lot → attendu REFUSÉ « lot dans le tour », obtenu ${JSON.stringify(a).slice(0, 320)}`);
+      const b = hook76(d, "actif", true);
+      if (b?.decision === "block" || !/LOT — le tour a écrit 1 retour/.test(b?.systemMessage || ""))
+        echecs.push(`76 bis : au second passage (stop_hook_active) → attendu aucun refus et l'écart affiché, obtenu ${JSON.stringify(b).slice(0, 300)}`);
+      const c = hook76(produit72({ ledger: [retour72(3, PENDANT72)], lots: LOT_CITE }), "vert");
+      if (c !== null && (c.decision === "block" || /LOT — /.test(dit(c)))) echecs.push(`76 ter : un relais avec le lot qui cite le seq → attendu aucun refus LOT, obtenu ${dit(c).slice(0, 300)}`);
+    }
+  }
+
+  // 77 — TF-2445 (12/11/2026, RU-21) : `--prejuger` JUGE UNE RÉPONSE COURTE D'UN TOUR SANS ÉCRITURE COMME LE HOOK DE FIN DE TOUR, DANS SES CINQ SENS. Le fait : un brouillon de 207 mots,
+  // « Niveau : Simple », dans un tour qui n'avait rien écrit, rendait `affichable: false` (S1 et S4) par `--prejuger`, alors que le hook de fin de tour l'acceptait par l'exemption « réponse
+  // courte sans écriture » ; la session affichait sans préjuger. ROUGE (avant) : (a) le brouillon de 207 mots, tour de lecture seule → attendu affichable, exit 0. VERTS : (b) le MÊME brouillon dans
+  // un tour qui a écrit un fichier reste jugé en restitution complète (S1, exit 1) ; (c) un « oui » court à une question de complétude sans « Mesuré sur » est refusé par COMPLÉTUDE, et (d) avec la
+  // ligne (le remède que le refus propose, joué) il est affichable ; (e) sans transcript, le tour est inconnu et le brouillon reste jugé en restitution complète (comportement d'avant).
+  if (veut(77)) {
+    const PHRASE77 = "Le relevé d'ouverture lit les exécutions récentes et ne touche à aucun fichier du dépôt, ce qui laisse le poste prêt pour la suite de la journée sans geste de votre part.";
+    const remplir77 = (tete, n) => { let t = tete; while (t.trim().split(/\s+/).length < n + 40) t += " " + PHRASE77; return t.trim().split(/\s+/).slice(0, n).join(" ") + "\n"; };
+    const COURT77 = remplir77("Niveau : Simple\n", 207);
+    if (COURT77.trim().split(/\s+/).length !== 207) echecs.push("77 : la fixture ne compte pas 207 mots — le cas ne prouve plus rien");
+    const QCOMPLETUDE77 = "Est-ce que le reste du site a été mis à jour ?";
+    const MESURE77 = "Mesuré sur : conditions générales du 15/10 du produit amont (docs/cgv-20261015d.md), relue à 14:32, périmètre 273 pages";
+    const OUI77 = remplir77("Oui, le site est à jour.", 207);
+    const OUI_MESURE77 = OUI77.trimEnd() + "\n\n" + MESURE77 + "\n";
+    const tour77 = (humain, outils, texteFinal) => [
+      { type: "user", message: { role: "user", content: humain } },
+      { type: "assistant", message: { role: "assistant", content: outils.map((n) => ({ type: "tool_use", name: n, input: n === "Write" ? { file_path: "C:/dev/produit-fictif/note.md" } : {} })) } },
+      { type: "user", message: { role: "user", content: [{ type: "tool_result", content: "ok" }] } },
+      { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texteFinal }] } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const dossier77 = join(base, "dossier-77"); mkdirSync(dossier77, { recursive: true });
+    const preju77 = (nom, humain, outils, brouillon, { sansTranscript = false } = {}) => {
+      const tr = join(base, `tour-77-${nom}.jsonl`); writeFileSync(tr, tour77(humain, outils, brouillon), "utf8");
+      const fb = join(base, `brouillon-77-${nom}.md`); writeFileSync(fb, brouillon, "utf8");
+      const r = spawnSync(process.execPath, [HOOK, "--prejuger", fb, ...(sansTranscript ? [] : ["--transcript", tr])], { encoding: "utf8", cwd: dossier77, env: ENV_SANS_SESSION });
+      let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* illisible */ }
+      return { code: r.status, o };
+    };
+    const a = preju77("lecture", "où en est le relevé d'ouverture ?", ["Read"], COURT77);
+    if (a.code !== 0 || a.o?.affichable !== true || (a.o?.bloquants || []).length)
+      echecs.push(`77 a : un brouillon de 207 mots (« Niveau : Simple »), tour de lecture seule → attendu affichable et exit 0 comme le hook de fin de tour, obtenu ${a.code} ${JSON.stringify(a.o).slice(0, 260)}`);
+    const b = preju77("ecriture", "mets à jour le relevé d'ouverture", ["Write"], COURT77);
+    if (b.code !== 1 || b.o?.affichable !== false || !(b.o?.bloquants || []).some((x) => /^S1 /.test(x)))
+      echecs.push(`77 b : le MÊME brouillon dans un tour qui a écrit un fichier reste jugé en restitution complète → attendu exit 1 et S1, obtenu ${b.code} ${JSON.stringify(b.o).slice(0, 260)}`);
+    const c = preju77("oui-sans-ligne", QCOMPLETUDE77, ["Read"], OUI77);
+    if (c.code !== 1 || c.o?.affichable !== false || !(c.o?.bloquants || []).some((x) => /^COMPLÉTUDE/.test(x)) || !/Mesuré sur/.test(c.o?.a_corriger || ""))
+      echecs.push(`77 c : un « oui » court à une question de complétude, sans « Mesuré sur » → attendu exit 1, COMPLÉTUDE et le remède nommé (la ligne attendue), obtenu ${c.code} ${JSON.stringify(c.o).slice(0, 300)}`);
+    const d = preju77("oui-avec-ligne", QCOMPLETUDE77, ["Read"], OUI_MESURE77);
+    if (d.code !== 0 || d.o?.affichable !== true)
+      echecs.push(`77 d : le MÊME « oui » avec la ligne « Mesuré sur » (le remède joué) → attendu affichable et exit 0, obtenu ${d.code} ${JSON.stringify(d.o).slice(0, 260)}`);
+    const e = preju77("sans-transcript", "où en est le relevé d'ouverture ?", ["Read"], COURT77, { sansTranscript: true });
+    if (e.code !== 1 || e.o?.affichable !== false || !(e.o?.bloquants || []).some((x) => /^S1 /.test(x)))
+      echecs.push(`77 e : sans transcript le tour est inconnu → attendu le jugement en restitution complète d'avant (exit 1, S1), obtenu ${e.code} ${JSON.stringify(e.o).slice(0, 260)}`);
+  }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
+if (filtre.actif) { const c = conclureFiltre("hook-restitution", filtre, echecs); (c.code === 0 ? console.log : console.error)(c.ligne); process.exit(c.code); }
 if (echecs.length) { console.error("hook-restitution : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log("hook-restitution : 62/62 — LA RACINE DU PROJET (cas 62, TF-1943, 29/10/2026 : un script de navigateur écrit sous src/scripts/ par un tour dont le répertoire courant est src/ est un fichier servi, il n'est plus lu comme l'outillage scripts/ du premier niveau ; l'outillage réel reste de l'outillage ; CLAUDE_PROJECT_DIR prime sur le répertoire courant) ; LA LIGNE « Livré : » DU BLOC 0 (cas 61, S87, TF-1973 et TF-2016, 29/10/2026 : un guide écrit sous output/04-cadrages dont le bloc 0 ne le lie pas est nommé en avertissement avec la ligne à écrire, par le hook comme par --prejuger ; la même ligne liée, en ligne, en puces, deux liens ou bloc 0 titré, ne dit rien ; la synthèse, les README, les sidecars, un brouillon temporaire et une retouche par Edit n'ont rien à lier ; un lien vers un autre fichier ne couvre pas, une cible nue à espaces n'est pas un lien, la comparaison passe par le nom) ; LE VERROU « LIVRÉ » (cas 60, T4, TF-1949, 26/10/2026 : chez un produit, un produit neuf déclaré livré sans ses livrables refusé sur S85 par le hook et par --prejuger, EXIGENCES.json nommé ; les livrables produits, aucun refus ; une livraison sans compte d'exigences sous le verrou, S72 avertie ; sans trace de mobilisation, S86 avertie avant l'échéance et refusée après, l'écrivain nommé) ; LA CRITIQUE D'IMPLÉMENTATION EXIGÉE D'OFFICE (cas 59, TF-1913, D-82 (a), 26/10/2026 : un tour qui écrit site/x.html sans critique averti avec son échéance jusqu'au 02/11 puis refusé dès le 03/11, le message dit à la session de la jouer et ne propose jamais à l'humain de la valider ; la même page suivie de sa critique, le remède joué, passe en silence avant comme après l'échéance, y compris au second passage ; un verdict antérieur à la dernière écriture, la critique d'une autre page, un SKIP, un plantage et la simple lecture du script ne valent pas critique, une sortie redirigée vers un fichier et une boucle shell si ; un tour d'outillage (.mjs, tests, scripts, gabarits, node_modules, fixtures, hooks, script Node, brouillon temporaire) n'accuse rien et le même plus une page n'accuse que la page ; la définition d'un fichier servi cas par cas au pilot et chez un produit ; --prejuger joue la critique) ; LE COMPTE RENDU COMPLET ALLÉGÉ (cas 58, T2, TF-1947, 26/10/2026 : sans les blocs 2, 6 et 7 sans refus ; sans le bloc 9 refusé sur S1 ; une décision au format B sans son tableau refusée sur S4, avec lui sans refus ; un verdict sans fait mesuré refusé sur S3 ; des actions sans ordre justifié averties sur S6 ; et, adaptés, GESTE (15), PROCÉDURE (37), S48 (45), S80 (50), DÉTAIL (51), S83 (55) et S84 (56) avertis au lieu de refusés, la détection inchangée) ; LA RÉPONSE COURTE VAUT POUR TOUT TOUR QUI N A RIEN ÉCRIT (cas 57, TF-1947, D-75 (c), 26/10/2026 : une question, 5 commandes de lecture dont le pré-vol par heredoc et une réponse courte, refusée jusque-là, passe ; la même dans un tour qui écrit un fichier, ou de 2 commandes dont un `git -C … commit`, reste jugée ; une redirection vers le dépôt est une écriture, vers le dossier temporaire non ; un « oui » court à une question de complétude sans « Mesuré sur » est refusé sans restitution exigée et son remède passe ; le pré-vol relit la transcription dans les deux sens) ; UNE DEMANDE D AVIS PORTE LE LIEN DU CONTENU (S83, TF-1936 : le cas réel « guide de mon message de 21:45 » dit avant le 28/10 et refusé à l échéance, le remède joué en silence) et L HEURE DU BLOC 1 SE RELÈVE DANS LE TOUR (S84, TF-1938 : « 19:52, durée 4 min » sans relevé dit puis refusé, l en-tête recopié de deux `date` en silence, un transcript sans horodatage non accusé, --prejuger avec et sans transcription) ; UNE AFFIRMATION D EXHAUSTIVITE PORTE SA LIGNE « Mesuré sur » (S82, bloquante) et UN « OUI » A UNE QUESTION DE COMPLETUDE AUSSI (contrôle COMPLÉTUDE, bloquant, seul à lire le dernier message humain) : le « oui » du 15/10 (RT-126) sans ligne est refusé par le hook de fin de tour et par --prejuger, avec la ligne « Mesuré sur : <source amont>, relue à HH:MM, périmètre <n> » il passe, la liste de l auteur (« mes marqueurs ») et la formule « Mesuré contre » restent refusées, un « non » n est pas l affirmation (cas 54, TF-1866, D-29 (a), 18/10/2026) ; LA MÊME RÉSERVATION AU PILOT (cas 53, TF-1872, D-32 (a), 18/10/2026) : une D-N nouvelle absente du registre decisions/REGISTRE.jsonl est AVERTIE jusqu au 2026-10-25 puis REFUSÉE, une D-N déjà prise pour une AUTRE question est nommée avec la question inscrite, les remèdes sont joués (scripts/reserver-decision.mjs --question rend et inscrit le numéro suivant, --reformuler garde le numéro d une décision réécrite), une D-N nommée par l humain, citée par le message précédent ou rappelée en une ligne n est pas nouvelle, un registre introuvable est dit sans accuser ; une D-N NOUVELLE du bloc 3 est inscrite au registre du produit est inscrite au registre du produit (une entrée question_humain de forge/ledger.jsonl qui la nomme) AVANT l affichage : non inscrite, elle est AVERTIE jusqu à l échéance du 2026-11-01 puis REFUSÉE par le hook de fin de tour et par --prejuger, le remède recommandé (ledger.py question_humain --decision D-N) est joué et lève le refus, un rappel d une ligne (S4), une D-N déjà à l écran ou nommée par l humain (61a, 61 détaille) ne sont pas jugés, et une forge ou un dossier hors pilot et hors produit n a pas de registre (cas 52, TF-1849, 18/10/2026) ; une demande de détail l emporte sur le rappel d une ligne (S4) : « 51 détaille », « détaille la 51 » reconnus et « étape 3 détaille », « TF-1851 détaille » épargnés, la décision rappelée en une ligne, absente ou reposée sans options REFUSÉE par le hook de fin de tour et par --prejuger, la décision reposée en entier ou remplacée par des décisions détaillées qui la citent acceptée (cas 51, TF-1851, 18/10/2026) ; S80 (E-11 sur le Markdown, TF-1847, 18/10/2026) est BLOQUANTE : une énumération « 1) … 2) … 3) » sur une ligne du bloc 4 est refusée par --prejuger et par le hook de fin de tour, la MÊME information en liste est affichable, la forme montrée entre guillemets français n est pas refusée, et le guide en paragraphe n est qu averti par S81 (cas 50) ; un document de projet marqué par son gabarit n est plus jugé à la place de la restitution, une synthèse nommée reste comparée, et --prejuger rend le même refus AFFICHAGE avant l affichage en relisant le transcript, la comparaison non jouée étant dite (cas 49, TF-1720, 15/10/2026) ; une explication demandée rendue en restitution sans fiche est dite en avertissement EXPLICATION, et la fiche écrite ou citée la lève (cas 48, TF-1641, 14/10/2026) ; un message d attente de 3 lignes au plus n est pas jugé tant qu une tâche d arrière-plan du tour n est pas revenue, et il redevient jugé sans tâche, tâche revenue ou verdict porté (cas 47, TF-1649, 14/10/2026) ; --prejuger rend le verdict bloquant du hook avant affichage, et un refus sans préjugement le dit comme un défaut distinct (cas 46, TF-1647, TF-1666, 14/10/2026) ; S48 est jugée au hook chez un produit, bloquante, et « rien à remonter » passe (cas 45, TF-1644, 14/10/2026) ; « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");
+console.log("hook-restitution : 77/77 — --prejuger JUGE UNE RÉPONSE COURTE D UN TOUR SANS ÉCRITURE COMME LE HOOK DE FIN DE TOUR (cas 77, TF-2445, RU-21 : un brouillon de 207 mots « Niveau : Simple » dans un tour de lecture seule est affichable, le même dans un tour qui a écrit reste jugé en restitution complète, un « oui » court à une question de complétude sans « Mesuré sur » est refusé par COMPLÉTUDE et le remède joué l'accepte, sans transcript le brouillon reste jugé en restitution complète) ; LE LOT PART DANS LE TOUR OÙ UN RETOUR EST ÉCRIT (cas 72 à 76, TF-2329, D-191 (a) : chez un produit, un retour écrit au ledger ou au journal hors run depuis le message humain et qu'aucun lot de forge/retours/ ne cite par son seq est REFUSÉ, avec la commande oracle-lot --remettre, par le hook de fin de tour, par --prejuger et sur un relais ; le lot qui le cite lève le refus ; un retour d'avant le tour, un tour qui n'a rien écrit, un dossier hors produit et un début de tour non daté ne sont pas accusés ; au second passage l'écart est dit sans second refus) ; LE REPLI DU DISQUE BORNÉ AU CHEMIN DISPARU ET LE MESSAGE D'UNE AUTRE SESSION OUVRE UN SEGMENT (cas 70 et 71, TF-2348) ; LE JOURNAL DES HOOKS D'UNE RECETTE N'EST PAS CELUI DU DÉPÔT (cas 69, TF-2257 : le hook lancé avec FORGE_HOOKS_JOURNAL écrit la ligne de sa session au fichier désigné et jamais à .claude/hooks-journal.jsonl du dépôt ; la recette dérive tout son journal, cas 66 compris, vers un fichier jetable) ; UN LIVRABLE LIÉ « LIVRÉ » SE SCELLE AU PASS ET SA RÉÉCRITURE EN PLACE EST REFUSÉE (cas 68, TF-2191, S94 : le sceau est posé sur l'étude liée, la même réécrite et liée de nouveau est refusée avec l'indice suivant nommé, le remède passe et se scelle ; scellerLivrable ne scelle ni un nom hors convention, ni une synthèse, ni un fichier déjà scellé) ; UNE FICHE DE GABARIT N'EST PAS LA SYNTHÈSE DU TOUR (cas 65, TF-2182, 06/11/2026 : une fiche E-16 qui déclare gabarit: en en-tête n'est plus retenue par syntheseDuTour, la restitution qui la cite passe, une synthèse nommée reste comparée, un gabarit: en prose n'écarte rien) ; EN MODE NON INTERACTIF, UN MESSAGE D'ATTENTE NE DIFFÈRE PAS LA RESTITUTION (cas 66, TF-2193 : session claude -p, tâche d'arrière-plan non revenue, refus dédié qui dit d'attendre au premier plan, exemption TF-1649 intacte en interactif, borne de 30 refus) ; --prejuger SORT EN 1 TANT QU'UN AVERTISSEMENT DES BLOCS 2, 3 ET 8 SUBSISTE (cas 67, TF-2203 : S3, S16, S32, S19, S11 ; le hook de fin de tour les dit sans refuser) ; UN LIVRABLE ÉCRIT À LA MAIN À CÔTÉ D UN SKILL DE LA FACTORY SE REMONTE (cas 64, TF-2078, RT-33, 04/11/2026 : chez un produit, un tour qui lance un skill de la Factory et écrit un livrable de page ou de document par Write sans retour au ledger reçoit l avertissement REMONTÉE, par le hook et par --prejuger, sans refus ; un retour consigné par commande ou au ledger après le message humain, un skill qui n est pas de la Factory, un skill sans livrable écrit à la main, un livrable sans skill, un projet hors produit ne disent rien, et un retour antérieur ne couvre pas) ; UNE SUPPRESSION DANS LE DOSSIER TEMPORAIRE N EST PAS UNE ÉCRITURE (cas 57 duodecies à quindecies, TF-2079, RT-34) ; LES CHIFFRES D'UN GAIN ÉCRIT AU REGISTRE (cas 63, D-131 (a), TF-2056, 02/11/2026 : « 813 Markdown suivis, 4 accusés » écrit par un Write devant une sortie qui dit 1 209 et 5 rend un avertissement GAINS par chiffre, jamais un refus ; un gain écrit par un heredoc, ou composé par un script que journaliser a imprimé et retrouvé au registre par son ts exact, aussi ; les chiffres lus dans le tour, un gain sans chiffre, un chiffre rapporté par l'agent, l'événement d'une autre session et un registre introuvable ne disent rien) ; LA RACINE DU PROJET (cas 62, TF-1943, 29/10/2026 : un script de navigateur écrit sous src/scripts/ par un tour dont le répertoire courant est src/ est un fichier servi, il n'est plus lu comme l'outillage scripts/ du premier niveau ; l'outillage réel reste de l'outillage ; CLAUDE_PROJECT_DIR prime sur le répertoire courant) ; LA LIGNE « Livré : » DU BLOC 0 (cas 61, S87, TF-1973 et TF-2016, 29/10/2026 : un guide écrit sous output/04-cadrages dont le bloc 0 ne le lie pas est nommé en avertissement avec la ligne à écrire, par le hook comme par --prejuger ; la même ligne liée, en ligne, en puces, deux liens ou bloc 0 titré, ne dit rien ; la synthèse, les README, les sidecars, un brouillon temporaire et une retouche par Edit n'ont rien à lier ; un lien vers un autre fichier ne couvre pas, une cible nue à espaces n'est pas un lien, la comparaison passe par le nom) ; LE VERROU « LIVRÉ » (cas 60, T4, TF-1949, 26/10/2026 : chez un produit, un produit neuf déclaré livré sans ses livrables refusé sur S85 par le hook et par --prejuger, EXIGENCES.json nommé ; les livrables produits, aucun refus ; une livraison sans compte d'exigences sous le verrou, S72 avertie ; sans trace de mobilisation, S86 avertie avant l'échéance et refusée après, l'écrivain nommé) ; LA CRITIQUE D'IMPLÉMENTATION EXIGÉE D'OFFICE (cas 59, TF-1913, D-82 (a), 26/10/2026 : un tour qui écrit site/x.html sans critique averti avec son échéance jusqu'au 02/11 puis refusé dès le 03/11, le message dit à la session de la jouer et ne propose jamais à l'humain de la valider ; la même page suivie de sa critique, le remède joué, passe en silence avant comme après l'échéance, y compris au second passage ; un verdict antérieur à la dernière écriture, la critique d'une autre page, un SKIP, un plantage et la simple lecture du script ne valent pas critique, une sortie redirigée vers un fichier et une boucle shell si ; un tour d'outillage (.mjs, tests, scripts, gabarits, node_modules, fixtures, hooks, script Node, brouillon temporaire) n'accuse rien et le même plus une page n'accuse que la page ; la définition d'un fichier servi cas par cas au pilot et chez un produit ; --prejuger joue la critique) ; LE COMPTE RENDU COMPLET ALLÉGÉ (cas 58, T2, TF-1947, 26/10/2026 : sans les blocs 2, 6 et 7 sans refus ; sans le bloc 9 refusé sur S1 ; une décision au format B sans son tableau refusée sur S4, avec lui sans refus ; un verdict sans fait mesuré refusé sur S3 ; des actions sans ordre justifié averties sur S6 ; et, adaptés, GESTE (15), PROCÉDURE (37), S48 (45), S80 (50), DÉTAIL (51), S83 (55) et S84 (56) avertis au lieu de refusés, la détection inchangée) ; LA RÉPONSE COURTE VAUT POUR TOUT TOUR QUI N A RIEN ÉCRIT (cas 57, TF-1947, D-75 (c), 26/10/2026 : une question, 5 commandes de lecture dont le pré-vol par heredoc et une réponse courte, refusée jusque-là, passe ; la même dans un tour qui écrit un fichier, ou de 2 commandes dont un `git -C … commit`, reste jugée ; une redirection vers le dépôt est une écriture, vers le dossier temporaire non ; un « oui » court à une question de complétude sans « Mesuré sur » est refusé sans restitution exigée et son remède passe ; le pré-vol relit la transcription dans les deux sens) ; UNE DEMANDE D AVIS PORTE LE LIEN DU CONTENU (S83, TF-1936 : le cas réel « guide de mon message de 21:45 » dit avant le 28/10 et refusé à l échéance, le remède joué en silence) et L HEURE DU BLOC 1 SE RELÈVE DANS LE TOUR (S84, TF-1938 : « 19:52, durée 4 min » sans relevé dit puis refusé, l en-tête recopié de deux `date` en silence, un transcript sans horodatage non accusé, --prejuger avec et sans transcription) ; UNE AFFIRMATION D EXHAUSTIVITE PORTE SA LIGNE « Mesuré sur » (S82, bloquante) et UN « OUI » A UNE QUESTION DE COMPLETUDE AUSSI (contrôle COMPLÉTUDE, bloquant, seul à lire le dernier message humain) : le « oui » du 15/10 (RT-126) sans ligne est refusé par le hook de fin de tour et par --prejuger, avec la ligne « Mesuré sur : <source amont>, relue à HH:MM, périmètre <n> » il passe, la liste de l auteur (« mes marqueurs ») et la formule « Mesuré contre » restent refusées, un « non » n est pas l affirmation (cas 54, TF-1866, D-29 (a), 18/10/2026) ; LA MÊME RÉSERVATION AU PILOT (cas 53, TF-1872, D-32 (a), 18/10/2026) : une D-N nouvelle absente du registre decisions/REGISTRE.jsonl est AVERTIE jusqu au 2026-10-25 puis REFUSÉE, une D-N déjà prise pour une AUTRE question est nommée avec la question inscrite, les remèdes sont joués (scripts/reserver-decision.mjs --question rend et inscrit le numéro suivant, --reformuler garde le numéro d une décision réécrite), une D-N nommée par l humain, citée par le message précédent ou rappelée en une ligne n est pas nouvelle, un registre introuvable est dit sans accuser ; une D-N NOUVELLE du bloc 3 est inscrite au registre du produit est inscrite au registre du produit (une entrée question_humain de forge/ledger.jsonl qui la nomme) AVANT l affichage : non inscrite, elle est AVERTIE jusqu à l échéance du 2026-11-01 puis REFUSÉE par le hook de fin de tour et par --prejuger, le remède recommandé (ledger.py question_humain --decision D-N) est joué et lève le refus, un rappel d une ligne (S4), une D-N déjà à l écran ou nommée par l humain (61a, 61 détaille) ne sont pas jugés, et une forge ou un dossier hors pilot et hors produit n a pas de registre (cas 52, TF-1849, 18/10/2026) ; une demande de détail l emporte sur le rappel d une ligne (S4) : « 51 détaille », « détaille la 51 » reconnus et « étape 3 détaille », « TF-1851 détaille » épargnés, la décision rappelée en une ligne, absente ou reposée sans options REFUSÉE par le hook de fin de tour et par --prejuger, la décision reposée en entier ou remplacée par des décisions détaillées qui la citent acceptée (cas 51, TF-1851, 18/10/2026) ; S80 (E-11 sur le Markdown, TF-1847, 18/10/2026) est BLOQUANTE : une énumération « 1) … 2) … 3) » sur une ligne du bloc 4 est refusée par --prejuger et par le hook de fin de tour, la MÊME information en liste est affichable, la forme montrée entre guillemets français n est pas refusée, et le guide en paragraphe n est qu averti par S81 (cas 50) ; un document de projet marqué par son gabarit n est plus jugé à la place de la restitution, une synthèse nommée reste comparée, et --prejuger rend le même refus AFFICHAGE avant l affichage en relisant le transcript, la comparaison non jouée étant dite (cas 49, TF-1720, 15/10/2026) ; une explication demandée rendue en restitution sans fiche est dite en avertissement EXPLICATION, et la fiche écrite ou citée la lève (cas 48, TF-1641, 14/10/2026) ; un message d attente de 3 lignes au plus n est pas jugé tant qu une tâche d arrière-plan du tour n est pas revenue, et il redevient jugé sans tâche, tâche revenue ou verdict porté (cas 47, TF-1649, 14/10/2026) ; --prejuger rend le verdict bloquant du hook avant affichage, et un refus sans préjugement le dit comme un défaut distinct (cas 46, TF-1647, TF-1666, 14/10/2026) ; S48 est jugée au hook chez un produit, bloquante, et « rien à remonter » passe (cas 45, TF-1644, 14/10/2026) ; « seul l humain la détient » est lu contre les messages humains de la session, avertissement dans ses quatre sens sans jamais recopier la valeur (cas 44, TF-1514, 13/10/2026) ; l option --pre-vol que NIVEAUX.md prescrit est jouée dans ses deux sens, Simple et Moyen (cas 43, CP3, 12/10/2026) ; le RAPPEL ne peut plus citer une version du gabarit différente de la sienne (cas 42, TF-1228, 02/10/2026) ; un rappel de D-N en PUCE, forme complète question comprise, est vu comme une décision reposée, et l identifiant seul suivi d un tiret sans question ne l est plus (cas 40 et 41, TF-1468, 28/09/2026) ; une décision CITÉE dans la prose n est plus prise pour une décision posée, une décision posée par sélecteur reste jugée (cas 38 et 39, 01/10/2026) ; une PROCÉDURE demandée reçoit le guide en tête (TF-1361) : les cinq demandes de la soirée du 22/09 reconnues et les quatre autres messages épargnés, le contrôle dans ses trois sens, et de bout en bout un message aux gestes en lignes d'action REFUSÉ sous une demande de procédure, le même guidé et sourcé accepté, le même sous un message qui ne demande rien seulement averti ; le SCEAU d une synthese se pose sans geste humain sur le fichier ECRIT dans le tour, le redepot juge le met a jour (53 couples (session, fichier) sur 238 au journal de ce depot, 22,3 %), une retouche faite APRES le dernier jugement reste un ecart J-1, et un tour qui ne fait que RELIRE ne rescelle rien (TF-1081) ; un fichier ÉCRIT dans le tour prime sur un fichier relu du disque, la relecture restant un repli (TF-1187) ; un fichier de synthèse RENOMMÉ hors outil d'écriture est retrouvé en relisant le dossier du chemin disparu, le plus récemment modifié l'emportant quand deux fichiers marqués coexistent, et un chemin écrit PRÉSENT n'ouvre aucune relecture (TF-1184) ; relais d'avancement dans ses TROIS sens (TF-1182) : trois lignes après une synthèse déjà affichée et RIEN d'écrit depuis NON jugées, le MÊME message précédé d'une seule écriture JUGÉ (le trou de TF-0978 reste fermé), et le MÊME message posant une D-7 JUGÉ (les trois absences de TF-0990 tiennent) ; marqueur lu en tête de ligne et jamais dans la prose : le gabarit qui le CITE n'est plus jugé à la place de la synthèse du tour (correction du 17 septembre 2026), hors format refusé (S1 nommé), anti-boucle, conforme accepté, lecture non jugée, défaut de détail averti SANS réécriture, phrase de transition qui ne masque plus la restitution, transcript sans texte final NON jugé (TF-0516), verdict sans écriture JUGÉ et accusé de réception / question exemptés (TF-0904), blocs 3 et 8 du fichier jugé retrouvés à l'écran — tableau d'options, sélecteurs A-N, acteurs du vocabulaire gelé (TF-0891), verdict du bloc 2 mesurant les mêmes faits des deux côtés — écran enrichi sans redépôt REFUSÉ, identifiants et dates non comptés (TF-0918), décision reçue et GESTE absent REFUSÉ — restitution rejouée mot pour mot et D-N reposée au bloc 3 —, geste exécuté accepté, message humain qui n'est pas un sélecteur hors contrôle, formes du sélecteur reconnues et prose épargnée (TF-1019), exemption « rien de neuf » dans ses DEUX sens — un accusé de trois lignes sans verdict ni D-N NON jugé, le même message posant une D-N JUGÉ (TF-0990)");

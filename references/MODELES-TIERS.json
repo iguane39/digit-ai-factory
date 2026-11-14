@@ -1,0 +1,2933 @@
+{
+  "schema": "pilot/modeles-tiers@1",
+  "version": "1.0.0",
+  "date": "2026-11-03",
+  "regle": "Loi n° 4 de la Factory : un identifiant de modèle tiers et sa date d'arrêt sont une donnée volatile, pas du code. Ce fichier est daté, sourcé, et se relit à la main (page citée, mots de la page) ; il ne se complète jamais de mémoire. Juge : oracles/oracle-modeles-tiers.mjs. Une recherche ne vaut que pour l'identifiant exact écrit ici : un alias, un identifiant absent du calendrier du fournisseur, ou une valeur construite à l'exécution échappent au contrôle.",
+  "etats": {
+    "courant": "listé par la page sans déprécation ou nommé remplaçant ; seuls ceux qu'un appelant du parc emploie sont recopiés",
+    "deprecie": "déprécié, avec ou sans date d'arrêt annoncée",
+    "arrete": "date d'arrêt atteinte ou page qui le range parmi les modèles arrêtés"
+  },
+  "decision": "TF-2109, décision humaine « A2 » du 03/11/2026 (synthèse 20261103n)",
+  "fournisseurs": {
+    "openai": {
+      "documentation": "https://developers.openai.com/api/docs/llms.txt",
+      "calendrier": "https://developers.openai.com/api/docs/deprecations.md",
+      "lu_le": "2026-11-03",
+      "lu_a": "17:05",
+      "portee": "sections « Upcoming deprecations » et « Past deprecations » de la page, relues le 03/11/2026 à 17:05 ; octet pour octet identiques à la copie du catalogue de 15:43 (cmp)",
+      "modeles": [
+        {
+          "id": "gpt-4o-2024-08-06",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-14",
+          "arret": "2027-01-14",
+          "remplacant": "gpt-6-luna",
+          "section": "2026-10-14: GPT-4 series model deprecations",
+          "citation": "January 14, 2027 | GPT-4o (`gpt-4o-2024-08-06`, `gpt-4o-2024-11-20`) | `gpt-6-luna`"
+        },
+        {
+          "id": "gpt-4o-2024-11-20",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-14",
+          "arret": "2027-01-14",
+          "remplacant": "gpt-6-luna",
+          "section": "2026-10-14: GPT-4 series model deprecations",
+          "citation": "January 14, 2027 | GPT-4o (`gpt-4o-2024-08-06`, `gpt-4o-2024-11-20`) | `gpt-6-luna`"
+        },
+        {
+          "id": "gpt-4o-mini-2024-07-18",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-14",
+          "arret": "2027-01-14",
+          "remplacant": "gpt-6-luna",
+          "section": "2026-10-14: GPT-4 series model deprecations",
+          "citation": "January 14, 2027 | GPT-4o mini (`gpt-4o-mini-2024-07-18`) | `gpt-6-luna`"
+        },
+        {
+          "id": "gpt-4.1-2025-04-14",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-14",
+          "arret": "2027-01-14",
+          "remplacant": "gpt-6-luna",
+          "section": "2026-10-14: GPT-4 series model deprecations",
+          "citation": "January 14, 2027 | GPT-4.1 (`gpt-4.1-2025-04-14`) | `gpt-6-luna`"
+        },
+        {
+          "id": "gpt-4.1-mini-2025-04-14",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-14",
+          "arret": "2027-01-14",
+          "remplacant": "gpt-6-luna",
+          "section": "2026-10-14: GPT-4 series model deprecations",
+          "citation": "January 14, 2027 | GPT-4.1 mini (`gpt-4.1-mini-2025-04-14`) | `gpt-6-luna`"
+        },
+        {
+          "id": "gpt-5.3-codex",
+          "famille": "code",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-04-01",
+          "remplacant": "gpt-6-sol",
+          "section": "2026-10-01: GPT-5.3-Codex, GPT-5.1, GPT-5.4-Nano",
+          "citation": "Apr 1, 2027 | `gpt-5.3-codex` | `gpt-6-sol`"
+        },
+        {
+          "id": "gpt-5.4-nano",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-04-01",
+          "remplacant": "gpt-6-luna",
+          "section": "2026-10-01: GPT-5.3-Codex, GPT-5.1, GPT-5.4-Nano",
+          "citation": "Apr 1, 2027 | `gpt-5.4-nano` \\| `gpt-5.4-nano-2026-03-17` | `gpt-6-luna`"
+        },
+        {
+          "id": "gpt-5.4-nano-2026-03-17",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-04-01",
+          "remplacant": "gpt-6-luna",
+          "section": "2026-10-01: GPT-5.3-Codex, GPT-5.1, GPT-5.4-Nano",
+          "citation": "Apr 1, 2027 | `gpt-5.4-nano` \\| `gpt-5.4-nano-2026-03-17` | `gpt-6-luna`"
+        },
+        {
+          "id": "gpt-5.1",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-04-01",
+          "remplacant": "gpt-6-sol",
+          "section": "2026-10-01: GPT-5.3-Codex, GPT-5.1, GPT-5.4-Nano",
+          "citation": "Apr 1, 2027 | `gpt-5.1` \\| `gpt-5.1-2025-11-13` | `gpt-6-sol`"
+        },
+        {
+          "id": "gpt-5.1-2025-11-13",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-04-01",
+          "remplacant": "gpt-6-sol",
+          "section": "2026-10-01: GPT-5.3-Codex, GPT-5.1, GPT-5.4-Nano",
+          "citation": "Apr 1, 2027 | `gpt-5.1` \\| `gpt-5.1-2025-11-13` | `gpt-6-sol`"
+        },
+        {
+          "id": "tts-1",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-01-06",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-10-01: Text-to-speech models",
+          "citation": "Jan 6, 2027 | `tts-1` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "tts-1-hd",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-01-06",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-10-01: Text-to-speech models",
+          "citation": "Jan 6, 2027 | `tts-1-hd` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "gpt-4o-mini-tts",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-01-06",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-10-01: Text-to-speech models",
+          "citation": "Jan 6, 2027 | `gpt-4o-mini-tts` \\| `gpt-4o-mini-tts-2025-03-20` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "gpt-4o-mini-tts-2025-03-20",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-01-06",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-10-01: Text-to-speech models",
+          "citation": "Jan 6, 2027 | `gpt-4o-mini-tts` \\| `gpt-4o-mini-tts-2025-03-20` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "gpt-4o-mini-tts-2025-12-15",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-10-01",
+          "arret": "2027-01-06",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-10-01: Text-to-speech models",
+          "citation": "Jan 6, 2027 | `gpt-4o-mini-tts` \\| `gpt-4o-mini-tts-2025-12-15` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "whisper-1",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-08-26",
+          "arret": "2027-02-26",
+          "remplacant": "gpt-live-transcribe or gpt-transcribe",
+          "section": "2026-08-26: Transcription models",
+          "citation": "Feb 26, 2027 | `whisper-1` | `gpt-live-transcribe` or `gpt-transcribe`"
+        },
+        {
+          "id": "gpt-4o-transcribe",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-08-26",
+          "arret": "2027-02-26",
+          "remplacant": "gpt-live-transcribe or gpt-transcribe",
+          "section": "2026-08-26: Transcription models",
+          "citation": "Feb 26, 2027 | `gpt-4o-transcribe` | `gpt-live-transcribe` or `gpt-transcribe`"
+        },
+        {
+          "id": "gpt-4o-mini-transcribe",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-08-26",
+          "arret": "2027-02-26",
+          "remplacant": "gpt-live-transcribe or gpt-transcribe",
+          "section": "2026-08-26: Transcription models",
+          "citation": "Feb 26, 2027 | `gpt-4o-mini-transcribe` \\| `gpt-4o-mini-transcribe-2025-12-15` | `gpt-live-transcribe` or `gpt-transcribe`"
+        },
+        {
+          "id": "gpt-4o-mini-transcribe-2025-12-15",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-08-26",
+          "arret": "2027-02-26",
+          "remplacant": "gpt-live-transcribe or gpt-transcribe",
+          "section": "2026-08-26: Transcription models",
+          "citation": "Feb 26, 2027 | `gpt-4o-mini-transcribe` \\| `gpt-4o-mini-transcribe-2025-12-15` | `gpt-live-transcribe` or `gpt-transcribe`"
+        },
+        {
+          "id": "gpt-4o-transcribe-diarize",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-08-26",
+          "arret": "2027-02-26",
+          "remplacant": "gpt-live-transcribe or gpt-transcribe",
+          "section": "2026-08-26: Transcription models",
+          "citation": "Feb 26, 2027 | `gpt-4o-transcribe-diarize` | `gpt-live-transcribe` or `gpt-transcribe`"
+        },
+        {
+          "id": "gpt-realtime",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-realtime-2.1",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-realtime` \\| `gpt-realtime-2025-08-28` | `gpt-realtime-2.1`"
+        },
+        {
+          "id": "gpt-realtime-2025-08-28",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-realtime-2.1",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-realtime` \\| `gpt-realtime-2025-08-28` | `gpt-realtime-2.1`"
+        },
+        {
+          "id": "gpt-audio",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-audio` \\| `gpt-audio-2025-08-28` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-audio-2025-08-28",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-audio` \\| `gpt-audio-2025-08-28` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-4o-audio",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-4o-audio` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-4o-realtime",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-realtime-2.1",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-4o-realtime` | `gpt-realtime-2.1`"
+        },
+        {
+          "id": "gpt-realtime-mini",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-realtime-mini` \\| `gpt-realtime-mini-2025-12-15` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "gpt-realtime-mini-2025-12-15",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-realtime-mini` \\| `gpt-realtime-mini-2025-12-15` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "gpt-audio-mini",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-audio-mini` \\| `gpt-audio-mini-2025-12-15` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-audio-mini-2025-12-15",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-audio-mini` \\| `gpt-audio-mini-2025-12-15` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-4o-mini-realtime",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-4o-mini-realtime` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "gpt-4o-mini-audio",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-4o-mini-audio` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-4o-mini-transcribe-2025-03-20",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": "2026-07-20",
+          "arret": "2027-01-20",
+          "remplacant": "gpt-4o-mini-transcribe-2025-12-15",
+          "section": "2026-07-20: Legacy audio, realtime, and transcription models",
+          "citation": "Jan 20, 2027 | `gpt-4o-mini-transcribe-2025-03-20` | `gpt-4o-mini-transcribe-2025-12-15`"
+        },
+        {
+          "id": "gpt-5",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5` \\| `gpt-5-2025-08-07` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5-2025-08-07",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5` \\| `gpt-5-2025-08-07` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5-mini",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5-mini` \\| `gpt-5-mini-2025-08-07` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-5-mini-2025-08-07",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5-mini` \\| `gpt-5-mini-2025-08-07` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-5-nano",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-luna",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5-nano` \\| `gpt-5-nano-2025-08-07` | `gpt-5.6-luna`"
+        },
+        {
+          "id": "gpt-5-nano-2025-08-07",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-luna",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5-nano` \\| `gpt-5-nano-2025-08-07` | `gpt-5.6-luna`"
+        },
+        {
+          "id": "gpt-5-pro",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5-pro` \\| `gpt-5-pro-2025-10-06` | `gpt-5.6-sol` (`reasoning.mode: pro`)"
+        },
+        {
+          "id": "gpt-5-pro-2025-10-06",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `gpt-5-pro` \\| `gpt-5-pro-2025-10-06` | `gpt-5.6-sol` (`reasoning.mode: pro`)"
+        },
+        {
+          "id": "o3",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `o3` \\| `o3-2025-04-16` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o3-2025-04-16",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `o3` \\| `o3-2025-04-16` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o3-pro",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `o3-pro` \\| `o3-pro-2025-06-10` | `gpt-5.6-sol` (`reasoning.mode: pro`)"
+        },
+        {
+          "id": "o3-pro-2025-06-10",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": "2026-06-11",
+          "arret": "2026-12-11",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-06-11: GPT-5 and o3 model deprecations",
+          "citation": "Dec 11, 2026 | `o3-pro` \\| `o3-pro-2025-06-10` | `gpt-5.6-sol` (`reasoning.mode: pro`)"
+        },
+        {
+          "id": "gpt-image-1-mini",
+          "famille": "image",
+          "etat": "deprecie",
+          "depreciation": "2026-06-02",
+          "arret": "2026-12-01",
+          "remplacant": "gpt-image-2.5-sunburst or gpt-image-2.5-flare",
+          "section": "2026-06-02: GPT Image model deprecations",
+          "citation": "Dec 1, 2026 | `gpt-image-1-mini` | `gpt-image-2.5-sunburst` or `gpt-image-2.5-flare`"
+        },
+        {
+          "id": "gpt-image-1.5",
+          "famille": "image",
+          "etat": "deprecie",
+          "depreciation": "2026-06-02",
+          "arret": "2026-12-01",
+          "remplacant": "gpt-image-2.5-sunburst or gpt-image-2.5-flare",
+          "section": "2026-06-02: GPT Image model deprecations",
+          "citation": "Dec 1, 2026 | `gpt-image-1.5` \\| `gpt-image-1.5-2025-12-16` | `gpt-image-2.5-sunburst` or `gpt-image-2.5-flare`"
+        },
+        {
+          "id": "gpt-image-1.5-2025-12-16",
+          "famille": "image",
+          "etat": "deprecie",
+          "depreciation": "2026-06-02",
+          "arret": "2026-12-01",
+          "remplacant": "gpt-image-2.5-sunburst or gpt-image-2.5-flare",
+          "section": "2026-06-02: GPT Image model deprecations",
+          "citation": "Dec 1, 2026 | `gpt-image-1.5` \\| `gpt-image-1.5-2025-12-16` | `gpt-image-2.5-sunburst` or `gpt-image-2.5-flare`"
+        },
+        {
+          "id": "chatgpt-image-latest",
+          "famille": "image",
+          "etat": "deprecie",
+          "depreciation": "2026-06-02",
+          "arret": "2026-12-01",
+          "remplacant": "gpt-image-2.5-sunburst or gpt-image-2.5-flare",
+          "section": "2026-06-02: GPT Image model deprecations",
+          "citation": "Dec 1, 2026 | `chatgpt-image-latest` | `gpt-image-2.5-sunburst` or `gpt-image-2.5-flare`"
+        },
+        {
+          "id": "gpt-5.4-cyber",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-09-11",
+          "arret": "2026-10-01",
+          "remplacant": "The most capable cyber model available to you.",
+          "section": "2026-09-11: GPT-5.4-Cyber",
+          "citation": "Oct 1, 2026 | `gpt-5.4-cyber` | The most capable cyber model available to you."
+        },
+        {
+          "id": "gpt-5.2-chat-latest",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-05-08",
+          "arret": "2026-08-10",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-05-08: `gpt-5.2-chat-latest` and `gpt-5.3-chat-latest` model snapshots",
+          "citation": "Aug 10, 2026 | `gpt-5.2-chat-latest` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5.3-chat-latest",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-05-08",
+          "arret": "2026-08-10",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-05-08: `gpt-5.2-chat-latest` and `gpt-5.3-chat-latest` model snapshots",
+          "citation": "Aug 10, 2026 | `gpt-5.3-chat-latest` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-3.5-turbo-0125",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-3.5-turbo-0125` \\| `gpt-3.5-turbo`, `gpt-3.5-turbo-completions` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-3.5-turbo",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-3.5-turbo-0125` \\| `gpt-3.5-turbo`, `gpt-3.5-turbo-completions` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-3.5-turbo-completions",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-3.5-turbo-0125` \\| `gpt-3.5-turbo`, `gpt-3.5-turbo-completions` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-4-0613",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-0613` \\| `gpt-4`, `gpt-4-0613-completions`, `gpt-4-completions` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-0613` \\| `gpt-4`, `gpt-4-0613-completions`, `gpt-4-completions` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4-0613-completions",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-0613` \\| `gpt-4`, `gpt-4-0613-completions`, `gpt-4-completions` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4-completions",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-0613` \\| `gpt-4`, `gpt-4-0613-completions`, `gpt-4-completions` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4-1106-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-1106-preview` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4-turbo",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-turbo` \\| `gpt-4-turbo-2024-04-09`, `gpt-4-turbo-completions` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4-turbo-2024-04-09",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-turbo` \\| `gpt-4-turbo-2024-04-09`, `gpt-4-turbo-completions` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4-turbo-completions",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4-turbo` \\| `gpt-4-turbo-2024-04-09`, `gpt-4-turbo-completions` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-4.1-nano",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-luna",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4.1-nano` \\| `gpt-4.1-nano-2025-04-14` | `gpt-5.6-luna`"
+        },
+        {
+          "id": "gpt-4.1-nano-2025-04-14",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-luna",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4.1-nano` \\| `gpt-4.1-nano-2025-04-14` | `gpt-5.6-luna`"
+        },
+        {
+          "id": "gpt-4o-2024-05-13",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-4o-2024-05-13` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-image-1",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-image-2.5-sunburst or gpt-image-2.5-flare",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `gpt-image-1` | `gpt-image-2.5-sunburst` or `gpt-image-2.5-flare`"
+        },
+        {
+          "id": "o1-2024-12-17",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o1-2024-12-17` \\| `o1` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o1",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o1-2024-12-17` \\| `o1` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o1-pro-2025-03-19",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o1-pro-2025-03-19` \\| `o1-pro` | `gpt-5.6-sol` (`reasoning.mode: pro`)"
+        },
+        {
+          "id": "o1-pro",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o1-pro-2025-03-19` \\| `o1-pro` | `gpt-5.6-sol` (`reasoning.mode: pro`)"
+        },
+        {
+          "id": "o3-mini-2025-01-31",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o3-mini-2025-01-31` \\| `o3-mini` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o3-mini",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o3-mini-2025-01-31` \\| `o3-mini` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "ft-o4-mini-2025-04-16",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `ft-o4-mini-2025-04-16` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "o4-mini-2025-04-16",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o4-mini-2025-04-16` \\| `o4-mini` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "o4-mini",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-10-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots",
+          "citation": "October 23, 2026 | `o4-mini-2025-04-16` \\| `o4-mini` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "computer-use-preview-2025-03-11",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `computer-use-preview-2025-03-11` \\| `computer-use-preview` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "computer-use-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `computer-use-preview-2025-03-11` \\| `computer-use-preview` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-4o-mini-search-preview-2025-03-11",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-4o-mini-search-preview-2025-03-11` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-4o-search-preview-2025-03-11",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-4o-search-preview-2025-03-11` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-5-chat-latest",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-5-chat-latest` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5-codex",
+          "famille": "code",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-5-codex` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5.1-chat-latest",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-5.1-chat-latest` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5.1-codex",
+          "famille": "code",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-5.1-codex` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5.1-codex-max",
+          "famille": "code",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-5.1-codex-max` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5.1-codex-mini",
+          "famille": "code",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-5.1-codex-mini` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-audio-mini-2025-10-06",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-audio-mini-2025-10-06` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-realtime-mini-2025-10-06",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-realtime-2.1-mini",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-realtime-mini-2025-10-06` | `gpt-realtime-2.1-mini`"
+        },
+        {
+          "id": "o3-deep-research-2025-06-26",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `o3-deep-research-2025-06-26` \\| `o3-deep-research` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o3-deep-research",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `o3-deep-research-2025-06-26` \\| `o3-deep-research` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o4-mini-deep-research-2025-06-26",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `o4-mini-deep-research-2025-06-26` \\| `o4-mini-deep-research` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "o4-mini-deep-research",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `o4-mini-deep-research-2025-06-26` \\| `o4-mini-deep-research` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "gpt-5.2-codex",
+          "famille": "code",
+          "etat": "arrete",
+          "depreciation": "2026-04-22",
+          "arret": "2026-07-23",
+          "remplacant": "gpt-5.6-sol",
+          "section": "2026-04-22: Legacy GPT model snapshots (July 2026 shutdown)",
+          "citation": "July 23, 2026 | `gpt-5.2-codex` | `gpt-5.6-sol`"
+        },
+        {
+          "id": "sora-2",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": "2026-03-24",
+          "arret": "2026-09-24",
+          "remplacant": null,
+          "section": "2026-03-24: Sora 2 video generation models and Videos API",
+          "citation": "2026-09-24 | `sora-2` | ---"
+        },
+        {
+          "id": "sora-2-pro",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": "2026-03-24",
+          "arret": "2026-09-24",
+          "remplacant": null,
+          "section": "2026-03-24: Sora 2 video generation models and Videos API",
+          "citation": "2026-09-24 | `sora-2-pro` | ---"
+        },
+        {
+          "id": "sora-2-2025-10-06",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": "2026-03-24",
+          "arret": "2026-09-24",
+          "remplacant": null,
+          "section": "2026-03-24: Sora 2 video generation models and Videos API",
+          "citation": "2026-09-24 | `sora-2-2025-10-06` | ---"
+        },
+        {
+          "id": "sora-2-2025-12-08",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": "2026-03-24",
+          "arret": "2026-09-24",
+          "remplacant": null,
+          "section": "2026-03-24: Sora 2 video generation models and Videos API",
+          "citation": "2026-09-24 | `sora-2-2025-12-08` | ---"
+        },
+        {
+          "id": "sora-2-pro-2025-10-06",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": "2026-03-24",
+          "arret": "2026-09-24",
+          "remplacant": null,
+          "section": "2026-03-24: Sora 2 video generation models and Videos API",
+          "citation": "2026-09-24 | `sora-2-pro-2025-10-06` | ---"
+        },
+        {
+          "id": "chatgpt-4o-latest",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-11-18",
+          "arret": "2026-02-17",
+          "remplacant": "gpt-5.1-chat-latest",
+          "section": "2025-11-18: `chatgpt-4o-latest` snapshot",
+          "citation": "2026-02-17 | `chatgpt-4o-latest` | `gpt-5.1-chat-latest`"
+        },
+        {
+          "id": "codex-mini-latest",
+          "famille": "code",
+          "etat": "arrete",
+          "depreciation": "2025-11-17",
+          "arret": "2026-02-12",
+          "remplacant": "gpt-5-codex-mini",
+          "section": "2025-11-17: `codex-mini-latest` model snapshot",
+          "citation": "2026-02-12 | `codex-mini-latest` | `gpt-5-codex-mini`"
+        },
+        {
+          "id": "dall-e-2",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": "2025-11-14",
+          "arret": "2026-05-12",
+          "remplacant": "gpt-image-2, gpt-image-1, or gpt-image-1-mini",
+          "section": "2025-11-14: DALL·E model snapshots",
+          "citation": "2026-05-12 | `dall-e-2` | `gpt-image-2`, `gpt-image-1`, or `gpt-image-1-mini`"
+        },
+        {
+          "id": "dall-e-3",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": "2025-11-14",
+          "arret": "2026-05-12",
+          "remplacant": "gpt-image-2, gpt-image-1, or gpt-image-1-mini",
+          "section": "2025-11-14: DALL·E model snapshots",
+          "citation": "2026-05-12 | `dall-e-3` | `gpt-image-2`, `gpt-image-1`, or `gpt-image-1-mini`"
+        },
+        {
+          "id": "gpt-3.5-turbo-instruct",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-09-28",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2025-09-26: Legacy GPT model snapshots",
+          "citation": "2026-09-28 | `gpt-3.5-turbo-instruct` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "babbage-002",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-09-28",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2025-09-26: Legacy GPT model snapshots",
+          "citation": "2026-09-28 | `babbage-002` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "davinci-002",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-09-28",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2025-09-26: Legacy GPT model snapshots",
+          "citation": "2026-09-28 | `davinci-002` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-3.5-turbo-1106",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-09-28",
+          "remplacant": "gpt-5.6-terra",
+          "section": "2025-09-26: Legacy GPT model snapshots",
+          "citation": "2026-09-28 | `gpt-3.5-turbo-1106` | `gpt-5.6-terra`"
+        },
+        {
+          "id": "gpt-4-0314",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-03-26",
+          "remplacant": "gpt-5 or gpt-4.1*",
+          "section": "2025-09-26: Legacy GPT model snapshots (March 2026 shutdown)",
+          "citation": "2026-03-26 | `gpt-4-0314` | `gpt-5` or `gpt-4.1*`",
+          "note": "la page donne aussi, plus bas, la date 2024-06-13 (« au plus tôt ») ; la plus récente annonce est retenue"
+        },
+        {
+          "id": "gpt-4-0125-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-03-26",
+          "remplacant": "gpt-5 or gpt-4.1*",
+          "section": "2025-09-26: Legacy GPT model snapshots (March 2026 shutdown)",
+          "citation": "2026-03-26 | `gpt-4-0125-preview` (including `gpt-4-turbo-preview` and `gpt-4-turbo-preview-completions`, which point to this snapshot) | `gpt-5` or `gpt-4.1*`"
+        },
+        {
+          "id": "gpt-4-turbo-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-03-26",
+          "remplacant": "gpt-5 or gpt-4.1*",
+          "section": "2025-09-26: Legacy GPT model snapshots (March 2026 shutdown)",
+          "citation": "2026-03-26 | `gpt-4-0125-preview` (including `gpt-4-turbo-preview` and `gpt-4-turbo-preview-completions`, which point to this snapshot) | `gpt-5` or `gpt-4.1*`"
+        },
+        {
+          "id": "gpt-4-turbo-preview-completions",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-09-26",
+          "arret": "2026-03-26",
+          "remplacant": "gpt-5 or gpt-4.1*",
+          "section": "2025-09-26: Legacy GPT model snapshots (March 2026 shutdown)",
+          "citation": "2026-03-26 | `gpt-4-0125-preview` (including `gpt-4-turbo-preview` and `gpt-4-turbo-preview-completions`, which point to this snapshot) | `gpt-5` or `gpt-4.1*`"
+        },
+        {
+          "id": "gpt-4o-realtime-preview",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-09-15",
+          "arret": "2026-05-07",
+          "remplacant": "gpt-realtime-1.5",
+          "section": "2025-09-15: `gpt-4o-realtime-preview` models",
+          "citation": "2026-05-07 | `gpt-4o-realtime-preview` | `gpt-realtime-1.5`"
+        },
+        {
+          "id": "gpt-4o-realtime-preview-2025-06-03",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-09-15",
+          "arret": "2026-05-07",
+          "remplacant": "gpt-realtime-1.5",
+          "section": "2025-09-15: `gpt-4o-realtime-preview` models",
+          "citation": "2026-05-07 | `gpt-4o-realtime-preview-2025-06-03` | `gpt-realtime-1.5`"
+        },
+        {
+          "id": "gpt-4o-realtime-preview-2024-12-17",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-09-15",
+          "arret": "2026-05-07",
+          "remplacant": "gpt-realtime-1.5",
+          "section": "2025-09-15: `gpt-4o-realtime-preview` models",
+          "citation": "2026-05-07 | `gpt-4o-realtime-preview-2024-12-17` | `gpt-realtime-1.5`"
+        },
+        {
+          "id": "gpt-4o-mini-realtime-preview",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-09-15",
+          "arret": "2026-05-07",
+          "remplacant": "gpt-realtime-mini",
+          "section": "2025-09-15: `gpt-4o-realtime-preview` models",
+          "citation": "2026-05-07 | `gpt-4o-mini-realtime-preview` | `gpt-realtime-mini`"
+        },
+        {
+          "id": "gpt-4o-audio-preview",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-09-15",
+          "arret": "2026-05-07",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2025-09-15: `gpt-4o-realtime-preview` models",
+          "citation": "2026-05-07 | `gpt-4o-audio-preview` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "gpt-4o-mini-audio-preview",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-09-15",
+          "arret": "2026-05-07",
+          "remplacant": "gpt-audio-mini",
+          "section": "2025-09-15: `gpt-4o-realtime-preview` models",
+          "citation": "2026-05-07 | `gpt-4o-mini-audio-preview` | `gpt-audio-mini`"
+        },
+        {
+          "id": "gpt-4o-realtime-preview-2024-10-01",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-06-10",
+          "arret": "2025-10-10",
+          "remplacant": "gpt-realtime-1.5",
+          "section": "2025-06-10: `gpt-4o-realtime-preview-2024-10-01`",
+          "citation": "2025-10-10 | `gpt-4o-realtime-preview-2024-10-01` | `gpt-realtime-1.5`"
+        },
+        {
+          "id": "gpt-4o-audio-preview-2024-10-01",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": "2025-06-10",
+          "arret": "2025-10-10",
+          "remplacant": "gpt-audio-1.5",
+          "section": "2025-06-10: `gpt-4o-audio-preview-2024-10-01`",
+          "citation": "2025-10-10 | `gpt-4o-audio-preview-2024-10-01` | `gpt-audio-1.5`"
+        },
+        {
+          "id": "text-moderation-007",
+          "famille": "moderation",
+          "etat": "arrete",
+          "depreciation": "2025-04-28",
+          "arret": "2025-10-27",
+          "remplacant": "omni-moderation",
+          "section": "2025-04-28: `text-moderation`",
+          "citation": "2025-10-27 | `text-moderation-007` | `omni-moderation`"
+        },
+        {
+          "id": "text-moderation-stable",
+          "famille": "moderation",
+          "etat": "arrete",
+          "depreciation": "2025-04-28",
+          "arret": "2025-10-27",
+          "remplacant": "omni-moderation",
+          "section": "2025-04-28: `text-moderation`",
+          "citation": "2025-10-27 | `text-moderation-stable` | `omni-moderation`"
+        },
+        {
+          "id": "text-moderation-latest",
+          "famille": "moderation",
+          "etat": "arrete",
+          "depreciation": "2025-04-28",
+          "arret": "2025-10-27",
+          "remplacant": "omni-moderation",
+          "section": "2025-04-28: `text-moderation`",
+          "citation": "2025-10-27 | `text-moderation-latest` | `omni-moderation`"
+        },
+        {
+          "id": "o1-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-04-28",
+          "arret": "2025-07-28",
+          "remplacant": "o3",
+          "section": "2025-04-28: `o1-preview` and `o1-mini`",
+          "citation": "2025-07-28 | `o1-preview` | `o3`"
+        },
+        {
+          "id": "o1-mini",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-04-28",
+          "arret": "2025-10-27",
+          "remplacant": "o4-mini",
+          "section": "2025-04-28: `o1-preview` and `o1-mini`",
+          "citation": "2025-10-27 | `o1-mini` | `o4-mini`"
+        },
+        {
+          "id": "gpt-4.5-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2025-04-14",
+          "arret": "2025-07-14",
+          "remplacant": "gpt-4.1",
+          "section": "2025-04-14: GPT-4.5-preview",
+          "citation": "2025-07-14 | `gpt-4.5-preview` | `gpt-4.1`"
+        },
+        {
+          "id": "gpt-4-32k",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2024-06-06",
+          "arret": "2025-06-06",
+          "remplacant": "gpt-4o",
+          "section": "2024-06-06: GPT-4-32K and Vision Preview models",
+          "citation": "2025-06-06 | `gpt-4-32k` | $60.00 / 1M input tokens + $120 / 1M output tokens | `gpt-4o`"
+        },
+        {
+          "id": "gpt-4-32k-0613",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2024-06-06",
+          "arret": "2025-06-06",
+          "remplacant": "gpt-4o",
+          "section": "2024-06-06: GPT-4-32K and Vision Preview models",
+          "citation": "2025-06-06 | `gpt-4-32k-0613` | $60.00 / 1M input tokens + $120 / 1M output tokens | `gpt-4o`"
+        },
+        {
+          "id": "gpt-4-32k-0314",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2024-06-06",
+          "arret": "2025-06-06",
+          "remplacant": "gpt-4o",
+          "section": "2024-06-06: GPT-4-32K and Vision Preview models",
+          "citation": "2025-06-06 | `gpt-4-32k-0314` | $60.00 / 1M input tokens + $120 / 1M output tokens | `gpt-4o`"
+        },
+        {
+          "id": "gpt-4-vision-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2024-06-06",
+          "arret": "2024-12-06",
+          "remplacant": "gpt-4o",
+          "section": "2024-06-06: GPT-4-32K and Vision Preview models",
+          "citation": "2024-12-06 | `gpt-4-vision-preview` | $10.00 / 1M input tokens + $30 / 1M output tokens | `gpt-4o`"
+        },
+        {
+          "id": "gpt-4-1106-vision-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2024-06-06",
+          "arret": "2024-12-06",
+          "remplacant": "gpt-4o",
+          "section": "2024-06-06: GPT-4-32K and Vision Preview models",
+          "citation": "2024-12-06 | `gpt-4-1106-vision-preview` | $10.00 / 1M input tokens + $30 / 1M output tokens | `gpt-4o`"
+        },
+        {
+          "id": "gpt-3.5-turbo-0613",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-11-06",
+          "arret": "2024-09-13",
+          "remplacant": "gpt-3.5-turbo",
+          "section": "2023-11-06: Chat model updates",
+          "citation": "2024-09-13 | `gpt-3.5-turbo-0613` | $1.50 / 1M input tokens + $2.00 / 1M output tokens | `gpt-3.5-turbo`"
+        },
+        {
+          "id": "gpt-3.5-turbo-16k-0613",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-11-06",
+          "arret": "2024-09-13",
+          "remplacant": "gpt-3.5-turbo",
+          "section": "2023-11-06: Chat model updates",
+          "citation": "2024-09-13 | `gpt-3.5-turbo-16k-0613` | $3.00 / 1M input tokens + $4.00 / 1M output tokens | `gpt-3.5-turbo`"
+        },
+        {
+          "id": "text-ada-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-3.5-turbo-instruct",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-ada-001` | $0.40 / 1M tokens | `gpt-3.5-turbo-instruct`"
+        },
+        {
+          "id": "text-babbage-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-3.5-turbo-instruct",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-babbage-001` | $0.50 / 1M tokens | `gpt-3.5-turbo-instruct`"
+        },
+        {
+          "id": "text-curie-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-3.5-turbo-instruct",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-curie-001` | $2.00 / 1M tokens | `gpt-3.5-turbo-instruct`"
+        },
+        {
+          "id": "text-davinci-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-3.5-turbo-instruct",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-davinci-001` | $20.00 / 1M tokens | `gpt-3.5-turbo-instruct`"
+        },
+        {
+          "id": "text-davinci-002",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-3.5-turbo-instruct",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-davinci-002` | $20.00 / 1M tokens | `gpt-3.5-turbo-instruct`"
+        },
+        {
+          "id": "text-davinci-003",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-3.5-turbo-instruct",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-davinci-003` | $20.00 / 1M tokens | `gpt-3.5-turbo-instruct`"
+        },
+        {
+          "id": "ada",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "babbage-002",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `ada` | $0.40 / 1M tokens | `babbage-002`"
+        },
+        {
+          "id": "babbage",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "babbage-002",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `babbage` | $0.50 / 1M tokens | `babbage-002`"
+        },
+        {
+          "id": "curie",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "davinci-002",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `curie` | $2.00 / 1M tokens | `davinci-002`"
+        },
+        {
+          "id": "davinci",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "davinci-002",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `davinci` | $20.00 / 1M tokens | `davinci-002`"
+        },
+        {
+          "id": "code-davinci-002",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-3.5-turbo-instruct",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `code-davinci-002` | --- | `gpt-3.5-turbo-instruct`",
+          "note": "la page donne aussi, plus bas, la date 2023-03-23 ; la plus récente annonce est retenue"
+        },
+        {
+          "id": "text-davinci-edit-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-4o",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-davinci-edit-001` | `gpt-4o`"
+        },
+        {
+          "id": "code-davinci-edit-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "gpt-4o",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `code-davinci-edit-001` | `gpt-4o`"
+        },
+        {
+          "id": "text-similarity-ada-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-similarity-ada-001` | $4.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-ada-doc-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-ada-doc-001` | $4.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-ada-query-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-ada-query-001` | $4.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "code-search-ada-code-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `code-search-ada-code-001` | $4.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "code-search-ada-text-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `code-search-ada-text-001` | $4.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-similarity-babbage-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-similarity-babbage-001` | $5.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-babbage-doc-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-babbage-doc-001` | $5.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-babbage-query-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-babbage-query-001` | $5.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "code-search-babbage-code-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `code-search-babbage-code-001` | $5.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "code-search-babbage-text-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `code-search-babbage-text-001` | $5.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-similarity-curie-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-similarity-curie-001` | $20.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-curie-doc-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-curie-doc-001` | $20.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-curie-query-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-curie-query-001` | $20.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-similarity-davinci-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-similarity-davinci-001` | $200.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-davinci-doc-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-davinci-doc-001` | $200.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "text-search-davinci-query-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": "2023-07-06",
+          "arret": "2024-01-04",
+          "remplacant": "text-embedding-3-small",
+          "section": "2023-07-06: GPT and embeddings",
+          "citation": "2024-01-04 | `text-search-davinci-query-001` | $200.00 / 1M tokens | `text-embedding-3-small`"
+        },
+        {
+          "id": "gpt-3.5-turbo-0301",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-06-13",
+          "arret": "2024-09-13",
+          "remplacant": "gpt-3.5-turbo",
+          "section": "2023-06-13: Updated chat models",
+          "citation": "2024-09-13 | `gpt-3.5-turbo-0301` | $15.00 / 1M input tokens + $20.00 / 1M output tokens | `gpt-3.5-turbo`"
+        },
+        {
+          "id": "code-davinci-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-03-20",
+          "arret": "2023-03-23",
+          "remplacant": "gpt-4o",
+          "section": "2023-03-20: Codex models",
+          "citation": "2023-03-23 | `code-davinci-001` | `gpt-4o`"
+        },
+        {
+          "id": "code-cushman-002",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-03-20",
+          "arret": "2023-03-23",
+          "remplacant": "gpt-4o",
+          "section": "2023-03-20: Codex models",
+          "citation": "2023-03-23 | `code-cushman-002` | `gpt-4o`"
+        },
+        {
+          "id": "code-cushman-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": "2023-03-20",
+          "arret": "2023-03-23",
+          "remplacant": "gpt-4o",
+          "section": "2023-03-20: Codex models",
+          "citation": "2023-03-23 | `code-cushman-001` | `gpt-4o`"
+        },
+        {
+          "id": "gpt-6-luna",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "January 14, 2027 | GPT-4o (`gpt-4o-2024-08-06`, `gpt-4o-2024-11-20`) | `gpt-6-luna`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        },
+        {
+          "id": "gpt-6-sol",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "Apr 1, 2027 | `gpt-5.3-codex` | `gpt-6-sol`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        },
+        {
+          "id": "gpt-realtime-2.1",
+          "famille": "audio",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "Jan 20, 2027 | `gpt-realtime` \\| `gpt-realtime-2025-08-28` | `gpt-realtime-2.1`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        },
+        {
+          "id": "gpt-5.6-sol",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "Dec 11, 2026 | `gpt-5` \\| `gpt-5-2025-08-07` | `gpt-5.6-sol`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        },
+        {
+          "id": "gpt-5.6-terra",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "Dec 11, 2026 | `gpt-5-mini` \\| `gpt-5-mini-2025-08-07` | `gpt-5.6-terra`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        },
+        {
+          "id": "gpt-5.6-luna",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "Dec 11, 2026 | `gpt-5-nano` \\| `gpt-5-nano-2025-08-07` | `gpt-5.6-luna`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        },
+        {
+          "id": "gpt-image-2.5-sunburst",
+          "famille": "image",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "Dec 1, 2026 | `gpt-image-1-mini` | `gpt-image-2.5-sunburst` or `gpt-image-2.5-flare`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        },
+        {
+          "id": "gpt-image-2.5-flare",
+          "famille": "image",
+          "etat": "courant",
+          "depreciation": null,
+          "arret": null,
+          "remplacant": null,
+          "citation": "Dec 1, 2026 | `gpt-image-1-mini` | `gpt-image-2.5-sunburst` or `gpt-image-2.5-flare`",
+          "note": "courant par déduction : la page le nomme remplaçant recommandé ; elle ne publie pas de liste de modèles courants"
+        }
+      ],
+      "api": [
+        {
+          "id": "assistants-api",
+          "etat": "arrete",
+          "arret": "2026-08-26",
+          "remplacant": "Responses API et Conversations API",
+          "citation": "2026-08-26 | Assistants API | Responses API and Conversations API",
+          "section": "2025-08-20: Assistants API",
+          "litteraux": []
+        },
+        {
+          "id": "realtime-beta",
+          "etat": "arrete",
+          "arret": "2026-05-12",
+          "remplacant": "Realtime API",
+          "citation": "2026-05-12 | OpenAI-Beta: realtime=v1 | Realtime API",
+          "section": "2025-09-15: Realtime API Beta",
+          "litteraux": [
+            "OpenAI-Beta: realtime=v1"
+          ]
+        },
+        {
+          "id": "assistants-v1-beta",
+          "etat": "arrete",
+          "arret": "2024-12-18",
+          "remplacant": "OpenAI-Beta: assistants=v2",
+          "citation": "2024-12-18 | OpenAI-Beta: assistants=v1 | OpenAI-Beta: assistants=v2",
+          "section": "2024-10-02: Assistants API beta v1",
+          "litteraux": [
+            "OpenAI-Beta: assistants=v1"
+          ]
+        },
+        {
+          "id": "videos-api",
+          "etat": "arrete",
+          "arret": "2026-09-24",
+          "remplacant": null,
+          "citation": "2026-09-24 | Videos API | ---",
+          "section": "2026-03-24: Sora 2 video generation models and Videos API",
+          "litteraux": []
+        },
+        {
+          "id": "audio-translations",
+          "etat": "deprecie",
+          "arret": "2027-02-26",
+          "remplacant": "v1/realtime/translations",
+          "citation": "Feb 26, 2027 | `/v1/audio/translations` | `v1/realtime/translations`",
+          "section": "2026-08-26: Transcription models",
+          "litteraux": [
+            "/v1/audio/translations"
+          ]
+        },
+        {
+          "id": "prompts-reutilisables",
+          "etat": "deprecie",
+          "arret": "2026-11-30",
+          "remplacant": "contenu des prompts déplacé dans le code de l'application",
+          "citation": "Nov 30, 2026 | The `v1/prompts` API and reusable prompt objects are scheduled to shut down.",
+          "section": "2026-06-03: Reusable prompts",
+          "litteraux": []
+        },
+        {
+          "id": "evals",
+          "etat": "deprecie",
+          "arret": "2026-11-30",
+          "remplacant": "Promptfoo (guide de migration de la page)",
+          "citation": "Nov 30, 2026 | The Evals dashboard and API are scheduled to shut down.",
+          "section": "2026-06-03: Evals platform",
+          "litteraux": []
+        },
+        {
+          "id": "agent-builder",
+          "etat": "deprecie",
+          "arret": "2026-11-30",
+          "remplacant": "Agents SDK ou ChatGPT Workspace Agents",
+          "citation": "Nov 30, 2026 | Agent Builder is scheduled to shut down.",
+          "section": "2026-06-03: Agent Builder",
+          "litteraux": []
+        },
+        {
+          "id": "fine-tuning-nouveaux-travaux",
+          "etat": "deprecie",
+          "arret": "2027-01-06",
+          "remplacant": null,
+          "citation": "Jan 6, 2027 | Active existing customers will no longer be able to create new fine-tuning jobs on this date.",
+          "section": "Update to OpenAI’s self-serve fine-tuning",
+          "litteraux": []
+        },
+        {
+          "id": "fine-tunes-endpoint",
+          "etat": "arrete",
+          "arret": "2024-01-04",
+          "remplacant": "/v1/fine_tuning/jobs",
+          "citation": "2024-01-04 | `/v1/fine-tunes` | `/v1/fine_tuning/jobs`",
+          "section": "2023-08-22: Fine-tunes endpoint",
+          "litteraux": [
+            "/v1/fine-tunes"
+          ]
+        },
+        {
+          "id": "edits-endpoint",
+          "etat": "arrete",
+          "arret": "2024-01-04",
+          "remplacant": "/v1/chat/completions",
+          "citation": "2024-01-04 | `/v1/edits` | `/v1/chat/completions`",
+          "section": "2023-07-06: GPT and embeddings",
+          "litteraux": [
+            "/v1/edits"
+          ]
+        },
+        {
+          "id": "engines-endpoint",
+          "etat": "arrete",
+          "arret": "2022-12-03",
+          "remplacant": "/v1/models",
+          "citation": "2022-12-03 | `/v1/engines` | [/v1/models](https://platform.openai.com/docs/api-reference/models/list)",
+          "section": "2022-06-03: Legacy endpoints",
+          "litteraux": [
+            "/v1/engines"
+          ]
+        }
+      ],
+      "bibliotheques_source": "catalogue brut du 03/11/2026, section « Bibliothèques officielles » ; versions lues par l'API GitHub releases/latest, anonyme, le 03/11/2026",
+      "bibliotheques": [
+        {
+          "paquet": "OpenAI SDK pour TypeScript et JavaScript",
+          "langage": "TypeScript / JavaScript",
+          "depot": "https://github.com/openai/openai-node",
+          "version": "v7.47.0",
+          "publiee_le": "2026-10-31",
+          "etat": "courante"
+        },
+        {
+          "paquet": "OpenAI SDK pour Python",
+          "langage": "Python",
+          "depot": "https://github.com/openai/openai-python",
+          "version": "v3.42.1",
+          "publiee_le": "2026-11-01",
+          "etat": "courante"
+        },
+        {
+          "paquet": "Client officiel pour C# (NuGet, paquet OpenAI)",
+          "langage": "C# / .NET",
+          "depot": "https://github.com/openai/openai-dotnet",
+          "version": "OpenAI_2.14.0",
+          "publiee_le": "2026-09-15",
+          "etat": "courante"
+        },
+        {
+          "paquet": "openai-java (« API helper », bêta selon la page)",
+          "langage": "Java",
+          "depot": "https://github.com/openai/openai-java",
+          "version": "v4.96.0",
+          "publiee_le": "2026-11-01",
+          "etat": "courante"
+        },
+        {
+          "paquet": "openai-go (« API helper », bêta selon la page)",
+          "langage": "Go",
+          "depot": "https://github.com/openai/openai-go",
+          "version": "v3.91.1",
+          "publiee_le": "2026-11-01",
+          "etat": "courante"
+        },
+        {
+          "paquet": "OpenAI SDK pour Ruby",
+          "langage": "Ruby",
+          "depot": "https://github.com/openai/openai-ruby",
+          "version": "v0.115.1",
+          "publiee_le": "2026-11-01",
+          "etat": "courante"
+        },
+        {
+          "paquet": "OpenAI CLI (`openai`)",
+          "langage": "Go (outil en ligne de commande)",
+          "depot": "https://github.com/openai/openai-cli",
+          "version": "v1.47.0",
+          "publiee_le": "2026-10-31",
+          "etat": "courante"
+        },
+        {
+          "paquet": "OpenAI Agents SDK pour TypeScript",
+          "langage": "TypeScript",
+          "depot": "https://github.com/openai/openai-agents-js",
+          "version": "@openai/agents-extensions@0.21.0",
+          "publiee_le": "2026-10-20",
+          "etat": "courante"
+        },
+        {
+          "paquet": "OpenAI Agents SDK pour Python",
+          "langage": "Python",
+          "depot": "https://github.com/openai/openai-agents-python",
+          "version": "v0.24.0",
+          "publiee_le": "2026-10-15",
+          "etat": "courante"
+        },
+        {
+          "paquet": "tiktoken",
+          "langage": "Python (comptage de tokens)",
+          "depot": "https://github.com/openai/tiktoken",
+          "version": "0.14.0",
+          "publiee_le": "2026-08-17",
+          "etat": "courante"
+        },
+        {
+          "paquet": "simple-evals",
+          "langage": "Python (évaluation)",
+          "depot": "https://github.com/openai/simple-evals",
+          "version": null,
+          "publiee_le": null,
+          "etat": "courante",
+          "note": "aucune publication ni tag"
+        },
+        {
+          "paquet": "mle-bench",
+          "langage": "Python (évaluation d'agents)",
+          "depot": "https://github.com/openai/mle-bench",
+          "version": null,
+          "publiee_le": null,
+          "etat": "courante",
+          "note": "aucune publication ni tag"
+        },
+        {
+          "paquet": "gym",
+          "langage": "Python (apprentissage par renforcement)",
+          "depot": "https://github.com/openai/gym",
+          "version": "0.26.2",
+          "publiee_le": "2022-10-04",
+          "etat": "courante",
+          "note": "dépôt archivé (champ archived à true, mesure du 03/11/2026)"
+        },
+        {
+          "paquet": "swarm",
+          "langage": "Python (orchestration, éducatif)",
+          "depot": "https://github.com/openai/swarm",
+          "version": null,
+          "publiee_le": null,
+          "etat": "courante",
+          "note": "aucune publication ni tag"
+        }
+      ]
+    },
+    "gemini": {
+      "documentation": "https://ai.google.dev/gemini-api/docs/llms.txt",
+      "calendrier": "https://ai.google.dev/gemini-api/docs/deprecations.md.txt",
+      "lu_le": "2026-11-03",
+      "lu_a": "17:05",
+      "portee": "toutes les tables de la page, relues le 03/11/2026 à 17:05. La page a changé depuis la copie du catalogue (15:31) : elle range maintenant les modèles arrêtés sous « Deprecated models » et date au 2026-12-01 l'arrêt de gemini-2.5-pro et de gemini-2.5-flash ; ce fichier suit la page relue à 17:05. La colonne de date de la page est la date de SORTIE du modèle (champ sortie), jamais une date de déprécation (champ depreciation, nul ici)",
+      "modeles": [
+        {
+          "id": "gemini-3.8-flash",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "September 2, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Gemini 3 models",
+          "citation": "`gemini-3.8-flash` * September 2, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-3.7-flash",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "August 13, 2026",
+          "arret": null,
+          "remplacant": "gemini-3.8-flash",
+          "section": "Gemini 3 models",
+          "citation": "`gemini-3.7-flash` * August 13, 2026 * N/A * `gemini-3.8-flash` (`gemini-3.7-flash` is no longer available in Google AI Studio; the endpoint is not shutting down and automatically routes API requests to `gemini-3.8-flash`)",
+          "note": "gemini-3.7-flash is no longer available in Google AI Studio; the endpoint is not shutting down and automatically routes API requests to gemini-3.8-flash"
+        },
+        {
+          "id": "gemini-3.6-flash",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "July 21, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Gemini 3 models",
+          "citation": "`gemini-3.6-flash` * July 21, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-3.5-flash-lite",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "July 21, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Gemini 3 models",
+          "citation": "`gemini-3.5-flash-lite` * July 21, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-3.5-flash",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "May 19, 2026",
+          "arret": null,
+          "remplacant": "gemini-3.6-flash",
+          "section": "Gemini 3 models",
+          "citation": "`gemini-3.5-flash` * May 19, 2026 * N/A * `gemini-3.6-flash` (`gemini-3.5-flash` is no longer available in Google AI Studio; the endpoint is not shutting down and automatically routes API requests to `gemini-3.6-flash`)",
+          "note": "gemini-3.5-flash is no longer available in Google AI Studio; the endpoint is not shutting down and automatically routes API requests to gemini-3.6-flash"
+        },
+        {
+          "id": "gemini-3.1-flash-lite",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "May 7, 2026",
+          "arret": "2027-05-07",
+          "remplacant": "gemini-3.5-flash-lite",
+          "section": "Gemini 3 models",
+          "citation": "`gemini-3.1-flash-lite` * May 7, 2026 * May 7, 2027 * `gemini-3.5-flash-lite`"
+        },
+        {
+          "id": "gemini-3.1-flash-tts-preview",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "February 26, 2026",
+          "arret": "2026-11-17",
+          "remplacant": "gemini-3.8-flash-tts or gemini-3.8-flash-lite-tts",
+          "section": "Gemini 3 models / Preview models",
+          "citation": "`gemini-3.1-flash-tts-preview` * February 26, 2026 * November 17, 2026 * `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`"
+        },
+        {
+          "id": "gemini-3.1-pro-preview",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "February 19, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Gemini 3 models / Preview models",
+          "citation": "`gemini-3.1-pro-preview` * February 19, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-3-flash-preview",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "December 17, 2025",
+          "arret": null,
+          "remplacant": "gemini-3.6-flash",
+          "section": "Gemini 3 models / Preview models",
+          "citation": "`gemini-3-flash-preview` * December 17, 2025 * No shutdown date announced * `gemini-3.6-flash`"
+        },
+        {
+          "id": "gemini-3-pro-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "November 18, 2025",
+          "arret": "2026-03-09",
+          "remplacant": "gemini-3.1-pro-preview",
+          "section": "Gemini 3 models / Deprecated models",
+          "citation": "`gemini-3-pro-preview` * November 18, 2025 * March 9, 2026 * `gemini-3.1-pro-preview`"
+        },
+        {
+          "id": "gemini-3.1-flash-lite-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "March 3, 2026",
+          "arret": "2026-05-25",
+          "remplacant": "gemini-3.1-flash-lite",
+          "section": "Gemini 3 models / Deprecated models",
+          "citation": "`gemini-3.1-flash-lite-preview` * March 3, 2026 * May 25, 2026 * `gemini-3.1-flash-lite`"
+        },
+        {
+          "id": "gemini-2.5-pro",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "June 17, 2025",
+          "arret": "2026-12-01",
+          "remplacant": "gemini-3.8-flash",
+          "section": "Gemini 2.5 Pro models",
+          "citation": "`gemini-2.5-pro` * June 17, 2025 * December 1, 2026 * `gemini-3.8-flash` (`gemini-2.5-pro` is no longer available in Google AI Studio; effective December 1, 2026, API requests to `gemini-2.5-pro` will automatically route to `gemini-3.8-flash`)",
+          "note": "gemini-2.5-pro is no longer available in Google AI Studio; effective December 1, 2026, API requests to gemini-2.5-pro will automatically route to gemini-3.8-flash"
+        },
+        {
+          "id": "gemini-2.5-computer-use-preview-10-2025",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "October 7, 2025",
+          "arret": "2026-07-28",
+          "remplacant": "gemini-3.8-flash",
+          "section": "Gemini 2.5 Pro models / Deprecated models",
+          "citation": "`gemini-2.5-computer-use-preview-10-2025` * October 7, 2025 * July 28, 2026 * `gemini-3.8-flash`"
+        },
+        {
+          "id": "gemini-2.5-pro-preview-03-25",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "March 3, 2025",
+          "arret": "2025-12-02",
+          "remplacant": "gemini-3.8-flash",
+          "section": "Gemini 2.5 Pro models / Deprecated models",
+          "citation": "`gemini-2.5-pro-preview-03-25` * March 3, 2025 * December 2, 2025 * `gemini-3.8-flash`"
+        },
+        {
+          "id": "gemini-2.5-pro-preview-05-06",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "May 6, 2025",
+          "arret": "2025-12-02",
+          "remplacant": "gemini-3.8-flash",
+          "section": "Gemini 2.5 Pro models / Deprecated models",
+          "citation": "`gemini-2.5-pro-preview-05-06` * May 6, 2025 * December 2, 2025 * `gemini-3.8-flash`"
+        },
+        {
+          "id": "gemini-2.5-pro-preview-06-05",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 5, 2025",
+          "arret": "2025-12-02",
+          "remplacant": "gemini-3.8-flash",
+          "section": "Gemini 2.5 Pro models / Deprecated models",
+          "citation": "`gemini-2.5-pro-preview-06-05` * June 5, 2025 * December 2, 2025 * `gemini-3.8-flash`"
+        },
+        {
+          "id": "gemini-2.5-flash",
+          "famille": "texte",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "June 17, 2025",
+          "arret": "2026-12-01",
+          "remplacant": "gemini-3.5-flash-lite",
+          "section": "Gemini 2.5 Flash models",
+          "citation": "`gemini-2.5-flash` * June 17, 2025 * December 1, 2026 * `gemini-3.5-flash-lite` (`gemini-2.5-flash` is no longer available in Google AI Studio; effective December 1, 2026, API requests to `gemini-2.5-flash` will automatically route to `gemini-3.5-flash-lite`)",
+          "note": "gemini-2.5-flash is no longer available in Google AI Studio; effective December 1, 2026, API requests to gemini-2.5-flash will automatically route to gemini-3.5-flash-lite"
+        },
+        {
+          "id": "gemini-2.5-flash-lite",
+          "famille": "texte",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "July 22, 2025",
+          "arret": null,
+          "remplacant": null,
+          "section": "Gemini 2.5 Flash models",
+          "citation": "`gemini-2.5-flash-lite` * July 22, 2025 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-2.5-flash-lite-preview-09-2025",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "September 25, 2025",
+          "arret": "2026-03-31",
+          "remplacant": "gemini-3.1-flash-lite",
+          "section": "Gemini 2.5 Flash models / Deprecated models",
+          "citation": "`gemini-2.5-flash-lite-preview-09-2025` * September 25, 2025 * March 31, 2026 * `gemini-3.1-flash-lite`"
+        },
+        {
+          "id": "gemini-2.5-flash-preview-05-20",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "May 20, 2025",
+          "arret": "2025-11-18",
+          "remplacant": "gemini-3.6-flash",
+          "section": "Gemini 2.5 Flash models / Deprecated models",
+          "citation": "`gemini-2.5-flash-preview-05-20` * May 20, 2025 * November 18, 2025 * `gemini-3.6-flash`"
+        },
+        {
+          "id": "gemini-2.5-flash-preview-09-2025",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "September 25, 2025",
+          "arret": "2026-02-17",
+          "remplacant": "gemini-3.6-flash",
+          "section": "Gemini 2.5 Flash models / Deprecated models",
+          "citation": "`gemini-2.5-flash-preview-09-2025` * September 25, 2025 * February 17, 2026 * `gemini-3.6-flash`"
+        },
+        {
+          "id": "gemini-2.0-flash",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 5, 2025",
+          "arret": "2026-06-01",
+          "remplacant": "gemini-3.6-flash",
+          "section": "Gemini 2.0 models / Deprecated models",
+          "citation": "`gemini-2.0-flash` * February 5, 2025 * June 1, 2026 * `gemini-3.6-flash`"
+        },
+        {
+          "id": "gemini-2.0-flash-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 5, 2025",
+          "arret": "2026-06-01",
+          "remplacant": "gemini-3.6-flash",
+          "section": "Gemini 2.0 models / Deprecated models",
+          "citation": "`gemini-2.0-flash-001` * February 5, 2025 * June 1, 2026 * `gemini-3.6-flash`"
+        },
+        {
+          "id": "gemini-2.0-flash-lite",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 25, 2025",
+          "arret": "2026-06-01",
+          "remplacant": "gemini-3.1-flash-lite",
+          "section": "Gemini 2.0 models / Deprecated models",
+          "citation": "`gemini-2.0-flash-lite` * February 25, 2025 * June 1, 2026 * `gemini-3.1-flash-lite`"
+        },
+        {
+          "id": "gemini-2.0-flash-lite-001",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 25, 2025",
+          "arret": "2026-06-01",
+          "remplacant": "gemini-3.1-flash-lite",
+          "section": "Gemini 2.0 models / Deprecated models",
+          "citation": "`gemini-2.0-flash-lite-001` * February 25, 2025 * June 1, 2026 * `gemini-3.1-flash-lite`"
+        },
+        {
+          "id": "gemini-2.0-flash-lite-preview",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 5, 2025",
+          "arret": "2025-12-09",
+          "remplacant": "gemini-3.1-flash-lite",
+          "section": "Gemini 2.0 models / Deprecated models",
+          "citation": "`gemini-2.0-flash-lite-preview` * February 5, 2025 * December 9, 2025 * `gemini-3.1-flash-lite`"
+        },
+        {
+          "id": "gemini-2.0-flash-lite-preview-02-05",
+          "famille": "texte",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 5, 2025",
+          "arret": "2025-12-09",
+          "remplacant": "gemini-3.1-flash-lite",
+          "section": "Gemini 2.0 models / Deprecated models",
+          "citation": "`gemini-2.0-flash-lite-preview-02-05` * February 5, 2025 * December 9, 2025 * `gemini-3.1-flash-lite`"
+        },
+        {
+          "id": "gemini-3.5-live-translate-preview",
+          "famille": "audio",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "June 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Live API models / Preview models",
+          "citation": "`gemini-3.5-live-translate-preview` * June 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-3.1-flash-live-preview",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "March 11, 2026",
+          "arret": "2026-11-17",
+          "remplacant": "gemini-3.8-live",
+          "section": "Live API models / Preview models",
+          "citation": "`gemini-3.1-flash-live-preview` * March 11, 2026 * November 17, 2026 * `gemini-3.8-live`"
+        },
+        {
+          "id": "gemini-2.5-flash-native-audio-preview-12-2025",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "December 12, 2025",
+          "arret": "2026-11-17",
+          "remplacant": "gemini-3.8-live",
+          "section": "Live API models / Preview models",
+          "citation": "`gemini-2.5-flash-native-audio-preview-12-2025` * December 12, 2025 * November 17, 2026 * `gemini-3.8-live`"
+        },
+        {
+          "id": "gemini-live-2.5-flash-preview",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 17, 2025",
+          "arret": "2025-12-09",
+          "remplacant": "gemini-3.8-live",
+          "section": "Live API models / Deprecated models",
+          "citation": "`gemini-live-2.5-flash-preview` * June 17, 2025 * December 9, 2025 * `gemini-3.8-live`"
+        },
+        {
+          "id": "gemini-2.0-flash-live-001",
+          "famille": "audio",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "April 9, 2025",
+          "arret": "2025-12-09",
+          "remplacant": "gemini-3.8-live",
+          "section": "Live API models / Deprecated models",
+          "citation": "`gemini-2.0-flash-live-001` * April 9, 2025 * December 9, 2025 * `gemini-3.8-live`"
+        },
+        {
+          "id": "gemini-2.5-flash-preview-tts",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "May 20, 2025",
+          "arret": "2026-11-17",
+          "remplacant": "gemini-3.8-flash-tts or gemini-3.8-flash-lite-tts",
+          "section": "Audio models / Preview models",
+          "citation": "`gemini-2.5-flash-preview-tts` * May 20, 2025 * November 17, 2026 * `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`"
+        },
+        {
+          "id": "gemini-2.5-pro-preview-tts",
+          "famille": "audio",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "May 20, 2025",
+          "arret": "2026-11-17",
+          "remplacant": "gemini-3.8-flash-tts or gemini-3.8-flash-lite-tts",
+          "section": "Audio models / Preview models",
+          "citation": "`gemini-2.5-pro-preview-tts` * May 20, 2025 * November 17, 2026 * `gemini-3.8-flash-tts` or `gemini-3.8-flash-lite-tts`"
+        },
+        {
+          "id": "gemini-embedding-2",
+          "famille": "plongement",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "April 22, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Embedding models",
+          "citation": "`gemini-embedding-2` * April 22, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-embedding-001",
+          "famille": "plongement",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "July 14, 2025",
+          "arret": "2028-05-14",
+          "remplacant": "gemini-embedding-2",
+          "section": "Embedding models",
+          "citation": "`gemini-embedding-001` * July 14, 2025 * May 14, 2028 * `gemini-embedding-2`"
+        },
+        {
+          "id": "gemini-embedding-2-preview",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "March 10, 2026",
+          "arret": "2026-08-10",
+          "remplacant": "gemini-embedding-2",
+          "section": "Embedding models / Deprecated models",
+          "citation": "`gemini-embedding-2-preview` * March 10, 2026 * August 10, 2026 * `gemini-embedding-2`"
+        },
+        {
+          "id": "text-embedding-004",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "April 9, 2024",
+          "arret": "2026-01-14",
+          "remplacant": "gemini-embedding-2",
+          "section": "Embedding models / Deprecated models",
+          "citation": "`text-embedding-004` * April 9, 2024 * January 14, 2026 * `gemini-embedding-2`"
+        },
+        {
+          "id": "embedding-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "April 9, 2024",
+          "arret": "2025-10-30",
+          "remplacant": "gemini-embedding-2",
+          "section": "Embedding models / Deprecated models",
+          "citation": "`embedding-001` * April 9, 2024 * October 30, 2025 * `gemini-embedding-2`"
+        },
+        {
+          "id": "embedding-gecko-001",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": null,
+          "arret": "2025-10-30",
+          "remplacant": "gemini-embedding-2",
+          "section": "Embedding models / Deprecated models",
+          "citation": "`embedding-gecko-001` * * October 30, 2025 * `gemini-embedding-2`"
+        },
+        {
+          "id": "gemini-embedding-exp",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": null,
+          "arret": "2025-10-30",
+          "remplacant": "gemini-embedding-2",
+          "section": "Embedding models / Deprecated models",
+          "citation": "`gemini-embedding-exp` * * October 30, 2025 * `gemini-embedding-2`"
+        },
+        {
+          "id": "gemini-embedding-exp-03-07",
+          "famille": "plongement",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": null,
+          "arret": "2025-10-30",
+          "remplacant": "gemini-embedding-2",
+          "section": "Embedding models / Deprecated models",
+          "citation": "`gemini-embedding-exp-03-07` * * October 30, 2025 * `gemini-embedding-2`"
+        },
+        {
+          "id": "gemini-nano-banana-2.1",
+          "famille": "image",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "October 6, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Nano Banana models",
+          "citation": "`gemini-nano-banana-2.1` * October 6, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-3.1-flash-lite-image",
+          "famille": "image",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "June 30, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Nano Banana models",
+          "citation": "`gemini-3.1-flash-lite-image` * June 30, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-3.1-flash-image",
+          "famille": "image",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "May 28, 2026",
+          "arret": null,
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Nano Banana models",
+          "citation": "`gemini-3.1-flash-image` * May 28, 2026 * No shutdown date announced * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "gemini-3-pro-image",
+          "famille": "image",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "May 28, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Nano Banana models",
+          "citation": "`gemini-3-pro-image` * May 28, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-2.5-flash-image",
+          "famille": "image",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "October 2, 2025",
+          "arret": "2027-03-15",
+          "remplacant": "gemini-3.1-flash-lite-image",
+          "section": "Nano Banana models",
+          "citation": "`gemini-2.5-flash-image` * October 2, 2025 * March 15, 2027 * `gemini-3.1-flash-lite-image`"
+        },
+        {
+          "id": "gemini-3.1-flash-image-preview",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 26, 2026",
+          "arret": "2026-06-25",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Nano Banana models / Deprecated models",
+          "citation": "`gemini-3.1-flash-image-preview` * February 26, 2026 * June 25, 2026 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "gemini-3-pro-image-preview",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "November 20, 2025",
+          "arret": "2026-06-25",
+          "remplacant": "gemini-3-pro-image",
+          "section": "Nano Banana models / Deprecated models",
+          "citation": "`gemini-3-pro-image-preview` * November 20, 2025 * June 25, 2026 * `gemini-3-pro-image`"
+        },
+        {
+          "id": "gemini-2.5-flash-image-preview",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "May 7, 2025",
+          "arret": "2026-01-15",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Nano Banana models / Deprecated models",
+          "citation": "`gemini-2.5-flash-image-preview` * May 7, 2025 * January 15, 2026 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "gemini-2.0-flash-preview-image-generation",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "May 7, 2025",
+          "arret": "2025-11-14",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Nano Banana models / Deprecated models",
+          "citation": "`gemini-2.0-flash-preview-image-generation` * May 7, 2025 * November 14, 2025 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "imagen-4.0-generate-001",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 24, 2025",
+          "arret": "2026-08-17",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Imagen models / Deprecated models",
+          "citation": "`imagen-4.0-generate-001` * June 24, 2025 * August 17, 2026 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "imagen-4.0-ultra-generate-001",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 24, 2025",
+          "arret": "2026-08-17",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Imagen models / Deprecated models",
+          "citation": "`imagen-4.0-ultra-generate-001` * June 24, 2025 * August 17, 2026 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "imagen-4.0-fast-generate-001",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 24, 2025",
+          "arret": "2026-08-17",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Imagen models / Deprecated models",
+          "citation": "`imagen-4.0-fast-generate-001` * June 24, 2025 * August 17, 2026 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "imagen-4.0-generate-preview-06-06",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 24, 2025",
+          "arret": "2026-02-17",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Imagen models / Deprecated models",
+          "citation": "`imagen-4.0-generate-preview-06-06` * June 24, 2025 * February 17, 2026 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "imagen-4.0-ultra-generate-preview-06-06",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 24, 2025",
+          "arret": "2026-02-17",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Imagen models / Deprecated models",
+          "citation": "`imagen-4.0-ultra-generate-preview-06-06` * June 24, 2025 * February 17, 2026 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "imagen-3.0-generate-002",
+          "famille": "image",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "February 6, 2025",
+          "arret": "2025-11-10",
+          "remplacant": "gemini-nano-banana-2.1",
+          "section": "Imagen models / Deprecated models",
+          "citation": "`imagen-3.0-generate-002` * February 6, 2025 * November 10, 2025 * `gemini-nano-banana-2.1`"
+        },
+        {
+          "id": "veo-3.1-lite-generate-preview",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "March 31, 2026",
+          "arret": "2026-10-22",
+          "remplacant": "gemini-omni-1.1-flash",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-3.1-lite-generate-preview` * March 31, 2026 * October 22, 2026 * `gemini-omni-1.1-flash`"
+        },
+        {
+          "id": "veo-3.1-generate-preview",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "October 15, 2025",
+          "arret": "2026-10-22",
+          "remplacant": "gemini-omni-1.1-flash",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-3.1-generate-preview` * October 15, 2025 * October 22, 2026 * `gemini-omni-1.1-flash`"
+        },
+        {
+          "id": "veo-3.1-fast-generate-preview",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "October 15, 2025",
+          "arret": "2026-10-22",
+          "remplacant": "gemini-omni-1.1-flash",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-3.1-fast-generate-preview` * October 15, 2025 * October 22, 2026 * `gemini-omni-1.1-flash`"
+        },
+        {
+          "id": "veo-3.0-generate-001",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "September 9, 2025",
+          "arret": "2026-06-30",
+          "remplacant": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-3.0-generate-001` * September 9, 2025 * June 30, 2026 * `gemini-omni-1.1-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
+          "note": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform"
+        },
+        {
+          "id": "veo-3.0-fast-generate-001",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "September 9, 2025",
+          "arret": "2026-06-30",
+          "remplacant": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-3.0-fast-generate-001` * September 9, 2025 * June 30, 2026 * `gemini-omni-1.1-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
+          "note": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform"
+        },
+        {
+          "id": "veo-2.0-generate-001",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "April 9, 2025",
+          "arret": "2026-06-30",
+          "remplacant": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-2.0-generate-001` * April 9, 2025 * June 30, 2026 * `gemini-omni-1.1-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
+          "note": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform"
+        },
+        {
+          "id": "veo-3.0-generate-preview",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "July 31, 2025",
+          "arret": "2025-11-12",
+          "remplacant": "gemini-omni-1.1-flash",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-3.0-generate-preview` * July 31, 2025 * November 12, 2025 * `gemini-omni-1.1-flash`"
+        },
+        {
+          "id": "veo-3.0-fast-generate-preview",
+          "famille": "video",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "July 31, 2025",
+          "arret": "2025-11-12",
+          "remplacant": "gemini-omni-1.1-flash",
+          "section": "Veo models / Deprecated models",
+          "citation": "`veo-3.0-fast-generate-preview` * July 31, 2025 * November 12, 2025 * `gemini-omni-1.1-flash`"
+        },
+        {
+          "id": "gemini-omni-1.1-flash",
+          "famille": "multimodal",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "August 27, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Gemini Omni Flash models",
+          "citation": "`gemini-omni-1.1-flash` * August 27, 2026 * No shutdown date announced *"
+        },
+        {
+          "id": "gemini-omni-flash-preview",
+          "famille": "multimodal",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "June 30, 2026",
+          "arret": "2026-10-22",
+          "remplacant": "gemini-omni-1.1-flash",
+          "section": "Gemini Omni Flash models / Deprecated models",
+          "citation": "`gemini-omni-flash-preview` * June 30, 2026 * October 22, 2026 * `gemini-omni-1.1-flash`"
+        },
+        {
+          "id": "lyria-3-pro-preview",
+          "famille": "musique",
+          "etat": "deprecie",
+          "depreciation": null,
+          "sortie": "March 25, 2026",
+          "arret": null,
+          "remplacant": "lyria-3.5",
+          "section": "Lyria models / Preview models",
+          "citation": "`lyria-3-pro-preview` * March 25, 2026 * No shutdown date announced * `lyria-3.5`"
+        },
+        {
+          "id": "gemini-robotics-er-1.6-preview",
+          "famille": "robotique",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "April 14, 2026",
+          "arret": "2026-08-31",
+          "remplacant": "gemini-robotics-er-2-preview",
+          "section": "Robotics models / Deprecated models",
+          "citation": "`gemini-robotics-er-1.6-preview` * April 14, 2026 * August 31, 2026 * `gemini-robotics-er-2-preview`"
+        },
+        {
+          "id": "gemini-robotics-er-1.5-preview",
+          "famille": "robotique",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "September 25, 2025",
+          "arret": "2026-04-30",
+          "remplacant": "gemini-robotics-er-2-preview",
+          "section": "Robotics models / Deprecated models",
+          "citation": "`gemini-robotics-er-1.5-preview` * September 25, 2025 * April 30, 2026 * `gemini-robotics-er-2-preview`"
+        },
+        {
+          "id": "deep-research-pro-preview-12-2025",
+          "famille": "agent",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "December 11, 2025",
+          "arret": "2026-10-23",
+          "remplacant": "deep-research-preview-04-2026",
+          "section": "Managed agents / Preview agents",
+          "citation": "`deep-research-pro-preview-12-2025` * December 11, 2025 * October 23, 2026 * `deep-research-preview-04-2026`",
+          "note": "date d'arrêt passée au 2026-11-03 ; la page le garde encore dans « Preview agents »"
+        },
+        {
+          "id": "antigravity-preview-05-2026",
+          "famille": "agent",
+          "etat": "arrete",
+          "depreciation": null,
+          "sortie": "May 19, 2026",
+          "arret": "2026-10-05",
+          "remplacant": "antigravity-preview-09-2026",
+          "section": "Managed agents / Deprecated agents",
+          "citation": "`antigravity-preview-05-2026` * May 19, 2026 * October 5, 2026 * `antigravity-preview-09-2026`"
+        }
+      ],
+      "api": [
+        {
+          "id": "interactions-schema-herite",
+          "etat": "arrete",
+          "arret": "2026-06-08",
+          "remplacant": "schéma steps et response_format, en-tête Api-Revision",
+          "citation": "The legacy schema will be removed on June 8, 2026 .",
+          "section": "catalogue Gemini 3.2, page interactions-breaking-changes-may-2026",
+          "litteraux": []
+        },
+        {
+          "id": "gmp-contextual-view",
+          "etat": "arrete",
+          "arret": "2026-06-15",
+          "remplacant": null,
+          "citation": "The experimental GMP Contextual View tool (a fixed interface for Grounding with Google Maps outputs) will shut down on June 15, 2026",
+          "section": "catalogue Gemini 3.2, Release notes du 15 juin 2026",
+          "litteraux": []
+        }
+      ],
+      "bibliotheques_source": "catalogue brut du 03/11/2026, section 4 ; versions lues par l'API GitHub releases/latest (anonyme) et pub.dev le 03/11/2026",
+      "bibliotheques": [
+        {
+          "paquet": "google-genai",
+          "langage": "Python",
+          "depot": "googleapis/python-genai",
+          "version": "v2.34.0",
+          "publiee_le": "2026-10-29",
+          "etat": "courante"
+        },
+        {
+          "paquet": "@google/genai",
+          "langage": "JavaScript/TypeScript",
+          "depot": "googleapis/js-genai",
+          "version": "v2.32.0",
+          "publiee_le": "2026-10-29",
+          "etat": "courante"
+        },
+        {
+          "paquet": "google.golang.org/genai",
+          "langage": "Go",
+          "depot": "googleapis/go-genai",
+          "version": "v1.77.0",
+          "publiee_le": "2026-10-29",
+          "etat": "courante"
+        },
+        {
+          "paquet": "google-genai (com.google.genai)",
+          "langage": "Java",
+          "depot": "googleapis/java-genai",
+          "version": "v1.80.0",
+          "publiee_le": "2026-10-29",
+          "etat": "courante"
+        },
+        {
+          "paquet": "Google.GenAI",
+          "langage": "C#",
+          "depot": "googleapis/dotnet-genai",
+          "version": "Google.GenAI-v1.28.0",
+          "publiee_le": "2026-10-29",
+          "etat": "courante"
+        },
+        {
+          "paquet": "google-generativeai (ancienne, dépréciée)",
+          "langage": "Python",
+          "depot": "google-gemini/deprecated-generative-ai-python",
+          "version": "v0.8.6",
+          "publiee_le": "2025-12-16",
+          "etat": "depreciee"
+        },
+        {
+          "paquet": "@google/generative-ai (ancienne, dépréciée)",
+          "langage": "JavaScript/TypeScript",
+          "depot": "google-gemini/generative-ai-js (redirigé vers google-gemini/deprecated-generative-ai-js)",
+          "version": "v0.24.1",
+          "publiee_le": "2025-04-29",
+          "etat": "depreciee"
+        },
+        {
+          "paquet": "github.com/google/generative-ai-go (ancienne, dépréciée)",
+          "langage": "Go",
+          "depot": "google/generative-ai-go",
+          "version": "v0.20.1",
+          "publiee_le": "2025-05-02",
+          "etat": "depreciee"
+        },
+        {
+          "paquet": "generative-ai-swift (ancienne, dépréciée)",
+          "langage": "Swift",
+          "depot": "google/generative-ai-swift (redirigé vers google-gemini/deprecated-generative-ai-swift)",
+          "version": "0.5.6",
+          "publiee_le": "2024-08-22",
+          "etat": "depreciee"
+        },
+        {
+          "paquet": "generative-ai-android (ancienne, dépréciée)",
+          "langage": "Android",
+          "depot": "google-gemini/generative-ai-android (redirigé vers google-gemini/deprecated-generative-ai-android)",
+          "version": "v0.9.0",
+          "publiee_le": "2024-07-02",
+          "etat": "depreciee"
+        },
+        {
+          "paquet": "gemini-api (Gemini API CLI) (outil, hors bibliothèque)",
+          "langage": "Go (CLI)",
+          "depot": "google-gemini/gemini-api-cli",
+          "version": "v0.4.5",
+          "publiee_le": "2026-10-30",
+          "etat": "courante",
+          "note": "hors des cinq bibliothèques courantes du Gemini API : outil, hors bibliothèque"
+        },
+        {
+          "paquet": "gemini-skills (skills d'agents) (outil, hors bibliothèque)",
+          "langage": "Markdown/scripts",
+          "depot": "google-gemini/gemini-skills",
+          "version": null,
+          "publiee_le": null,
+          "etat": "courante",
+          "note": "hors des cinq bibliothèques courantes du Gemini API : outil, hors bibliothèque"
+        },
+        {
+          "paquet": "google_generative_ai (ancienne, dépréciée)",
+          "langage": "Dart et Flutter",
+          "depot": "pub.dev/packages/google_generative_ai ; dépôt annoncé par le pubspec : google-gemini/generative-ai-dart",
+          "version": "0.4.7",
+          "publiee_le": "2025-04-17",
+          "etat": "depreciee"
+        },
+        {
+          "paquet": "firebase_ai (remplaçant que la page recommande, produit Firebase)",
+          "langage": "Dart et Flutter",
+          "depot": "pub.dev/packages/firebase_ai",
+          "version": "5.1.0",
+          "publiee_le": "2026-10-23",
+          "etat": "courante",
+          "note": "hors des cinq bibliothèques courantes du Gemini API : remplaçant que la page recommande, produit Firebase"
+        }
+      ]
+    }
+  }
+}

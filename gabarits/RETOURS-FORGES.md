@@ -4,10 +4,13 @@
      Emplacement : forge\retours\<projet> - RETOURS - <AAAAMMJJ><indice>.md dans le projet.
      Le PRÉFIXE PROJET est obligatoire (décision humaine 13/08) : côté pilot, les lots de
      tous les projets cohabitent dans input\00-retours\ — le nom dit qui retourne quoi.
-     Un fichier remis ne se modifie JAMAIS — le lot suivant est un nouveau fichier daté. -->
+     Un fichier remis ne se modifie JAMAIS — le lot suivant est un nouveau fichier daté.
+     QUAND : DANS LE TOUR où le retour est écrit au ledger, pas à la clôture du run (D-191 (a), TF-2329). Le hook de fin de tour
+     du produit refuse un tour qui a écrit une entrée `type: retour` qu'aucun lot de `forge\retours\` ne cite par son seq. -->
 
 - **Contexte** : <clôture du run <run-id> | inspection production v<X> | incident | autre>
 - **Références ledger** : `forge\ledger.jsonl` seq <n, n…> (entrées `type: retour`)
+- **Références hors run** (si des retours ont été écrits sans run ouvert) : `forge/hors-run.jsonl` seq <n, n…> (entrées `type: retour`, TF-2260). Le seq du journal hors run repart de 1 : le segment nomme le journal et se termine par « ; » ou la fin de ligne, sinon l'ouverture du produit ne sait pas lequel des deux journaux le lot a compilé.
 - **Remise au pilot** : copier ce fichier (et son sidecar) dans le SAS
   `<pilot>\input\00-retours\_arrivee\` (ignoré par git), jamais à la racine de `input\00-retours\` :
   le pilot l'y dépose lui-même après pseudonymisation (`todo\accueillir-lot.mjs`, TF-0981) ; un lot
@@ -21,6 +24,12 @@
 > ```
 > node forge\retours\oracle-lot.mjs "<ce fichier>.md"
 > ```
+>
+> **Remettre = ce même geste avec `--remettre`** (TF-2314, 10/11/2026) :
+> `node forge\retours\oracle-lot.mjs "<ce fichier>.md" --remettre` joue le contrôle puis copie le lot et son sidecar
+> dans le sas du pilot, et **ne copie rien si le verdict est FAIL** (sortie 1). Ne copie jamais à la main un lot
+> dont le dernier verdict est FAIL : le 04/11 et le 09/11/2026, un lot en échec est parti au sas dans la même commande
+> que son contrôle.
 >
 > Il rend **0** si la forme du lot est tenue, **1** sinon — et il dit alors ce qui manque *et le
 > geste qui répare*. C'est **exactement le contrôle** que la porte du pilot joue à l'ingestion :

@@ -1,7 +1,9 @@
 # Protocole d'accueil — de l'intention de l'utilisateur au run
 
-Référence chargée par les prompts d'usage du README (« Utilise …digit-ai-factory
-pour… »). Prérequis : la phase 0 d'AGENTS.md est passée — l'installateur a rendu « FACTORY
+Référence chargée par la phrase d'usage du README, la même pour tous les cas d'usage depuis le
+04/11/2026 : « Utilise https://github.com/iguane39/digit-ai-factory pour ce projet ». Elle ne
+porte pas d'intention : le tour d'installation finit sur la bannière (étape 1) et l'intention
+arrive au message suivant ; un message qui en porte une la fait lire dès l'étape 1. Prérequis : la phase 0 d'AGENTS.md est passée — l'installateur a rendu « FACTORY
 DIGIT-AI OPÉRATIONNELLE ». **L'installation ne pose aucune question** (TF-1637) : ni sur
 l'intention, ni sur un outil manquant, que l'installateur pose lui-même en portée utilisateur.
 L'accord explicite de l'étape 6 porte sur la démarche du run, jamais sur l'installation. Ce protocole se

@@ -61,17 +61,18 @@
  *    d'environnement puis par chemins candidats DÉCLARÉS. Aucun chemin n'est écrit en dur ici :
  *    un poste qui range Git ailleurs édite la table, il ne corrige pas le module.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const TABLE_PAR_DEFAUT = join(ICI, "consommateurs-skills.json");
 const DELAI_PAR_DEFAUT = 600000;
 
-export function lireTable(chemin = TABLE_PAR_DEFAUT) {
+// FORGE_TABLE_CONSOMMATEURS (D-135 (a)) désigne une table de RECETTE, jamais celle du poste : le hook, qui décide du rejeu, et le processus détaché, qui le joue, lisent la même.
+export function lireTable(chemin = process.env.FORGE_TABLE_CONSOMMATEURS || TABLE_PAR_DEFAUT) {
   if (!existsSync(chemin)) return { erreur: `table des consommateurs introuvable : ${chemin}`, consommateurs: [] };
   try {
     const t = JSON.parse(readFileSync(chemin, "utf8"));
@@ -101,7 +102,8 @@ export function concernes(table, skills) {
  */
 export function resoudreInterprete(interprete, { existe = existsSync, env = process.env } = {}) {
   if (!interprete) return { requis: false };
-  const developper = (s) => String(s).replace(/%([A-Za-z_][A-Za-z0-9_]*)%|\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g,
+  // Windows admet des parenthèses dans un nom de variable : %ProgramFiles(x86)% (TF-2068).
+  const developper = (s) => String(s).replace(/%([A-Za-z_][A-Za-z0-9_()]*)%|\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g,
     (_, a, b) => env[a || b] || "");
   const parVariable = interprete.variable ? env[interprete.variable] : null;
   if (parVariable && existe(parVariable)) return { requis: true, chemin: parVariable, par: `$${interprete.variable}` };
@@ -299,4 +301,246 @@ export function encadrer({ skills, racine, table = lireTable(), propager, delaiP
   const apres = vises.map((c) => jouer(c, racine, { delaiParDefaut, lanceur }));
   return { mesure_le: table.mesure_le || null, skills_touches: skills || [], consommateurs: vises.map((c) => c.depot),
     avant, apres, findings: confronter(avant, apres), resultat };
+}
+
+// ---- TF-2048 (02/11/2026) · UN ROUGE NEUF LAISSE UNE TRACE QUE L'OUVERTURE RELIT -----------------------------------------
+//
+// LE FAIT. Le 02/11, la recette de forge-design rendait 2 échecs depuis 12 jours : V23 de render_page (digit-ai-page-html 1.40.0,
+// 21/10) refusait une fixture verte que personne ne rejouait, et la même fixture avait déjà cassé avec V18 en septembre (TF-1100).
+// Le constat C1/C5 de ce module existait déjà ; il s'imprimait dans la sortie d'UNE commande, lue ce jour-là ou jamais.
+//
+// LA TRACE. Un fichier JSONL HORS dépôt, à côté du journal des propagations (`consommateurs-rouges.jsonl`), une ligne par événement :
+//   · « rouge-neuf » — un consommateur passait avant la propagation et échoue après (C1), ou son rouge s'est aggravé (C5) ;
+//   · « leve »       — le même consommateur, rejoué, passe ;
+//   · « non-rejoue » — une propagation réelle a eu lieu SANS rejouer les consommateurs (`--sans-consommateurs`, le mode de
+//                      `bootstrap.mjs --pull`) : de quoi mesurer la fréquence du raccourci, qu'aucun journal ne portait.
+// `hook-ouverture.mjs` relit les rouges encore ouverts et les dit à chaque ouverture du pilot, jusqu'à ce qu'un rejeu les lève
+// (`oracle-skills.mjs --rejouer-consommateurs`). La trace SIGNALE : comme le reste de ce module, elle ne retient ni n'annule rien.
+export const traceRouges = (installes) => process.env.FORGE_TRACE_CONSOMMATEURS || join(dirname(installes), "consommateurs-rouges.jsonl");
+
+/** Les événements de trace d'une propagation encadrée. `ouverts` : les dépôts déjà en rouge ouvert, que ce rejeu a pu lever. */
+export function evenementsDePropagation(enc, { ouverts = [], maintenant = new Date() } = {}) {
+  const ts = maintenant.toISOString();
+  const evts = [];
+  const commandeDe = (depot) => ((enc.apres || []).find((r) => r.depot === depot) || {}).commande || null;
+  for (const f of enc.findings || []) {
+    if (f.statut !== "FAIL" || (f.regle !== "C1" && f.regle !== "C5")) continue;
+    const r = (enc.apres || []).find((x) => x.depot === f.ou) || {};
+    evts.push({ ts, evenement: "rouge-neuf", depot: f.ou, regle: f.regle, commande: commandeDe(f.ou), skills: enc.skills_touches || [],
+      exit: r.exit ?? null, extrait: r.extrait || null });
+  }
+  for (const r of enc.apres || []) {
+    if (r.statut === "PASS" && ouverts.includes(r.depot)) evts.push({ ts, evenement: "leve", depot: r.depot, commande: r.commande || null });
+  }
+  return evts;
+}
+
+/** L'événement d'une propagation réelle faite sans rejouer les consommateurs ; rien si elle n'a rien copié. */
+export const evenementNonRejoue = (applique, maintenant = new Date()) =>
+  (applique || []).length ? [{ ts: maintenant.toISOString(), evenement: "non-rejoue", skills: applique }] : [];
+
+/** Ajoute des événements à la trace. Une trace qui ne s'écrit pas ne retient jamais la propagation : l'échec est rendu, pas levé. */
+export function ecrireTrace(chemin, evts) {
+  if (!evts.length) return { ecrit: 0, chemin };
+  try { appendFileSync(chemin, evts.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8"); return { ecrit: evts.length, chemin }; }
+  catch (e) { return { ecrit: 0, chemin, erreur: e.message }; }
+}
+
+/** Les lignes que l'ouverture du pilot imprime pour les rouges encore ouverts ; vide quand il n'y en a aucun (un relevé bavard se désactive). */
+export function lignesOuverture(chemin) {
+  const { ouverts } = rougesOuverts(chemin);
+  if (!ouverts.length) return [];
+  const hebdo = (e) => e.origine === ORIGINE_REJEU;
+  // D-135 (a) : un rouge né du rejeu hebdomadaire garde la MÊME ligne, qui dit seulement « rejeu hebdomadaire » à la place de la propagation.
+  return ["", `## Consommateurs des skills : ${ouverts.length} rouge(s) neuf(s) non levé(s) par ${ouverts.some(hebdo) ? "une propagation ou le rejeu hebdomadaire" : "une propagation"} (TF-2048)`,
+    ...ouverts.map((e) => (hebdo(e)
+      ? `- ${e.depot} : \`${e.commande || "vérification native"}\` échoue au rejeu hebdomadaire du ${String(e.ts).slice(0, 10)} à ${String(e.ts).slice(11, 16)} UTC, sans rouge ouvert avant lui `
+        + `(rejeu hebdomadaire${(e.skills || []).length ? `, skills consommés : ${e.skills.join(", ")}` : ""})${e.extrait ? ` — ${String(e.extrait).slice(0, 160)}` : ""}.`
+      : `- ${e.depot} : \`${e.commande || "vérification native"}\` passait avant la propagation du ${String(e.ts).slice(0, 10)} à ${String(e.ts).slice(11, 16)} UTC `
+        + `(${e.regle}, skills touchés : ${(e.skills || []).join(", ") || "?"}) et échoue après${e.extrait ? ` — ${String(e.extrait).slice(0, 160)}` : ""}.`)),
+    "→ corriger la règle neuve du socle ou le consommateur, puis `node oracles/oracle-skills.mjs --rejouer-consommateurs` lève la trace dès que la vérification passe ; rien n'a été annulé."];
+}
+
+/** Les rouges encore ouverts : le dernier événement de chaque dépôt est « rouge-neuf ». `non-rejoue` ne compte que pour la mesure. */
+export function rougesOuverts(chemin) {
+  const parDepot = new Map();
+  let nonRejoue = 0, lignes = 0, illisibles = 0;
+  if (existsSync(chemin)) {
+    for (const l of readFileSync(chemin, "utf8").split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      lignes += 1;
+      let e; try { e = JSON.parse(l); } catch { illisibles += 1; continue; }
+      if (e.evenement === "non-rejoue") nonRejoue += 1;
+      else if (e.depot && (e.evenement === "rouge-neuf" || e.evenement === "leve")) parDepot.set(e.depot, e);
+    }
+  }
+  return { ouverts: [...parDepot.values()].filter((e) => e.evenement === "rouge-neuf"), non_rejoue: nonRejoue, lignes, illisibles, existe: existsSync(chemin) };
+}
+
+// ---- D-135 (a) du 02/11/2026, TF-2048 · LE REJEU HEBDOMADAIRE : TOUS LES DÉPÔTS DE LA TABLE, EN ARRIÈRE-PLAN, UNE FOIS PAR SEMAINE ------------
+//
+// LE FAIT. La trace ci-dessus ne se remplit que sur une propagation qui rejoue les consommateurs ; `bootstrap --pull` (chaque ouverture) passe
+// `--sans-consommateurs`, et `--rejouer-consommateurs` ne rejoue que les dépôts DÉJÀ en rouge ouvert. Un consommateur qui casse sans
+// propagation (V23 de render_page chez forge-design, 12 jours rouge) n'entrait donc jamais dans la trace.
+//
+// LE GESTE, décidé par l'humain : une fois par semaine, l'ouverture du PILOT lance le rejeu de TOUS les dépôts de la table, sans attendre son
+// résultat ; un rouge s'affiche à l'ouverture suivante, avec 7 jours de retard au plus.
+//   · il compare à la trace : un dépôt qui ÉCHOUE sans rouge ouvert → « rouge-neuf » ; un rouge ouvert qui PASSE → « leve » ;
+//   · un dépôt INDÉTERMINÉ ou SKIP ne compte ni pour vert ni pour rouge, et l'ouverture dit qu'il n'a rien jugé ;
+//   · un rejeu COUPÉ n'écrit RIEN à la trace (tout ou rien) : coupé, il n'a rien jugé ;
+//   · l'état vit dans un fichier à côté de la trace (`rejeu-hebdomadaire.json`, début et fin) ; un VERROU (`rejeu-hebdomadaire.verrou`, pid et
+//     heure) évite deux rejeux à la fois, et un verrou dont le processus est mort, ou plus vieux que la somme des délais de la table, est PÉRIMÉ ;
+//   · un rejeu qui n'a pas abouti depuis plus de 14 jours se dit à l'ouverture.
+// Aucune nouvelle dépendance : `node:child_process`, `node:fs`. Ce rejeu n'écrit que dans le dossier de la trace.
+export const ORIGINE_REJEU = "rejeu-hebdomadaire";
+export const SEUIL_REJEU_JOURS = 7;
+export const ALERTE_REJEU_JOURS = 14;
+const JOUR_MS = 86400000;
+const MARGE_VERROU_MS = 600000;
+const FORMAT_ETAT_REJEU = "pilot/rejeu-hebdomadaire@1";
+export const cheminEtatRejeu = (trace) => join(dirname(trace), "rejeu-hebdomadaire.json");
+export const cheminVerrouRejeu = (trace) => join(dirname(trace), "rejeu-hebdomadaire.verrou");
+
+const lireJson = (chemin) => { try { return JSON.parse(readFileSync(chemin, "utf8")); } catch { return null; } };
+export const lireEtatRejeu = (trace) => lireJson(cheminEtatRejeu(trace));
+function ecrireEtatRejeu(trace, etat) {
+  const chemin = cheminEtatRejeu(trace), tmp = `${chemin}.${process.pid}.tmp`;
+  writeFileSync(tmp, JSON.stringify(etat, null, 1) + "\n", "utf8");
+  renameSync(tmp, chemin);
+}
+
+/** Un processus existe-t-il ? `kill(pid, 0)` ne tue rien ; EPERM veut dire « il existe, mais pas à nous ». */
+export function pidVivant(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try { process.kill(pid, 0); return true; } catch (e) { return e.code === "EPERM"; }
+}
+
+/** Au-delà de ce temps, un verrou est périmé même si son pid répond (pid recyclé) : la somme des délais de la table, plus une marge. */
+export const plafondVerrouMs = (table) => (table.consommateurs || []).reduce((s, c) => s + (Number(c.verification?.delai_ms) || DELAI_PAR_DEFAUT), 0) + MARGE_VERROU_MS;
+
+export function etatVerrou(trace, { maintenant = new Date(), table = lireTable(), vivant = pidVivant } = {}) {
+  const chemin = cheminVerrouRejeu(trace);
+  if (!existsSync(chemin)) return { present: false, vivant: false };
+  const v = lireJson(chemin) || {};
+  const age_ms = maintenant - Date.parse(v.ts);
+  const vivantOui = vivant(v.pid) && Number.isFinite(age_ms) && age_ms <= plafondVerrouMs(table);
+  return { present: true, vivant: vivantOui, perime: !vivantOui, pid: v.pid ?? null, ts: v.ts ?? null };
+}
+
+/** Faut-il lancer le rejeu ? Non si la table est vide, si un rejeu tourne, ou si le dernier rejeu COMPLET a moins de 7 jours. */
+export function decisionRejeu(trace, { maintenant = new Date(), table = lireTable(), vivant = pidVivant } = {}) {
+  if (!(table.consommateurs || []).length) return { lancer: false, raison: "table-vide" };
+  const v = etatVerrou(trace, { maintenant, table, vivant });
+  if (v.present && v.vivant) return { lancer: false, raison: "en-cours", pid: v.pid };
+  const fin = Date.parse(lireEtatRejeu(trace)?.dernier_complet?.fin);
+  if (Number.isFinite(fin) && maintenant - fin < SEUIL_REJEU_JOURS * JOUR_MS) return { lancer: false, raison: "a-jour", age_jours: (maintenant - fin) / JOUR_MS };
+  return { lancer: true, raison: Number.isFinite(fin) ? "echu" : "jamais", verrou_perime: v.present };
+}
+
+/**
+ * Lance le rejeu DÉTACHÉ, et rend la main aussitôt : l'appelant n'attend ni le résultat ni la fin du processus. `spawner` est injectable
+ * pour la recette. Un lancement impossible (ENOENT, pas de pid) est rendu `lance: false` avec sa cause, jamais levé.
+ */
+export function lancerRejeuHebdomadaire({ trace, pilot, maintenant = new Date(), table = lireTable(), vivant = pidVivant, spawner = spawn } = {}) {
+  const d = decisionRejeu(trace, { maintenant, table, vivant });
+  if (!d.lancer) return { ...d, lance: false };
+  const t0 = Date.now();
+  try {
+    const enfant = spawner(process.execPath, [join(ICI, "oracle-skills.mjs"), "--rejouer-tous-consommateurs"],
+      { cwd: pilot, detached: true, stdio: "ignore", windowsHide: true, env: process.env });
+    enfant.on?.("error", () => { /* le lancement échoué est lu sur `pid` ci-dessous */ });
+    if (!enfant.pid) return { ...d, lance: false, erreur: "aucun processus n'a démarré (pas de pid)", duree_ms: Date.now() - t0 };
+    enfant.unref?.();
+    return { ...d, lance: true, pid: enfant.pid, duree_ms: Date.now() - t0 };
+  } catch (e) {
+    return { ...d, lance: false, erreur: e.code || e.message, duree_ms: Date.now() - t0 };
+  }
+}
+
+/** Les événements de trace d'un rejeu complet : ce qui ÉCHOUE sans rouge ouvert, et ce qui PASSE alors qu'un rouge était ouvert. */
+export function evenementsDeRejeu(resultats, table, { ouverts = [], maintenant = new Date() } = {}) {
+  const ts = maintenant.toISOString();
+  const skillsDe = (depot) => ((table.consommateurs || []).find((c) => c.depot === depot) || {}).skills || [];
+  const evts = [];
+  for (const r of resultats) {
+    if (r.statut === "FAIL" && !ouverts.includes(r.depot)) {
+      evts.push({ ts, evenement: "rouge-neuf", origine: ORIGINE_REJEU, depot: r.depot, regle: "H1", commande: r.commande || null, skills: skillsDe(r.depot),
+        exit: r.exit ?? null, extrait: r.extrait || null });
+    } else if (r.statut === "PASS" && ouverts.includes(r.depot)) {
+      evts.push({ ts, evenement: "leve", origine: ORIGINE_REJEU, depot: r.depot, commande: r.commande || null });
+    }
+  }
+  return evts;
+}
+
+const resumeDepots = (resultats) => resultats.map((r) => ({ depot: r.depot, statut: r.statut, ...(r.motif ? { motif: String(r.motif).slice(0, 240) } : {}) }));
+const marquerCoupe = (etat) => ({ ...etat, coupes_depuis_complet: (etat.coupes_depuis_complet || 0) + 1, dernier: { ...etat.dernier, statut: "coupe" } });
+
+/**
+ * Le rejeu lui-même (processus détaché, ou lancé à la main). Prend le verrou, rejoue TOUS les dépôts de la table, compare à la trace, écrit
+ * ses événements d'un seul tenant À LA FIN, puis l'état. Rend `deja-en-cours` sans rien écrire si un autre rejeu vivant tient le verrou.
+ */
+export function executerRejeuHebdomadaire({ trace, racine, table = lireTable(), maintenant = () => new Date(), vivant = pidVivant, jouerUn = jouer, lanceur = spawnSync, delaiParDefaut = DELAI_PAR_DEFAUT } = {}) {
+  const verrou = cheminVerrouRejeu(trace);
+  const v = etatVerrou(trace, { maintenant: maintenant(), table, vivant });
+  if (v.present && v.vivant) return { statut: "deja-en-cours", pid: v.pid, depuis: v.ts };
+  let etat = lireEtatRejeu(trace) || {};
+  // Un verrou périmé, ou un état « en-cours » sans verrou : le rejeu précédent a été coupé. Il est dit, et il n'a rien jugé.
+  if (v.present) { try { unlinkSync(verrou); } catch { /* retiré par un autre */ } }
+  if (etat.dernier?.statut === "en-cours") etat = marquerCoupe(etat);
+  const debut = maintenant().toISOString();
+  try { writeFileSync(verrou, JSON.stringify({ pid: process.pid, ts: debut }), { encoding: "utf8", flag: "wx" }); }
+  catch { return { statut: "deja-en-cours", pid: null, depuis: null }; }
+  try {
+    ecrireEtatRejeu(trace, { ...etat, format: FORMAT_ETAT_REJEU, premier_essai: etat.premier_essai || debut, dernier: { debut, fin: null, statut: "en-cours", pid: process.pid } });
+    const ouverts = rougesOuverts(trace).ouverts.map((e) => e.depot);
+    const resultats = (table.consommateurs || []).map((c) => jouerUn(c, racine, { delaiParDefaut, lanceur }));
+    const fin = maintenant();
+    const evts = evenementsDeRejeu(resultats, table, { ouverts, maintenant: fin });
+    const t = ecrireTrace(trace, evts);
+    const depots = resumeDepots(resultats);
+    const juges = resultats.filter((r) => r.statut === "PASS" || r.statut === "FAIL").length;
+    const complet = { debut, fin: fin.toISOString(), depots, juges };
+    ecrireEtatRejeu(trace, { ...etat, format: FORMAT_ETAT_REJEU, premier_essai: etat.premier_essai || debut, coupes_depuis_complet: 0,
+      dernier: { ...complet, statut: "termine", pid: process.pid, evenements_ecrits: t.ecrit }, dernier_complet: complet });
+    return { statut: "termine", debut, fin: complet.fin, depots, juges, evenements: evts, trace: t };
+  } finally {
+    if ((lireJson(verrou) || {}).pid === process.pid) { try { unlinkSync(verrou); } catch { /* déjà retiré */ } }
+  }
+}
+
+/**
+ * Ce que l'ouverture du pilot dit du rejeu hebdomadaire, hors les rouges (qui passent par `lignesOuverture`) : un rejeu coupé, les dépôts
+ * qui n'ont RIEN JUGÉ, un rejeu qui n'a pas abouti depuis plus de 14 jours. `lancer` : fonction qui lance le rejeu s'il est dû et rend le résultat de
+ * `lancerRejeuHebdomadaire` (absente : aucun lancement). Vide quand il n'y a rien à dire (un relevé bavard se désactive).
+ */
+export function lignesRejeuOuverture(trace, { maintenant = new Date(), table = lireTable(), vivant = pidVivant, lancer = null } = {}) {
+  const etat = lireEtatRejeu(trace);
+  const out = [];
+  const date = (ts) => String(ts || "?").slice(0, 10);
+  if (etat) {
+    const v = etatVerrou(trace, { maintenant, table, vivant });
+    const dernier = etat.dernier || {};
+    if (dernier.statut === "coupe" || (dernier.statut === "en-cours" && !(v.present && v.vivant))) {
+      out.push(`- le rejeu hebdomadaire commencé le ${date(dernier.debut)} a été COUPÉ avant sa fin : il n'a rien jugé, ni vert ni rouge, pas même pour les dépôts rejoués avant la coupure`
+        + `${etat.coupes_depuis_complet > 1 ? ` (${etat.coupes_depuis_complet} coupures depuis le dernier rejeu complet)` : ""}.`);
+    }
+    const complet = etat.dernier_complet;
+    const sansJugement = (complet?.depots || []).filter((d) => d.statut === "INDETERMINE" || d.statut === "SKIP");
+    if (sansJugement.length) {
+      out.push(`- au dernier rejeu hebdomadaire complet (${date(complet.fin)}), ${sansJugement.length} dépôt(s) sur ${complet.depots.length} n'ont RIEN JUGÉ, ni vert ni rouge : `
+        + `${sansJugement.map((d) => `${d.depot} (${d.statut}${d.motif ? ` — ${String(d.motif).slice(0, 110)}` : ""})`).join(" ; ")}.`);
+    }
+    const ref = Date.parse(complet?.fin) || Date.parse(etat.premier_essai);
+    if (Number.isFinite(ref) && maintenant - ref > ALERTE_REJEU_JOURS * JOUR_MS) {
+      out.push(`- aucun rejeu hebdomadaire n'a abouti depuis ${Math.floor((maintenant - ref) / JOUR_MS)} jours (dernier rejeu complet : ${complet ? date(complet.fin) : "jamais"}) : `
+        + "les consommateurs des skills ne sont plus relevés, un rouge neuf n'y serait pas vu.");
+    }
+  }
+  // Le lancement vient APRÈS la lecture de l'état : le processus lancé réécrit l'état dès qu'il démarre, et lu après lui, un rejeu coupé ne se dirait plus.
+  const lancement = lancer ? lancer() : null;
+  if (lancement?.lance) out.push(`- rejeu des ${(table.consommateurs || []).length} dépôts de la table lancé en arrière-plan (${lancement.raison === "jamais" ? "jamais joué sur ce poste" : "dernier rejeu complet de plus de 7 jours"}, `
+    + `pid ${lancement.pid}, lancement en ${lancement.duree_ms} ms, sans attente) : son résultat se lit à l'ouverture suivante.`);
+  else if (lancement?.erreur) out.push(`- rejeu hebdomadaire NON lancé (${lancement.erreur}) : les consommateurs des skills ne sont pas rejoués cette semaine.`);
+  return out.length ? ["", "## Rejeu hebdomadaire des consommateurs des skills (D-135 (a), TF-2048)", ...out] : [];
 }

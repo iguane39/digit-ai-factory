@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.55.0",
- "date": "2026-10-30",
+ "version": "1.73.0",
+ "date": "2026-11-12",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -2628,6 +2628,1188 @@
    "voisines": [
     "restitution-bloquants-disperses"
    ]
+  },
+  {
+   "cle": "cout-perimetre-non-declare",
+   "famille": "gabarit-document",
+   "libelle": "Deux totaux comparés sans dire ce que chacun comprend. Proposée par Produit-84 (2026-10-19).",
+   "creee_le": "2026-11-02",
+   "fondee_par": [
+    "TF-1971"
+   ],
+   "regle": "references/ECRITURE.md E-18 : deux montants comparés portent la rubrique « Compris, non compris, conséquence »",
+   "oracle": "pilot, oracles/oracle-ecriture.mjs EC-17 et son self-test",
+   "voisines": []
+  },
+  {
+   "cle": "conception-sur-resume-sans-texte-de-regle",
+   "famille": "regle-morte",
+   "libelle": "Un livrable met en oeuvre une regle ecrite d apres des resumes successifs, sans en citer le texte, et ses relecteurs ne la recoivent pas : il la contredit sans qu aucun controle le voie. Proposée par Produit-03 (2026-10-20).",
+   "creee_le": "2026-11-02",
+   "fondee_par": [
+    "TF-1972"
+   ],
+   "regle": "references/RELECTURE-INTENTION.md : une consigne qui nomme une règle sans son texte déclenche une alerte",
+   "oracle": "pilot, scripts/relecture-intention.mjs (reglesSansTexte) et scripts/relecture-intention.test.mjs, cas TF-1972",
+   "voisines": []
+  },
+  {
+   "cle": "porte-juge-passif-deja-publie",
+   "famille": "hook-ou-gate",
+   "libelle": "La porte de publication juge comme nouveaux des enregistrements déjà présents chez le distant : un passif publié bloque tout envoi, quel que soit son contenu. Proposée par pilot (2026-10-29).",
+   "creee_le": "2026-11-02",
+   "fondee_par": [
+    "TF-2027"
+   ],
+   "regle": "le pre-push ne juge que ce que le distant n'a pas",
+   "oracle": "digit-ai-forge-agents, quality-oracles/scripts/self-test-hamecon-publication.mjs, cas 16 quater",
+   "voisines": []
+  },
+  {
+   "cle": "valeur-affichee-en-dur-divergente-de-sa-source",
+   "famille": "donnees-perissables-en-dur",
+   "libelle": "Une valeur affichée par l'application (version, environnement, date) est écrite en dur ou dérivée sans contrôle, et diverge de sa source sans qu'aucun oracle ne relise la page servie contre cette source. Proposée par Produit-84 (2026-10-30).",
+   "creee_le": "2026-11-02",
+   "fondee_par": [
+    "TF-2043"
+   ],
+   "regle": "une valeur dérivée affichée égale sa source, sur déclaration du produit",
+   "oracle": "digit-ai-forge-design, oracles/oracle-valeur-affichee.mjs VA1 à VA4 et son self-test",
+   "voisines": []
+  },
+  {
+   "cle": "mobilisation-jugee-sur-fichiers-touches",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une forge est écartée parce qu'aucun de ses fichiers n'est touché, alors que la demande change le sens ou la source de ce qu'elle juge. Proposée par Produit-84 (2026-10-30).",
+   "creee_le": "2026-11-02",
+   "fondee_par": [
+    "TF-2044"
+   ],
+   "regle": "references/CARTE-FORGES.json : la question de la forge design porte sur le sens ou la source d'un texte affiché",
+   "oracle": "pilot, scripts/verifier-carte-forges.mjs --self-test et CF2 d'oracles/lib-mobilisation.mjs",
+   "voisines": []
+  },
+  {
+   "cle": "trace-de-mobilisation-partagee-entre-sessions",
+   "famille": "tracabilite-ledger",
+   "libelle": "Plusieurs sessions d'un même produit écrivent la même trace de mobilisation, et le verrou juge la dernière ligne, quelle que soit la session qui restitue. Proposée par Produit-84 (2026-10-30).",
+   "creee_le": "2026-11-02",
+   "fondee_par": [
+    "TF-2045"
+   ],
+   "regle": "gabarits/RESTITUTION.md : le verrou « livré » juge la ligne de la session qui restitue",
+   "oracle": "pilot, scripts/mobiliser.test.mjs et le cas (j) d'oracle-synthese --self-test",
+   "voisines": []
+  },
+  {
+   "cle": "banc-de-tests-hors-format-non-reconnu",
+   "famille": "regle-morte",
+   "libelle": "Un adaptateur de couverture ne reconnaît qu'un format de test et déclare jamais exercé ce qu'un banc d'un autre format exerce à chaque fusion. Proposée par Produit-84 (2026-10-30).",
+   "creee_le": "2026-11-02",
+   "fondee_par": [
+    "TF-2046"
+   ],
+   "regle": "une table appelée par l'API depuis un dossier tests compte comme exercée",
+   "oracle": "digit-ai-forge-tests, tests/test_tf_2008_pan_supabase.py",
+   "voisines": []
+  },
+  {
+   "cle": "skill-sans-sortie-partageable",
+   "famille": "affordance-ui",
+   "libelle": "Un skill ne rend son résultat que dans une forme liée à la session (serveur local, état en mémoire) : le porteur ne peut ni le rouvrir ni le transmettre sans le reconstruire. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2076"
+   ],
+   "regle": "forge-agents, skill make-it-better : un rendu de comparaison s'exporte en page HTML autoportante sous output/ (proposé, à sceller à la clôture)",
+   "oracle": "forge-agents, recette du skill make-it-better (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "ecriture-temporaire-comptee-tour-de-travail",
+   "famille": "hook-ou-gate",
+   "libelle": "Une écriture ou suppression dans le dossier temporaire de la session fait juger un tour de lecture comme tour de travail. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2079"
+   ],
+   "regle": "pilot, references/NIVEAUX.md : une écriture dans le scratchpad de session ne compte pas comme écriture de tour (proposé, à sceller à la clôture)",
+   "oracle": "pilot, oracles/hook-restitution.mjs, détection d'écriture du tour (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "reservation-bornee-au-format-en-citation",
+   "famille": "restitution-forme",
+   "libelle": "Le contrôle de réservation des décisions ne reconnaît qu'un format d'écriture et laisse passer une D-N non réservée écrite autrement. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2081"
+   ],
+   "regle": "pilot, gabarits/RESTITUTION.md : toute D-N nouvelle du bloc 3 se réserve, quel que soit son format d'écriture (proposé, à sceller à la clôture)",
+   "oracle": "pilot, oracles/oracle-synthese.mjs, contrôle RÉSERVATION (proposé, à outiller à la clôture)",
+   "voisines": [
+    "decision-non-reservee"
+   ]
+  },
+  {
+   "cle": "garde-contraire-a-une-preference-du-porteur",
+   "famille": "hook-ou-gate",
+   "libelle": "Une garde refuse la forme de réponse qu'une préférence enregistrée du porteur impose. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2082"
+   ],
+   "regle": "pilot, references/PREFERENCES-PORTEUR.md prime sur la longueur minimale exigée par le hook gestes-distants (proposé, à sceller à la clôture)",
+   "oracle": "pilot, oracle/hook des gestes distants, validation de reponse_humaine (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "type-de-ledger-prescrit-refuse-par-l-ecrivain",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un gabarit prescrit un type d'entrée de ledger que l'écrivain du ledger refuse comme inconnu. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2083"
+   ],
+   "regle": "pilot, gabarits/ledger.py : les cinq types prescrits « au ledger » par les gabarits de doctrine (CLAUDE-PRODUIT.md, CLAUDE-PRODUIT-DETAIL.md, REGLES-PROJET.md, dont conflit_regles par R-43) sont au vocabulaire TYPES, hérité par les produits (R-47)",
+   "oracle": "pilot, gabarits/ledger.test.mjs banc TF-2083 (vert/rouge), joué par oracles/self-tests.mjs (I2)",
+   "voisines": []
+  },
+  {
+   "cle": "gestes-distants-concurrents-sans-registre",
+   "famille": "hook-ou-gate",
+   "libelle": "Plusieurs sessions d'un même produit font des gestes distants sur les mêmes ressources sans registre commun qui les rende visibles l'une à l'autre. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2084"
+   ],
+   "regle": "pilot, references/GESTES-DISTANTS.md : registre des gestes distants en cours, partagé par les sessions d'un produit, lu avant tout geste distant et tout diagnostic de panne (proposé, à sceller à la clôture)",
+   "oracle": "pilot, à définir (proposé, à outiller à la clôture)",
+   "voisines": [
+    "trace-de-mobilisation-partagee-entre-sessions"
+   ]
+  },
+  {
+   "cle": "jeu-fictif-sans-definition-ni-oracle",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un jeu de données fictif est livré sans définition de ce qu'il doit couvrir ni oracle qui juge sa complétude. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2085"
+   ],
+   "regle": "forge-data ou forge-tests : définition d'un jeu fictif (chaque écran alimenté, chaque type d'enregistrement, histoire cohérente par stade) (proposé, à sceller à la clôture)",
+   "oracle": "forge-data/forge-tests, oracle comparant les totaux affichés à ceux du générateur (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "outil-sans-repli-de-moteur",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un outil qui dépend d'un moteur externe s'arrête sur l'échec du premier trouvé sans essayer les autres présents. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2088"
+   ],
+   "regle": "forge-audit, fiche-en-pdf.mjs : sur échec de démarrage d'un moteur, essayer les autres moteurs trouvés avant de rendre 3 (récidive de TF-1408) (proposé, à sceller à la clôture)",
+   "oracle": "forge-audit, recette de fiche-en-pdf.mjs (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "outil-sans-garde-d-argument",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un outil prend une option d'usage (--help) pour un argument positionnel et fait un geste réel au lieu d'afficher l'usage. Proposée par Produit-84 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2089"
+   ],
+   "regle": "forge-audit : tout outil de tools/ refuse un argument commençant par « - » comme dossier cible et affiche l'usage (récidive de TF-1181) (proposé, à sceller à la clôture)",
+   "oracle": "forge-audit, recette des outils de tools/ (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "adaptateur-plante-emporte-le-rapport",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un adaptateur d'audit plante sur une entrée absente au lieu de rendre sans objet, et le rapport entier sort en ERREUR. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2090"
+   ],
+   "regle": "forge-tests : un adaptateur teste l'absence de sa source (sans_objet) avant de l'exercer (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette de l'analyseur (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "audit-mute-l-arbre-audite",
+   "famille": "hook-ou-gate",
+   "libelle": "Une campagne d'audit altère en place les sources du projet audité : une écriture ou un commit concurrent peut figer un mutant. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2091"
+   ],
+   "regle": "forge-tests : la campagne de mutation travaille sur une copie, ou pose un verrou lu par les hooks de la factory (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette de la campagne de mutation (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "ressource-statique-generee-sans-version",
+   "famille": "page-html-socle",
+   "libelle": "Une page générée par un script de la factory charge une ressource statique sans version ni empreinte. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2094"
+   ],
+   "regle": "pilot : les générateurs de projections (ARCHITECTURE.html, MODELE-DONNEES.html) versionnent l'adresse des ressources statiques par empreinte (proposé, à sceller à la clôture)",
+   "oracle": "pilot, recette des générateurs de projections (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "capture-de-preuve-porte-un-jeton",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une capture produite par un outil de forge conserve un jeton ou un cookie réel, et la preuve versionnée l'emporte dans le dépôt. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2095",
+    "TF-2100"
+   ],
+   "regle": "forge-websec et forge-tests : une capture caviarde la valeur des cookies et des champs cachés, ou s'écrit hors de l'arbre versionné du produit (proposé, à sceller à la clôture)",
+   "oracle": "forge-websec et forge-tests, recettes de capture (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "regle-de-framework-hors-framework",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un audit applique une règle propre à un framework absent des dépendances du projet et produit des bloquants faux. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2096"
+   ],
+   "regle": "forge-tests : les règles propres à un framework ne se jouent que si ce framework figure dans les dépendances du projet (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan sécurité (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "motif-reconnu-sur-la-cible-pas-sur-le-lien",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un contrôle reconnaît un motif sur la page qui le porte, mais pas sur la page qui y renvoie. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2097"
+   ],
+   "regle": "forge-tests : le contrôle interface/création reconnaît un lien dont la cible porte le motif de page dédiée (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan interface (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "instance-tls-locale-injoignable",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un pan d'audit à navigateur ne peut pas joindre une instance locale servie en TLS auto-signé, faute d'option déclarée. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2098"
+   ],
+   "regle": "forge-tests : une option déclarée, bornée aux hôtes de boucle locale, autorise un certificat auto-signé pour le pan qualif (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan qualif (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "mire-standard-non-reconnue",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un pan d'audit ne reconnaît pas le champ identifiant d'une mire standard et poursuit en anonyme. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2099"
+   ],
+   "regle": "forge-tests : le sélecteur d'identifiant reconnaît autocomplete=username et un champ sans attribut type (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du pan qualif (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "livrable-de-forge-hors-critique",
+   "famille": "page-html-socle",
+   "libelle": "Un livrable HTML généré par une forge n'est pas jugé par la critique d'implémentation d'une autre forge et la refuse. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2101"
+   ],
+   "regle": "forge-tests : le gabarit du tableau de bord passe par run-oracles-design de forge-design dans la recette de la forge (proposé, à sceller à la clôture)",
+   "oracle": "forge-tests, recette du gabarit de tableau de bord (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "lexique-de-langue-incomplet",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un oracle d'écriture juge sur un lexique fermé qui ignore des formes courantes de la langue et produit des bloquants faux. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2102"
+   ],
+   "regle": "forge-design : oracle-textes-application complète son lexique, ou ne bloque pas sur une forme hors lexique (proposé, à sceller à la clôture)",
+   "oracle": "forge-design, recette d'oracle-textes-application (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "perimetre-de-session-confondu",
+   "famille": "hook-ou-gate",
+   "libelle": "Un juge de fin de tour attribue à la session les fichiers qu'une autre session a écrits dans le même arbre. Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2103"
+   ],
+   "regle": "pilot : la relecture d'intention n'attribue au tour que les fichiers écrits par la session courante (proposé, à sceller à la clôture)",
+   "oracle": "pilot, recette de la relecture d'intention (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "recette-absente-de-la-batterie-ci",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un fichier de test existe dans le dépôt mais n'est pas listé dans la batterie d'intégration continue, donc jamais rejoué. Proposée par la revue de la campagne forge-audit (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2104"
+   ],
+   "regle": "forge : tout fichier de test de tests/ est dans la batterie de la CI (proposé, à sceller à la clôture)",
+   "oracle": "forge, contrôle de couverture de la batterie CI (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "livrable-derive-non-regenere",
+   "famille": "versionnement-livrable",
+   "libelle": "Un livrable dérivé (kit embarqué, page générée) n'est pas régénéré après un changement de sa source, et sert une version périmée. Proposée par la revue de la campagne forge-audit (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2106"
+   ],
+   "regle": "forge : un livrable dérivé se régénère quand sa source change (proposé, à sceller à la clôture)",
+   "oracle": "forge, contrôle de fraîcheur des dérivés (proposé, à outiller à la clôture)",
+   "voisines": []
+  },
+  {
+   "cle": "test-appelle-fournisseur-reel-sans-double",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un test d'un produit appelle le fournisseur LLM réel sans double (mock/stub), exposant à une dépense et à un appel réseau non voulus ; l'audit ne le dénonçait pas. Relevée par la campagne forge-tests (2026-11-03).",
+   "creee_le": "2026-11-03",
+   "fondee_par": [
+    "TF-2117"
+   ],
+   "regle": "forge-tests : un test qui appelle le fournisseur LLM réel sans double est dénoncé par le pan prompts",
+   "oracle": "forge-tests, banc du pan prompts (TF-2117)",
+   "voisines": []
+  },
+  {
+   "voisines": [],
+   "cle": "pret-annonce-sans-usage-reel",
+   "famille": "hook-ou-gate",
+   "libelle": "Un run se déclare prêt pour la production sans qu'un parcours réel par persona ait été joué sur l'instance servie et revu",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2124"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261103c RP-3) : porte d'exploitabilité avant « prêt » ; doctrine posée à l'humain sous D-166",
+   "oracle": "forge-design oracles/oracle-exploitabilite.mjs, joué sur l'instance servie (porteur partiel : il juge l'exploitabilité d'une page, pas la clôture du run)"
+  },
+  {
+   "voisines": [],
+   "cle": "secret-sans-canal-entre-sessions",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un secret fourni par l'humain dans une session n'a aucun canal vers la session suivante du produit, qui le redemande ou le relit dans une transcription",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2127"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261103d RP-5) : un geste « ranger un secret » au coffre du produit, consigné au ledger par nom et empreinte ; posé à l'humain sous D-167",
+   "oracle": "oracles/oracle-secrets-hors-perimetre.mjs SP1 et SP2 (porteur partiel : il constate un secret rangé hors du coffre, pas un secret perdu entre deux sessions)"
+  },
+  {
+   "voisines": [],
+   "cle": "ressource-neuve-retiree-comptee-geste-destructif",
+   "famille": "hook-ou-gate",
+   "libelle": "Le retrait d'une ressource distante créée dans le même tour et jamais employée est traité comme un geste destructif, et la session la duplique plutôt que de la retirer",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2128"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261103d RP-6) : l'admettre dans la liste fermée de GESTES-DISTANTS, consigné avec son identifiant de création ; posé à l'humain sous D-168",
+   "oracle": "oracles/hook-gestes-distants.mjs (liste fermée des gestes distants)"
+  },
+  {
+   "voisines": [],
+   "cle": "ecart-de-surface-decide-par-la-session",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un écart de surface implicite est accepté alors que la session, un agent ou le build l'a décidé, sans décision humaine référencée",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2119"
+   ],
+   "regle": "forge-conception : un écart de surface implicite porte une décision humaine référencée (D-N, entrée de ledger ou citation datée)",
+   "oracle": "forge-conception oracles/oracle-surface.mjs S4 et S5 (1.6.0)"
+  },
+  {
+   "voisines": [],
+   "cle": "region-de-convention-sans-repli-de-capacite",
+   "famille": "contrat-interface-forge",
+   "libelle": "La région de convention d'une souscription n'a pas de repli quand la capacité manque, et le réseau créé avant l'échec reste orphelin",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2129"
+   ],
+   "regle": "forge-ops : un plan Azure déclare une région de repli et sonde la capacité avant le premier réseau (runbook G-05)",
+   "oracle": "forge-ops oracles/oracle-ops.mjs O-5"
+  },
+  {
+   "voisines": [],
+   "cle": "modification-automatique-sur-fichier-change",
+   "famille": "hook-ou-gate",
+   "libelle": "Une modification automatique s'applique alors que le fichier visé a changé depuis qu'elle a été listée, et rien ne dit l'effet qu'elle devait produire",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2070"
+   ],
+   "regle": "oeil-critique 1.4.0 : empreinte du fichier visé à la liste, refus si elle a changé, ligne « effet attendu » jugée à l'exécution suivante",
+   "oracle": "forge-agents .claude/skills/oeil-critique/scripts/automatiques.mjs verifier (self-test 23 cas)"
+  },
+  {
+   "voisines": [],
+   "cle": "produit-sans-logo-sans-methode",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un produit qui n'a pas encore de logo n'est guidé par aucune méthode de création : concepts, clichés de la catégorie, familiarité, lecture en petit",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2073"
+   ],
+   "regle": "systeme-de-marque 1.4.0, références produit-sans-logo.md (méthode reprise de logo-design-skill, MIT, sans sa bibliothèque)",
+   "oracle": "forge-design skills/systeme-de-marque/scripts/self-test.mjs (branche produit sans logo)"
+  },
+  {
+   "voisines": [],
+   "cle": "logo-illisible-en-petit",
+   "famille": "affordance-ui",
+   "libelle": "Un logo SVG passe les contrôles alors qu'il est illisible à 16 ou 32 px : traits plus fins qu'un pixel, détails fusionnés, contraste insuffisant",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2074"
+   ],
+   "regle": "forge-design : un logo se juge rendu à 16 et 32 px",
+   "oracle": "forge-design oracles/oracle-logo-petit.mjs LP1 à LP5"
+  },
+  {
+   "voisines": [
+    "trace-de-mobilisation-partagee-entre-sessions"
+   ],
+   "cle": "verrou-livre-sans-fraicheur",
+   "famille": "hook-ou-gate",
+   "libelle": "Le verrou « livré » accepte un livrable antérieur à la demande qu'il est censé clore. Proposée par Produit-84 (2026-11-04).",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2136"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261104a RT-41) : mobiliser --verifier ne rend PRESENT qu'un livrable écrit après l'horodatage de la demande, sinon MANQUANT",
+   "oracle": "pilot, scripts/mobiliser.mjs --verifier (S85) et scripts/mobiliser.test.mjs (porteur partiel : la fraîcheur du livrable reste à y juger, TF-2136)"
+  },
+  {
+   "voisines": [
+    "contrainte-client-connue-non-consultee"
+   ],
+   "cle": "standard-client-ignore-par-le-routage",
+   "famille": "hook-ou-gate",
+   "libelle": "Le routage d'une demande vers une forge générique ignore le standard que le client publie pour ce livrable (prompt, modèle, référentiel, porte). Proposée par Produit-84 (2026-11-04).",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2144"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261104d RT-44) : le routage lit d'abord le standard du client (conventions client, projet commun) et la mobilisation exige sa porte",
+   "oracle": "pilot, oracles/hook-lexique.mjs et oracles/lib-mobilisation.mjs (porteur partiel : ni l'un ni l'autre ne lit encore le standard du client, TF-2144)"
+  },
+  {
+   "voisines": [
+    "remontee-declaree-nulle-apres-correction"
+   ],
+   "cle": "correction-de-livrable-restee-au-produit",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une correction humaine d'un livrable produit par une forge reste chez le produit au lieu d'être portée dans la forge qui le génère. Proposée par Produit-84 (2026-11-04).",
+   "creee_le": "2026-11-04",
+   "fondee_par": [
+    "TF-2145"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261104e RT-45) : une demande humaine de correction d'un livrable de forge se remonte comme demande de portage dans la forge ; doctrine du format posée à l'humain sous D-171",
+   "oracle": "pilot, gabarits/oracle-lot-retours.mjs (porteur partiel : il juge la forme du lot, pas encore la présence d'une demande de portage, TF-2145)"
+  },
+  {
+   "cle": "ergonomie-d-office-non-exigee",
+   "famille": "affordance-ui",
+   "libelle": "Un défaut d'ergonomie qu'un nouvel arrivant voit d'emblée passe tous les oracles du design Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2158"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : pilot : des défauts d'ergonomie vus d'emblée par le porteur passent tous les oracles du design",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2158 — porteur à outiller"
+  },
+  {
+   "cle": "instruction-lue-comme-option",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une instruction du porteur qui touche une doctrine est transformée en options au lieu d'être confirmée Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2159"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : pilot : une instruction du porteur qui touche une doctrine est transformée en options",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2159 — porteur à outiller"
+  },
+  {
+   "cle": "releve-relit-les-secrets",
+   "famille": "hook-ou-gate",
+   "libelle": "La relève d'un tour recopie un fichier de secret vers un agent Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2160"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : pilot : la relève de relecture d'intention recopie un fichier de clé vers l'agent relecteur",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2160 — porteur à outiller"
+  },
+  {
+   "cle": "configuration-d-audit-non-persistee",
+   "famille": "contrat-interface-forge",
+   "libelle": "La configuration d'audit d'un produit ne vit que dans la transcription d'une session Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2161"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-tests : la configuration d'audit d'un produit ne vit que dans la transcription",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2161 — porteur à outiller"
+  },
+  {
+   "cle": "alignement-compte-un-panneau-deplie",
+   "famille": "contrat-interface-forge",
+   "libelle": "La règle d'alignement compte les contrôles d'un panneau déplié comme une rangée Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2162"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-design : la règle d'alignement compte les cases d'un menu déplié, T4-2 lit une négation comme un état vide",
+   "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture de TF-2162 — porteur à outiller"
+  },
+  {
+   "cle": "appel-de-modele-sous-verrou-et-pseudonyme-fragile",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un appel de modèle tient un verrou d'écriture, et ses pseudonymes ne survivent pas à la reformulation Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2163"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-agents : un appel de modèle tient un verrou d'écriture, et ses pseudonymes ne survivent pas à la reformulation",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2163 — porteur à outiller"
+  },
+  {
+   "cle": "reseau-docker-sans-releve-ni-ignore",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un réseau Docker posé par Terraform ne relève pas les plages prises et dérive à chaque apply Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2164"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-ops : un réseau Docker posé par Terraform ne relève pas les plages prises et dérive à chaque apply",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2164 — porteur à outiller"
+  },
+  {
+   "cle": "frontal-resout-l-amont-une-fois",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un frontal nginx fige l'adresse de son amont au démarrage et rend 502 après sa recréation Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2165"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104a) : forge-ops : un frontal nginx fige l'adresse de son amont au démarrage et rend 502 après sa recréation",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2165 — porteur à outiller"
+  },
+  {
+   "cle": "identifiants-de-test-renouveles-a-chaque-deploiement",
+   "famille": "contrat-interface-forge",
+   "libelle": "Les identifiants de test remis à l'humain changent à chaque déploiement Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2166"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104b) : pilot : les identifiants de test remis à l'humain changent à chaque déploiement (règle demandée par le porteur)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2166 — porteur à outiller"
+  },
+  {
+   "cle": "secret-remis-a-l-humain-difficile-a-recopier",
+   "famille": "affordance-ui",
+   "libelle": "Un secret remis à l'humain contient des signes et des sosies qui se recopient mal Proposée par Produit-86 (2026-11-04).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2167"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261104b) : pilot : un secret remis à l'humain contient des signes et des sosies qui se recopient mal",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2167 — porteur à outiller"
+  },
+  {
+   "cle": "mandat-de-push-sans-identite",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un mandat de publication des forges est écrit sans l'identité sous laquelle il s'exerce : depuis un profil de session lié à un autre compte, le push est refusé, et un agent qui ignore le mandat prend un push légitime pour une anomalie. Proposée par Produit-84 (2026-11-05).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2168"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261105a) : pilot : RT-46 — le mandat permanent de push des forges ne dit pas sous quelle identité il s'exerce (403 depuis un profil lié au compte d'un client)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2168 — porteur à outiller"
+  },
+  {
+   "cle": "erreur-de-saisie-sans-champ-designe",
+   "famille": "affordance-ui",
+   "libelle": "Une saisie refusée ne désigne pas son champ et ne dit pas la forme attendue Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2172"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105a) : forge-design : une saisie refusée s'affiche loin du formulaire, sans champ désigné ni forme attendue (demande du porteur)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture de TF-2172 — porteur à outiller"
+  },
+  {
+   "cle": "outil-autonome-hors-application-sans-verdict-de-tests",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un outil Python autonome rangé hors de l'application principale ne peut recevoir aucun verdict de la forge de tests Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2173"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105a) : forge-tests : un outil Python autonome hors de backend/ ne peut pas être jugé",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2173 — porteur à outiller"
+  },
+  {
+   "cle": "champ-d-entree-capture-par-une-option-de-l-ecrivain",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un champ d'entrée de ledger porte le nom d'une option de l'écrivain et ne peut pas être écrit Proposée par Produit-86 (2026-11-03).",
+   "creee_le": "2026-11-05",
+   "fondee_par": [
+    "TF-2174"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105a) : pilot : forge/ledger.py ne sait pas écrire le champ run d'un run_open",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2174 — porteur à outiller"
+  },
+  {
+   "cle": "version-servie-illisible",
+   "famille": "contrat-interface-forge",
+   "libelle": "L'instance servie ne dit pas quel commit elle sert : la session doit le reconstituer Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2201"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105b) : forge-ops : version servie illisible",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2201 — porteur à outiller"
+  },
+  {
+   "cle": "note-de-relecteur-integree-sans-recompte",
+   "famille": "regle-morte",
+   "libelle": "Une affirmation d'un relecteur entre dans une correction sans avoir été vérifiée à la source Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2202"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105b) : prompt-analyzer-l99, mode boucle : note de relecteur non recomptée, rejet par régression qui livre une passe aux majeurs connus",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2202 — porteur à outiller"
+  },
+  {
+   "cle": "decision-remplacee-sans-retrait-de-ses-artefacts",
+   "famille": "restitution-forme",
+   "libelle": "Une décision humaine en remplace une autre sans que soit retiré ce que la première avait créé Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2206",
+    "TF-2210"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105d) : décision humaine qui en remplace une autre sans retirer ce que la première a créé",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2206 — porteur à outiller"
+  },
+  {
+   "cle": "inventaire-de-composants-sans-controle-de-fraicheur",
+   "famille": "regle-morte",
+   "libelle": "L'inventaire des composants existe mais aucun oracle ne le compare aux ressources réelles Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2209"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : COMPOSANTS-OPS figé depuis le premier commit malgré TF-1113 : R-20 ne juge pas la fraîcheur",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2209 — porteur à outiller"
+  },
+  {
+   "cle": "controle-produit-sans-accroche-de-run",
+   "famille": "hook-ou-gate",
+   "libelle": "Un produit ne peut pas faire rejouer ses propres contrôles à chaque run Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2211"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : contrôle du produit sans accroche possible à l'ouverture et à la clôture des runs",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2211 — porteur à outiller"
+  },
+  {
+   "cle": "page-generee-par-le-pilot-hors-oracles",
+   "famille": "page-html-socle",
+   "libelle": "Une page générée par le pilot échoue aux oracles qu'il impose aux produits Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2212"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : generer-todo-produit.mjs : page TODO-PRODUIT en échec à run-oracles-design (7/11)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2212 — porteur à outiller"
+  },
+  {
+   "cle": "journal-de-hook-dans-l-arbre-du-produit",
+   "famille": "hook-ou-gate",
+   "libelle": "Un hook de la factory écrit son journal dans l'arbre de travail d'un produit Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2213",
+    "TF-2215"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105e) : hook des rappels de leçons : journal écrit dans l'arbre du produit, lu comme secret par son balayage",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2213 — porteur à outiller"
+  },
+  {
+   "cle": "decision-ouverte-perdue-entre-deux-runs",
+   "famille": "restitution-forme",
+   "libelle": "Une décision posée à l'humain disparaît des restitutions suivantes sans avoir reçu de réponse Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2214"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105f) : décision posée puis jamais rappelée : D-48 perdue entre deux runs",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2214 — porteur à outiller"
+  },
+  {
+   "cle": "assertion-de-test-executee-zero-fois",
+   "famille": "regle-morte",
+   "libelle": "Un test passe sans avoir exécuté son assertion : boucle sur zéro élément ou attente expirée en silence Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2216"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105g) : tests de bout en bout verts sans rien vérifier : boucle exécutée zéro fois, attente qui expire sans échouer",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2216 — porteur à outiller"
+  },
+  {
+   "cle": "interrupteur-d-arret-sans-oracle-en-course",
+   "famille": "regle-morte",
+   "libelle": "Un interrupteur d'arrêt n'est prouvé qu'au repos, jamais pendant une action en cours Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2217"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105g) : arrêt d'urgence jamais rejoué en course par un oracle : job démarré 0,3 s après l'arrêt de sa mission",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents-security) à la clôture de TF-2217 — porteur à outiller"
+  },
+  {
+   "cle": "go-humain-exige-pour-un-geste-local-reversible",
+   "famille": "hook-ou-gate",
+   "libelle": "Un geste local et réversible, nécessaire à la demande en cours, est soumis au GO humain comme une mise en production Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2218"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105g) : GO humain exigé pour redéployer la préproduction locale, réversible, dont dépend la demande en cours",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2218 — porteur à outiller"
+  },
+  {
+   "cle": "livrable-exige-hors-perimetre-de-la-demande",
+   "famille": "hook-ou-gate",
+   "libelle": "Un vérificateur exige qu'un livrable soit réécrit alors que la demande ne le touche pas Proposée par Produit-86 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2221"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261105h) : mobiliser --verifier exige tokens.css pour une évolution qui n'ajoute aucun jeton",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2221 — porteur à outiller"
+  },
+  {
+   "cle": "pile-deduite-d-un-nom-de-dossier",
+   "famille": "contrat-interface-forge",
+   "libelle": "Une forge reconnaît la pile d'un produit par un nom de dossier conventionnel au lieu de ses manifestes Proposée par Produit-81 (2026-11-05).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2222"
+   ],
+   "regle": "Proposition de Produit-81 (lot 20261105a) : forge_tests déduit la pile d'un nom de dossier : FRONT/ React et BACK .NET non reconnus",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2222 — porteur à outiller"
+  },
+  {
+   "cle": "gabarit-skill-rouge-aux-oracles-du-socle",
+   "famille": "page-html-socle",
+   "libelle": "Un gabarit fourni par un skill, instancié tel quel, échoue aux oracles du socle qui jugent la page produite, sans que le skill nomme ces oracles dans son flux Proposée par Produit-84 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2263"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261106c) : client-a-schemas : RT-54 — le gabarit du skill, instancié tel quel, échoue à run-oracles-design (81 bloquants de jetons, 453 de rendu dont 413 V4 sur les cadres de couloir)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2263 — porteur à outiller"
+  },
+  {
+   "cle": "livrable-frais-masque-par-un-ancien",
+   "famille": "hook-ou-gate",
+   "libelle": "Un contrôle de présence retient la première correspondance d'un motif de chemin et juge sa fraîcheur seule, si bien qu'un livrable ancien masque un livrable frais du même motif Proposée par Produit-84 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2264"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261106d) : factory : RT-55 — mobiliser --verifier déclare manquant un livrable frais, masqué par un ancien du même motif rangé dans un dossier trié avant",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2264 — porteur à outiller"
+  },
+  {
+   "cle": "verification-sur-substitut-non-representatif",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un script ou un geste est valide sur un substitut (base jetable, jeu fictif) construit sans relire la cible ; le substitut differe de la cible sur un point decisif et l echec n apparait qu a l execution reelle Proposée par Produit-81 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2267"
+   ],
+   "regle": "Proposition de Produit-81 (lot 20261106a) : forge-tests : RP-3 — un script SQL de données validé sur une base jetable reconstruite d'après le jeu fictif échoue sur la cible (colonne d'identité)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2267 — porteur à outiller"
+  },
+  {
+   "cle": "suite-rouge-rendue-en-skip",
+   "famille": "hook-ou-gate",
+   "libelle": "Une suite de tests rouge est rendue comme une absence de mesure (SKIP) au lieu d'un échec nommé Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2269"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106a) : forge_tests : une suite backend rouge rend les pans api, data et migrations en SKIP, verdict PARTIEL inchangé",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2269 — porteur à outiller"
+  },
+  {
+   "cle": "infra-appliquee-sans-convergence",
+   "famille": "hook-ou-gate",
+   "libelle": "Une chaîne applique l'infrastructure et rend PASS sans vérifier que le plan suivant est vide Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2271"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106a) : Chaîne de déploiement Terraform : apply PASS sans convergence, dérive permanente du fournisseur Docker",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2271 — porteur à outiller"
+  },
+  {
+   "cle": "condition-de-saut-lue-hors-contexte",
+   "famille": "hook-ou-gate",
+   "libelle": "Un contrôle juge qu'un test se saute sans tenir compte du contexte où il le joue Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2274"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106c) : parcours-personas : fichiers e2e écartés comme sautables même quand l'instance est fournie",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2274 — porteur à outiller"
+  },
+  {
+   "cle": "banc-sans-reponse-realiste",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un outil qui lit les réponses d'une cible tierce n'est testé que sur des réponses factices idéales (200 sans cookie, un seul passage) : les défauts de la première réponse réelle (redirection, cookie, jeton, rejeu) passent tous les bancs Proposée par Produit-86 (2026-11-06).",
+   "creee_le": "2026-11-06",
+   "fondee_par": [
+    "TF-2275"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261106d) : Bancs sans réponse de cible réaliste : 4 défauts du mode client vus seulement au premier job réel",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture de TF-2275 — porteur à outiller"
+  },
+  {
+   "cle": "voie-manuelle-proposee-alors-qu-automatisable",
+   "famille": "restitution-forme",
+   "libelle": "Une session propose à l'humain un geste manuel qu'elle pouvait exécuter elle-même, au besoin après une approbation groupée, au lieu de proposer d'abord la voie automatique (loi n° 5). Proposée par Produit-81 (2026-11-09).",
+   "creee_le": "2026-11-09",
+   "fondee_par": [
+    "TF-2304"
+   ],
+   "regle": "Proposition de Produit-81 (lot 20261109c, RT-11) : voie manuelle proposée à l'utilisateur alors que la session pouvait l'automatiser",
+   "oracle": "à porter par le pilot (oracles/oracle-synthese.mjs) à la clôture de TF-2304 — porteur à outiller"
+  },
+  {
+   "cle": "etat-servi-non-relu-apres-epreuve",
+   "famille": "hook-ou-gate",
+   "libelle": "Une épreuve qui change l'état de l'instance servie (arrêt, mode dégradé, verrou) ne relit pas cet état à sa fin et le laisse au porteur. Proposée par Produit-86 (2026-11-09).",
+   "creee_le": "2026-11-09",
+   "fondee_par": [
+    "TF-2308"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261109a, RP-53) : le test de mise en production laisse l'instance servie dans l'état de sa dernière épreuve",
+   "oracle": "digit-ai-forge-ops : oracles/oracle-ops.mjs --etat-servi, règle O30 (relevé du gabarit gabarits/smoke-mise-en-production.mjs), forge-ops 28fc468"
+  },
+  {
+   "cle": "localisateur-trop-etroit",
+   "famille": "restitution-forme",
+   "libelle": "Deux règles du même socle se contredisent sur ce qui localise une action : l'une exige une adresse, l'autre ne la compte pas. Proposée par Produit-86 (2026-11-09).",
+   "creee_le": "2026-11-09",
+   "fondee_par": [
+    "TF-2310"
+   ],
+   "regle": "Proposition de Produit-86 (lot 20261109a, RP-55) : S13 ne compte pas une adresse http(s) nue comme localisateur, que S92 exige",
+   "oracle": "à porter par le pilot (oracles/oracle-synthese.mjs S13) à la clôture de TF-2310 — porteur à outiller"
+  },
+  {
+   "cle": "attente-fournisseur-sur-service-inutilise",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un fournisseur d'infrastructure attend la santé d'un service que le produit n'utilise pas Proposée par Produit-84 (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2312"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261109b + ledger seq 264) : RU-13 — supabase_settings échoue tant qu'un service inutilisé (realtime) n'est pas sain",
+   "oracle": "à porter par la forge cible (digit-ai-forge-ops) à la clôture de TF-2312 — porteur à outiller"
+  },
+  {
+   "cle": "remise-sans-verdict",
+   "famille": "lot-forme",
+   "libelle": "Un lot est remis au sas sans que la copie attende le verdict de son contrôle Proposée par Produit-84 (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2314"
+   ],
+   "regle": "Proposition de Produit-84 (lot 20261109b + ledger seq 267) : RT-58 — un lot part au sas alors que son contrôle rend FAIL (2e occurrence)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2314 — porteur à outiller"
+  },
+  {
+   "cle": "formation-sans-document-du-formateur",
+   "famille": "gabarit-document",
+   "libelle": "Une chaîne de formation ne produit que les pièces du participant (support, kit) : aucun document du formateur (minutage, solutions, matériel, préparation de la veille) n'est prévu ni exigé, et ce qui revient au formateur finit dans le kit du participant ou nulle part Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2315"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 703)) : une chaîne de formation ne produit aucun document du formateur (RA-06)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2315 — porteur à outiller"
+  },
+  {
+   "cle": "coherence-entre-pieces-d-une-formation-non-jugee",
+   "famille": "gabarit-document",
+   "libelle": "Les pièces d'une formation (support, notes, kit, programme) passent chacune leurs oracles alors qu'elles se contredisent : durée d'un exercice, temps d'une demi-journée, solution chez le participant, fiche contraire à la grille enseignée Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2316"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 692)) : aucun oracle ne juge la cohérence entre les pièces d'une formation (RA-07)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2316 — porteur à outiller"
+  },
+  {
+   "cle": "programme-de-formation-calque-sur-la-propale",
+   "famille": "gabarit-document",
+   "libelle": "Un programme de formation reprend la lettre de la propale commerciale au lieu de l'usage attendu par chaque public, et enchaîne des modules suivis séparément Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2317"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 609)) : les modules de formation suivent la lettre de la propale, pas l'usage attendu (RA-08)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2317 — porteur à outiller"
+  },
+  {
+   "cle": "hamecon-d-anonymisation-reecrit-l-arbre-de-travail",
+   "famille": "anonymisation",
+   "libelle": "Le hameçon d'anonymisation au commit réécrit les fichiers de travail sur le disque au lieu de la seule copie indexée, y compris des entrants en lecture seule Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2321"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 540)) : pre-commit-anonymiser réécrit le disque, pas seulement l'index (RA-12)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2321 — porteur à outiller"
+  },
+  {
+   "cle": "prerequis-declare-installe-absent-du-poste",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un skill déclare un prérequis installé que le poste n'a pas, et l'échec qui en résulte ne le nomme pas Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2326"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 645)) : digit-ai-pptx déclare pptxgenjs installé globalement, absent du poste (RA-17)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2326 — porteur à outiller"
+  },
+  {
+   "cle": "insecable-perdu-par-le-generateur-pptx",
+   "famille": "contrat-interface-forge",
+   "libelle": "Le générateur de diapositives prescrit par un skill perd l'espace insécable U+00A0 que l'oracle de charte du même socle exige Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2328"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 681)) : pptxgenjs remplace l'espace insécable U+00A0, que S8 exige ensuite (RA-19)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2328 — porteur à outiller"
+  },
+  {
+   "cle": "echeance-de-seance-sans-revue-declenchee",
+   "famille": "hook-ou-gate",
+   "libelle": "La date d'une séance ou d'une remise n'est inscrite dans aucun calendrier lu par le dispositif : aucune revue de préparation n'est déclenchée avant elle Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2330"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 693)) : rien ne déclenche une revue de préparation avant une séance datée (RP-07)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2330 — porteur à outiller"
+  },
+  {
+   "cle": "engagement-de-document-sans-livrable",
+   "famille": "gabarit-document",
+   "libelle": "Un document remis au client annonce une pièce, un temps ou un outil qu'aucun autre livrable de la chaîne ne produit ni ne contrôle Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2333"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109b (ledger forge/ledger.jsonl seq 694)) : un engagement écrit dans un document n'a ni livrable ni contrôle (RP-10)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2333 — porteur à outiller"
+  },
+  {
+   "cle": "lot-de-fiches-sans-indice-commun",
+   "famille": "versionnement-livrable",
+   "libelle": "R-4 exige un indice du jour distinct par livrable d'un dossier : un lot de fiches produit en un seul traitement porte autant de lettres que de fiches, et ces lettres ne disent aucune version. Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2341"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109c (ledger forge/ledger.jsonl seq 218)) : R-4 impose un indice distinct à chaque fiche d'un lot produit en un seul traitement (RP-204)",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2341 — porteur à outiller"
+  },
+  {
+   "cle": "documentation-d-outil-differente-de-sa-sortie",
+   "famille": "contrat-interface-forge",
+   "libelle": "La documentation d'un outil de forge annonce un format de sortie que l'outil ne rend pas : le script qui suit la documentation échoue à l'exécution. Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2355"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109c (ledger forge/ledger.jsonl seq 152)) : SKILL.md annonce de l'hexadécimal pour les clés usages_pptx, lire-marque.mjs rend un objet (RA-205)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2355 — porteur à outiller"
+  },
+  {
+   "cle": "asset-vectoriel-rendu-faux-sans-erreur",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un skill de rendu ne déclare pas les formats d'asset qu'il rend fidèlement : un SVG à dégradé rendu par un moteur qui l'ignore sort faux (logo noir), sans erreur ni avertissement. Proposée par digit-ai-marketing (2026-11-09).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2377"
+   ],
+   "regle": "Proposition de digit-ai-marketing (lot 20261109c (ledger forge/ledger.jsonl seq 480)) : prepare_images.py ne lit pas le SVG, et un moteur choisi à la place rend un logo faux sans erreur (RA-227)",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2377 — porteur à outiller"
+  },
+  {
+   "cle": "lot-de-gestes-sans-releve-des-ressources-protegees",
+   "famille": "hook-ou-gate",
+   "libelle": "Un lot de gestes de droits est posé pour un environnement neuf sans relever toutes les ressources protégées que la chaîne référence ; un droit manquant bloque le run et impose une seconde décision. Proposée par Produit-81 (2026-11-10).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2409"
+   ],
+   "regle": "Proposition de Produit-81 (lot du 10/11/2026) : le lot de gestes de l'ouverture d'un environnement ne listait pas la connexion de service ; le run d'infrastructure s'est arrêté sur son autorisation",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2409 — porteur à outiller",
+   "voisines": []
+  },
+  {
+   "cle": "personne-nommee-a-l-ecran",
+   "famille": "restitution-forme",
+   "libelle": "Une restitution cite une personne par son nom ou son adresse au lieu de son rôle. Proposée par Produit-81 (2026-11-10).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2410"
+   ],
+   "regle": "Proposition de Produit-81 (lot du 10/11/2026) : une réponse citait des personnes relevées dans des attributions de rôle ; préférence du porteur du 09/11/2026",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2410 — porteur à outiller",
+   "voisines": []
+  },
+  {
+   "cle": "git-distant-sans-jeton-prescrit",
+   "famille": "hook-ou-gate",
+   "libelle": "Une commande git distante est lancée sans le mode d'authentification prescrit pour ce dépôt. Proposée par Produit-81 (2026-11-10).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2411"
+   ],
+   "regle": "Proposition de Produit-81 (lot du 10/11/2026) : un fetch et un push nus avant la relecture de la consigne d'authentification du clone",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2411 — porteur à outiller",
+   "voisines": []
+  },
+  {
+   "cle": "serveur-de-banc-orphelin",
+   "famille": "hook-ou-gate",
+   "libelle": "Un serveur lancé pour un banc reste actif après le tour et fausse les mesures suivantes. Proposée par Produit-84 (2026-11-10).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2414"
+   ],
+   "regle": "Proposition de Produit-84 (lot du 10/11/2026) : un serveur de développement lancé pour un banc a consommé 25 880 s de processeur le lendemain",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture de TF-2414 — porteur à outiller",
+   "voisines": []
+  },
+  {
+   "cle": "decision-retiree-rappelee-ouverte",
+   "famille": "tracabilite-ledger",
+   "libelle": "Une décision retirée sans être posée reste rappelée comme en attente. Proposée par Produit-84 (2026-11-10).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2415"
+   ],
+   "regle": "Proposition de Produit-84 (lot du 10/11/2026) : 2 décisions retirées rappelées au porteur comme ouvertes par S93",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture de TF-2415 — porteur à outiller",
+   "voisines": []
+  },
+  {
+   "cle": "porte-client-incompatible-avec-le-rendu",
+   "famille": "contrat-interface-forge",
+   "libelle": "La porte du standard client refuse un rendu que la forge juge diffusable, pour des raisons qui ne tiennent pas aux données. Proposée par Produit-84 (2026-11-10).",
+   "creee_le": "2026-11-10",
+   "fondee_par": [
+    "TF-2420"
+   ],
+   "regle": "Proposition de Produit-84 (lot du 10/11/2026) : la porte du projet commun compile les blocs application/json comme du JavaScript et exige un score pour une dimension sans objet",
+   "oracle": "à porter par la forge cible (digit-ai-forge-audit) à la clôture de TF-2420 — porteur à outiller",
+   "voisines": []
+  },
+  {
+   "cle": "ecran-d-etat-jamais-juge",
+   "famille": "affordance-ui",
+   "libelle": "Un écran d'état voulu (page introuvable, erreur, accès refusé) n'est jugé par aucune critique : le lanceur rend SKIP dès que le code HTTP n'est pas 200.",
+   "creee_le": "2026-11-12",
+   "fondee_par": [
+    "TF-2432"
+   ],
+   "regle": "Retour de produit du 10/11/2026 : l'écran « Page introuvable » d'une exigence rend SKIP exit 2 (X0 réponse 404).",
+   "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "cadence-d-avancement-non-tenue",
+   "famille": "contrat-interface-forge",
+   "libelle": "La cadence d'avancement que le contrat d'agent impose ne tient pas pendant une commande longue ou une compaction : le pilot lit un silence comme un blocage.",
+   "creee_le": "2026-11-12",
+   "fondee_par": [
+    "TF-2434"
+   ],
+   "regle": "Retour de produit du 10/11/2026 : 18 émissions sur 2 h 30, 10 écarts de plus de 4 minutes, 33 minutes au plus.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "verification-native-omise-au-commit",
+   "famille": "hook-ou-gate",
+   "libelle": "Un commit qui ne touche pas au code part sans la vérification native du dépôt (make test, docker compose config) : rien ne la nomme pour ce cas.",
+   "creee_le": "2026-11-12",
+   "fondee_par": [
+    "TF-2436"
+   ],
+   "regle": "Retour de produit du 10/11/2026 : référentiel et correctif commités sans vérification native, rejouée ensuite exit 0 par la session.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "dossier-temporaire-partage-avec-les-agents",
+   "famille": "contrat-interface-forge",
+   "libelle": "Les agents délégués écrivent dans le dossier temporaire de la session qui les lance, partagé avec elle et entre eux : collisions de fichiers et suppressions bloquées par la garde.",
+   "creee_le": "2026-11-12",
+   "fondee_par": [
+    "TF-2437"
+   ],
+   "regle": "Retour de produit du 10/11/2026 : scripts et captures d'un constructeur écrits dans le dossier temporaire de la session.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "echec-de-workflow-heberge-sans-alerte",
+   "famille": "hook-ou-gate",
+   "libelle": "Un workflow hébergé d'un produit échoue plusieurs jours de suite sans que l'ouverture de session ni aucun relevé le dise : la panne se découvre par hasard.",
+   "creee_le": "2026-11-12",
+   "fondee_par": [
+    "TF-2442"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : workflow de publication en échec sur 5 exécutions du 03/11 au 12/11, 3 publications non parties.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
   }
  ],
  "cliquet_porteur": {

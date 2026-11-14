@@ -1,0 +1,517 @@
+{
+  "schema": "l99-boucle@1",
+  "prompt": "Série d'animations présentant les pans fonctionnels de la Factory et de ses forges (09/11/2026)",
+  "arbitre": {
+    "rubrique": "couches.md Ch1, 6 dimensions /100",
+    "arret": "0 bloquant et 0 majeur",
+    "seuil_score": null,
+    "gain_min": 3,
+    "borne": 3,
+    "garde_longueur": 0.15,
+    "retenue": "union_recomptee",
+    "verification_cloture": true,
+    "rejet_regression": true,
+    "recompte_notes": true,
+    "reprise_unique": true,
+    "score_de_passe": "le plus bas des 2 relecteurs, lecture à charge"
+  },
+  "passes": [
+    {
+      "n": 1,
+      "fichier": "prompt-p1.md",
+      "mots": 1614,
+      "relecteur": {
+        "agent": "verificateur A et verificateur B, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "fichiers « L99 » ou « crible »"
+        ]
+      },
+      "scores_relecteurs": {
+        "A": 84,
+        "B": 74
+      },
+      "score_mesure": 74,
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "oracle-claims ambigu : deux oracles de ce nom, ni chemin ni commande",
+          "citation": "`oracle-claims` et `oracle-nom-client-publie` au registre du skill `quality-oracles`",
+          "vu_par": [
+            "A",
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n oracle-claims ~/.claude/skills/quality-oracles/references/registre-oracles.md",
+            "resultat": "lignes 61 (scripts/oracle-claims.mjs, montants) et 78 (forge-conception oracle-claims.mjs <EXIGENCES.json>)"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "oracle-nom-client-publie prend un dépôt ou un bundle, pas un fichier",
+          "citation": "`oracle-nom-client-publie` PASS",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n usage ~/.claude/skills/quality-oracles/scripts/oracle-nom-client-publie.mjs",
+            "resultat": "ligne 859 : usage node oracle-nom-client-publie.mjs <depot|fixture.bundle>"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "durée 60-120 s sans méthode ; oracle-motion ne juge que les transitions CSS ; script de comptage non nommé",
+          "citation": "durée totale entre 60 et 120 s ... (comptés par script)",
+          "vu_par": [
+            "A",
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n R4 C:/dev/digit-ai-forge-design/oracles/oracle-motion.mjs",
+            "resultat": "ligne 10-11 : R4 durée de transition > 300 ms, animations décoratives longues non jugées ici"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "run-oracles-design sans chemin ni arguments, absent de l'ÉTAPE 0",
+          "citation": "le verdict de la critique d'implémentation `run-oracles-design` daté après la dernière écriture",
+          "vu_par": [
+            "A",
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n Usage -A3 C:/dev/digit-ai-forge-design/oracles/run-oracles-design.mjs",
+            "resultat": "ligne 18 : node run-oracles-design.mjs <fichier.html> [--mobile] [--tokens t.css] [--json-only] [--rendu]"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "allouer-indice.mjs appelé sans les arguments obligatoires",
+          "citation": "L'indice s'obtient par `node C:\\dev\\digit-ai-factory\\scripts\\allouer-indice.mjs`.",
+          "vu_par": [
+            "B"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -E 'node scripts/allouer|2 = ' scripts/allouer-indice.mjs",
+            "resultat": "ligne 116 : --dossier <d> --prefixe <p> --jour AAAAMMJJ ; ligne 123 : 2 = usage erroné"
+          }
+        }
+      ],
+      "majeurs_clos": 0,
+      "rejetee": false,
+      "decision": "continuer",
+      "notes_reprises": []
+    },
+    {
+      "n": 2,
+      "fichier": "prompt-p2.md",
+      "mots": 2016,
+      "relecteur": {
+        "agent": "verificateur C et verificateur D, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "dossier l99-animations",
+          "fichiers « L99 » ou « crible »"
+        ]
+      },
+      "scores_relecteurs": {
+        "C": 84,
+        "D": 84
+      },
+      "score_mesure": 84,
+      "verification_cloture": {
+        "agent": "verificateur neuf, avec contexte (5 défauts visés, prompt avant et après)",
+        "note": false,
+        "clotures": 4,
+        "defauts_crees": 3,
+        "detail": "4 défauts fermés, le 4e (run-oracles-design) fermé avec réserve sur l'ordre non testé ; 3 défauts créés, recomptés et corrigés avant la relecture : npx playwright absent du dépôt alors que le Playwright Python répond « pw ok » ; allouer-indice ne réserve rien (deux appels rendent a, a) ; ordre « après la dernière écriture » sans comparaison de date."
+      },
+      "notes_reprises": [
+        {
+          "note": "TDD : 2 fichiers avec -w, 4 sans",
+          "recompte": {
+            "commande": "git -C digit-ai-forge-development grep -l -w TDD | wc -l ; git grep -l TDD | wc -l",
+            "resultat": "2 ; 4"
+          }
+        },
+        {
+          "note": "npx playwright échoue, Playwright Python présent",
+          "recompte": {
+            "commande": "npx --no-install playwright --version ; python -c \"import playwright;print('pw ok')\"",
+            "resultat": "npm error ; pw ok"
+          }
+        },
+        {
+          "note": "allouer-indice ne réserve rien",
+          "recompte": {
+            "commande": "allouer-indice.mjs --dossier <vide> --prefixe 'X - Note - T' --jour 20261109 --extension .md, deux fois",
+            "resultat": "a ; a"
+          }
+        }
+      ],
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "contradiction PASS du précédent / livrer après 3 échecs ; run unique non dit",
+          "citation": "Chaque épisode suivant démarre après le PASS du précédent.",
+          "vu_par": [
+            "C",
+            "D"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -E 'PASS du précédent|Après 3 passes' prompt-p2.md",
+            "resultat": "lignes 133 et 186, aucune règle de passage après 3 échecs"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "date +%s et stat supposent un shell POSIX non nommé",
+          "citation": "la même commande imprime `date +%s` puis `stat -c %Y <fichier.html>`",
+          "vu_par": [
+            "C"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "powershell Get-Command stat ; grep -n 'date +%s' prompt-p2.md",
+            "resultat": "stat.exe présent via Git, mais date = Get-Date sous PowerShell : date +%s échoue ; ligne 174 sans shell nommé"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "oracle-nom-client-publie sur 6 fichiers alors que joué par épisode ; git add sans commit",
+          "citation": "les 6 fichiers copiés seuls dans un dossier temporaire initialisé par `git init` puis `git add`",
+          "vu_par": [
+            "D"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -E 'ls-files|C3' oracle-nom-client-publie.mjs ; grep -n '6 fichiers' prompt-p2.md",
+            "resultat": "ligne 808 git ls-files, C3 messages de commit ; ligne 176 du prompt : 6 fichiers sans cas par épisode"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "controle-serie.mjs sans schéma de la table Preuves ni format d'extraction de SCENES",
+          "citation": "`scripts\\controle-serie.mjs <fichier.html> <cadrage.md>`, écrit par la session dans le dépôt",
+          "vu_par": [
+            "D"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -E 'controle-serie|Preuves' prompt-p2.md ; Test-Path C:\\dev\\digit-ai-marketing\\scripts\\controle-serie.mjs",
+            "resultat": "ligne 169, aucun schéma de colonnes ni marqueur ; fichier absent"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "script de chronométrage ni nommé ni spécifié",
+          "citation": "lecture chronométrée par un script Python avec Playwright",
+          "vu_par": [
+            "D"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n chronométrée prompt-p2.md",
+            "resultat": "ligne 170 : aucun nom, critère de fin ni fixture"
+          }
+        }
+      ],
+      "majeurs_clos": 5,
+      "rejetee": false,
+      "decision": "continuer"
+    },
+    {
+      "n": 3,
+      "fichier": "prompt-p3.md",
+      "mots": 2309,
+      "relecteur": {
+        "agent": "verificateur E et verificateur F, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "dossiers l99-animations et relecture-p2",
+          "fichiers « L99 » ou « crible »"
+        ]
+      },
+      "scores_relecteurs": {
+        "E": 84,
+        "F": 74
+      },
+      "score_mesure": 74,
+      "verification_cloture": {
+        "agent": "verificateur neuf, avec contexte (5 défauts visés, prompt avant et après)",
+        "note": false,
+        "clotures": 5,
+        "defauts_crees": 3,
+        "detail": "5 défauts fermés sur 5 ; 3 défauts créés, recomptés et corrigés avant la relecture : chemins en `~\\` illisibles en Git Bash (ls rend « cannot access »), comparaison date +%s contre stat toujours vraie (même valeur 1794239428 pour un fichier neuf), source `chemin:ligne` ambiguë avec un chemin Windows absolu."
+      },
+      "notes_reprises": [
+        {
+          "note": "Git Bash : ~\\.claude\\... non développé",
+          "recompte": {
+            "commande": "ls ~\\\\.claude\\\\skills\\\\quality-oracles\\\\scripts\\\\oracle-claims.mjs ; ls \"$HOME/.claude/skills/quality-oracles/scripts/oracle-claims.mjs\"",
+            "resultat": "cannot access ; /c/Users/iguan/.claude/skills/quality-oracles/scripts/oracle-claims.mjs"
+          }
+        },
+        {
+          "note": "date +%s et stat -c %Y d'un fichier neuf égaux",
+          "recompte": {
+            "commande": "f=$(mktemp); date +%s; stat -c %Y \"$f\"",
+            "resultat": "1794239428 ; 1794239428"
+          }
+        }
+      ],
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "règle d'arrêt ambiguë : épisode à nom réel laissé sur disque, « jugé » non défini",
+          "citation": "« absente » à l'écran arrête la série ; la restitution le dit.",
+          "vu_par": [
+            "E"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -E 'arrête la série|dernier épisode jugé|quarantaine' prompt-p3.md",
+            "resultat": "lignes 148 et 150 ; aucun retrait ni définition de « jugé »"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "run-oracles-design imposé en éditoriale sur une page à scènes sans essai sur témoin",
+          "citation": "--rendu --type-page editoriale --tokens donnees/marque/tokens.css",
+          "vu_par": [
+            "E",
+            "F"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n type-page prompt-p3.md",
+            "resultat": "ligne 189 seule ; aucun essai sur page témoin ni justification"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "aucun juge de la valeur commerciale (problème, gain, preuve visible)",
+          "citation": "node C:/dev/digit-ai-forge-design/oracles/oracle-motion.mjs <fichier.html> PASS",
+          "vu_par": [
+            "F"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i -E 'prospect|relecture à froid|grille' prompt-p3.md",
+            "resultat": "aucune ligne"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "aucune priorité de coupe ni budget pour 2 scripts, 1 cadrage et 5 pages dans un seul run",
+          "citation": "`stat -c %Y <fichier.html>` relevé juste avant et juste après la commande",
+          "vu_par": [
+            "F"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i -E 'budget|plafond|priorité de coupe' prompt-p3.md",
+            "resultat": "aucune ligne"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "une scène liée à une preuve partielle peut affirmer plus que la preuve ; aucun contrôle de formulation",
+          "citation": "Une capacité **partielle** se montre pour ce qu'elle est",
+          "vu_par": [
+            "F"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i -E 'formulation|verbe' prompt-p3.md",
+            "resultat": "aucune ligne"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "exemple de source faux, créé par la correction de la passe 3",
+          "citation": "`digit-ai-forge-data/CLAUDE.md:12`",
+          "vu_par": [
+            "F"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i 'forme de la discipline' C:/dev/digit-ai-forge-data/CLAUDE.md ; grep -n 'CLAUDE.md:12' prompt-p3.md",
+            "resultat": "ligne 14 ; ligne 113 du prompt cite :12"
+          }
+        }
+      ],
+      "majeurs_clos": 5,
+      "rejetee": true,
+      "decision": "rejeter",
+      "cause_regression": {
+        "nature": "defaut_cree",
+        "citation": "`digit-ai-forge-data/CLAUDE.md:12`",
+        "recompte": {
+          "commande": "grep -n -i 'forme de la discipline' C:/dev/digit-ai-forge-data/CLAUDE.md",
+          "resultat": "14:  forge-data vérifie la **forme de la discipline**, pas le contenu des données."
+        },
+        "part": "seul défaut créé par la correction parmi les 6 majeurs ; les 5 autres préexistaient en passe 2 sans y avoir été vus"
+      }
+    },
+    {
+      "n": 4,
+      "fichier": "prompt-p3r.md",
+      "mots": 2309,
+      "reprise": true,
+      "reprise_de": 3,
+      "relecteur": {
+        "agent": "verificateur G et verificateur H, neufs",
+        "aveugle": true,
+        "interdits": [
+          "analyse",
+          "passes précédentes",
+          "journal de boucle",
+          "dossiers l99-animations, relecture-p2 et relecture-p3",
+          "fichiers « L99 » ou « crible »"
+        ]
+      },
+      "scores_relecteurs": {
+        "G": 82,
+        "H": 84
+      },
+      "score_mesure": 82,
+      "verification_cloture": {
+        "agent": "verificateur neuf, avec contexte (1 défaut visé, prompt avant et après)",
+        "note": false,
+        "clotures": 1,
+        "defauts_crees": 0,
+        "detail": "diff : seule la ligne 113 change (:12 devient :14) ; grep -n « forme de la discipline » rend 14 ; aucun défaut créé."
+      },
+      "notes_reprises": [],
+      "defauts": [
+        {
+          "severite": "majeur",
+          "defaut": "PASS de l'oracle des noms possible sur une table vide",
+          "citation": "`node …/oracle-nom-client-publie.mjs <ce dossier>` PASS",
+          "vu_par": [
+            "G"
+          ],
+          "statut": "ecarte",
+          "dementi": true,
+          "recompte": {
+            "commande": "oracle-nom-client-publie.mjs sur un dossier neuf (git init, 1 fichier, commit « série »)",
+            "resultat": "verdict PASS ; 11 terme(s) du référentiel, 51 nom(s) de produit de la table : la table se charge par défaut"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "aucune règle de reprise d'un run interrompu (état écrit, artefacts gardés)",
+          "citation": "Si le tour s'interrompt avant l'épisode 5, elle nomme le dernier épisode jugé.",
+          "vu_par": [
+            "G"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i -E 'reprend|reprise|état écrit' prompt-p3r.md",
+            "resultat": "ligne 134 seule, sans rapport (rétro-modèle)"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "contenu et emplacement des fixtures rouges non fixés",
+          "citation": "chacun validé sur ses fixtures rouge et verte avant toute page",
+          "vu_par": [
+            "G"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i fixture prompt-p3r.md",
+            "resultat": "lignes 142, 184, 185 : aucun écart imposé à la fixture rouge, aucun emplacement"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "format du préfixe d'allouer-indice non posé (séparateur final « - »)",
+          "citation": "--prefixe \"<nom sans date>\"",
+          "vu_par": [
+            "H"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "sed -n 28,34p scripts/allouer-indice.mjs",
+            "resultat": "prefixe: \"Client - Fiche - Dev - \" ; nom = `${prefixe}${jour}${indice}${extension}`"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "la version prefers-reduced-motion n'a ni juge ni critère de fin",
+          "citation": "lecture avec `prefers-reduced-motion`",
+          "vu_par": [
+            "H"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i reduced prompt-p3r.md",
+            "resultat": "lignes 121, 180, 198 : aucune ligne du tableau des juges"
+          }
+        },
+        {
+          "severite": "majeur",
+          "defaut": "une page « non conforme » se livre sans marque ni seuil de diffusion",
+          "citation": "est livré marqué « non conforme », ses écarts consignés au cadrage",
+          "vu_par": [
+            "H"
+          ],
+          "statut": "retenu",
+          "dementi": false,
+          "recompte": {
+            "commande": "grep -n -i 'non conforme' prompt-p3r.md",
+            "resultat": "ligne 146 seule : rien sur la page elle-même ni sur la diffusion"
+          }
+        }
+      ],
+      "majeurs_clos": 1,
+      "rejetee": true,
+      "decision": "rejeter"
+    }
+  ],
+  "arret": {
+    "passe": 2,
+    "raison": "regression"
+  },
+  "score_affiche": {
+    "valeur": 84,
+    "nature": "mesure"
+  }
+}

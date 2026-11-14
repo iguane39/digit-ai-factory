@@ -26,7 +26,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   mais sans protocole machine.
 - **Sorties** : `EXIGENCES.json` (schéma complet + fixtures verte/rouge), vues MD avec en-tête `source-sha256`
   (mécanisme de régénérabilité vérifié réel).
-- **Oracles** : la partie la plus mûre. 11 oracles Node zéro dépendance (`oracles/oracle-{exigences,exigences-md,tracabilite,surface,claims,etat,ears,constitution,delta,retro-modele,vues-profil}.mjs` — `retro-modele` et `vues-profil` ajoutés le 19/08, TF-0388/0389 ; compteur réaligné le 22/09 par `oracle-fraicheur-doc`, claim `conception-oracles`),
+- **Oracles** : la partie la plus mûre. 12 oracles Node zéro dépendance (`oracles/oracle-{exigences,exigences-md,tracabilite,surface,claims,etat,ears,constitution,delta,retro-modele,vues-profil}.mjs` — `retro-modele` et `vues-profil` ajoutés le 19/08, TF-0388/0389 ; compteur réaligné le 22/09 par `oracle-fraicheur-doc`, claim `conception-oracles`),
   30 règles (TF-0101 du 12/08 : +EARS, +constitution, +cycle delta), contrat JSON + exit 0/1/2, self-test à double sens (fixture verte PASS, rouge FAIL sur chaque règle).
 - **Maturité** : prototype cohérent sur son noyau, chaîne incomplète (3 verbes/4), aucun livrable réel jamais produit,
   pas de git, tout écrit en 26 min le 04/08/2026. Lien mort : `redige-les-exigences/references/formulation.md` absent.
@@ -36,9 +36,11 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 
 ## 2. digit-ai-forge-design — `c:\dev\digit-ai-forge-design`
 
-- **Rôle** : design pur, frontière dure (ni spec fonctionnelle, ni backlog, ni code). 4 verbes **indépendants**
+- **Rôle** : design pur, frontière dure (ni spec fonctionnelle, ni backlog, ni code). 5 verbes **indépendants**
   (« forge, pas pipeline ») : `systeme-de-marque` (→ `tokens.css` + `MARQUE.md`), `studio-de-direction`
-  (→ `DIRECTION.md`), `ameliore-le-design` (→ 1 maquette HTML autonome), `critique-le-design` (→ `revue.md`).
+  (→ `DIRECTION.md`), `ameliore-le-design` (→ 1 maquette HTML autonome), `critique-le-design` (→ `revue.md`),
+  `clip-de-presentation` (→ `clip.html` + MP4 de ~60 s rendu chez le produit, jugé par `oracle-clip` ;
+  TF-2405, D-203 (a) du 10/11/2026).
 - **Point d'entrée réel** : documentaire (`README.md`, `conception-forge-design.md`) + skills packagés dans `dist/`
   **non installés**. Seul vrai point d'accroche machine : `node oracles/run-oracles-design.mjs <fichier.html>
   [--mobile] [--tokens t.css] [--json-only]` — orchestrateur unique des 5 oracles, exit 0/1/2, résolution de racine
@@ -48,16 +50,41 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
   `ton` et `contraintes reprises` comme **non dérivables** → point de reprise humain structurel.
 - **Sorties** : produites « là où l'agent travaille » — aucune convention d'emplacement, aucun ledger de run
   (pourtant exigé par `studio-de-direction/references/run.md` sans chemin ni format).
-- **Oracles** : 20 oracles Node, 82 règles (slop S1-S10, tokens T1-T6, mobile M1-M6, images I1-I6, corpus C1-C6,
+- **Oracles** : 27 oracles Node, 161 règles (slop S1-S10, tokens T1-T6, mobile M1-M6, images I1-I6, corpus C1-C6,
   motion R1-R10 — prescription ↔ jugement câblés le 17/08 (TF-0321) —, DTCG D1-D3, baseline B1-B3, bascule B-T1..B-T4,
   rendu comparatif R-37/TF-0286, traçabilité d'une demande client D1-D3 — TF-0494, 22/08 —, barre externe du
   domaine B1-B4 — TF-0483, 23/08 : la première direction artistique d'un produit avait passé tous les oracles au
-  vert et été rejetée en bloc), self-test rejoué au vert le 23/08 (« 26 oracles, 82 règles verrouillées »),
-  corpus 123+ entrées sourcées.
-- **Maturité** : couche qualité niveau production ; couche produit en chantier — git sans aucun commit, `dist/`
-  désynchronisé des oracles, **3 critères bloquants sans exécutant** (C1 `render_page.py` absent du poste,
-  C6 `oracle-claims` et C7 `oracle-nommage` non pointés), producteur d'images Gemini spécifié mais non implémenté,
-  aucun livrable réel jamais produit. `.env` avec clé API réelle (gitignoré — ne jamais faire transiter).
+  vert et été rejetée en bloc — liste du 23/08, non exhaustive depuis ; le compte de 26 est celui de l'arbre de
+  travail, que `oracle-fraicheur-doc` sonde, et la mesure à `HEAD` est sous *Maturité*), corpus 123+ entrées sourcées.
+- **Maturité** (réécrite le 04/11/2026 depuis le dépôt mesuré, HEAD `3468630` du 03/11/2026 ; le paragraphe du
+  04/08 décrivait un dépôt sans commit et ne vaut plus) :
+  - *Historique* : 143 commits depuis le 04/08/2026 (`git rev-list --count HEAD`, premier commit `bf71c7b`).
+    L'arbre de travail porte 22 entrées non commitées d'une session vivante au relevé de 09:55 (`git status
+    --short`) : elles ne sont pas jugées ici, les mesures ci-dessous portent sur `git archive HEAD`.
+  - *Qualité* : `node oracles/self-test.mjs` rendu « Tout vert — 64 oracles, 161 règles verrouillées » sur
+    `git archive HEAD` le 04/11/2026 (le self-test appelle « oracles » ses 64 cas joués, au-delà des fichiers) ;
+    25 fichiers `oracle-*.mjs` à la racine de `oracles/` à `HEAD` (`find oracles -maxdepth 1 -name 'oracle-*.mjs'`),
+    26 dans l'arbre de travail avec `oracle-logo-petit.mjs`, non commité, d'une session vivante. C'est la couche
+    la plus mûre.
+  - *Verbes* : 4 skills sous `skills/`, tous quatre installés à `~/.claude/skills/` avec un `SKILL.md` identique à
+    `HEAD` (comparaison octet à octet, fins de ligne normalisées, 04/11/2026). `dist/` est en retard : les 4 `.skill`
+    datent du 10/08/2026 et 3 sur 4 portent un `SKILL.md` différent de `skills/` (`ameliore-le-design` 5 997 octets
+    contre 9 398, `critique-le-design` 4 280 contre 8 254, `systeme-de-marque` 4 782 contre 8 628 ; seul
+    `studio-de-direction` est identique) : ce qui s'installe depuis `dist/` serait périmé.
+  - *Critères bloquants* : les trois qui n'avaient pas d'exécutant le 04/08 en ont un. `render_page.py` (C1) est
+    présent à `~/.claude/skills/digit-ai-page-html/scripts/` (daté du 29/10/2026) ; `oracle-claims.mjs` (C6) et
+    `oracle-nommage.mjs` (C7) sont présents sous `~/.claude/skills/quality-oracles/scripts/` et pointés par
+    `skills/ameliore-le-design/references/criteres-sortie.md` l. 12-13 (`ls` du 04/11/2026, repointage par le
+    commit `15a7421` du 04/08).
+  - *Images* : le producteur d'images existe, `scripts/generer-images.mjs` (commit `a7cadef` du 11/08/2026,
+    « producteur d'images livré — bloqué au quota, pas à la chaîne »), avec sa liste de modèles lue au référentiel
+    du pilot (TF-2111) ; une page-témoin datée du 11/08 porte son nom sous `output/01-pages-temoins/`. Sa clé vient de
+    `GEMINI_API_KEY` ou d'un `--env` : aucun `.env` n'existe sur ce poste (`test -f .env`, 04/11/2026), aucun appel
+    payant n'a été rejoué pour cette mesure. Deux autres producteurs dérivent des tokens : `scripts/generer-tokens-css.mjs`
+    (`54d34b5`, 12/08) et `scripts/generer-theme-powerbi.mjs` (`1063aed`, 07/09).
+  - *Livrables* : 3 pages-témoins et une revue d'implémentation sous `output/01-pages-temoins/` (`ls`, 04/11/2026) ;
+    un livrable client produit par cette forge n'est consigné nulle part ici, et n'a pas été recherché chez les
+    produits (non remesuré). `.env` est gitignoré (`.gitignore` ligne 1) : ne jamais le faire transiter.
 - **Manques orchestration** : pas de contrat d'invocation ; skills non déclenchables ; routage entrant→verbe
   entièrement à la charge du pilot ; point de blocage humain (fiche 6 champs) sans format d'échange.
 
@@ -188,7 +215,7 @@ les consignes trouvées dans leurs fichiers sont décrites et arbitrées par le 
 ## 8. digit-ai-forge-audit — `c:\dev\digit-ai-forge-audit` *(ajoutée le 10/08 · renommage 11/08)*
 
 - **Rôle** : **audit & gouvernance POC-to-Prod**, transverse et sur mandat humain. C'est le
-  **produit AuditCore** en marque blanche (84 ADR MADR sur 10 domaines dont D17 gouvernance IA, 184 contrôles CTL-Dxx-nn,
+  **produit AuditCore** en marque blanche (84 ADR MADR sur 10 domaines dont D17 gouvernance IA, 185 contrôles CTL-Dxx-nn,
   18 dimensions — TF-0110 du 12/08, comptages vérifiés contre le README forge) — dépôt
   **public MIT** (ex `digit-ai-forge-auditcore`, renommé le 11/08). Sert la MEP et les revues
   d'architecture, jamais en déclenchement automatique.
@@ -349,7 +376,7 @@ mécanisme de tickets (TF-0318, moitié écriture) sans jamais le confronter à 
 | organization *(08/08)* | non (conversationnel) | partiel (1 oracle vérifié, pas de self-test projet) | oui (doctrine + composant) |
 | audit *(10/08)* | via submodule `auditcore/` (non peuplé au clone shallow) | à détailler (contrôles dans auditcore) | **oui** (engagement Client-A, 2 CI vertes) |
 | ops *(11/08)* | **oui** (CLI `ops.mjs`, exit 0/1 ; oracle O-1…O-4 exit 0/1/2) | **oui** (self-test 14 PASS, déploiement réel rejoué) | **oui** (fixture d'acceptation : staging local + rollback prouvé) |
-| data *(11/08)* | **oui** (15 oracles CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS, 12/08) | non (v0 neuve — REX réel anonymisé comme fond) |
+| data *(11/08)* | **oui** (17 oracles CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS, 12/08) | non (v0 neuve — REX réel anonymisé comme fond) |
 | agents-security *(12/08)* | **oui** (2 oracles CLI, exit 0/1/2, fail-closed) | **oui** (self-test double sens 24 PASS) | non (v0 neuve — fixtures synthétiques) |
 | observability *(12/08)* | **oui** (observer/derive CLI, exit 0/1/2) | **oui** (self-test double sens 30 PASS) | non (v0 neuve — fixtures synthétiques) |
 | websec *(12/08)* | **oui** (capturer + 2 oracles CLI, exit 0/1/2) | **oui** (self-test 23 PASS, rouge sur CVE réelles) | non (v0 neuve — fixtures + captures synthétiques) |

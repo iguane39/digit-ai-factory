@@ -20,7 +20,8 @@
  *   --restaurer  canal → produit : ce qui manque ou a vieilli sur ce poste (hook d'ouverture, asynchrone) ;
  *   --pousser    produit → canal : ce qui a changé hors de git sur ce poste (hook de fin de tour) ;
  *   --verifier   le juge (défaut) : RP1 manifeste valide · RP2 aucun secret déclaré · RP3 canal joignable
- *                sur ce poste · RP4 aucun écart non restauré · RP5 envoi actif sous feu vert consigné.
+ *                sur ce poste · RP4 aucun écart non restauré · RP5 envoi actif sous feu vert consigné ·
+ *                RP6 rien de ce que le canal poserait n'est commitable (TF-2441).
  *   Options : --racine <produit> (défaut : dossier courant), --budget <secondes>, --etat <dossier>.
  *
  * DÉCISION FICHIER PAR FICHIER. Un état par poste et par produit, HORS du dépôt
@@ -30,6 +31,10 @@
  *   - les deux ont changé, ou aucun état (premier passage sur ce poste) → le plus récent gagne, et la
  *     version écrasée est gardée en sauvegarde sous ~/.digit-ai-forge/reprise/sauvegardes/.
  *   La copie reporte la date de la source : après synchronisation, les deux côtés sont à égalité.
+ *   Une restauration REFUSE de poser un fichier que git ni n'ignore ni ne suit (TF-2441, RT-150) : un
+ *   dossier ignoré puis renommé revient du canal sous son ancien nom, que .gitignore ne couvre plus, et
+ *   ses fichiers deviendraient commitables. Le refus se dit (`refuses`, RP6) ; son remède est de garder
+ *   l'ancien chemin dans .gitignore. Un fichier déjà suivi par git se met à jour sans exposition nouvelle.
  *
  * EXCLUSIONS DURES, dans les deux sens : un secret ne transite jamais par le canal (garde-fou « les
  * .env ne transitent jamais », CLAUDE.md du pilot) — .env*, clés, certificats, coffres, fichiers dont
@@ -45,10 +50,11 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSy
 import { join, resolve, dirname, sep } from "node:path";
 import { homedir } from "node:os";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 
-export const VERSION = "1.0.0";
+export const VERSION = "1.1.0";
 export const MANIFESTE = join("forge", "REPRISE.json");
 
 // Un motif par ligne : `*` vaut n'importe quel nom sans séparateur, et un motif sans « / » juge le
@@ -138,6 +144,28 @@ function sha(cote, rel, info, base, connu) {
   return empreinte(join(base, rel));
 }
 
+/**
+ * Parmi des chemins relatifs au produit, ceux qu'un `git add .` du produit prendrait : ni suivis, ni
+ * ignorés (TF-2441, RT-150). Un dossier ignoré puis renommé revient du canal sous son ancien nom, que
+ * `.gitignore` ne couvre plus : poser ses fichiers les rend commitables. Un fichier SUIVI se met à jour
+ * sans exposition nouvelle ; seul le fichier ni suivi ni ignoré est refusé.
+ * Rend null quand le produit n'est pas un dépôt git (rien à juger, déclaré au NON_JUGE).
+ */
+export function visiblesDeGit(racine, rels) {
+  const env = { ...process.env };
+  for (const k of ["GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"]) delete env[k];
+  const git = (args, input) => spawnSync("git", ["-C", racine, ...args], { encoding: "utf8", env, input, maxBuffer: 256 * 1024 * 1024 });
+  const dedans = git(["rev-parse", "--is-inside-work-tree"]);
+  if (dedans.status !== 0 || dedans.stdout.trim() !== "true") return null;
+  if (!rels.length) return new Set();
+  const suivis = git(["ls-files", "-z"]);
+  const ignores = git(["check-ignore", "-z", "--stdin"], rels.join("\0") + "\0");
+  // check-ignore : 0 = au moins un ignoré, 1 = aucun ; 128 = erreur, auquel cas on ne peut rien affirmer
+  if (suivis.status !== 0 || (ignores.status !== 0 && ignores.status !== 1)) return null;
+  const poses = new Set([...suivis.stdout.split("\0"), ...ignores.stdout.split("\0")].filter(Boolean));
+  return new Set(rels.filter((r) => !poses.has(r)));
+}
+
 /** Calcule ce que chaque fichier demande, sans rien écrire. */
 export function planifier(racine, canal, m, opt = {}) {
   const exclusions = m.exclusions || [];
@@ -155,7 +183,10 @@ export function planifier(racine, canal, m, opt = {}) {
     else if (e && sc === e.sha) plan.push({ rel, sens: "pousser", motif: "ce poste a changé" });
     else plan.push({ rel, sens: c.mtime > l.mtime ? "restaurer" : "pousser", motif: e ? "les deux côtés ont changé, le plus récent gagne" : "premier passage sur ce poste, le plus récent gagne", conflit: true });
   }
-  return { plan, etat };
+  // Ce que le canal poserait sur ce poste sans que git l'ignore ni le suive : refusé (TF-2441).
+  const visibles = visiblesDeGit(racine, plan.filter((p) => p.sens === "restaurer").map((p) => p.rel));
+  if (visibles) for (const p of plan) if (p.sens === "restaurer" && visibles.has(p.rel)) p.refus = "non ignoré par git : le poser le rendrait commitable";
+  return { plan, etat, git: visibles !== null };
 }
 
 function copier(src, dst, sauvegarde) {
@@ -179,7 +210,7 @@ export function synchroniser(racine, sens, opt = {}) {
   const debut = Date.now(), budget = (opt.budget ?? 200) * 1000;
   const { plan, etat } = planifier(racine, canal, m, opt);
   const horodate = new Date().toISOString().replace(/[:.]/g, "-");
-  const fait = [], conflits = [];
+  const fait = [], conflits = [], refuses = [];
   let reste = 0;
   for (const p of plan) {
     if (p.sens === "egal") {
@@ -187,6 +218,7 @@ export function synchroniser(racine, sens, opt = {}) {
       continue;
     }
     if (p.sens !== sens) continue;
+    if (p.refus) { refuses.push({ rel: p.rel, motif: p.refus }); continue; }
     if (Date.now() - debut > budget) { reste++; continue; }
     const [src, dst] = sens === "restaurer" ? [join(canal, p.rel), join(racine, p.rel)] : [join(racine, p.rel), join(canal, p.rel)];
     const sauvegarde = p.conflit ? join(dossierEtat(opt), "sauvegardes", cleProduit(racine), horodate, sens === "restaurer" ? "poste" : "canal", p.rel) : null;
@@ -197,7 +229,7 @@ export function synchroniser(racine, sens, opt = {}) {
     if (p.conflit) conflits.push({ rel: p.rel, motif: p.motif, sauvegarde });
   }
   ecrireEtat(racine, opt, etat);
-  return { canal, sens, fait, conflits, reste, egaux: plan.filter((p) => p.sens === "egal").length, a_faire_autre_sens: plan.filter((p) => p.sens !== "egal" && p.sens !== sens).length };
+  return { canal, sens, fait, conflits, refuses, reste, egaux: plan.filter((p) => p.sens === "egal").length, a_faire_autre_sens: plan.filter((p) => p.sens !== "egal" && p.sens !== sens).length };
 }
 
 /** Le juge. */
@@ -222,11 +254,17 @@ export function verifier(racine, opt = {}) {
   if (!canal) ko("RP3", `canal introuvable sur ce poste (essayés : ${candidats.join(" ; ")}) — installer le client de synchronisation, ajouter l'emplacement de ce poste à « canal.chemins », ou exporter REPRISE_CANAL`);
   else {
     ok("RP3", `canal joignable : ${canal}`);
-    const { plan } = planifier(racine, canal, m, opt);
-    const ecarts = plan.filter((p) => p.sens === "restaurer");
+    const { plan, git } = planifier(racine, canal, m, opt);
+    const ecarts = plan.filter((p) => p.sens === "restaurer" && !p.refus);
     ecarts.length
       ? ko("RP4", `${ecarts.length} fichier(s) du canal manquent ou ont vieilli sur ce poste, non restaurés : ${ecarts.slice(0, 3).map((p) => `${p.rel} (${p.motif})`).join(", ")} — \`node oracles/oracle-reprise.mjs --restaurer\` les reprend, et le hook d'ouverture le fait seul`)
       : ok("RP4", `aucun écart à restaurer (${plan.filter((p) => p.sens === "egal").length} fichier(s) identiques, ${plan.filter((p) => p.sens === "pousser").length} à envoyer)`);
+    const refuses = plan.filter((p) => p.refus);
+    if (refuses.length) {
+      const dossier = (rel) => { const parts = rel.split("/"); return parts.length > 1 ? parts.slice(0, -1).join("/") + "/" : rel; };
+      const motifs = [...new Set(refuses.map((p) => dossier(p.rel)))].slice(0, 3);
+      ko("RP6", `${refuses.length} fichier(s) du canal seraient posés sur ce poste sans que git les ignore ni les suive, donc commitables : ${refuses.slice(0, 3).map((p) => p.rel).join(", ")} — rien n'a été posé. Un dossier ignoré a-t-il été renommé ? Garder l'ancien chemin dans le .gitignore du produit (ligne par dossier, ex. « ${motifs.join(" », « ")} »), ou retirer ces fichiers du canal`);
+    } else ok("RP6", git ? "rien de ce que le canal poserait n'est commitable : tout est ignoré ou déjà suivi par git" : "produit hors dépôt git : le périmètre ignoré n'est pas jugé");
   }
   if (m.envoi?.actif && !goComplet(m)) ko("RP5", "envoi actif sans feu vert de publication complet — « envoi.go_publication » porte decision, date (AAAA-MM-JJ) et par : envoyer vers le canal publie sur un service hébergé (R-38)");
   else if (m.envoi?.actif) ok("RP5", `envoi actif sous le feu vert « ${m.envoi.go_publication.decision} » du ${m.envoi.go_publication.date}`);
@@ -237,6 +275,7 @@ export function verifier(racine, opt = {}) {
 export const NON_JUGE = [
   "une suppression ne se propage pas : un fichier effacé d'un côté revient de l'autre",
   "deux postes qui écrivent le même fichier entre deux synchronisations : le plus récent gagne, l'autre reste en sauvegarde, sans fusion de contenu",
+  "le périmètre ignoré d'un produit qui n'est pas un dépôt git : sans git, rien ne dit ce qui serait commitable, et la restauration ne refuse rien",
   "ce que le fournisseur du canal fait du fichier une fois déposé (versions, partage, rétention)",
   "que le canal soit à jour du côté du fournisseur : le juge lit le miroir local, tel que le client de synchronisation l'a laissé",
 ];

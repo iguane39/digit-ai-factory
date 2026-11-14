@@ -98,19 +98,31 @@ mkdirSync(join(verte, ".claude"), { recursive: true });
 // pas, et 9 cas de cette recette étaient rouges à HEAD depuis l'entrée de l'exigence.
 writeFileSync(join(verte, ".claude", "settings.json"),
   JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs ouverture --sans-readme --contexte-json", async: true },
-      { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true }] }],
-    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" }] }],
+      { type: "command", command: "node forge/hooks/factory.mjs reprise --restaurer", async: true },
+      // TF-2181 (HERITAGE 1.52.0, 05/11/2026) : les sessions sans relevé des coûts rattrapées à l'ouverture.
+      { type: "command", command: "node forge/hooks/factory.mjs couts --rattraper", async: true }] }],
+    SessionEnd: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs couts" }] }],
+    // D-209 (a) (HERITAGE 1.61.0, 12/11/2026) : la veille du suivi des agents, en asyncRewake, en fin de tour.
+    Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" },
+      { type: "command", command: "node forge/hooks/factory.mjs suivi-agents --veille", asyncRewake: true, timeout: 1200 }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
       // D-106 (b) (HERITAGE 1.44.0, 29/10/2026) : les .env ne transitent jamais, le hook refuse leur lecture.
       { matcher: "Read|Grep|Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs fichiers-env" }] },
       { matcher: "Bash|PowerShell|WebFetch", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs identite-sortante" },
         { type: "command", command: "node forge/hooks/factory.mjs remisage" }] },
       // TF-1959 (HERITAGE 1.37.0, 26/10/2026) : les gestes destructifs distants se décident en un lot.
-      { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs gestes-distants" }] },
+      { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs gestes-distants" },
+        // TF-2126 (HERITAGE 1.48.0, 04/11/2026) : pas de commit ni de déploiement pendant une campagne de mutation.
+        { type: "command", command: "node forge/hooks/factory.mjs mutation-en-cours" }] },
+      // TF-2150 (HERITAGE 1.50.0, 04/11/2026) : la leçon rappelée au geste qui la déclenche.
+      { matcher: "Bash|PowerShell|Write|Edit|MultiEdit", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lecons" }] },
       // D-19 (a) (HERITAGE 1.29.0, 18/10/2026) : la flotte d'agents rappelée à chaque délégation.
       { matcher: "Agent|Task", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs flotte" }] }],
     // TF-1756 (HERITAGE 1.24.0, 15/10/2026) : chaque hook du gabarit est exigé ; la verte les porte tous.
-    PostToolUse: [{ matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) }],
+    PostToolUse: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs suivi-agents" }] },
+      { matcher: "Write|Edit|MultiEdit", hooks: ["page-html", "ecriture", "droits-accordes"].map((n) => ({ type: "command", command: `node forge/hooks/factory.mjs ${n}` })) },
+      // TF-2211 (HERITAGE 1.55.0, 06/11/2026) : les contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close.
+      { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs controles-produit" }] }],
     UserPromptSubmit: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lexique" }] }] } })
     // TF-1903 (21/10/2026) : le lanceur s'appelle par un chemin ancré sur la racine du projet (R-43), comme au gabarit.
     .replace(/node forge\/hooks\/factory\.mjs/g, () => 'node \\"${CLAUDE_PROJECT_DIR}/forge/hooks/factory.mjs\\"') + "\n");
@@ -617,6 +629,71 @@ check("R-11 bis : les trois déclarés — dont « absent » motivé — → PAS
     writeFileSync(chemin, avant);
   }
 });
+// TF-2125 (04/11/2026, retour Produit-86) — R-11 ter : la table « Règles de socle applicables » du CLAUDE.md est confrontée aux types
+// d'écrans que le produit porte. ROUGES : une page à tableau sans ligne « Page HTML de données » (section absente, ou section qui ne
+// porte qu'une autre ligne, ou seule la ligne-gabarit non remplie) ; des boutons sans ligne « Textes d'application » — la ligne
+// manquante est NOMMÉE et celle qui existe n'est pas redemandée. VERTS : le remède joué (la ligne ajoutée, « aucune » motivée comprise),
+// les deux types déclarés, une page à tableau sous output\ (un livrable, pas un écran du produit), un produit sans écran.
+// L'avertissement ne fait jamais échouer l'oracle (exit 0), comme R-11 bis.
+{
+  const PAGE_TABLEAU = "<html><body><h1>Clients</h1><table><tr><th>Nom</th></tr><tr><td>A</td></tr></table></body></html>\n";
+  const PAGE_BOUTONS = "<html><body><button>Enregistrer</button><form><input name=\"q\"></form></body></html>\n";
+  const ENTETE_TABLE = "\n## Règles de socle applicables\n\n| Type de livrable | Règles de socle | Composant / oracle |\n|---|---|---|\n";
+  const LIGNE_DONNEES = "| Page HTML de données (tableau, console, tableau de bord) | BEST-PRACTICES-HTML.md § I ; L4 | check_html.py |\n";
+  const LIGNE_TEXTES = "| Textes d'application (libellés, erreurs, états vides, aide) | ECRITURE.md E-12 | C15 |\n";
+  const avecEcrans = (pages, ajoutClaude, controle) => {
+    const chemin = join(verte, "CLAUDE.md");
+    const avant = readFileSync(chemin, "utf8");
+    const posees = [];
+    try {
+      for (const [rel, contenu] of Object.entries(pages)) {
+        const f = join(verte, ...rel.split("/"));
+        mkdirSync(dirname(f), { recursive: true });
+        writeFileSync(f, contenu);
+        posees.push(f);
+      }
+      writeFileSync(chemin, avant + ajoutClaude);
+      const { exit, rapport } = lance(verte);
+      controle({ exit, avert: rapport.non_juge.filter((l) => /^R-11 ter — /.test(l)), pass: rapport.findings.filter((x) => x.regle === "R-11 ter") });
+    } finally {
+      writeFileSync(chemin, avant);
+      for (const f of posees) rmSync(f, { force: true });
+      rmSync(join(verte, "src"), { recursive: true, force: true });
+    }
+  };
+  check("R-11 ter : une page à tableau et aucune section de règles de socle → la ligne « Page HTML de données » est NOMMÉE, sans échec (TF-2125)", () => {
+    avecEcrans({ "src/clients.html": PAGE_TABLEAU }, "", ({ exit, avert, pass }) => {
+      if (!avert.length) throw new Error("aucun avertissement R-11 ter — le trou de Produit-86 resterait invisible");
+      if (!/Page HTML de données/.test(avert[0]) || !/src\/clients\.html/.test(avert[0])) throw new Error(`la ligne manquante ou la page n'est pas nommée : ${avert[0]}`);
+      if (/Textes d'application/.test(avert.join(" "))) throw new Error("un type absent du produit est réclamé");
+      if (pass.length) throw new Error("un PASS est rendu alors que la ligne manque");
+      if (exit !== 0) throw new Error(`l'avertissement fait échouer l'oracle (exit ${exit})`);
+    });
+  });
+  check("R-11 ter : une section qui ne porte qu'une autre ligne, ou la ligne-gabarit non remplie, ne couvre pas la page à tableau (TF-2125)", () => {
+    avecEcrans({ "src/clients.html": PAGE_TABLEAU }, ENTETE_TABLE + "| Page HTML de prose (rapport, fiche, note) | socle digit-ai-page-html | check_html.py |\n| <autre type de ce produit> | <règles> | <composant / oracle> |\n",
+      ({ avert }) => { if (!avert.length || !/Page HTML de données/.test(avert[0])) throw new Error(`la ligne manquante n'est pas nommée : ${avert[0]}`); });
+  });
+  check("R-11 ter : des boutons sans ligne « Textes d'application » → cette ligne est nommée, celle qui existe n'est pas redemandée (TF-2125)", () => {
+    avecEcrans({ "src/app.html": PAGE_BOUTONS }, ENTETE_TABLE + LIGNE_DONNEES, ({ avert }) => {
+      if (!avert.length || !/Textes d'application/.test(avert[0])) throw new Error(`la ligne manquante n'est pas nommée : ${avert[0]}`);
+      if (/Page HTML de données/.test(avert.join(" "))) throw new Error("la ligne déjà déclarée est redemandée");
+    });
+  });
+  check("R-11 ter : le remède joué — la ligne ajoutée, « aucune » motivée comprise — rend PASS et lève l'avertissement (TF-2125)", () => {
+    avecEcrans({ "src/clients.html": PAGE_TABLEAU, "src/app.html": PAGE_BOUTONS }, ENTETE_TABLE + LIGNE_DONNEES + "| Textes d'application | aucune — les libellés viennent du client, hors périmètre | sans objet |\n",
+      ({ avert, pass }) => {
+        if (avert.length) throw new Error(`l'avertissement subsiste après le remède : ${avert[0]}`);
+        if (!pass.length || pass[0].statut !== "PASS" || !/2 type\(s\)/.test(pass[0].message)) throw new Error(`PASS attendu sur les 2 types, obtenu ${JSON.stringify(pass[0])}`);
+      });
+  });
+  check("R-11 ter : une page à tableau sous output\\ ou un produit sans écran ne déclenche rien (TF-2125)", () => {
+    avecEcrans({ "output/Produit - Rapport Test - 20260806b.html": PAGE_TABLEAU }, "", ({ avert, pass }) => {
+      if (avert.length || pass.length) throw new Error("un livrable d'output\\ est pris pour un écran du produit");
+    });
+    avecEcrans({}, "", ({ avert, pass }) => { if (avert.length || pass.length) throw new Error("un produit sans écran est jugé"); });
+  });
+}
 // ---- fixture ROUGE : défauts plantés, chaque règle dure doit se déclencher -------------------
 const rouge = mkdtempSync(join(tmpdir(), "conf-rouge-"));
 mkdirSync(join(rouge, "output", "Old"), { recursive: true });      // R-1 (input absent), R-3 (docs absent)
@@ -947,6 +1024,31 @@ check("TF-1015, recalée TF-1500 — R-4 dénonce un chemin d'output\\ qui dépa
     throw new Error("le chemin de 125 caractères, déjà refusé avec l'ancienne constante, n'est plus accusé");
   if (/passait jusqu'au/.test(surAncien.message))
     throw new Error(`le chemin de 125 caractères est présenté comme une nouveauté, il était refusé avant le 01/10/2026 : « ${surAncien.message.slice(0, 240)} »`);
+});
+// TF-2344 (10/11/2026) — LE SIDECAR `.md.jugement.json` QUE LE HOOK ÉCRIT N'EST PAS UN LIVRABLE. Les DEUX SENS sur le même dossier : une restitution de 110 caractères (144 avec son
+// sidecar d'oracle, conforme) porte son `.md.jugement.json` de 124 caractères (158 avec 34 de plus) — R-4 ne l'accuse pas, il ne dépasse pas le plafond de sa restitution — ; une
+// restitution de 117 caractères, elle, reste accusée (le plafond n'est pas désarmé), et un fichier `.json` ordinaire de 124 caractères n'est pas exempté par ce suffixe.
+const jugementLong = mkdtempSync(join(tmpdir(), "conf-jugement-"));
+mkdirSync(join(jugementLong, "output", "07-restitutions"), { recursive: true });
+const restitutionDe = (n) => {
+  const tete = "output/07-restitutions/Produit - Restitution - ";
+  const queue = " - 20261110a.md";
+  return tete + "x".repeat(n - tete.length - queue.length) + queue;
+};
+const RESTITUTION_CONFORME = restitutionDe(110);
+const JUGEMENT_DU_HOOK = `${RESTITUTION_CONFORME}.jugement.json`;           // 124 caractères
+const JSON_ORDINAIRE = RESTITUTION_CONFORME.replace(/\.md$/, "") + ".donnees.json";   // même longueur à un caractère près, sans le suffixe du hook
+const RESTITUTION_TROP_LONGUE = restitutionDe(117);
+for (const c of [RESTITUTION_CONFORME, JUGEMENT_DU_HOOK, JSON_ORDINAIRE, RESTITUTION_TROP_LONGUE]) writeFileSync(join(jugementLong, c), "x" + NL_TEST);
+sh("git", ["init", "-q", "-b", "main"], jugementLong);
+check("TF-2344 — R-4 ne compte pas les 34 du sidecar sur le `.md.jugement.json` du hook, accuse toujours la restitution trop longue et le `.json` ordinaire de même longueur", () => {
+  if (JUGEMENT_DU_HOOK.length !== 124 + 0 || RESTITUTION_CONFORME.length !== 110) throw new Error(`fixture invalide : ${RESTITUTION_CONFORME.length} et ${JUGEMENT_DU_HOOK.length} caractères`);
+  const { rapport } = lance(jugementLong);
+  const r4 = rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL" && /plafond/.test(f.message));
+  if (r4.some((f) => f.ou === JUGEMENT_DU_HOOK)) throw new Error(`le sidecar jugement.json du hook est accusé comme un livrable : « ${r4.find((f) => f.ou === JUGEMENT_DU_HOOK).message.slice(0, 200)} »`);
+  if (r4.some((f) => f.ou === RESTITUTION_CONFORME)) throw new Error("la restitution de 110 caractères, conforme, est accusée");
+  if (!r4.some((f) => f.ou === RESTITUTION_TROP_LONGUE)) throw new Error("la restitution de 117 caractères n'est plus accusée — l'exemption a désarmé le plafond");
+  if (!r4.some((f) => f.ou === JSON_ORDINAIRE)) throw new Error(`le .json ordinaire de ${JSON_ORDINAIRE.length} caractères n'est plus accusé — l'exemption est trop large : ${JSON.stringify(r4.map((f) => f.ou.length))}`);
 });
 // TF-1500 — LA CONSTANTE SE MESURE SUR LE DISQUE, ELLE NE SE RECOPIE PAS. Elle valait 26 pendant trois
 // semaines : personne ne l'avait comparée à un sidecar réel. La mesure est une FONCTION PURE, jouée
@@ -1593,6 +1695,140 @@ check("TF-1203 borne : une antériorité déclarée ne pardonne QUE ce qui préc
     throw new Error(`les deux écarts anciens, par ailleurs toujours couverts, ne sont plus imprimés : ${f.message}`);
 });
 
+// ---- TF-2494 (13/11/2026, campagne « A1 & A2 », lot pd) — R-42 N'AVAIT AUCUN REMÈDE POUR UN SAUT DE SEQ EN
+// AVANT. Mesuré le 13/11 par l'agent du lot ps chez le produit 02 : 15 sauts en avant (des entrées jamais
+// écrites, ou écrites ailleurs) restaient sans entrée qui les couvre, et le message de R-42 disait seulement
+// qu'un saut « reste un écart ». Une rectification ULTÉRIEURE qui NOMME, dans `entrees[]`, le seq qui suit la
+// lacune la déclare ; une `anteriorite_ledger` datée la couvre en bloc. Dans les deux cas l'écart reste IMPRIMÉ,
+// et une lacune récente que rien ne déclare reste un écart. ------------------------------------------------
+const LEDGER_SAUT = [
+  { seq: 1, ts: "2026-09-01T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "abc1234" } },
+  { seq: 2, ts: "2026-09-01T09:00:00Z", type: "retour" },
+  { seq: 3, ts: "2026-09-01T09:30:00Z", type: "etape_close" },
+  { seq: 7, ts: "2026-09-02T10:00:00Z", type: "retour" },        // saut en avant : 4, 5 et 6 jamais écrits
+  { seq: 8, ts: "2026-09-02T10:05:00Z", type: "etape_close" },
+];
+const DECL_SAUT = { seq: 9, ts: "2026-09-03T08:00:00Z", type: "rectification_horodatage",
+  entrees: [{ seq: 7, ts_consigne: "2026-09-02T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu avant la fusion" }] };
+const sautNuR42 = mkdtempSync(join(tmpdir(), "conf-saut-nu-r42-"));
+ecrireDans(sautNuR42, "forge/ledger.jsonl", LEDGER_SAUT.map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 rouge : un saut de seq EN AVANT (3 puis 7) que rien ne déclare → FAIL, et le message dit comment déclarer la lacune", () => {
+  const { exit, rapport } = lance(sautNuR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 7 là où 4 était attendu/.test(f.message)) throw new Error(`le saut n'est pas dénoncé : ${f && f.message}`);
+  if (!/saut en avant.*seq qui SUIT la lacune/.test(f.message))
+    throw new Error(`le message ne prescrit aucun remède pour un saut en avant : ${f.message}`);
+});
+const sautDeclareR42 = mkdtempSync(join(tmpdir(), "conf-saut-declare-r42-"));
+ecrireDans(sautDeclareR42, "forge/ledger.jsonl", [...LEDGER_SAUT, DECL_SAUT].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 vert : le MÊME saut, déclaré par une rectification qui nomme le seq 7 dans entrees[] → PASS, imprimé [RECTIFIÉ] (le remède prescrit est joué)", () => {
+  const { exit, rapport } = lance(sautDeclareR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+  const f = r42.find((x) => x.statut === "PASS");
+  if (!f || !/\[RECTIFIÉ\] seq 7 là où 4 était attendu : saut en avant/.test(f.message))
+    throw new Error(`le saut déclaré n'est pas imprimé [RECTIFIÉ] : ${f && f.message} — une lacune silencieuse serait une réécriture`);
+  if (/sans écart correspondant/.test(f.message)) throw new Error(`une rectification consommée est comptée « sans écart » : ${f.message}`);
+});
+const sautSansTsR42 = mkdtempSync(join(tmpdir(), "conf-saut-sans-ts-r42-"));
+ecrireDans(sautSansTsR42, "forge/ledger.jsonl", [...LEDGER_SAUT,
+  { ...DECL_SAUT, entrees: [{ seq: 7, cause: "trois entrées perdues" }] }].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 borne : une déclaration de lacune SANS ts cité n'est pas opposable (TF-1466) → le saut reste un écart", () => {
+  const { exit, rapport } = lance(sautSansTsR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 7 là où 4 était attendu/.test(f.message) || /\[RECTIFIÉ\] seq 7 là où/.test(f.message))
+    throw new Error(`la déclaration sans ts a quand même couvert le saut : ${f && f.message}`);
+});
+const sautAnterioriteR42 = mkdtempSync(join(tmpdir(), "conf-saut-anteriorite-r42-"));
+ecrireDans(sautAnterioriteR42, "forge/ledger.jsonl", [...LEDGER_SAUT,
+  { seq: 9, ts: "2026-09-12T10:00:00Z", type: "anteriorite_ledger", avant: "2026-09-05T00:00:00Z",
+    cause: "mesure du 12/09/2026 : lacune de seq du 02/09, antérieure à la session révélatrice (TF-2494)" }].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 vert : le même saut, ANCIEN, couvert en bloc par une antériorité bornée par une date → PASS, imprimé [ANTÉRIORITÉ]", () => {
+  const { rapport } = lance(sautAnterioriteR42);
+  const r42 = rapport.findings.filter((x) => x.regle === "R-42");
+  if (r42.some((x) => x.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r42.filter((x) => x.statut === "FAIL").map((x) => x.message))}`);
+  const f = r42.find((x) => x.statut === "PASS");
+  if (!f || !/\[ANTÉRIORITÉ\] seq 7 là où 4 était attendu : saut en avant/.test(f.message))
+    throw new Error(`le saut ancien n'est pas imprimé [ANTÉRIORITÉ] : ${f && f.message}`);
+});
+const sautRecentR42 = mkdtempSync(join(tmpdir(), "conf-saut-recent-r42-"));
+ecrireDans(sautRecentR42, "forge/ledger.jsonl", [...LEDGER_SAUT,
+  { seq: 9, ts: "2026-09-12T10:00:00Z", type: "anteriorite_ledger", avant: "2026-09-02T00:00:00Z",
+    cause: "mesure du 12/09/2026 : écarts antérieurs au 02/09, avant la session révélatrice (TF-2494)" }].map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
+check("TF-2494 borne : une antériorité datée AVANT le saut ne le couvre pas — un saut récent reste un écart", () => {
+  const { exit, rapport } = lance(sautRecentR42);
+  if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
+  const f = rapport.findings.find((x) => x.regle === "R-42" && x.statut === "FAIL");
+  if (!f || !/seq 7 là où 4 était attendu/.test(f.message)) throw new Error(`le saut récent n'est plus dénoncé : ${f && f.message}`);
+});
+
+// ---- TF-2495 (13/11/2026, lot pd) — R-16 NE LISAIT QUE LA RACINE D'output\ ET R-32 EXIGE UN JOURNAL, PAS UN PASS.
+// Mesuré le 13/11 par l'agent du lot ps chez le produit 02 : la copie du dossier de MEP existait dans une famille
+// d'output\ posée par D-15 (output\NN-…) et R-16 la déclarait absente ; 9 pages sur 10 étaient conformes à R-32
+// avec un journal qui consigne un FAIL. R-16 lit donc aussi les racines des familles NN-… (jamais leur old\) ; R-32
+// garde sa règle (la présence du journal) et un avertissement NOMMÉ, « R-32 sexies », dit le FAIL consigné. -------
+const MEP_COPIE = "Digit-AI - Dossier de MEP - 20261113a.md";
+const projetMep = (nom, copieA) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-${nom}-`));
+  ecrireDans(d, "forge/DOSSIER-MEP.md", "# Dossier de MEP\n");
+  ecrireDans(d, "output/Digit-AI - Note - 20261113a.md", "# Une note\n");
+  if (copieA) ecrireDans(d, `${copieA}/${MEP_COPIE}`, "# Dossier de MEP\n");
+  return d;
+};
+const r16 = (d) => (lance(d).rapport.findings || []).find((x) => x.regle === "R-16");
+check("TF-2495 rouge : DOSSIER-MEP.md et AUCUNE copie datée dans output\\ → R-16 FAIL (la règle est intacte)", () => {
+  const f = r16(projetMep("r16-sans"));
+  if (!f || f.statut !== "FAIL") throw new Error(`R-16 : ${JSON.stringify(f)}`);
+});
+check("TF-2495 rouge : la copie vit SEULEMENT dans une famille D-15 (output/06-mep/) → R-16 PASS, et le message nomme la famille", () => {
+  const f = r16(projetMep("r16-famille", "output/06-mep"));
+  if (!f || f.statut !== "PASS") throw new Error(`R-16 : ${JSON.stringify(f)} — la famille posée par D-15 n'est pas lue`);
+  if (!/06-mep/.test(f.message)) throw new Error(`le constat ne dit pas où la copie a été trouvée : ${f.message}`);
+});
+check("TF-2495 vert : la copie à la racine d'output\\ passe comme avant", () => {
+  const f = r16(projetMep("r16-racine", "output"));
+  if (!f || f.statut !== "PASS") throw new Error(`R-16 : ${JSON.stringify(f)}`);
+});
+check("TF-2495 borne : une copie dans old\\ d'une famille, ou dans un dossier qui n'est pas une famille NN-…, ne tient pas lieu de copie courante → R-16 FAIL", () => {
+  for (const ou of ["output/06-mep/old", "output/divers"]) {
+    const f = r16(projetMep("r16-borne", ou));
+    if (!f || f.statut !== "FAIL") throw new Error(`${ou} : R-16 ${JSON.stringify(f)} — le périmètre de la lecture déborde les familles de D-15`);
+  }
+});
+
+const HTML_R32 = '<!DOCTYPE html>\n<html lang="fr"><head><title>x</title></head><body>x</body></html>\n';
+const projetJournal = (nom, journal) => {
+  const d = mkdtempSync(join(tmpdir(), `conf-${nom}-`));
+  ecrireDans(d, "output/Digit-AI - Page - 20261113a.html", HTML_R32);
+  if (journal !== null) ecrireDans(d, "forge/oracles/Digit-AI - Page - 20261113a.json", typeof journal === "string" ? journal : JSON.stringify(journal, null, 1));
+  return d;
+};
+const r32 = (d) => { const f = lance(d).rapport.findings || []; return { r32: f.find((x) => x.regle === "R-32"), sexies: f.find((x) => x.regle === "R-32 sexies") }; };
+check("TF-2495 rouge : un journal qui consigne un FAIL (verdicts.render_page) → R-32 reste PASS, et « R-32 sexies » AVERTIT en nommant la page et l'oracle", () => {
+  const { r32: f, sexies } = r32(projetJournal("r32-fail", { verdicts: { check_html: "PASS", render_page: "FAIL" } }));
+  if (!f || f.statut !== "PASS") throw new Error(`R-32 a changé de règle : ${JSON.stringify(f)}`);
+  if (!sexies || sexies.statut !== "PASS" || !/AVERTISSEMENT, non bloquant/.test(sexies.message)) throw new Error(`pas d'avertissement nommé : ${JSON.stringify(sexies)}`);
+  if (!/Digit-AI - Page - 20261113a\.html/.test(sexies.message) || !/render_page/.test(sexies.message)) throw new Error(`l'avertissement ne nomme ni la page ni l'oracle : ${sexies.message}`);
+});
+check("TF-2495 rouge : le verdict d'ensemble en texte libre (« PASS (socle) / FAIL (critique) ») est lu aussi", () => {
+  const { sexies } = r32(projetJournal("r32-texte", { verdict: "PASS (socle) / FAIL (critique forge-design, 3 écarts)" }));
+  if (!sexies || !/AVERTISSEMENT/.test(sexies.message) || !/verdict/.test(sexies.message)) throw new Error(`pas d'avertissement : ${JSON.stringify(sexies)}`);
+});
+check("TF-2495 vert : un journal tout PASS, ou « 0 FAIL », ne déclenche aucun avertissement ; un journal illisible n'est pas jugé", () => {
+  for (const [nom, j] of [["propre", { verdicts: { check_html: "PASS", render_page: "PASS" } }], ["zero", { verdict: "PASS aux oracles, 0 FAIL" }], ["illisible", "{ pas du json"]]) {
+    const { r32: f, sexies } = r32(projetJournal(`r32-${nom}`, j));
+    if (!f || f.statut !== "PASS") throw new Error(`${nom} : R-32 ${JSON.stringify(f)}`);
+    if (sexies && /AVERTISSEMENT/.test(sexies.message)) throw new Error(`${nom} : avertissement à tort : ${sexies.message}`);
+  }
+});
+check("TF-2495 borne : sans journal, R-32 reste FAIL (la règle ne change pas) et « R-32 sexies » ne dit rien", () => {
+  const { r32: f, sexies } = r32(projetJournal("r32-sans", null));
+  if (!f || f.statut !== "FAIL") throw new Error(`R-32 : ${JSON.stringify(f)}`);
+  if (sexies && /AVERTISSEMENT/.test(sexies.message)) throw new Error("un avertissement sur un journal qui n'existe pas");
+});
+
 // ---- fixture R-42 bis (TF-1424, 25/09/2026, RS-3) : un ts POSTÉRIEUR au commit qui l'a introduite
 // est composé, pas relevé — double sens sur un dépôt git JETABLE, la date du commit FIXÉE par
 // `--date`, comme `projetAnteriorite` plus bas (même idiome, TF-0923). --------------------------
@@ -1684,11 +1920,26 @@ check("verte-TODO-PRODUIT : générateur déterministe (2 exécutions = HTML ide
   // RV-9 (14/08) : `color-scheme` FIGÉ à « light dark » faisait peindre au navigateur ses propres
   // surfaces en sombre sur un corps clair. Il doit SUIVRE le thème effectif — donc porté par les
   // deux blocs de tokens, jamais figé dans un <meta>.
-  // (les commentaires HTML sont retirés d'abord : la page DOCUMENTE l'anti-pattern, elle ne le porte pas)
-  if (/<meta\s+name="color-scheme"/i.test(apres.replace(/<!--[\s\S]*?-->/g, "")))
-    throw new Error("color-scheme figé dans un <meta> — défaut relevé par RV-9 : il doit suivre le thème effectif");
-  if (!/:root\{color-scheme:light/.test(apres) || !/:root\[data-theme="dark"\]\{color-scheme:dark/.test(apres))
-    throw new Error("color-scheme absent des blocs de tokens — les surfaces du navigateur ne suivraient pas le thème (RV-9)");
+  // TF-2212 (06/11/2026) : la page dérive désormais du socle digit-ai-page-html, qui tient RV-9 par un autre idiome — un <meta
+  // name="color-scheme"> que le script d'amorçage RÉÉCRIT à chaque thème (`meta.setAttribute('content', theme)`). L'exigence reste
+  // celle de RV-9 (jamais figé à « light dark », toujours suivre le thème) ; les deux idiomes la tiennent, un troisième non.
+  // Écart déclaré au rapport de campagne : la lettre de ce contrôle (« jamais de <meta> », jetons seuls) change, son défaut ciblé non.
+  const erreurRV9 = (page) => {
+    const sansCommentaires = page.replace(/<!--[\s\S]*?-->/g, ""); // la page DOCUMENTE l'anti-pattern, elle ne le porte pas
+    const meta = sansCommentaires.match(/<meta\s+name="color-scheme"\s+content="([^"]*)"/i);
+    if (meta && /light\s+dark|dark\s+light/i.test(meta[1]))
+      return "color-scheme figé à « light dark » dans un <meta> — défaut relevé par RV-9 : il doit suivre le thème effectif";
+    const parJetons = /:root\{color-scheme:light/.test(sansCommentaires) && /:root\[data-theme="dark"\]\{color-scheme:dark/.test(sansCommentaires);
+    const parScript = Boolean(meta) && /meta\.setAttribute\('content',\s*theme\)/.test(sansCommentaires);
+    return parJetons || parScript ? null : "color-scheme ne suit pas le thème (ni blocs de tokens, ni <meta> réécrit par le script) — les surfaces du navigateur ne suivraient pas le thème (RV-9)";
+  };
+  { const e = erreurRV9(apres); if (e) throw new Error(e); }
+  { // le même contrôle sait refuser : meta figé « light dark », et page sans aucun suivi du thème
+    const figee = apres.replace(/(<meta\s+name="color-scheme"\s+content=")[^"]*"/i, '$1light dark"');
+    if (figee === apres || !erreurRV9(figee)) throw new Error("contrôle RV-9 sans effet : un <meta> figé à « light dark » passe");
+    const sansSuivi = apres.replace("meta.setAttribute('content', theme)", "void 0");
+    if (sansSuivi === apres || !erreurRV9(sansSuivi)) throw new Error("contrôle RV-9 sans effet : une page qui ne réécrit plus le <meta> passe");
+  }
   // volet ÉCRITURE refusé par le verdict O3 : la page ne doit porter AUCUNE surface de saisie
   if (/<(input|textarea|form|button[^>]*type="submit")/i.test(apres.replace(/<button id="theme-toggle"[\s\S]*?<\/button>/, "")))
     throw new Error("surface de saisie dans une page déclarée en lecture seule — la moitié ÉCRITURE est refusée en l'état (LLM01)");
@@ -2012,6 +2263,44 @@ check("TF-0898 borne : une règle demandée sans constat est DITE, jamais un PAS
     const f = (lanceArgs(d, "--regles", "R-99").rapport.findings || []).find((x) => x.regle === "R-99");
     if (!f || f.statut !== "SANS_OBJET") throw new Error("un identifiant de règle inconnu rend un vert muet");
   } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- TF-2028 (02/11/2026) — une étude suit R-4 ; le préfixe daté « AAAAMMJJ-… » reste admis ----
+// R-4 nomme « tout livrable documentaire » `<Projet> - <Objet> - AAAAMMJJ<indice>.<ext>` et n'excepte
+// aucun dossier. L'oracle exigeait pourtant, sous `output\03-etudes\`, un préfixe daté (TF-0197) et
+// refusait les études nommées selon R-4. VERT : l'étude au nom R-4 passe, l'étude au préfixe daté
+// historique passe. ROUGE : un nom sans date échoue, une étude R-4 sans indice échoue, et deux études
+// R-4 de radical distinct qui partagent un indice échouent (le jugement ordinaire s'applique à elles).
+const projetEtudes = (noms) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-etudes-"));
+  mkdirSync(join(d, "output", "03-etudes"), { recursive: true });
+  for (const n of noms) writeFileSync(join(d, "output", "03-etudes", n), "# étude\n", "utf8");
+  return d;
+};
+const r4Etudes = (noms) => {
+  const d = projetEtudes(noms);
+  try { const r = lanceArgs(d, "--regles", "R-4"); return { exit: r.exit, fails: (r.rapport.findings || []).filter((x) => x.regle === "R-4" && x.statut === "FAIL") }; }
+  finally { rmSync(d, { recursive: true, force: true }); }
+};
+check("TF-2028 vert : une étude nommée selon R-4 (« Projet - Type - Objet - AAAAMMJJ<i> ») sous 03-etudes → PASS", () => {
+  const r = r4Etudes(["Digit-AI - Étude - Boucle de relecture - 20261029f.md"]);
+  if (r.exit !== 0 || r.fails.length) throw new Error(`étude conforme à R-4 refusée : ${JSON.stringify(r.fails)}`);
+});
+check("TF-2028 vert : le préfixe daté historique « AAAAMMJJ-… » sous 03-etudes reste valide → PASS", () => {
+  const r = r4Etudes(["20260817-etude-rangement.md", "20261001-L99-etude-textes-relance.md"]);
+  if (r.exit !== 0 || r.fails.length) throw new Error(`nom historique refusé : ${JSON.stringify(r.fails)}`);
+});
+check("TF-2028 rouge : un nom d'étude sans aucune date → FAIL R-4", () => {
+  const r = r4Etudes(["etude-sans-date.md"]);
+  if (r.exit !== 1 || !r.fails.some((f) => /etude-sans-date/.test(f.ou))) throw new Error(`nom sans date accepté : exit ${r.exit}`);
+});
+check("TF-2028 rouge : « Projet - Type - Objet » sans date ni indice → FAIL R-4", () => {
+  const r = r4Etudes(["Digit-AI - Étude - Boucle de relecture.md"]);
+  if (r.exit !== 1 || !r.fails.some((f) => /Boucle de relecture/.test(f.ou))) throw new Error(`nom R-4 sans date accepté : exit ${r.exit}`);
+});
+check("TF-2028 rouge : deux études R-4 de radical distinct au même indice → FAIL R-4 (unicité de l'indice, TF-0750)", () => {
+  const r = r4Etudes(["Digit-AI - Étude - Sujet A - 20261028a.md", "Digit-AI - Inventaire - Sujet B - 20261028a.md"]);
+  if (r.exit !== 1 || !r.fails.some((f) => /20261028a/.test(f.message))) throw new Error(`indice partagé accepté : exit ${r.exit} ${JSON.stringify(r.fails)}`);
 });
 
 // ---- TF-0902 (08/09) — R-7 bis : deux versions du même livrable hors old\ ---------------------
@@ -2903,6 +3192,357 @@ check("TF-1746 antériorité : un livrable daté avant le 15/10/2026 n'est pas j
     if ((r.findings || []).some((x) => x.regle === "R-32 quinquies" && x.statut !== "SANS_OBJET")) throw new Error(JSON.stringify(r.findings));
     if (!(r.non_juge || []).some((l) => /R-32 quinquies/.test(l))) throw new Error("l'antériorité n'est pas déclarée");
   } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- R-61 bis (TF-2124, D-166 (a) du 04/11/2026) — « prêt pour la production » exige le pan parcours-personas et oracle-exploitabilite ---
+// Le fait (Produit-86, RP-3) : 85 exigences tenues sur 85 comptées sur un référentiel écrit par la session, produit jugé
+// inexploitable par le porteur. Un run qui se déclare prêt porte au ledger de CE run un PASS de chacun des deux contrôles :
+// avertissement nommé jusqu'au 18/11/2026 inclus, FAIL à partir du 19/11/2026. Le jour se lit à l'horloge ; `--aujourd-hui`
+// le fixe ici, `--declarer-pret` joue la porte avant l'écriture du run_close. Fixtures à double sens : un run sans les deux
+// contrôles verts (avertissement avant la date, rouge après), un run avec les deux verts (vert), et le remède prescrit joué.
+const R61B_OUVERTURE = { seq: 1, ts: "2026-11-04T08:00:00Z", type: "run_open", schema_ledger: "1.1" };
+const r61bVerdict = (oracleNom, verdict, seq) => ({ seq, ts: "2026-11-04T09:00:00Z", type: "oracles_verdict", oracle: oracleNom, verdict });
+const R61B_PARCOURS = (v = "PASS") => r61bVerdict("forge-tests:parcours-personas", v, 2);
+const R61B_EXPLOIT = (v = "PASS") => r61bVerdict("oracle-exploitabilite", v, 3);
+const r61bCloture = (ts = "2026-11-04T13:00:00Z", statut = "pret_production_en_attente_GO") => ({ seq: 99, ts, type: "run_close", statut });
+const projet61b = (entrees) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-r61b-"));
+  mkdirSync(join(d, "forge"), { recursive: true });
+  writeFileSync(join(d, "forge", "ledger.jsonl"), entrees.map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  return d;
+};
+const juge61b = (d, jour, ...plus) => {
+  const r = lanceArgs(d, "--regles", "R-61 bis", ...(jour ? ["--aujourd-hui", jour] : []), ...plus);
+  return { ...r, f: (r.rapport.findings || []).filter((x) => x.regle === "R-61 bis") };
+};
+check("R-61 bis vert : les deux contrôles PASS au ledger du run déclaré prêt → PASS sans avertissement, exit 0 (TF-2124)", () => {
+  const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(), R61B_EXPLOIT(), r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-20");
+    if (exit !== 0 || !f.some((x) => x.statut === "PASS" && /parcours-personas/.test(x.message) && /oracle-exploitabilite/.test(x.message)) || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge avant la date : aucun des deux contrôles, le 2026-11-18 (dernier jour inclus) → AVERTISSEMENT nommant les deux, jamais un FAIL", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-18");
+    const a = f.find((x) => /AVERTISSEMENT/.test(x.message));
+    if (exit !== 0 || !a || a.statut !== "PASS" || !/parcours-personas/.test(a.message) || !/oracle-exploitabilite/.test(a.message) || !/19\/11\/2026/.test(a.message)) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge à la date : le même run le 2026-11-19 → FAIL nommant les deux contrôles, exit 1", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-19");
+    const k = f.find((x) => x.statut === "FAIL");
+    if (exit !== 1 || !k || !/parcours-personas/.test(k.message) || !/oracle-exploitabilite/.test(k.message) || f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge : un seul contrôle manque (exploitabilité FAIL, parcours PASS) → seule l'exploitabilité est nommée, avec son verdict", () => {
+  const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(), R61B_EXPLOIT("FAIL"), r61bCloture()]);
+  try {
+    const { exit, f } = juge61b(d, "2026-12-01");
+    const k = f.find((x) => x.statut === "FAIL");
+    if (exit !== 1 || !k || !/oracle-exploitabilite[^;]*FAIL/.test(k.message) || /manque[^]*parcours-personas :/.test(k.message)) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis rouge : un verdict NA ou SKIP n'est pas un vert (pan sans persona déclaré, cible non jugeable) → nommé", () => {
+  for (const v of ["NA", "SKIP"]) {
+    const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(v), R61B_EXPLOIT(), r61bCloture()]);
+    try {
+      const { exit, f } = juge61b(d, "2026-12-01");
+      const k = f.find((x) => x.statut === "FAIL");
+      if (exit !== 1 || !k || !new RegExp(`parcours-personas[^;]*${v}`).test(k.message)) throw new Error(`${v} : ${JSON.stringify({ exit, f })}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  }
+});
+check("R-61 bis vert : les graphies du parc (forge-tests:…, forge-design:…, chemin et .mjs, nom nu) sont reconnues", () => {
+  const a = projet61b([R61B_OUVERTURE, r61bVerdict("forge-tests:parcours-personas", "PASS", 2), r61bVerdict("digit-ai-forge-design/oracles/oracle-exploitabilite.mjs (instance servie)", "PASS", 3), r61bCloture()]);
+  const b = projet61b([R61B_OUVERTURE, r61bVerdict("parcours-personas", "PASS", 2), r61bVerdict("forge-design:oracle-exploitabilite", "PASS", 3), r61bCloture()]);
+  try {
+    for (const x of [a, b]) {
+      const { exit, f } = juge61b(x, "2026-12-01");
+      if (exit !== 0 || !f.some((y) => y.statut === "PASS" && !/AVERTISSEMENT/.test(y.message))) throw new Error(JSON.stringify({ exit, f }));
+    }
+  } finally { rmSync(a, { recursive: true, force: true }); rmSync(b, { recursive: true, force: true }); }
+});
+check("R-61 bis : le dernier verdict d'un contrôle fait foi (FAIL puis PASS → vert ; PASS puis FAIL → rouge)", () => {
+  const vert = projet61b([R61B_OUVERTURE, r61bVerdict("forge-tests:parcours-personas", "FAIL", 2), r61bVerdict("forge-tests:parcours-personas", "PASS", 3), R61B_EXPLOIT(), r61bCloture()]);
+  const rouge = projet61b([R61B_OUVERTURE, R61B_PARCOURS("PASS"), r61bVerdict("forge-tests:parcours-personas", "FAIL", 3), R61B_EXPLOIT(), r61bCloture()]);
+  try {
+    if (juge61b(vert, "2026-12-01").exit !== 0) throw new Error("FAIL puis PASS devrait être vert");
+    if (juge61b(rouge, "2026-12-01").exit !== 1) throw new Error("PASS puis FAIL devrait être rouge");
+  } finally { rmSync(vert, { recursive: true, force: true }); rmSync(rouge, { recursive: true, force: true }); }
+});
+check("R-61 bis : les verdicts d'un run précédent ne comptent pas, seuls ceux qui suivent le dernier run_open sont lus", () => {
+  const d = projet61b([R61B_OUVERTURE, R61B_PARCOURS(), R61B_EXPLOIT(), r61bCloture("2026-11-04T10:00:00Z"), { ...R61B_OUVERTURE, seq: 5, ts: "2026-11-05T08:00:00Z" }, r61bCloture("2026-11-05T13:00:00Z")]);
+  try {
+    const { exit, f } = juge61b(d, "2026-12-01");
+    if (exit !== 1 || !f.some((x) => x.statut === "FAIL")) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis : un run qui ne se déclare pas prêt n'est pas jugé (SANS_OBJET, même après la date, exit 0)", () => {
+  const d = projet61b([R61B_OUVERTURE, { seq: 4, ts: "2026-11-04T13:00:00Z", type: "run_close", statut: "en_cours_de_repli" }]);
+  try {
+    const { exit, f } = juge61b(d, "2026-12-01");
+    if (exit !== 0 || !f.length || f.some((x) => x.statut !== "SANS_OBJET")) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis : --declarer-pret joue la porte avant le run_close (avertissement avant la date, FAIL à partir du 19/11/2026)", () => {
+  const d = projet61b([R61B_OUVERTURE]);
+  try {
+    const av = juge61b(d, "2026-11-10", "--declarer-pret");
+    if (av.exit !== 0 || !av.f.some((x) => /AVERTISSEMENT/.test(x.message))) throw new Error(`avant : ${JSON.stringify(av.f)}`);
+    const ap = juge61b(d, "2026-11-19", "--declarer-pret");
+    if (ap.exit !== 1 || !ap.f.some((x) => x.statut === "FAIL")) throw new Error(`après : ${JSON.stringify(ap.f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis antériorité : un run déclaré prêt le 2026-11-03, avant la décision, n'est pas jugé et c'est dit au non_juge", () => {
+  const d = projet61b([{ ...R61B_OUVERTURE, ts: "2026-11-03T08:00:00Z" }, r61bCloture("2026-11-03T13:00:00Z")]);
+  try {
+    const { exit, f, rapport } = juge61b(d, "2026-12-01");
+    if (exit !== 0 || f.some((x) => x.statut !== "SANS_OBJET")) throw new Error(JSON.stringify({ exit, f }));
+    if (!(rapport.non_juge || []).some((l) => /R-61 bis/.test(l) && /2026-11-03/.test(l))) throw new Error("antériorité non déclarée au non_juge");
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis remède joué (TF-1013) : consigner les deux verdicts PASS lève le refus du 2026-11-19", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    if (juge61b(d, "2026-11-19").exit !== 1) throw new Error("le cas de départ n'est pas rouge");
+    appendFileSync(join(d, "forge", "ledger.jsonl"), [R61B_PARCOURS(), R61B_EXPLOIT()].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    const { exit, f } = juge61b(d, "2026-11-19");
+    if (exit !== 0 || !f.some((x) => x.statut === "PASS" && !/AVERTISSEMENT/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+// ---- R-61 bis, volet campagne forge-tests (TF-2207, RP-27, décision R-58 du 06/11/2026) : un `run_close` « prêt » ne se pose pas sur
+// un forge-tests PARTIEL non motivé. Refus DÈS le 06/11/2026 (pas de période d'avertissement), alors que les deux contrôles d'usage
+// avertissent jusqu'au 18/11. Fixtures à double sens : PARTIEL nu (rouge), PARTIEL motivé (vert), PASS (vert), graphie `forge_tests --json` en
+// tableau `oracles[]` (rouge), pan `forge-tests:parcours-personas` PARTIEL (hors volet), antériorité, remède joué.
+const r61cCampagne = (verdict, plus = {}, seq = 4) => ({ seq, ts: "2026-11-06T09:30:00Z", type: "oracles_verdict", oracle: "forge-tests", verdict, ...plus });
+const R61C_USAGE = () => [R61B_PARCOURS(), R61B_EXPLOIT()];
+const MOTIF_PARTIEL = "pans api et mobile sans adaptateur : produit backend-only, 7 pans non jouables, couverture des 4 parcours tenue";
+check("R-61 bis forge-tests : PARTIEL sans motif → FAIL dès le 2026-11-06, le constat nomme la campagne et le champ motif_partiel (TF-2207)", () => {
+  const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne("PARTIEL"), r61bCloture("2026-11-06T13:00:00Z")]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-06");
+    if (exit !== 1 || !f.some((x) => x.statut === "FAIL" && /campagne forge-tests \(seq 4\) est PARTIELLE sans motif/.test(x.message) && /motif_partiel/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests : PARTIEL motivé (motif_partiel ou motif de 20 caractères) → PASS qui le dit, PASS → PASS (TF-2207)", () => {
+  for (const [verdict, plus, attendu] of [["PARTIEL", { motif_partiel: MOTIF_PARTIEL }, /forge-tests PARTIEL motivée/], ["PARTIEL", { motif: MOTIF_PARTIEL }, /motivée/], ["PASS", {}, /forge-tests PASS/]]) {
+    const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne(verdict, plus), r61bCloture("2026-11-06T13:00:00Z")]);
+    try {
+      const { exit, f } = juge61b(d, "2026-11-06");
+      if (exit !== 0 || !f.some((x) => x.statut === "PASS" && attendu.test(x.message))) throw new Error(`${verdict} ${JSON.stringify(plus).slice(0, 40)} : ${JSON.stringify({ exit, f })}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  }
+});
+check("R-61 bis forge-tests : un motif trop court (« ok ») ne motive pas, un PARTIEL du pan parcours-personas n'est pas une campagne (TF-2207)", () => {
+  const court = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne("PARTIEL", { motif_partiel: "ok" }), r61bCloture("2026-11-06T13:00:00Z")]);
+  const pan = projet61b([R61B_OUVERTURE, R61B_EXPLOIT(), r61bVerdict("forge-tests:parcours-personas", "PARTIEL", 2), r61bCloture("2026-11-06T13:00:00Z")]);
+  try {
+    if (juge61b(court, "2026-11-06").exit !== 1) throw new Error("un motif de 2 caractères a motivé le PARTIEL");
+    const { f } = juge61b(pan, "2026-11-06");
+    if (f.some((x) => /campagne forge-tests/.test(x.message))) throw new Error(`le pan parcours-personas a été pris pour la campagne : ${JSON.stringify(f)}`);
+  } finally { rmSync(court, { recursive: true, force: true }); rmSync(pan, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests : la graphie du parc `forge_tests --json` en tableau oracles[] est lue (ledger du run d'août), et --declarer-pret refuse avant l'écriture (TF-2207)", () => {
+  const tableau = { seq: 4, ts: "2026-11-06T09:30:00Z", type: "oracles_verdict", etape: "tests", oracles: [{ oracle: "forge_tests --json", verdict: "PARTIEL", exit: 3, detail: "7 pans sans adaptateur" }] };
+  const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), tableau]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-06", "--declarer-pret");
+    if (exit !== 1 || !f.some((x) => x.statut === "FAIL" && /PARTIELLE sans motif/.test(x.message))) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests : antériorité — un run déclaré prêt le 2026-11-05 avec un PARTIEL nu n'est pas refusé par ce volet (la règle entre le 06/11)", () => {
+  const d = projet61b([R61B_OUVERTURE, ...R61C_USAGE(), { ...r61cCampagne("PARTIEL"), ts: "2026-11-05T09:30:00Z" }, r61bCloture("2026-11-05T13:00:00Z")]);
+  try {
+    const { exit, f } = juge61b(d, "2026-11-10");
+    if (exit !== 0 || f.some((x) => /campagne forge-tests/.test(x.message) && x.statut === "FAIL")) throw new Error(JSON.stringify({ exit, f }));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis forge-tests remède joué (TF-1013) : consigner le motif, ou un PASS plus tard, lève le refus", () => {
+  const base61c = [R61B_OUVERTURE, ...R61C_USAGE(), r61cCampagne("PARTIEL"), r61bCloture("2026-11-06T13:00:00Z")];
+  for (const ajout of [r61cCampagne("PARTIEL", { motif_partiel: MOTIF_PARTIEL }, 5), r61cCampagne("PASS", {}, 5)]) {
+    const d = projet61b(base61c);
+    try {
+      if (juge61b(d, "2026-11-06").exit !== 1) throw new Error("le cas de départ n'est pas rouge");
+      appendFileSync(join(d, "forge", "ledger.jsonl"), JSON.stringify(ajout) + "\n", "utf8");
+      const { exit, f } = juge61b(d, "2026-11-06");
+      if (exit !== 0 || !f.some((x) => x.statut === "PASS")) throw new Error(`${ajout.verdict} : ${JSON.stringify({ exit, f })}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  }
+});
+check("R-61 bis : --aujourd-hui invalide → ERREUR exit 2, rien n'est jugé", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const r = lanceArgs(d, "--regles", "R-61 bis", "--aujourd-hui", "hier");
+    if (r.exit !== 2 || r.rapport.verdict !== "ERREUR") throw new Error(JSON.stringify(r));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("R-61 bis horloge : sans --aujourd-hui, le jour lu est celui de la machine (AAAA-MM-JJ local)", () => {
+  const d = projet61b([R61B_OUVERTURE, r61bCloture()]);
+  try {
+    const n = new Date();
+    const jour = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+    const { f } = juge61b(d, null);
+    if (!f.length || !f.some((x) => x.message.includes(jour))) throw new Error(`jour ${jour} absent : ${JSON.stringify(f)}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
+// ---- D-192 (a) du 10/11/2026 (TF-2341, TF-2347) — les deux assouplissements de la règle de nommage -----------
+// Double sens. LOT (R-4) : un indice partagé par des livrables de radical distinct passe quand une ligne de
+// `forge/lots-livrables.jsonl` déclare le couple dossier + indice (traitement cité, date réelle), et reste refusé
+// sans elle, avec une déclaration d'un autre couple, incomplète, au modèle non rempli ou datée du futur. NOMMAGE (R-25) :
+// « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<i> » passe quand `forge/NOMMAGE.json` cite la décision humaine, et reste
+// refusé comme avant sans déclaration, sans décision citée, avec un autre préfixe ou un type qui n'est pas au registre.
+// Le remède que le message propose est JOUÉ : sa ligne modèle, remplie, doit faire PASSER (TF-1013).
+const JOUR_D192 = "2026-11-10";
+const projetD192 = ({ fichiers, lots, nommage }) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-d192-"));
+  mkdirSync(join(d, "output", "Fiches"), { recursive: true });
+  mkdirSync(join(d, "forge"), { recursive: true });
+  for (const n of fichiers) writeFileSync(join(d, "output", n.includes("/") ? "" : "Fiches", n), "# livrable\n", "utf8");
+  if (lots !== undefined) writeFileSync(join(d, "forge", "lots-livrables.jsonl"), lots.map((l) => (typeof l === "string" ? l : JSON.stringify(l))).join("\n") + "\n", "utf8");
+  if (nommage !== undefined) writeFileSync(join(d, "forge", "NOMMAGE.json"), typeof nommage === "string" ? nommage : JSON.stringify(nommage), "utf8");
+  return d;
+};
+const jugeD192 = (d, regle) => {
+  const r = lanceArgs(d, "--regles", regle, "--aujourd-hui", JOUR_D192);
+  const f = r.rapport.findings || [];
+  return { exit: r.exit, fails: f.filter((x) => x.regle === regle && x.statut === "FAIL"), passes: f.filter((x) => x.regle === regle && x.statut === "PASS") };
+};
+const avecD192 = (cfg, regle, fn) => { const d = projetD192(cfg); try { return fn(jugeD192(d, regle), d); } finally { rmSync(d, { recursive: true, force: true }); } };
+const FICHES_LOT = ["Digit-AI - Client-A - Fiche Accueil - 20261109a.md", "Digit-AI - Client-A - Fiche Cuisine - 20261109a.md", "Digit-AI - Client-A - Fiche Salle - 20261109a.md"];
+const LOT_OK = { ts: "2026-11-09T21:00:00.000Z", dossier: "output/Fiches", indice: "20261109a", traitement: "kit de trois fiches produit en un seul traitement" };
+check("D-192 (a) lot vert : trois fiches au même indice, le lot est déclaré (dossier + indice + traitement) → R-4 PASS, le constat cite le lot déclaré", () =>
+  avecD192({ fichiers: FICHES_LOT, lots: [LOT_OK] }, "R-4", (r) => {
+    if (r.exit !== 0 || r.fails.length) throw new Error(`lot déclaré refusé : exit ${r.exit} ${JSON.stringify(r.fails)}`);
+    if (!r.passes.some((x) => /lot DÉCLARÉ le 2026-11-09/.test(x.message) && /un seul traitement/.test(x.message))) throw new Error(`aucun constat ne cite le lot : ${JSON.stringify(r.passes)}`);
+  }));
+check("D-192 (a) lot rouge : les mêmes trois fiches SANS déclaration → FAIL R-4, et le message donne la forme de la déclaration", () =>
+  avecD192({ fichiers: FICHES_LOT }, "R-4", (r) => {
+    const f = r.fails.find((x) => /indice « 20261109a »/.test(x.message));
+    if (r.exit !== 1 || !f) throw new Error(`indice partagé sans déclaration accepté : exit ${r.exit}`);
+    if (!/forge\\lots-livrables\.jsonl/.test(f.message) || !/"traitement"/.test(f.message)) throw new Error(`le message ne donne pas la forme de la déclaration : ${f.message}`);
+  }));
+check("D-192 (a) lot remède : la ligne modèle du message, remplie, fait PASSER (TF-1013)", () => {
+  const msg = avecD192({ fichiers: FICHES_LOT }, "R-4", (r) => r.fails[0].message);
+  const m = msg.match(/la ligne (\{.*\}) — un indice partagé sans déclaration/);
+  if (!m) throw new Error(`aucune ligne modèle extractible du message : ${msg}`);
+  const ligne = JSON.parse(m[1]);
+  if (ligne.dossier !== "output/Fiches" || ligne.indice !== "20261109a") throw new Error(`le modèle ne nomme pas le bon couple : ${m[1]}`);
+  ligne.ts = "2026-11-09T21:00:00.000Z"; ligne.traitement = "kit de trois fiches produit en un seul traitement";
+  avecD192({ fichiers: FICHES_LOT, lots: [ligne] }, "R-4", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`le remède du message ne passe pas : ${JSON.stringify(r.fails)}`); });
+});
+check("D-192 (a) lot rouge : une déclaration d'un AUTRE indice, ou d'un AUTRE dossier, ne couvre pas le lot → FAIL R-4", () => {
+  for (const autre of [{ ...LOT_OK, indice: "20261108a" }, { ...LOT_OK, dossier: "output/Autres" }])
+    avecD192({ fichiers: FICHES_LOT, lots: [autre] }, "R-4", (r) => { if (r.exit !== 1 || !r.fails.some((x) => /indice « 20261109a »/.test(x.message))) throw new Error(`couple non couvert accepté : ${JSON.stringify(autre)}`); });
+});
+check("D-192 (a) lot borne : le lot déclaré ne couvre que SON indice — un autre indice partagé du même dossier reste refusé", () =>
+  avecD192({ fichiers: [...FICHES_LOT, "Digit-AI - Client-A - Plan Salle - 20261110a.md", "Digit-AI - Client-A - Plan Cuisine - 20261110a.md"], lots: [LOT_OK] }, "R-4", (r) => {
+    if (r.exit !== 1 || r.fails.length !== 1 || !/indice « 20261110a »/.test(r.fails[0].message)) throw new Error(`attendu un seul refus, sur 20261110a : ${JSON.stringify(r.fails.map((x) => x.message.slice(0, 60)))}`);
+  }));
+check("D-192 (a) lot rouge : déclaration incomplète, modèle non rempli ou datée du futur → la ligne est REFUSÉE (FAIL nommé) et l'indice reste refusé", () => {
+  for (const [nom, ligne] of [["traitement trop court", { ...LOT_OK, traitement: "lot" }], ["traitement sans objet", { ...LOT_OK, traitement: undefined }],
+    ["modèle recopié", { ...LOT_OK, traitement: "<le traitement unique qui a produit ces livrables, 20 caractères au moins>" }],
+    ["ts futur", { ...LOT_OK, ts: "2026-11-11T08:00:00.000Z" }], ["indice mal formé", { ...LOT_OK, indice: "9a" }], ["JSON invalide", "{pas du json"]])
+    avecD192({ fichiers: FICHES_LOT, lots: [ligne] }, "R-4", (r) => {
+      if (r.exit !== 1) throw new Error(`${nom} : déclaration acceptée, exit ${r.exit}`);
+      if (!r.fails.some((x) => /lots-livrables\.jsonl ligne 1/.test(x.ou))) throw new Error(`${nom} : la ligne refusée n'est pas nommée : ${JSON.stringify(r.fails.map((x) => x.ou))}`);
+      if (!r.fails.some((x) => /indice « 20261109a »/.test(x.message))) throw new Error(`${nom} : l'indice partagé n'est plus refusé`);
+    });
+});
+check("D-192 (a) lot vert : sans fichier de lots et sans indice partagé, R-4 ne change pas (aucune déclaration par défaut)", () =>
+  avecD192({ fichiers: ["Digit-AI - Client-A - Fiche Accueil - 20261109a.md", "Digit-AI - Client-A - Fiche Salle - 20261109b.md"] }, "R-4", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(JSON.stringify(r.fails)); }));
+
+const NOMME = "Digit-AI - Client-A - Rapport Test - 20261109a.md";
+const NOMMAGE_OK = { prefixe: "Digit-AI", rang_type: 3, decision: { date: "2026-09-30", source: "décision du porteur du 30/09/2026 : « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<indice> » pour un fichier qui concerne un client" } };
+const refusType = (r, mot) => r.fails.some((x) => x.regle === "R-25" && new RegExp(`type « ${mot} »`).test(x.message));
+check("D-192 (a) nommage vert : « Digit-AI - <Client> - <Type> <Objet> - AAAAMMJJ<i> » avec le nommage décidé déclaré → R-25 PASS, le type est lu au 3e segment", () =>
+  avecD192({ fichiers: [NOMME], nommage: NOMMAGE_OK }, "R-25", (r) => {
+    if (r.exit !== 0 || r.fails.length) throw new Error(`nommage déclaré refusé : exit ${r.exit} ${JSON.stringify(r.fails)}`);
+    if (!r.passes.some((x) => /au type admis/.test(x.message))) throw new Error("aucun PASS « au type admis » : le registre des types est-il lisible ? (verte vide)");
+    if (!r.passes.some((x) => /nommage décidé par le porteur le 2026-09-30/.test(x.message))) throw new Error("le constat ne cite pas la décision");
+  }));
+check("D-192 (a) nommage rouge : le même nom SANS déclaration → FAIL R-25 comme aujourd'hui (type « Client-A »), le message donne la forme à déclarer", () =>
+  avecD192({ fichiers: [NOMME] }, "R-25", (r) => {
+    if (r.exit !== 1 || !refusType(r, "Client-A")) throw new Error(`nom refusé pour une autre raison, ou accepté : exit ${r.exit}`);
+    if (!/forge\\NOMMAGE\.json/.test(r.fails[0].message)) throw new Error("le message ne dit pas où déclarer le nommage");
+  }));
+check("D-192 (a) nommage remède : la forme du message, remplie, fait PASSER (TF-1013)", () => {
+  const msg = avecD192({ fichiers: [NOMME] }, "R-25", (r) => r.fails[0].message);
+  const m = msg.match(/NOMMAGE-PRODUIT\.json\) : (\{.*\}) ; sans déclaration valide/);
+  if (!m) throw new Error(`aucune forme extractible du message : ${msg}`);
+  const decl = JSON.parse(m[1]);
+  decl.prefixe = "Digit-AI"; decl.decision = { date: "2026-09-30", source: "décision du porteur du 30/09/2026 : le client en 2e segment" };
+  avecD192({ fichiers: [NOMME], nommage: decl }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`le remède du message ne passe pas : ${JSON.stringify(r.fails)}`); });
+});
+check("D-192 (a) nommage rouge : déclaration sans décision citée (absente, vide, modèle non rempli, date future, date réelle mais fausse) → REFUSÉE, et le nom reste refusé", () => {
+  const sans = { prefixe: "Digit-AI", rang_type: 3 };
+  for (const [nom, decl] of [["sans decision", sans], ["source vide", { ...sans, decision: { date: "2026-09-30", source: "" } }],
+    ["source modèle", { ...sans, decision: { date: "2026-09-30", source: "<la décision humaine citée : date, auteur, message>" } }],
+    ["date future", { ...sans, decision: { date: "2026-12-01", source: "décision du porteur du 01/12/2026" } }],
+    ["date 31 février", { ...sans, decision: { date: "2026-02-31", source: "décision du porteur du 31/02/2026" } }],
+    ["rang 2", { ...NOMMAGE_OK, rang_type: 2 }], ["JSON invalide", "{pas du json"]])
+    avecD192({ fichiers: [NOMME], nommage: decl }, "R-25", (r) => {
+      if (r.exit !== 1) throw new Error(`${nom} : déclaration acceptée, exit ${r.exit}`);
+      if (!r.fails.some((x) => x.ou === "forge/NOMMAGE.json" && /REFUSÉE/.test(x.message))) throw new Error(`${nom} : la déclaration refusée n'est pas nommée`);
+      if (!refusType(r, "Client-A")) throw new Error(`${nom} : le nom n'est plus refusé comme avant`);
+    });
+});
+check("D-192 (a) nommage gabarit : le gabarit du pilot recopié tel quel est REFUSÉ (modèle non rempli), rempli il PASSE", () => {
+  const gabarit = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "NOMMAGE-PRODUIT.json"), "utf8"));
+  avecD192({ fichiers: [NOMME], nommage: gabarit }, "R-25", (r) => { if (r.exit !== 1 || !r.fails.some((x) => x.ou === "forge/NOMMAGE.json" && /REFUSÉE/.test(x.message))) throw new Error(`le gabarit non rempli est accepté : exit ${r.exit}`); });
+  const rempli = { ...gabarit, prefixe: "Digit-AI", decision: { date: "2026-09-30", source: "décision du porteur du 30/09/2026 : le client en 2e segment" } };
+  avecD192({ fichiers: [NOMME], nommage: rempli }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`le gabarit rempli est refusé : ${JSON.stringify(r.fails)}`); });
+});
+check("D-192 (a) nommage borne : la déclaration déplace la lecture, pas le registre — un type du 3e segment hors registre, ou un autre préfixe, restent refusés", () => {
+  avecD192({ fichiers: ["Digit-AI - Client-A - Grimoire Test - 20261109a.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Grimoire")) throw new Error(`type hors registre accepté : exit ${r.exit}`); });
+  avecD192({ fichiers: ["Autre - Client-A - Rapport Test - 20261109a.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Client-A")) throw new Error(`autre préfixe lu comme déclaré : exit ${r.exit}`); });
+});
+check("D-192 (a) nommage vert : un produit déclaré garde la lecture ordinaire pour un nom SANS client (3 segments), et son type reste jugé", () => {
+  avecD192({ fichiers: ["Digit-AI - Rapport Test - 20261109b.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`nom à 3 segments refusé : ${JSON.stringify(r.fails)}`); });
+  avecD192({ fichiers: ["Digit-AI - Grimoire Test - 20261109b.md"], nommage: NOMMAGE_OK }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Grimoire")) throw new Error("type hors registre à 3 segments accepté"); });
+});
+
+// ---- TF-2447 (12/11/2026) — R-25 NE LIT LE TYPE AU RANG DÉCLARÉ QUE SI LE 2E SEGMENT N'EST PAS DÉJÀ UN TYPE ADMIS ----
+// Le fait : chez le produit marketing, « Digit-AI - <Type> - <Objet> - AAAAMMJJ<i> » a son type au 2e segment, et le nommage
+// décidé (« Digit-AI - <Client> - <Type> <Objet> - … », rang 3) faisait lire le 3e : 10 noms conformes refusés sur leur objet
+// (Animation, Textes, Face, Série). Double sens sur les QUATRE formes mesurées, noms inventés : le type du 2e segment,
+// admis, suffit ; un 2e segment qui n'est pas un type (le client) laisse la lecture au rang déclaré ; sans déclaration,
+// la lecture au 2e segment est celle d'avant.
+const FORMES_2447 = [
+  ["Animation", "Digit-AI - Présentation - Animation du produit test - 20261109a.md"],
+  ["Textes", "Digit-AI - Proposition - Textes du clip test - 20261109b.md"],
+  ["Face", "Digit-AI - Proposition - Face au test - 20261109c.md"],
+  ["Série", "Digit-AI - Cadrage - Série d'animations du test - 20261109d.md"],
+];
+check("TF-2447 rouge→vert : avec le nommage décidé déclaré, un nom dont le 2e segment est un type admis (Présentation, Proposition, Cadrage) est lu au 2e segment — les 4 formes (Animation, Textes, Face, Série) PASSENT", () => {
+  const ecarts = [];   // les quatre formes sont jugées, et toutes celles qui échouent sont nommées
+  for (const [mot, nom] of FORMES_2447)
+    avecD192({ fichiers: [nom], nommage: NOMMAGE_OK }, "R-25", (r) => {
+      if (refusType(r, mot)) ecarts.push(`« ${mot} » est lu comme un type alors que le 2e segment en porte un`);
+      else if (r.exit !== 0 || r.fails.length) ecarts.push(`${nom} : exit ${r.exit} ${JSON.stringify(r.fails.map((x) => x.message.slice(0, 80)))}`);
+      else if (!r.passes.some((x) => /au type admis/.test(x.message))) ecarts.push(`${nom} : aucun PASS « au type admis » (verte vide)`);
+    });
+  if (ecarts.length) throw new Error(`${ecarts.length}/${FORMES_2447.length} forme(s) refusée(s) : ${ecarts.join(" ; ")}`);
+});
+check("TF-2447 second sens : le client en 2e segment laisse la lecture au rang déclaré — les mêmes 4 objets, derrière un client, restent REFUSÉS comme types", () => {
+  for (const [mot, nom] of FORMES_2447)
+    avecD192({ fichiers: [nom.replace(/^Digit-AI - \S+ - /, "Digit-AI - Client-A - ")], nommage: NOMMAGE_OK }, "R-25", (r) => {
+      if (r.exit !== 1 || !refusType(r, mot)) throw new Error(`« ${mot} » derrière un client n'est plus lu au rang 3 : exit ${r.exit} ${JSON.stringify(r.fails.map((x) => x.message.slice(0, 60)))}`);
+    });
+});
+check("TF-2447 second sens : un 2e segment HORS registre n'est pas « déjà un type » — la lecture reste au rang 3 et le 3e segment hors registre est refusé", () => {
+  // « Grimoire » n'est pas un type admis : le 2e segment n'est pas « déjà un type », la lecture reste au rang 3 (« Série »).
+  avecD192({ fichiers: ["Digit-AI - Grimoire - Série d'animations du test - 20261109e.md"], nommage: NOMMAGE_OK }, "R-25", (r) => {
+    if (r.exit !== 1 || !refusType(r, "Série")) throw new Error(`2e segment hors registre : la lecture a quitté le rang 3, exit ${r.exit}`);
+  });
+});
+check("TF-2447 borne : sans déclaration, la lecture reste au 2e segment — le nom du 2e rang admis passe, un 2e rang hors registre est refusé comme avant", () => {
+  avecD192({ fichiers: [FORMES_2447[3][1]] }, "R-25", (r) => { if (r.exit !== 0 || r.fails.length) throw new Error(`nom à type en 2e segment refusé sans déclaration : ${JSON.stringify(r.fails)}`); });
+  avecD192({ fichiers: ["Digit-AI - Grimoire - Série d'animations du test - 20261109e.md"] }, "R-25", (r) => { if (r.exit !== 1 || !refusType(r, "Grimoire")) throw new Error(`2e segment hors registre accepté sans déclaration : exit ${r.exit}`); });
 });
 
 console.log(`\nSelf-test conformité projet : ${pass} PASS, ${fail} FAIL`);

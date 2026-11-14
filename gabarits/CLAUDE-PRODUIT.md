@@ -22,13 +22,13 @@ Avant « livré », chaque forge mobilisée a ses livrables (S85, `--verifier`).
 - Tests : forge_tests, `--sortie forge\etapes\tests\rapport-<AAAAMMJJ>.json` ; jamais « tests OK » sur un pytest direct.
 - Audit du produit : forge-audit (`init-audit-workspace`, `forge\audit\<AAAAMMJJ>`) ; jamais forge_tests.
 - Évolution : retour au ledger, puis run de version ; jamais de code livré hors run.
-- Déploiement : étape MEP par la chaîne du produit, GO humain sur `forge\DOSSIER-MEP.md` ; jamais lancé d'un poste.
+- Déploiement : étape MEP par la chaîne du produit, GO humain sur `forge\DOSSIER-MEP.md`, sauf préprod locale (TF-2218) ; jamais lancé d'un poste.
 - Détail des routes, demandes entre produits : `<PILOT_ROOT>\references\CLAUDE-PRODUIT-DETAIL.md`.
 
 **Retours et noms.** Une friction forge se consigne au ledger au moment même (`type: retour`, 4 réponses du test de
-généralité). À la clôture, lot `<projet> - RETOURS - …` et sidecar `.tf.jsonl` au sas `<pilot>\input\00-retours\_arrivee\`,
-jamais ailleurs dans `input\`. Le lot porte le vrai nom du projet ; le pilot, public, pseudonymise à l'accueil, jamais le
-produit. Un dépôt PRIVÉ (`gh repo view --json visibility`) garde les noms réels (règle humaine du 01/10/2026).
+généralité) ; son lot `<projet> - RETOURS - …` + sidecar `.tf.jsonl` part dans CE tour au sas `<pilot>\input\00-retours\_arrivee\`,
+jamais ailleurs dans `input\` (D-191 : sans lot, le tour est refusé). Le lot porte le vrai nom du
+projet ; seul le pilot pseudonymise, à l'accueil. Un dépôt PRIVÉ (`gh repo view --json visibility`) garde les noms réels.
 
 **Gestes destructifs distants : une décision groupée, jamais une par commande (TF-1959, D-77 (b) amendée
 du 26/10/2026)** : « une décision pour toutes les modifs en une fois, pas une décision à chaque fois qu'il
@@ -58,8 +58,8 @@ de sécurité se juge par les oracles de forge-websec, jamais par un contrôle r
 
 ## Conventions locales
 
-- `REGLES-PROJET.md` du pilot : `input\` en lecture seule, livrables datés sous `output\`, **`.env` jamais committé**,
-  push sur GO humain ; **aucun livrable publié sur un service hébergé sans GO humain consigné**, jamais proposé en option
+- `REGLES-PROJET.md` du pilot : `input\` en lecture seule, livrables datés sous `output\`, **`.env` jamais committé**
+  (secret reçu en session : `<valeur> | node forge/ranger-secret.mjs NOM`, TF-2127, D-167 (a)), push sur GO humain ; **aucun livrable publié sur un service hébergé sans GO humain consigné**, jamais proposé en option
   (R-38) ; **aucune donnée d'identité de l'utilisateur vers un service tiers sans sa demande** (R-62). Des hooks y veillent.
 - Écart au socle : retour dans le tour (TF-1048) ; `ts` du ledger relevé à l'écriture (TF-1424) ; une version tenue
   ouverte n'arrête pas la nouvelle (TF-1503).

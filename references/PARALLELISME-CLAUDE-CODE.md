@@ -64,6 +64,36 @@ maximal est de 14, contre 20 permis par défaut. L'étude 20261019f avait mesur�
 La part des appels vers un agent nommé était de 18 % sur ce relevé, pour 90 % visés. L'unité est le sous-agent d'une
 session, pas la session parallèle : le 22/09/2026, 15 sessions étaient vivantes sur le poste, dont 4 sur le pilot.
 
+## L'isolation `worktree` est refusée depuis une racine de session en minuscule (TF-2443)
+
+Ce que cela change pour vous : une session ouverte sur `c:\dev\…` ne peut pas lancer un agent avec `isolation: "worktree"`.
+Ouvrez-la sur `C:\dev\…`, ou lancez l'agent sans isolation sur un arbre créé par `git worktree add`.
+
+Rejoué le 12/11/2026 par `claude -p` (Claude Code 2.1.322, Windows), dans un dépôt jetable, avec le même appel d'agent :
+
+| Racine de la session | Résultat |
+|---|---|
+| `c:\tmp\…` (lettre de lecteur en minuscule) | refus : « Refusing to use c:\tmp\…\.claude\worktrees\agent-… as an isolation worktree: git resolves its working tree to C:/tmp/… » ; une copie vide reste verrouillée dans `git worktree list` |
+| `C:\tmp\…` (majuscule) | l'agent démarre et répond |
+
+Localisation : le refus ne vit dans aucun hook ni outil du parc. `git grep` sur les fichiers suivis du pilot et des 13 forges
+(hors `input`, `output`, `todo`, `decisions`) ne trouve ni le message « Refusing to use » ni un réglage `isolation: worktree` ailleurs que dans `.gitignore`.
+Le message et la comparaison sont dans le binaire du harnais (`claude.exe`) : il compare le chemin de l'arbre d'isolation à ce que
+git rend (`git rev-parse --show-toplevel` rend toujours `C:/…`), avec une égalité qui distingue la casse. Le parc ne corrige donc
+pas la comparaison ; il la contourne. Les noms de fonctions du binaire sont minifiés et propres à la version lue : ils ne sont pas cités.
+
+Ce que le parc fait, à son niveau :
+
+- la racine canonique est celle dont la lettre de lecteur est en majuscule : les sessions qui lancent des agents isolés s'ouvrent sur elle ;
+- `oracles\hook-flotte.mjs` (PreToolUse sur l'outil Agent) avertit, avant le refus, quand un appel demande `isolation: "worktree"`
+  depuis un `cwd` ou un `CLAUDE_PROJECT_DIR` en minuscule, et nomme la racine canonique (recette `oracles\hook-flotte.test.mjs`,
+  avec le remède joué : la même racine en majuscule ne reçoit rien) ;
+- l'alternative sans l'isolation du harnais est un arbre créé par `git worktree add`, comme le fait la campagne du 12/11/2026 ;
+  le refus ne le concerne pas.
+
+Non jugé : une isolation posée dans la définition d'un agent (`isolation: worktree` en tête de son `.md`), que l'entrée du hook ne
+porte pas ; les autres clients que l'extension VS Code ; un correctif du harnais, qui reste à signaler à l'éditeur.
+
 ## Non vérifié
 
 - L'échelle à quatre paliers de la vidéo n° 87 n'a aucune source officielle ; elle ne sert pas de critère.

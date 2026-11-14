@@ -583,7 +583,7 @@ table.res-table { width: 100%; font-size: .84rem; margin: 0; border-collapse: co
 <!-- COMPOSANT-EMBARQUE:DEBUT table-filters.css — copie du socle digit-ai-page-html/assets/table-filters.css,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<style data-composant="table-filters.css" data-empreinte="sha256:36a64400e5c944a5dbbdfbed124f8cd27baee82db16795997024bbc6bc8e84aa">
+<style data-composant="table-filters.css" data-empreinte="sha256:8945bd067654224f565ab34b3db0f338040e741c84ff3cc7ce918572a7ff1cb5">
 /* table-filters.css — habillage charté du composant de filtres de colonne (D-12).
    TF-0176 (13/08) : un composant se livre AVEC son CSS — livré nu, il sort en rendu brut
    navigateur chez tous ses hôtes (constaté sur le dashboard forge-tests du 13/08, refusé
@@ -594,59 +594,73 @@ table.res-table { width: 100%; font-size: .84rem; margin: 0; border-collapse: co
    --line, --blue, --r-sm) : aucune couleur en dur, les deux thèmes sont servis. TF-1059
    (11/09) : deux couleurs en dur restaient (texte du bouton actif, repli du survol), treize
    espacements sortaient de l'échelle 4pt et quatre anneaux de focus n'étaient pas prescrits —
-   corrigés ici, à la source, plutôt que dans chaque produit. */
+   corrigés ici, à la source, plutôt que dans chaque produit.
+   TF-1964 (RT-13, 19/10/2026) : chaque jeton porte un REPLI. Une page hôte écrite à la main, qui ne
+   déclarait ni --surface, ni --muted, ni --r-sm, ni --sans, rendait cinq panneaux de filtre au fond
+   `rgba(0,0,0,0)` : le texte du tableau passait à travers la liste de valeurs, et ni `--constat` ni
+   check_html ne le disaient. Le repli est un MOT-CLÉ DE COULEUR SYSTÈME (Canvas, CanvasText, GrayText,
+   LinkText), jamais une couleur en dur : il suit le thème du navigateur, reste opaque, et ne sert que si
+   l'hôte ne déclare pas le jeton. `embarquer-composants.mjs --constat` signale en plus tout jeton
+   consommé SANS repli et absent de la page.
+   TF-1965 (RT-14, 19/10/2026) : le repli en cartes du socle masque le thead ; les déclencheurs de filtre
+   y vivent. Sous 900 px, ils sortent du thead masqué et se posent en barre au-dessus des cartes. */
 
 .tf-btn {
   font: inherit; font-size: .72rem; line-height: 1;
-  color: var(--blue); background: var(--surface);
-  border: 1px solid var(--line); border-radius: var(--r-sm);
+  color: var(--blue, LinkText); background: var(--surface, Canvas);
+  border: 1px solid var(--line, GrayText); border-radius: var(--r-sm, 8px);
   padding: 4px 8px; margin-left: 8px; cursor: pointer; vertical-align: middle;
 }
-.tf-btn:hover { border-color: var(--blue); }
-.tf-btn:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-btn:hover { border-color: var(--blue, LinkText); }
+.tf-btn:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue, LinkText)); outline-offset: var(--focus-decalage, 1px); }
 /* filtre ACTIF : l'état se voit sans ouvrir le panneau */
-.tf-btn.tf-on { background: var(--blue); color: var(--surface); border-color: var(--blue); }
+.tf-btn.tf-on { background: var(--blue, LinkText); color: var(--surface, Canvas); border-color: var(--blue, LinkText); }
+/* TF-1623 (RA-4) : colonne alignée à droite (valeurs numériques) — l'en-tête suit sa colonne,
+   et le déclencheur passe À GAUCHE du libellé : les bords droits du libellé et des valeurs
+   coïncident. La classe est posée par le composant d'après l'alignement calculé des cellules. */
+th.tf-num { text-align: right; }
+th.tf-num .tf-btn { float: left; margin-left: 0; margin-right: 8px; }
 
 .tf-panel {
   position: absolute; z-index: 30; top: calc(100% + 4px); left: 0;
   min-width: 230px; max-width: 320px; max-height: 320px; overflow: auto;
-  background: var(--surface); color: var(--ink);
-  border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--surface, Canvas); color: var(--ink, CanvasText);
+  border: 1px solid var(--line, GrayText); border-radius: var(--r-sm, 8px);
   box-shadow: 0 8px 24px rgba(15, 23, 42, .16);
   padding: 12px; text-align: left; text-transform: none;
-  font-family: var(--sans); font-size: .85rem; font-weight: 400;
+  font-family: var(--sans, system-ui, sans-serif); font-size: .85rem; font-weight: 400;
   letter-spacing: normal; cursor: default;
 }
 .tf-search {
-  width: 100%; font: inherit; color: var(--ink); background: var(--surface);
-  border: 1px solid var(--line); border-radius: var(--r-sm);
+  width: 100%; font: inherit; color: var(--ink, CanvasText); background: var(--surface, Canvas);
+  border: 1px solid var(--line, GrayText); border-radius: var(--r-sm, 8px);
   padding: 8px 12px; margin: 0 0 8px;
 }
-.tf-search:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-search:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue, LinkText)); outline-offset: var(--focus-decalage, 1px); }
 .tf-actions {
-  display: flex; gap: 16px; border-bottom: 1px solid var(--line);
+  display: flex; gap: 16px; border-bottom: 1px solid var(--line, GrayText);
   padding-bottom: 8px; margin-bottom: 8px;
 }
 .tf-actions button {
-  font: inherit; font-weight: 600; color: var(--blue);
+  font: inherit; font-weight: 600; color: var(--blue, LinkText);
   background: none; border: none; cursor: pointer; padding: 0 4px;
 }
-.tf-actions button:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-actions button:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue, LinkText)); outline-offset: var(--focus-decalage, 1px); }
 .tf-opts { display: flex; flex-direction: column; gap: 4px; }
 .tf-opts label {
   display: flex; align-items: center; gap: 8px;
   padding: 4px; border-radius: 4px; cursor: pointer;
 }
-.tf-opts label:hover { background: var(--bg); }
-.tf-opts input[type="checkbox"] { accent-color: var(--blue); }
+.tf-opts label:hover { background: var(--bg, Canvas); }
+.tf-opts input[type="checkbox"] { accent-color: var(--blue, LinkText); }
 /* TF-0782 (02/09) : la cardinalite decide de la FORME du panneau, pas de son existence — et
    une forme qui change sans le dire est une affordance muette. Le panneau ouvert sur sa
    recherche (plus de 15 valeurs) ou reduit a une valeur unique porte sa note. */
-.tf-forme-note { margin: 0 0 8px; color: var(--muted); font-size: .78rem; font-style: italic; }
+.tf-forme-note { margin: 0 0 8px; color: var(--muted, GrayText); font-size: .78rem; font-style: italic; }
 /* TF-1051 (08/09) : une colonne a valeur UNIQUE le dit dans son en-tete, la ou on la lit —
    repliee dans le panneau, la note n'etait vue par personne et le lecteur concluait a une panne. */
 .tf-unique {
-  display: block; margin-top: 4px; color: var(--muted);
+  display: block; margin-top: 4px; color: var(--muted, GrayText);
   font-size: .72rem; font-weight: 400; font-style: italic; text-transform: none;
 }
 
@@ -658,16 +672,34 @@ table.res-table { width: 100%; font-size: .84rem; margin: 0; border-collapse: co
 /* TF-0430 : etat vide — un filtre qui ne laisse rien le DIT dans le tableau, et offre la
    seule action utile a ce moment. */
 tr[data-tf-empty] td {
-  padding: 16px 12px; text-align: center; color: var(--muted);
-  font-style: italic; border-bottom: 1px solid var(--line);
+  padding: 16px 12px; text-align: center; color: var(--muted, GrayText);
+  font-style: italic; border-bottom: 1px solid var(--line, GrayText);
 }
 .tf-reset {
-  font: inherit; font-style: normal; font-weight: 600; color: var(--blue);
-  background: none; border: 1px solid var(--line); border-radius: var(--r-sm);
+  font: inherit; font-style: normal; font-weight: 600; color: var(--blue, LinkText);
+  background: none; border: 1px solid var(--line, GrayText); border-radius: var(--r-sm, 8px);
   padding: 4px 12px; margin-left: 12px; cursor: pointer;
 }
-.tf-reset:hover { border-color: var(--blue); }
-.tf-reset:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue)); outline-offset: var(--focus-decalage, 1px); }
+.tf-reset:hover { border-color: var(--blue, LinkText); }
+.tf-reset:focus-visible { outline: var(--focus-anneau, 2px solid var(--blue, LinkText)); outline-offset: var(--focus-decalage, 1px); }
+
+/* TF-1965 : le repli en cartes (`table.repli-cartes thead { display: none }` sous 900 px) masquait les
+   en-têtes et, avec eux, les déclencheurs de filtre : cinq boutons en 0 x 0 à 390 px, seule la recherche
+   restait. Un tableau replié ET filtrable garde son thead, rendu en BARRE : une puce « libellé + filtre »
+   par colonne filtrable, les autres en-têtes restent masqués (la carte les porte déjà par data-label).
+   Le panneau s'ouvre sous sa puce (le composant pose position: relative sur le th). */
+@media screen and (max-width: 900px) {
+  table.repli-cartes:has(.tf-btn) thead { display: block; margin: 0 0 12px; }
+  table.repli-cartes:has(.tf-btn) thead tr {
+    display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0;
+  }
+  table.repli-cartes:has(.tf-btn) thead th { display: none; }
+  table.repli-cartes:has(.tf-btn) thead th:has(.tf-btn) {
+    display: block; border: 1px solid var(--line, GrayText); border-radius: var(--r-sm, 8px);
+    padding: 4px 4px 4px 12px; background: var(--surface, Canvas); color: var(--ink, CanvasText);
+  }
+  table.repli-cartes:has(.tf-btn) thead th .tf-btn { margin-left: 4px; }
+}
 
 @media print { .tf-btn, .tf-panel, tr[data-tf-empty] { display: none; } }
 </style>
@@ -1710,7 +1742,7 @@ version_du_gabarit: 1.0.0
 <!-- COMPOSANT-EMBARQUE:DEBUT find-in-page.js — copie du socle digit-ai-page-html/assets/find-in-page.js,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="find-in-page.js" data-empreinte="sha256:c12d95c744a55817895314f71685d960ff1da00adfedbaf7ce4de305ea3956c6">
+<script data-composant="find-in-page.js" data-empreinte="sha256:721208e18a0c5de4899a498c8ebef8ebbb6677155f13a27d479988d7142ff908">
 /* find-in-page.js — Recherche dans un conteneur + compteur d'occurrences · socle Digit-AI
  *
  * Surligne les correspondances (<mark class="find-hit">) dans un conteneur et affiche
@@ -1787,34 +1819,82 @@ version_du_gabarit: 1.0.0
     try { return new RegExp(pat, 'gi'); } catch (e) { return null; }
   }
 
+  // Le BLOC d'un nœud texte : l'ancêtre le plus proche qui n'est pas un élément EN LIGNE. Dans un
+  // schéma SVG, le bloc est le <text> qui le porte (un <tspan> y est en ligne). Une phrase coupée
+  // par une mise en gras, un code ou un lien reste ainsi UN texte à fouiller (TF-1342).
+  function blocDe(el, root) {
+    if (el.namespaceURI === SVG_NS) {
+      var t = el.closest ? el.closest('text') : null;
+      return t && root.contains(t) ? t : el;
+    }
+    var b = el;
+    while (b !== root && b.parentNode && b.nodeType === 1) {
+      var d = getComputedStyle(b).display;
+      if (d !== 'inline' && d !== 'contents') break;
+      b = b.parentNode;
+    }
+    return b;
+  }
+
   // Surligne les correspondances dans root et renvoie le nombre d'occurrences. Enveloppe les
   // nœuds texte trouvés, sans remplacer aucun élément (TF-1340) ; dans un texte SVG, l'enveloppe
   // est un <tspan>, que SVG peint, et non un <mark>, qu'il ignore (TF-1353). Les noms d'éléments
   // se comparent sans casse : le <style> et le <script> d'un SVG s'écrivent en minuscules.
+  //
+  // TF-1342 (lot Produit-64 20260923b, RD-19) — LE MOTIF S'APPLIQUAIT NŒUD TEXTE PAR NŒUD TEXTE :
+  // « application <strong>laissée arrêtée</strong> » figurait dans le texte de la page et restait
+  // introuvable (3 occurrences dans le texte, 2 comptées, mesuré sur un livrable servi). Le motif
+  // se cherche désormais dans le texte CONTINU d'un bloc (les nœuds texte consécutifs d'un même
+  // paragraphe, cellule, bloc de code, titre…), puis chaque correspondance est posée par PLAGES sur
+  // les nœuds qu'elle traverse : une occurrence à cheval sur trois nœuds donne trois enveloppes
+  // et compte UNE fois.
   function highlight(root, re) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    var nodes = [], n, count = 0;
-    while ((n = walker.nextNode())) nodes.push(n);
-    for (var k = 0; k < nodes.length; k++) {
-      var tn = nodes[k], parent = tn.parentNode;
+    var groupes = [], courant = null, n;
+    while ((n = walker.nextNode())) {
+      var parent = n.parentNode;
       if (!parent || /^(MARK|SCRIPT|STYLE)$/i.test(parent.nodeName)
-          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) continue;
-      var txt = tn.nodeValue; re.lastIndex = 0;
-      if (!re.test(txt)) continue; re.lastIndex = 0;
-      var svg = parent.namespaceURI === SVG_NS;
-      var frag = document.createDocumentFragment(), last = 0, m;
-      while ((m = re.exec(txt))) {
-        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
-        var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
-        mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
-        mk.textContent = m[0];
-        frag.appendChild(mk);
-        count++;
-        last = m.index + m[0].length;
+          || (parent.getAttribute && parent.getAttribute('class') === 'find-hit')) {
+        courant = null;           // un nœud écarté coupe le texte continu
+        continue;
+      }
+      var bloc = blocDe(parent, root);
+      if (!courant || courant.bloc !== bloc) { courant = { bloc: bloc, noeuds: [] }; groupes.push(courant); }
+      courant.noeuds.push(n);
+    }
+    var count = 0;
+    for (var g = 0; g < groupes.length; g++) {
+      var noeuds = groupes[g].noeuds, texte = '', debuts = [];
+      for (var k = 0; k < noeuds.length; k++) { debuts.push(texte.length); texte += noeuds[k].nodeValue; }
+      var plages = [], m;
+      re.lastIndex = 0;
+      while ((m = re.exec(texte))) {
+        if (m[0].length) plages.push([m.index, m.index + m[0].length]);
         if (m.index === re.lastIndex) re.lastIndex++; // évite les boucles sur match vide
       }
-      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
-      parent.replaceChild(frag, tn);
+      if (!plages.length) continue;
+      count += plages.length;
+      for (var j = 0; j < noeuds.length; j++) {
+        var tn = noeuds[j], txt = tn.nodeValue, d0 = debuts[j], d1 = d0 + txt.length;
+        var morceaux = [];
+        for (var p = 0; p < plages.length; p++) {
+          var a = Math.max(plages[p][0], d0), b = Math.min(plages[p][1], d1);
+          if (a < b) morceaux.push([a - d0, b - d0]);
+        }
+        if (!morceaux.length) continue;
+        var svg = tn.parentNode.namespaceURI === SVG_NS;
+        var frag = document.createDocumentFragment(), last = 0;
+        for (var q = 0; q < morceaux.length; q++) {
+          if (morceaux[q][0] > last) frag.appendChild(document.createTextNode(txt.slice(last, morceaux[q][0])));
+          var mk = svg ? document.createElementNS(SVG_NS, 'tspan') : document.createElement('mark');
+          mk.setAttribute('class', 'find-hit');   // jamais 'find' : cf. avertissement en tête de fichier
+          mk.textContent = txt.slice(morceaux[q][0], morceaux[q][1]);
+          frag.appendChild(mk);
+          last = morceaux[q][1];
+        }
+        if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+        tn.parentNode.replaceChild(frag, tn);
+      }
     }
     return count;
   }
@@ -1871,7 +1951,7 @@ version_du_gabarit: 1.0.0
 <!-- COMPOSANT-EMBARQUE:DEBUT table-filters.js — copie du socle digit-ai-page-html/assets/table-filters.js,
      posée par digit-ai-page-html/scripts/embarquer-composants.mjs. NE PAS ÉDITER ICI : la SOURCE fait foi.
      La copie se régénère (--ecrire) et sa dérive est refusée (--constat, oracle-parite-assets). -->
-<script data-composant="table-filters.js" data-empreinte="sha256:9af4ae15d11d04634690232aa93e99aa8ab8c68545144f65f3386404a9cbacf9">
+<script data-composant="table-filters.js" data-empreinte="sha256:1260259330bd1aabb7086d3f8ef0b2fec4eb580477d55047c402c353e4d4ea66">
 /* Digit-AI — Filtres de colonne sur tableaux de données.
    Socle commun : voir references/composant-filtres-tableau.md (checklist G1-G9).
    Viewer-only : le JS ne s'exécute pas à l'export WeasyPrint, la regle @media print
@@ -2291,6 +2371,7 @@ version_du_gabarit: 1.0.0
         var th = e.col && e.col.th;
         if (th) {
           th.removeAttribute('data-tf-forme');
+          th.classList.remove('tf-num');
           var u = th.querySelector('.tf-unique'); if (u) u.parentNode.removeChild(u);
         }
       });
@@ -2337,6 +2418,17 @@ version_du_gabarit: 1.0.0
           u.textContent = 'une seule valeur';
           col.th.appendChild(u);
         }
+        /* TF-1623 (RA-4, 13/10/2026) — « les entetes de colonnes ne sont pas alignes avec les
+           contenus ». Une cellule numerique s'aligne a droite, son `<th>` restait a gauche, et le
+           declencheur (bouton + marge, 30 px) poussait encore le libelle. L'en-tete suit
+           desormais l'alignement CALCULE de sa colonne : a droite, il prend la classe `tf-num`
+           (feuille du composant) et son declencheur flotte A GAUCHE du libelle — le bord droit
+           du libelle tombe sur celui des valeurs, sans compensation a calculer. */
+        try {
+          var premiere = lignes.length && lignes[0].cells[col.index];
+          var aligne = premiere ? window.getComputedStyle(premiere).textAlign : '';
+          if (aligne === 'right' || aligne === 'end') col.th.classList.add('tf-num');
+        } catch (e) { /* alignement non lisible : l'en-tete garde le sien */ }
         col.th.appendChild(b);
         col.th.appendChild(ui.panneau);
         Array.prototype.forEach.call(ui.options.querySelectorAll('.tf-opt'), function (cb) {

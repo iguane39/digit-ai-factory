@@ -30,11 +30,39 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // et 6 phrases voisines épargnées (audits spécialisés, run de forge-tests) ; puis de 58 à 66 le 15/10
 // (TF-1753) : la question d'IMITATION, 4 questions « comme X » reconnues et 4 phrases voisines épargnées ;
 // puis de 66 à 74 le 19/10 (TF-1885) : la route jugée sur le texte de l'humain hors bloc collé ou cité,
-// 2 cas fondateurs (prompt collé, formule du lexique qui prime) et 6 cas voisins dans les deux sens.
-check("self-test du hook : 74 cas verts", () => {
+// 2 cas fondateurs (prompt collé, formule du lexique qui prime) et 6 cas voisins dans les deux sens ;
+// puis de 74 à 81 le 05/11 (TF-2144) : le standard d'audit du client lu avant le routage, 7 cas dans les deux sens ;
+// puis de 81 à 93 le 09/11 (TF-2301) : le verbe de la demande porte l'audit, 7 mentions épargnées (identifiant,
+// énumération d'idées, citation, constat) et 5 demandes reconnues dont celles qui portent des mots voisins.
+check("self-test du hook : 93 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/74 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/93 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+});
+// TF-2301 — la consigne d'une série d'animations qui cite `forge-audit` dans une liste d'idées ne reçoit plus la route d'audit ;
+// la même liste suivie d'une demande portée par un verbe la reçoit. Joué au point d'entrée réel.
+check("hook — une liste d'idées qui cite forge-audit n'injecte rien, la même liste suivie de « lance un audit complet du projet » injecte la route", () => {
+  const liste = "Idées d'animation pour la série :\n- forge-audit qui passe le produit au crible\n- un audit du produit raconté en 30 secondes\n- le site qui s'anime";
+  const non = jouer(liste);
+  const oui = jouer(`${liste}\nPuis lance un audit complet du projet`);
+  if (non.status !== 0 || non.stdout.trim() !== "") throw new Error(`la liste d'idées reçoit une consigne : ${non.stdout}`);
+  if (oui.status !== 0 || !/\[audit — hook-lexique\][^\n]*forge-audit/.test(oui.stdout)) throw new Error(`la demande portée par un verbe ne reçoit pas la route : ${oui.stdout}`);
+});
+// TF-2144 — le point d'entrée RÉEL lit le standard d'audit du client : une session ouverte dans un produit d'un dossier `_<client>` dont le projet
+// commun publie une porte reçoit cette porte dans la consigne d'audit ; la même demande hors de tout client reçoit la consigne d'avant.
+check("hook — « lance un audit complet du projet » chez un client qui publie sa porte → la consigne nomme le standard et sa porte, hors client elle ne change pas", () => {
+  const parc = mkdtempSync(join(tmpdir(), "lexique-client-"));
+  mkdirSync(join(parc, "_ClientFictif", "commun", "kit"), { recursive: true });
+  mkdirSync(join(parc, "_ClientFictif", "produit-a"), { recursive: true });
+  mkdirSync(join(parc, "produit-libre"), { recursive: true });
+  writeFileSync(join(parc, "_ClientFictif", "commun", "CONVENTIONS-CLIENT.md"), "# Conventions\n\n- Audit : porte du kit obligatoire.\n", "utf8");
+  writeFileSync(join(parc, "_ClientFictif", "commun", "kit", "verifier-rapport-audit.mjs"), "// porte fictive\n", "utf8");
+  const lancer = (cwd) => spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt: "lance un audit complet du projet", cwd }),
+    env: { ...process.env, FORGE_ROOT: parc, CLAUDE_PROJECT_DIR: cwd } });
+  const chez = lancer(join(parc, "_ClientFictif", "produit-a"));
+  if (chez.status !== 0 || !/STANDARD D'AUDIT PUBLIÉ PAR LE CLIENT _ClientFictif/.test(chez.stdout) || !/verifier-rapport-audit\.mjs/.test(chez.stdout)) throw new Error(`standard absent : ${chez.stdout}`);
+  const libre = lancer(join(parc, "produit-libre"));
+  if (libre.status !== 0 || !/\[audit — hook-lexique\]/.test(libre.stdout) || /STANDARD D'AUDIT PUBLIÉ/.test(libre.stdout)) throw new Error(`hors client : ${libre.stdout}`);
 });
 // TF-1753 — la question de l'humain, jouée au point d'entrée réel : elle reçoit la consigne
 // d'imitation ; « Demande à la Factory de le faire », délégation explicite, ne reçoit rien.

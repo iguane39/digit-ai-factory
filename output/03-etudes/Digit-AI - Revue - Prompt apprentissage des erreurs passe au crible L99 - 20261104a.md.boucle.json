@@ -1,0 +1,220 @@
+{
+ "schema": "l99-boucle@1",
+ "prompt": "Étude d'opportunités : Claude Code apprend de ses erreurs, par produit et à la Factory",
+ "arbitre": {
+  "rubrique": "couches.md Ch1, 6 dimensions /100",
+  "arret": "0 bloquant et 0 majeur",
+  "seuil_score": null,
+  "gain_min": 3,
+  "borne": 3,
+  "garde_longueur": 0.15,
+  "retenue": "union_recomptee",
+  "verification_cloture": true,
+  "rejet_regression": true,
+  "score_de_passe": "le plus bas des 2 relecteurs, lecture à charge"
+ },
+ "passes": [
+  {
+   "n": 1,
+   "fichier": "prompt-p1.md",
+   "mots": 1399,
+   "relecteur": {
+    "agent": "verificateur A et verificateur B, neufs",
+    "aveugle": true,
+    "interdits": ["analyse", "passes précédentes", "journal de boucle", "fichiers « passe au crible L99 »"]
+   },
+   "scores_relecteurs": { "A": 90, "B": 71 },
+   "score_mesure": 71,
+   "defauts": [
+    {
+     "severite": "majeur",
+     "defaut": "2 073 items attribués à todo\\TODO.jsonl, journal d'événements ; le chiffre vient de RECIDIVES.json",
+     "citation": "| Registre des sujets TODO-FORGE | `todo\\TODO.jsonl` | 2 073 items",
+     "vu_par": ["A", "B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "wc -l todo/TODO.jsonl ; node -e (ids distincts de TODO.jsonl, puis de TODO.jsonl + TODO-ARCHIVE.jsonl)", "resultat": "6015 lignes, 1363 ids distincts ; 2144 avec l'archive ; RECIDIVES.json items=2073" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "« au moins les 9 existants » ambigu : quelles lignes comptent, quid des ajouts trouvés dans INDEX.md",
+     "citation": "Le tableau de non-recouvrement porte au moins les 9 existants de l'ÉTAPE 0",
+     "vu_par": ["A"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -c \"^| \" prompt-p1.md", "resultat": "10 lignes de tableau (en-tête + 9 existants) ; la consigne d'ajout depuis INDEX.md n'est pas reliée au seuil" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "R-25 cité sans source : absent du texte de REGLES-PROJET.md, registre des types non localisé",
+     "citation": "Nom, selon R-4 (le projet ouvre le nom) et R-25 (le type est le premier mot du deuxième segment, pris au registre des types)",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"R-25\" REGLES-PROJET.md ; grep -n \"R-25\" oracles/oracle-conformite-projet.mjs", "resultat": "aucune ligne dans REGLES-PROJET.md ; règle encodée dans oracle-conformite-projet.mjs l.453, registre lu chez digit-ai-forge-organization" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Chiffrage du statu quo O0 et forme attendue des options non définis",
+     "citation": "Fournir à Claude Code la capacité d'apprendre de ses erreurs. Lorsqu'un agent comprend qu'il a",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"O0\" prompt-p1.md", "resultat": "2 occurrences (livrable, contrat 7), aucune méthode de chiffrage ni forme d'option" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Jeu d'essai sans tirage reproductible, risque d'exposer un nom réel de produit",
+     "citation": "4. Jeu d'essai : rejoue l'option retenue sur 3 erreurs réelles tirées de `todo\\TODO.jsonl`, dont une générique et une propre à un produit",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"Jeu d'essai\" prompt-p1.md", "resultat": "ligne présente, aucun critère de tirage ni de pseudonymisation" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Aucune commande de mesure donnée pour l'ÉTAPE 0",
+     "citation": "| Mémoire automatique de Claude Code, par projet et par poste | `~\\.claude\\projects\\*\\memory\\` et `~\\.claude-b\\projects\\*\\memory\\` | 34 projets sur 44 au profil 1, 22 sur 22 au profil 2 |",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"Commande\" prompt-p1.md", "resultat": "aucune colonne ni ligne de commande ; valeurs exactes (34/44, 22/22 recomptées)" }
+    }
+   ],
+   "majeurs_clos": 0,
+   "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 2,
+   "fichier": "prompt-p2.md",
+   "mots": 1903,
+   "relecteur": {
+    "agent": "verificateur A et verificateur B, neufs",
+    "aveugle": true,
+    "interdits": ["analyse", "passes précédentes", "journal de boucle", "fichiers « passe au crible L99 »"]
+   },
+   "verification_cloture": {
+    "agent": "verificateur neuf avec contexte",
+    "note": false,
+    "clotures": 5,
+    "defauts_crees": 4,
+    "detail": "D5 partiellement fermé (dernier lot non localisable) ; 4 défauts créés (mesure O0 sur 90 jours impossible avec la colonne « Dernière », contradiction O0 « réfutée » contre « réfutée ou retenue », verdict global de l'oracle de conformité inutilisable, trois comptes de classes non expliqués), corrigés avant la relecture aveugle ; une ligne E5 et une ligne E6 abîmées par sed, réparées et vérifiées par diff"
+   },
+   "scores_relecteurs": { "A": 84, "B": 84 },
+   "score_mesure": 84,
+   "defauts": [
+    {
+     "severite": "majeur",
+     "defaut": "Le dernier lot ingéré pointe un sidecar .tf.jsonl, cible mouvante, aucun repli si le lot ne porte pas d'erreur de produit",
+     "citation": "Ce lot est le champ `fichier` du dernier événement `\"ev\":\"ingestion\"` de `todo\\TODO.jsonl`",
+     "vu_par": ["A", "B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep '\"ev\":\"ingestion\"' todo/TODO.jsonl | tail -1 ; ls input/00-retours | grep \"Produit-84 - RETOURS - 20261104e\"", "resultat": "fichier = …20261104e.tf.jsonl, heritage_non_verifie ; le .md jumeau existe" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Valeurs de départ qui dérivent pendant le run sans règle d'écart ; commande du profil 2 non écrite en entier",
+     "citation": "| E8 | Mémoire automatique de Claude Code, par projet, hors de tout dépôt |",
+     "vu_par": ["A", "B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "wc -l todo/TODO.jsonl ; grep -n \"de même sous\" prompt-p2.md", "resultat": "6016 lignes contre 6015 annoncées ; « de même sous `~/.claude-b` » sans commande complète" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Candidature : schéma d'événement absent, --essai non mentionné, écriture au registre non déclarée comme exception",
+     "citation": "émet une candidature au registre par `node todo\\journaliser.mjs --fichier <evenements.json>`, au statut `candidat`.",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"essai\\|schéma\\|creation\" prompt-p2.md", "resultat": "aucune mention de --essai ni du schéma de l'événement creation" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Indice du jour : un fichier du jour porte déjà « a » et le prompt ne le signale pas",
+     "citation": "L'indice est la première lettre que ne porte aucun fichier du jour dans `output\\03-etudes\\`",
+     "vu_par": ["A"],
+     "statut": "ecarte",
+     "dementi": true,
+     "recompte": { "commande": "grep -n \"tous noms\" prompt-p2.md", "resultat": "ligne 112 : « première lettre que ne porte aucun fichier du jour […], tous noms confondus » : la règle couvre déjà la revue et son journal" }
+    }
+   ],
+   "majeurs_clos": 6,
+   "rejetee": false,
+   "decision": "continuer"
+  },
+  {
+   "n": 3,
+   "fichier": "prompt-p3.md",
+   "mots": 2178,
+   "relecteur": {
+    "agent": "verificateur A et verificateur B, neufs",
+    "aveugle": true,
+    "interdits": ["analyse", "passes précédentes", "journal de boucle", "fichiers « passe au crible L99 »"]
+   },
+   "verification_cloture": {
+    "agent": "verificateur neuf avec contexte",
+    "note": false,
+    "clotures": 2,
+    "defauts_crees": 4,
+    "detail": "D1 et D2 fermés, D3 partiel ; 4 défauts créés (champs R4 d'oracle-todo manquants, phrase d'ouverture contraire à l'exception d'écriture, voie journaliser contre sidecar non tranchée, aucune commande pour le plus haut TF), corrigés avant la relecture aveugle ; commande du plus haut TF jouée : TF-2146"
+   },
+   "scores_relecteurs": { "A": 88, "B": 84 },
+   "score_mesure": 84,
+   "defauts": [
+    {
+     "severite": "majeur",
+     "defaut": "Jeu d'essai : le lot de produit retenu peut être atypique, aucun critère pour choisir l'erreur propre au produit",
+     "citation": "Ce lot se fige au début du run : prends le dernier événement `\"ev\":\"ingestion\"`",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"Ce lot se fige\" prompt-p3.md", "resultat": "ligne 165 présente, aucun critère de choix de l'erreur dans le lot" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Cinq lignes de risque pour chaque option, O0 comprise, invitent au remplissage mécanique",
+     "citation": "Quatre risques, une ligne chacun par option",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"Quatre risques, une ligne\" prompt-p3.md", "resultat": "ligne 81 présente ; rien ne gradue le détail entre option retenue et options écartées" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Définition de l'erreur sans critère ni cas limites classés",
+     "citation": "Définis ce qu'est une erreur et ce qui n'en est pas une (un choix contesté, une préférence).",
+     "vu_par": ["B"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"Définis ce qu'est une erreur\" prompt-p3.md", "resultat": "ligne 56 présente, aucun cas limite exigé" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "La boucle du protocole rejoue 1 à 4 et laisse le jeu d'essai hors boucle ; le test 4 reste une auto-évaluation",
+     "citation": "Boucle bornée à 3 passes : corrige, rejoue 1 à 4.",
+     "vu_par": ["A"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"rejoue 1 à 4\" prompt-p3.md", "resultat": "ligne 172 présente" }
+    },
+    {
+     "severite": "majeur",
+     "defaut": "Fichier d'événements sans emplacement, en contradiction avec « seule écriture permise » ; oracle-todo sans chemin",
+     "citation": "Joue `node todo\\journaliser.mjs --fichier <evenements.json> --essai`",
+     "vu_par": ["A"],
+     "statut": "retenu",
+     "dementi": false,
+     "recompte": { "commande": "grep -n \"evenements.json\\|oracle-todo\" prompt-p3.md", "resultat": "lignes 108, 116, 117 : aucun emplacement pour le fichier, oracle-todo cité sans chemin todo/oracle-todo.mjs" }
+    }
+   ],
+   "majeurs_clos": 3,
+   "rejetee": false,
+   "decision": "arreter"
+  }
+ ],
+ "arret": { "passe": 3, "raison": "gain_insuffisant" },
+ "score_affiche": { "valeur": 84, "nature": "mesure" }
+}

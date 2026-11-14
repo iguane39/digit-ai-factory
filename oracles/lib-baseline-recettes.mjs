@@ -47,6 +47,8 @@
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
 
 /**
  * Le compte de cas lu dans la ligne de résumé d'une recette. Deux formes cohabitent dans ce
@@ -234,6 +236,43 @@ export function confronter(resultats, baseline, jour) {
   const disparues = Object.keys(baseline).filter((nom) => !vus.has(nom))
     .map((nom) => ({ nom, exemption: Boolean(baseline[nom] && baseline[nom].non_lu), cas: baseline[nom] && Number.isInteger(baseline[nom].cas) ? baseline[nom].cas : null }));
   return { baisses, montees, nonLus, disparues, nonJoues, baseline: suivante };
+}
+
+/**
+ * TF-2480 (13/11/2026) — UNE RECETTE JOUÉE DANS UN ARBRE DE CAMPAGNE NE RÉÉCRIT PLUS LA RÉFÉRENCE DE MAIN.
+ *
+ * LE FAIT. Le 12/11/2026, la recette entière d'un agent de campagne a réécrit `oracles/baseline-recettes.json` dans son arbre de travail (5 entrées
+ * relevées d'un coup, dont celles que d'autres lots avaient montées sur main) : une HAUSSE s'inscrit toute seule, et l'arbre d'un agent ne voit que
+ * son lot. Le fichier réécrit, fusionné, aurait porté dans main des comptes qui ne sont pas ceux de main. La référence se met à jour par son
+ * écrivain, joué dans main, là où tous les lots sont réunis.
+ *
+ * LA RÈGLE. Un arbre de travail git LIÉ (`git worktree add` : son répertoire git n'est pas le répertoire commun) est un arbre de campagne : le
+ * harnais y dit les hausses qu'il a vues et ne les inscrit pas. Deux gestes écrits gardent leur effet : `--appliquer` (accepter une baisse) et
+ * `--ecrire-baseline` (inscrire les hausses ici, sciemment, par exemple à la fusion). CE QUE ÇA NE FERME PAS : un arbre de campagne n'est reconnu que
+ * par git ; une copie du dépôt sans `.git` partagé (clone, archive) reste un arbre ordinaire, et `git` absent rend « arbre ordinaire ».
+ */
+const norme = (p) => { const n = resolve(p).replace(/[\\/]+$/, ""); return process.platform === "win32" ? n.toLowerCase() : n; };
+
+/** Vrai quand le répertoire git d'un arbre n'est pas le répertoire commun du dépôt (arbre lié). Pur. */
+export function arbreLie(repertoireGit, repertoireCommun) { return norme(repertoireGit) !== norme(repertoireCommun); }
+
+/** Vrai quand `racine` est un arbre de travail git lié ; faux ailleurs, `git` absent ou dépôt illisible compris. */
+export function arbreDeCampagne(racine) {
+  const lireGit = (option) => {
+    const r = spawnSync("git", ["rev-parse", option], { cwd: racine, encoding: "utf8" });
+    return !r.error && r.status === 0 && r.stdout.trim() ? resolve(racine, r.stdout.trim()) : null;
+  };
+  const g = lireGit("--git-dir"), c = lireGit("--git-common-dir");
+  return g && c ? arbreLie(g, c) : false;
+}
+
+/**
+ * La décision d'inscrire les hausses d'un bilan. `ordinaire` : inscrire (comportement d'origine, TF-0681) ; `campagne` : ne pas inscrire, sauf
+ * `forcer` (--ecrire-baseline) ; une baisse ou une disparition n'inscrit jamais ici (elles passent par --appliquer). Rend `{ ecrire, campagne }`.
+ */
+export function decisionInscription(bilan, { campagne = false, forcer = false } = {}) {
+  const hausses = bilan.montees.length > 0 && !bilan.baisses.length && !bilan.disparues.length;
+  return { ecrire: hausses && (!campagne || forcer), campagne: hausses && campagne && !forcer };
 }
 
 /** Écrit la baseline, triée par nom — un fichier versionné dont l'ordre bouge est illisible. */
