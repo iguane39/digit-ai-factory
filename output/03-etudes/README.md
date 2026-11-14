@@ -67,6 +67,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
 | `Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md` | fichier | 8,9 Ko | Diagnostic Factory — Sessions concurrentes sur forge-digit-ai-fr — 20261114b |
+| `Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md` | fichier | 31,5 Ko | Étude d'opportunité — Amélioration continue des agents par leurs leçons — 20261114d |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 7,7 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` | fichier | 98,8 Ko | JSON |
 | `Digit-AI - Étude - Apprentissage des erreurs par les produits et la Factory - 20261104b.md` | fichier | 22,5 Ko | Étude d'opportunité — Apprentissage des erreurs par les produits et la Factory — 20261104b |
@@ -77,6 +78,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` | fichier | 199,3 Ko | Étude — Compétences OpenAI et Gemini dans la Factory |
 | `Digit-AI - Étude - Coordination des sessions multiples d'un projet - 20261114c.md` | fichier | 18,2 Ko | Étude d'opportunité — Coordination des sessions multiples d'un projet — 20261114c |
 | `Digit-AI - Étude - Cout et qualite de la boucle L99 - 20261106b.md` | fichier | 24,3 Ko | Coût et qualité de la boucle L99 : pourquoi elle ne s'arrête jamais où elle le dit, et ce  |
+| `Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md` | fichier | 31,3 Ko | Défauts créés par les corrections des agents : où ils naissent et ce qui les préviendrait |
 | `Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` | fichier | 13,0 Ko | Étude d'opportunité — Étape de revue de code par un seul agent — 20261103k |
 | `Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` | fichier | 25,3 Ko | Étude d'opportunité — huit outils de motion design pour la Factory — 20261102t |
 | `Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md` | fichier | 12,7 Ko | Étude d'opportunité — Intégration des compétences de clip vidéo dans la Factory — 20261110 |
@@ -123,4 +125,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_103 fichier(s), 3 sous-dossier(s)_
+_105 fichier(s), 3 sous-dossier(s)_
