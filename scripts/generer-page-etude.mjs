@@ -218,7 +218,7 @@ export function gloserColonnes(html) {
  *
  * LE FAIT : régénérées avec leur sommaire, les 8 pages d'étude échouaient à `check_html.py` sur L10
  * (un chapitre qui porte une table d'au moins 8 lignes doit porter un `.exemple-lecture`) et sur
- * L30 (un terme du référentiel `jargon-a-gloser.json` employé dans un chapitre y porte sa glose :
+ * L30 (chapitre) (un terme du référentiel `jargon-a-gloser.json` employé dans un chapitre y porte sa glose :
  * `<dfn>`, `.termes` ou `.glossaire`). Le Markdown des études n'avait aucune forme pour l'un ni pour
  * l'autre : la régénération du 12/10 a été annulée (b2847ce9).
  *
@@ -915,7 +915,7 @@ Audience : le pilote de l'écosystème, qui décide des mandats. Le reste de la 
   if (!/data-definition="Colonne « Résultat » \(2 sur 2\)/.test(htmlAvec))
     casse.push("le rang d'une colonne glosée change quand sa voisine est décrite par l'auteur — le rang doit compter TOUTES les colonnes");
 
-  // 27 et 28. TF-1463 — L'EXEMPLE DE LECTURE (L10) ET LE GLOSSAIRE (L30), AUX DEUX BORDS. Vert : les
+  // 27 et 28. TF-1463 — L'EXEMPLE DE LECTURE (L10) ET LE GLOSSAIRE (L30 (chapitre)), AUX DEUX BORDS. Vert : les
   // deux libellés réservés reçoivent leur classe, sans voler le chapeau ni devenir une note de
   // colonne. Rouge : un libellé voisin (« Exemple ») ou une citation sans libellé restent nus.
   const SOURCE_CITATIONS_NOMMEES = `${SOURCE_SANS_AUTEUR}
@@ -932,7 +932,7 @@ Audience : le pilote de l'écosystème, qui décide des mandats. Le reste de la 
   const htmlCitations = pageEtude(SOURCE_CITATIONS_NOMMEES, "20261013-etude-opportunite-essai-citations.md");
   if (!/<blockquote class="exemple-lecture"><p><strong>Exemple de lecture<\/strong> : la ligne/.test(htmlCitations)
     || !/<blockquote class="termes"><p><strong>Termes<\/strong> : le grain/.test(htmlCitations))
-    casse.push("une citation « **Exemple de lecture** : » ou « **Termes** : » ne reçoit pas sa classe — L10 et L30 de check_html.py resteraient en FAIL");
+    casse.push("une citation « **Exemple de lecture** : » ou « **Termes** : » ne reçoit pas sa classe — L10 et L30 (chapitre) de check_html.py resteraient en FAIL");
   if (/<blockquote class="[^"]*"><p><strong>Exemple<\/strong>/.test(htmlCitations) || /aria-describedby/.test(htmlCitations)
     || /<p class="ch-apprend"><strong>Exemple de lecture/.test(htmlCitations))
     casse.push("un libellé voisin reçoit une classe réservée, ou une citation nommée devient chapeau ou note de colonne — la convention déborde de ses deux libellés");
