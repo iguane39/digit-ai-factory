@@ -39,6 +39,21 @@ chaque étape validée par les oracles de sa forge. Suspends-toi proprement (for
 si une décision me revient. Consigne tes hypothèses. Aucune écriture dans les dépôts
 digit-ai-forge-* ; améliorations en proposition seulement.
 
+Délégation aux agents — avant la première étape, écris au brief du run qui prend quelle activité
+(agents nommés de la flotte du pilot, gabarits\flotte\ ; un `subagent_type` par appel) :
+- Tu gardes le pilotage, les décisions, la restitution et le ledger : un agent ne décide rien
+  et n'écrit jamais au ledger.
+- `explorateur` lit, extrait et compte ; `relecteur` relit à l'aveugle, en lecture seule, sans shell ;
+  `verificateur` rejoue une recette ou un oracle et dit si c'est fait ; `redacteur` écrit un document
+  sous gabarit ; `campagne` écrit dans UN dépôt sous gabarits\AGENT-CAMPAGNE.md ; `constructeur`
+  prend la construction complexe (maquette, architecture, code neuf d'ampleur).
+- Pour chacune des 5 étapes (conception, design, development, tests, MEP), le brief nomme l'agent
+  de chaque activité, ou dit « session seule » avec son motif : un brief sans cette ligne est incomplet.
+- Des agents qui écrivent en parallèle travaillent sur des arbres disjoints (`git worktree add`, un
+  par agent). `isolation: "worktree"` est refusée depuis une racine de session en minuscule
+  (`c:\…`, TF-2443) : ouvre la session sur la racine canonique (`C:\…`), ou lance les agents sans
+  isolation sur des arbres créés à la main.
+
 Promesse : autonome du brief jusqu'au staging vérifié (oracle MEP au complet, `ETAPE-MEP.md`).
 La production attend mon GO, donné sur le forge\DOSSIER-MEP.md que tu me présenteras.
 

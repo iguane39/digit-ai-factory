@@ -1,10 +1,12 @@
 {
-  "cible": "c:\\dev\\digit-ai-factory\\PROMPT-PRODUIT.md",
-  "date_iso": "2026-10-02T08:44:25.664Z",
-  "registre_version": "2.35.0",
+  "cible": "C:\\dev\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
+  "date_iso": "2026-11-14T17:25:24.971Z",
+  "registre_version": "2.63.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
   "resume": {
     "pass": 3,
     "fail": 0,
@@ -13,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "PROMPT-PRODUIT.md"
+      "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -24,54 +26,54 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "PROMPT-PRODUIT.md",
+      "file": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "PROMPT-PRODUIT.md",
+      "file": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "PROMPT-PRODUIT.md",
+      "file": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "PROMPT-PRODUIT.md",
+      "file": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune table détectée, aucun effectif annoncé ancré, aucun pourcentage ni unité publiés"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "PROMPT-PRODUIT.md",
+      "file": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "PROMPT-PRODUIT.md",
+      "file": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "PROMPT-PRODUIT.md",
+      "file": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
       "verdict": "SKIP",
-      "detail": ""
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
   ],
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "PROMPT-PRODUIT.md",
-    "ts": "2026-10-02T08:44:25.663Z",
+    "release": "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md",
+    "ts": "2026-11-14T17:25:24.970Z",
     "fichiers": {
-      "PROMPT-PRODUIT.md": "152065173a3c6cb386ffdc5c8f4cde360f9206270cc9811265c4bd280de53920"
+      "..\\_wt-pilot-ph\\PROMPT-PRODUIT.md": "02a12606935dca1f6f00a3598f88ac355a69531efde8356c4594b0ccdbc684ef"
     }
   },
   "empreinte_motif": null,

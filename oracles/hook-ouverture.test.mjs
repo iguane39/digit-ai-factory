@@ -1421,6 +1421,35 @@ if (veut(2511)) {
   });
 }
 
+// ---- TF-2547 (14/11/2026) : L'OUVERTURE DIT QU'UNE RACINE DE SESSION EN MINUSCULE INTERDIT L'ISOLATION DES AGENTS (TF-2443) ----------------------------------------------------
+// Le fait : un run dont le brief prévoyait des agents qui écrivent en parallèle s'est ouvert chez un produit dont la racine est `c:\dev\…` : `isolation: "worktree"` y est refusée par le
+// harnais, et seul le hook `flotte` le dit, à l'appel. Sens rouge : une racine à lettre de lecteur minuscule (cwd ou CLAUDE_PROJECT_DIR) donne, en tête du relevé, une ligne qui la nomme et
+// donne la racine canonique. Sens vert : la même racine en majuscule, un chemin POSIX ou UNC ne donne rien.
+if (veut(2547)) {
+  const cwd2547 = mkdtempSync(join(tmpdir(), "ouv-2547-"));
+  const ouvrir = (racine, ...options) => execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", ...options],
+    { cwd: cwd2547, encoding: "utf8", timeout: delaiSousCharge(120000), env: { ...process.env, CLAUDE_PROJECT_DIR: racine } });
+  const ligneRacine = (sortie) => sortie.split(/\r?\n/).findIndex((l) => /Racine de session en minuscule/.test(l));
+  check("TF-2547 rouge — une racine en minuscule (c:\\dev\\produit) donne une ligne en tête du relevé qui nomme la racine, son isolation refusée et la racine canonique", () => {
+    const sortie = ouvrir("c:\\dev\\produit");
+    const i = ligneRacine(sortie);
+    if (i < 0) throw new Error("aucune ligne « Racine de session en minuscule »");
+    if (i > 6) throw new Error(`la ligne est à la ligne ${i} : elle doit ouvrir le relevé, avec les gates`);
+    const l = sortie.split(/\r?\n/)[i];
+    if (!l.includes("« c:\\dev\\produit »") || !l.includes("« C:\\dev\\produit »") || !/isolation: "worktree"/.test(l) || !/git worktree add/.test(l) || !/TF-2443/.test(l)) throw new Error(`ligne incomplète : ${l.slice(0, 300)}`);
+  });
+  check("TF-2547 rouge — en mode asynchrone (--contexte-json), la ligne est dans la TÊTE du contexte injecté, qu'aucune borne de budget ne retire", () => {
+    const j = JSON.parse(ouvrir("c:\\dev\\produit", "--contexte-json").trim().split(/\r?\n/).at(-1));
+    if (!/Racine de session en minuscule/.test(j.hookSpecificOutput.additionalContext)) throw new Error("la ligne n'est pas dans le contexte injecté");
+  });
+  check("TF-2547 vert — la même racine en majuscule, un chemin POSIX et un chemin UNC ne donnent aucune ligne", () => {
+    for (const racine of ["C:\\dev\\produit", "/c/dev/produit", "\\\\serveur\\partage\\produit"]) {
+      if (ligneRacine(ouvrir(racine)) >= 0) throw new Error(`avertissement à tort pour ${racine}`);
+    }
+  });
+  rmSync(cwd2547, { recursive: true, force: true });
+}
+
 if (filtre.actif) { const c = conclureFiltre("hook-ouverture", filtre, fail ? [`${fail} contrôle(s) en échec (lignes [FAIL] ci-dessus)`] : []); (c.code === 0 ? console.log : console.error)(c.ligne); process.exit(c.code); }
 console.log(`${NL}Recette hook d'ouverture (.env local, TF-0869 ; consommateurs, TF-2048 ; rejeu hebdomadaire, D-135 ; journal d'héritage, TF-2067 ; workflows hébergés en échec, TF-2442) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
