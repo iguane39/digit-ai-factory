@@ -2039,9 +2039,28 @@ else {
         rectificationsInvalides.push(`seq ${seq} : rectification datée ${e.ts || "(ts absent)"} pas postérieure à la collision qu'elle corrige (${tsCollision}) — TF-1466`);
         continue;
       }
-      rectifies.set(seq, String((d && d.cause) || "cause non dite"));
+      // TF-2540 (14/11/2026) : la déclaration garde SON `ts_consigne` et la rectification qui la porte, pour juger qu'elle colle à l'entrée visée.
+      if (!rectifies.has(seq)) rectifies.set(seq, []);
+      rectifies.get(seq).push({ cause: String((d && d.cause) || "cause non dite"), tsConsigne: String((d && d.ts_consigne) || ""), par: e.seq });
     }
   }
+  // TF-2540 (14/11/2026) — `ledger.mjs verify` (forge-agents, TF-1425) tient depuis le 28/09 qu'une déclaration couvre l'entrée dont le ts
+  // est son `ts_consigne` EXACT, et pas une autre : « une déclaration qui ne colle pas à l'histoire ne couvre rien (et le dit) ». R-42 ne
+  // contrôlait que l'antériorité de la rectification sur le ts cité (TF-1466) : une rectification dont `ts_consigne` ne désignait AUCUNE
+  // entrée au seq visé rendait PASS ici et exit 1 chez `verify` (le défaut de TF-1425, deux juges, deux verdicts ; mesuré le 14/11/2026 par
+  // l'agent du lot fa2, TF-2494, pour le saut comme pour la collision). `couverture` rend la déclaration qui couvre l'entrée de ce seq et de ce
+  // ts, ou, à défaut, la première déclarée à ce seq (`divergente`), que le message nomme. Une déclaration qui ne cite que `ts_reel_estime`
+  // (sans `ts_consigne`) n'a rien à confronter : elle couvre comme avant (TF-1466), et ce contrôle-là reste à `verify`.
+  const couverture = (seq, ts) => {
+    const declarees = rectifies.get(seq) || [];
+    const r = declarees.find((d) => !d.tsConsigne || d.tsConsigne === ts) || null;
+    return { r, divergente: r ? null : (declarees[0] || null) };
+  };
+  const seqDivergents = new Set();
+  const divergence = (seq, ts, d) => {
+    seqDivergents.add(seq);
+    return ` — la rectification du seq ${d.par} déclare \`ts_consigne\` ${d.tsConsigne}, l'entrée porte ${ts || "(ts absent)"} : une déclaration qui ne correspond pas à l'histoire ne couvre rien (TF-2540)`;
+  };
   // TF-1203 (14/09/2026, campagne D-51 (a)) — R-42 NE PORTAIT QU'UNE VOIE NOMMÉE SEQ PAR SEQ
   // (TF-0794, ci-dessus) ; R-19, sa règle voisine, tient DÉJÀ une antériorité bornée par une
   // DATE (DOCTRINE_CLES_COMPLETES) qui couvre tout un passé sans le nommer entrée par entrée.
@@ -2103,21 +2122,24 @@ else {
           const nature = seq > seqAttendu
             ? `saut en avant, seq ${seqAttendu}${seq - 1 > seqAttendu ? ` à ${seq - 1}` : ""} jamais écrit${seq - 1 > seqAttendu ? "s" : ""}`
             : "seq en collision";
-          if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} : ${nature} — ${rectifies.get(seq)}`);
+          const { r, divergente } = couverture(seq, ts);
+          if (r) notes.push(`[RECTIFIÉ] ${quoi} : ${nature} — ${r.cause}`);
           else if (avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} : ${nature} — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
-          else ecarts.push(`${quoi} — append-only rompu`);
+          else ecarts.push(`${quoi} — append-only rompu${divergente ? divergence(seq, ts, divergente) : ""}`);
         }
         seqAttendu = Math.max(seqAttendu, seq + 1);
       }
       if (ts && !Number.isFinite(instant)) {
         const quoi = `seq ${Number.isFinite(seq) ? seq : "?"} : horodatage illisible (${ts}) — ne se résout pas en instant (Date.parse)`;
-        if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} — ${rectifies.get(seq)}`);
-        else ecarts.push(quoi);
+        const { r, divergente } = couverture(seq, ts);
+        if (r) notes.push(`[RECTIFIÉ] ${quoi} — ${r.cause}`);
+        else ecarts.push(`${quoi}${divergente ? divergence(seq, ts, divergente) : ""}`);
       } else if (ts && Number.isFinite(tsMaxInstant) && instant < tsMaxInstant) {
         const quoi = `seq ${Number.isFinite(seq) ? seq : "?"} : horodatage décroissant (${ts} après ${tsMax})`;
-        if (rectifies.has(seq)) notes.push(`[RECTIFIÉ] ${quoi} — ${rectifies.get(seq)}`);
+        const { r, divergente } = couverture(seq, ts);
+        if (r) notes.push(`[RECTIFIÉ] ${quoi} — ${r.cause}`);
         else if (avantBorne(instant)) notes.push(`[ANTÉRIORITÉ] ${quoi} — antérieur au ${new Date(anterioriteBorneInstant).toISOString()} déclaré (anteriorite_ledger) : ${anterioriteBorneCause.slice(0, 90)}`);
-        else ecarts.push(quoi);
+        else ecarts.push(`${quoi}${divergente ? divergence(seq, ts, divergente) : ""}`);
       }
       if (ts && Number.isFinite(instant) && (!Number.isFinite(tsMaxInstant) || instant > tsMaxInstant)) { tsMax = ts; tsMaxInstant = instant; }
     }
@@ -2125,12 +2147,12 @@ else {
   if (lues.length && !avecSeq) notes.push("aucune entree ne porte SEQ — la continuite d append n est PAS jugeable sur ce ledger (le contrat 3 l exige ; anteriorite, jamais reecrite) : seuls les horodatages et l ouverture le sont");
   // Garde de chiffre (TF-0438) : « seq 7 » nu matcherait « seq 76 » ; et depuis TF-0794 une note
   // rectifiée peut dire « seq 76 là où 78 était attendu », pas seulement « seq 76 : ».
-  const rectifiesNonVus = [...rectifies.keys()].filter((seq) => !notes.some((n) => n.startsWith("[RECTIFIÉ]") && new RegExp(`seq ${seq}(?![0-9])`).test(n)));
+  const rectifiesNonVus = [...rectifies.keys()].filter((seq) => !seqDivergents.has(seq) && !notes.some((n) => n.startsWith("[RECTIFIÉ]") && new RegExp(`seq ${seq}(?![0-9])`).test(n)));
   if (rectifiesNonVus.length) notes.push(`rectification(s) sans écart correspondant : seq ${rectifiesNonVus.join(", ")} — une rectification qui ne rectifie rien se retire`);
   if (ecarts.length) {
     ko("R-42", "forge/ledger.jsonl", `intégrité rompue — ${ecarts.length} écart(s) : ${ecarts.slice(0, 6).join(" · ")}${ecarts.length > 6 ? " …" : ""}` +
       (notes.length ? ` (par ailleurs : ${notes.join(" · ")})` : "") +
-      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ]. Un saut en avant (des seq jamais écrits) se déclare de la même façon : nommer dans `entrees[]` le seq qui SUIT la lacune, avec son `ts_consigne` et la cause — ce que les seq manquants contenaient ou pourquoi ils n'existent pas (TF-2494). " +
+      ". L'histoire ne se réécrit pas : ajouter une entrée `type: rectification_horodatage` portant le champ `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]` — un seq par élément, ANTÉRIEUR à l'entrée qui le rectifie ; un seq nommé en prose dans `resume` n'est pas lu (TF-0794) ; `ts_consigne` est le ts de l'entrée visée, à l'identique : une déclaration qui ne colle pas à l'histoire ne couvre rien (TF-2540). Un seq en double ou en recul ainsi nommé devient [RECTIFIÉ]. Un saut en avant (des seq jamais écrits) se déclare de la même façon : nommer dans `entrees[]` le seq qui SUIT la lacune, avec son `ts_consigne` et la cause — ce que les seq manquants contenaient ou pourquoi ils n'existent pas (TF-2494). " +
       "Pour un lot d'écarts anciens sans les nommer un par un : une entrée `type: anteriorite_ledger` portant `avant` (date ISO) et `cause` (≥20 car.) couvre, en [ANTÉRIORITÉ], tout écart dont l'horodatage précède `avant` (TF-1203) — seuls les écarts sans horodatage lisible restent hors de sa portée");
   } else {
     ok("R-42", "forge/ledger.jsonl", `intégrité tenue sur ${lues.length} entrée(s) — seq continu, horodatages non décroissants, ouverture par run_open` +
@@ -2181,6 +2203,44 @@ else {
         composes.length
           ? ok("R-42 bis", "forge/ledger.jsonl", `AVERTISSEMENT, non bloquant : ${composes.length} entrée(s) dont l'horodatage dépasse le commit qui l'a introduite — horodatage COMPOSÉ plutôt que relevé (TF-1424) : ${composes.slice(0, 6).join(" · ")}${composes.length > 6 ? " …" : ""}. Relever l'heure au moment d'écrire l'entrée, jamais après coup`)
           : ok("R-42 bis", "forge/ledger.jsonl", "aucune entrée dont l'horodatage dépasse le commit qui l'a introduite (TF-1424)");
+      }
+    }
+  }
+
+  // R-42 ter — UNE ÉVOLUTION LIVRÉE APRÈS LA CLÔTURE D'UN RUN, SANS RUN NI TRACE AU LEDGER (TF-2542, 14/11/2026).
+  // Le fait : à l'ouverture du run forge-digit-ai-fr-20261114a, `git log 6b9c4c8..HEAD` a relevé cinq évolutions du produit
+  // (90350be, b28cf0c, d61b813, c1f2511, fba0efc) livrées après le `run_close` du 20260818a sans aucune entrée au ledger ; une
+  // seule (3abf516) y était tracée. Le ledger est l'histoire du produit : une évolution qui n'y figure pas n'a ni verdict ni
+  // oracle, et personne ne la voit sans mesurer à la main. Le contrôle compare les commits POSTÉRIEURS au dernier `run_close`
+  // (et antérieurs au `run_open` qui le suit, s'il y en a un : les commits d'un run ouvert sont ceux de ce run) aux entrées du
+  // ledger : un commit est TRACÉ quand son sha (7 à 40 caractères, en préfixe) figure dans une entrée. Ne comptent pas les
+  // commits qui ne touchent que `forge/` (le ledger et les artefacts du run lui-même s'y consignent) ni les fusions sans fichier.
+  // AVERTISSEMENT en PASS, jamais un FAIL : règle neuve, jamais lue sur le parc ; elle se durcira sur un corpus lu.
+  if (aGit) {
+    const entreesTer = lignes.map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+    const close = entreesTer.filter((e) => (e.type || e.ev) === "run_close").at(-1);
+    if (close) {
+      const tClose = Date.parse(String(close.ts || ""));
+      const reouvert = entreesTer.slice(entreesTer.lastIndexOf(close) + 1).find((e) => (e.type || e.ev) === "run_open");
+      const tOuvre = reouvert ? Date.parse(String(reouvert.ts || "")) : NaN;
+      if (Number.isFinite(tClose)) {
+        const log = git("log", "--format=%H%x1f%cI%x1f%s", `--since=${new Date(tClose).toISOString()}`);
+        const apres = (log.status === 0 ? log.stdout.split(/\r?\n/).filter(Boolean) : []).map((l) => {
+          const [hash, date, sujet] = l.split("\x1f"); return { hash, date, sujet, t: Date.parse(date) };
+        }).filter((c) => Number.isFinite(c.t) && c.t > tClose && !(Number.isFinite(tOuvre) && c.t >= tOuvre));
+        const jetons = (lignes.join("\n").match(/\b[0-9a-f]{7,40}\b/g) || []);
+        const BORNE = 300;
+        const nonTraces = [];
+        for (const c of apres.slice(0, BORNE)) {
+          if (jetons.some((j) => c.hash.startsWith(j))) continue;
+          const fichiers = git("show", "--name-only", "--format=", c.hash).stdout.split(/\r?\n/).filter(Boolean);
+          if (fichiers.every((f) => f.startsWith("forge/"))) continue;
+          nonTraces.push(`${c.hash.slice(0, 7)} (${c.date.slice(0, 10)}) « ${c.sujet.slice(0, 70)} »`);
+        }
+        const run = String(close.run || close.run_id || "").trim();
+        nonTraces.length
+          ? ok("R-42 ter", "forge/ledger.jsonl", `AVERTISSEMENT, non bloquant : ${nonTraces.length} commit(s) livré(s) après le run_close du ${close.ts}${run ? ` (${run})` : ""} sans trace au ledger — ${nonTraces.slice(0, 6).join(" · ")}${nonTraces.length > 6 ? " …" : ""}${apres.length > BORNE ? ` (${BORNE} premiers commits lus sur ${apres.length})` : ""}. Une évolution livrée hors run se consigne : un run de version (references\\RUN-VERSION.md), ou à défaut une entrée du ledger qui nomme le commit par son sha (TF-2542)`)
+          : ok("R-42 ter", "forge/ledger.jsonl", `aucun commit livré après le run_close du ${close.ts} sans trace au ledger (${apres.length} commit(s) lu(s) depuis, hors ceux qui ne touchent que forge/) (TF-2542)`);
       }
     }
   }
@@ -3179,7 +3239,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, « R-35 bis », R-42, « R-42 bis », R-43, R-47, R-60, « R-61 bis »)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, « R-35 bis », R-42, « R-42 bis », « R-42 ter », R-43, R-47, R-60, « R-61 bis »)" });
     }
   }
 }

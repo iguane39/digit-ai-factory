@@ -26,6 +26,7 @@ import { lireEntreeHook, gestesDansFenetre, lignesGestesAvant } from "./lib-gest
 import { constatR47 } from "./lib-resume-r47.mjs";
 import { lancerRejeuHebdomadaire, lignesOuverture as lignesConsommateursRouges, lignesRejeuOuverture, traceRouges } from "./consommateurs-skills.mjs";
 import { skillsInstalles } from "../scripts/lib-config-installee.mjs";
+import { LECTEUR_MINUSCULE } from "./hook-flotte.mjs";
 import { cheminTrace as cheminTraceWorkflows, lancerReleve as lancerReleveWorkflows, lignesOuverture as lignesWorkflowsHeberges } from "./releve-workflows-heberges.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -1008,7 +1009,19 @@ function lignesGates() { return ["",
   "- Tout message de fin de traitement — tour qui a ÉCRIT, verdict rendu, ou message de plus de 250 mots — suit gabarits\\RESTITUTION.md v2.69.0 (14/11) : le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Bloc 0 et blocs 1, 3, 4, 5, 8 et 9 toujours présents, un bloc vide dit en une ligne ; blocs 2, 6 et 7 seulement s'ils ont un contenu. Le bloc 0 se clôt, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif, espaces en %20>) », un lien par livrable (S87, avertissante). Le hook de fin de tour ne refuse que : un bloc toujours présent absent ; une décision sans ses options (au format B, sans son tableau) ; chez un produit, « livré », « complet » ou une clôture sans les livrables des forges mobilisées à la dernière demande de la session dans `forge/mobilisation.jsonl` (S85), ou sans cette trace dès le 2026-11-02 (S86) — à chaque demande, `node <pilot>/scripts/mobiliser.mjs` y écrit les 13 verdicts motivés et rend la ligne « Je mobilise : … » ; un verdict sans fait mesuré ; une exhaustivité sans « Mesuré sur : <source>, relue à HH:MM, périmètre <n> » ; un écran qui ne reprend pas la synthèse déposée ; une D-N nouvelle non réservée (`node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit le ledger) ; un fichier servi (HTML, CSS, JS) écrit sans le verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 : joue-la toi-même, ne la propose jamais à l'humain). Un point de suivi des agents (première ligne « Suivi agents », une ligne mesurée par agent) est une forme reconnue des deux juges (S116). Le reste avertit sous la réponse, dont l'heure du bloc 1 relevée par `date` (S84) et le lien du contenu dans une demande d'avis (S83). Un tour qui n'a rien écrit rend une réponse courte de 250 mots au plus, sans verdict ni D-N ou A-N posée, quel que soit le nombre de commandes de lecture (references\\NIVEAUX.md). Préjuge une restitution avant de l'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>`.",
   ligneCrochetReadme(),
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).",
+  ...lignesRacineMinuscule(),
   ...lignesPreferences()]; }
+
+// TF-2547 (14/11/2026, décidé après le retour 20261114f) — L'OUVERTURE DIT QU'UNE RACINE DE SESSION EN MINUSCULE INTERDIT L'ISOLATION DES AGENTS.
+// Le fait : la racine `c:\dev\forge-digit-ai-fr`, à lettre de lecteur minuscule, interdit `isolation: "worktree"` (TF-2443 : git résout `C:/…`, le harnais
+// compare les deux chemins à la casse près et refuse), et rien ne le disait à l'ouverture d'un run dont le brief prévoyait des agents qui écrivent en
+// parallèle ; le hook `flotte` ne le dit qu'au moment de l'appel, après que le plan de délégation est écrit. Avertissement en tête du relevé, jamais un refus.
+function lignesRacineMinuscule(racines = [process.cwd(), process.env.CLAUDE_PROJECT_DIR]) {
+  const racine = racines.find((c) => typeof c === "string" && LECTEUR_MINUSCULE.test(c));
+  if (!racine) return [];
+  const canonique = racine[0].toUpperCase() + racine.slice(1);
+  return [`- **Racine de session en minuscule** (TF-2443, TF-2547) : « ${racine} » — \`isolation: "worktree"\` y sera refusée (git résout « ${canonique} », le harnais compare les chemins à la casse près). Rouvrir la session sur « ${canonique} » avant tout run dont le brief prévoit des agents qui écrivent en parallèle, ou lancer ces agents sans isolation sur des arbres créés par \`git worktree add\`.`];
+}
 
 // T1 de l'œil critique (TF-1946, D-68 (a) du 26/10/2026) — les préférences du porteur et les conventions
 // du client se chargent PARTOUT, en tête du relevé, au lieu de devenir une règle du pilot de plus.

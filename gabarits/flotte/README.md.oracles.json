@@ -1,7 +1,7 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\gabarits\\flotte\\README.md",
-  "date_iso": "2026-10-18T05:58:43.409Z",
-  "registre_version": "2.43.0",
+  "cible": "C:\\dev\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
+  "date_iso": "2026-11-14T17:23:42.747Z",
+  "registre_version": "2.63.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -15,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "gabarits\\flotte\\README.md"
+      "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -26,43 +26,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "gabarits\\flotte\\README.md",
+      "file": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "gabarits\\flotte\\README.md",
+      "file": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "gabarits\\flotte\\README.md",
+      "file": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "gabarits\\flotte\\README.md",
+      "file": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
       "verdict": "SKIP",
       "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "gabarits\\flotte\\README.md",
+      "file": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
       "verdict": "SKIP",
       "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "gabarits\\flotte\\README.md",
+      "file": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
       "verdict": "SKIP",
       "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "gabarits\\flotte\\README.md",
+      "file": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
       "verdict": "SKIP",
       "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
@@ -70,10 +70,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "gabarits\\flotte\\README.md",
-    "ts": "2026-10-18T05:58:43.409Z",
+    "release": "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md",
+    "ts": "2026-11-14T17:23:42.747Z",
     "fichiers": {
-      "gabarits\\flotte\\README.md": "b884d83d9ca998be3c57de1f8e3c88b7afd7fe568fabe34ec757b6315cd34bdb"
+      "..\\_wt-pilot-ph\\gabarits\\flotte\\README.md": "b1baafecb7db0966533a46c3d6ae0ac39b4ff9b1a0c6d7245a99709e6bc16891"
     }
   },
   "empreinte_motif": null,

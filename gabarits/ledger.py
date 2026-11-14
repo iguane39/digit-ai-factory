@@ -7,6 +7,13 @@ première entrée `run_open`. Écrivain unique : l'orchestrateur de session.
   python forge/ledger.py --verifier
   python forge/ledger.py <type> --archive <run clos> --champ valeur ...   (écrit dans runs/<run clos>/ledger.jsonl)
   python forge/ledger.py --hors-run                  (liste forge/hors-run.jsonl) ; --verifier --hors-run en juge l'intégrité
+  python forge/ledger.py <type> --essai --champ valeur ...   (mode d'essai : rien n'est écrit)
+
+MODE D'ESSAI (TF-2549). `--essai` joue tous les contrôles d'une écriture (type, forme, première entrée, numérotation) et AFFICHE
+l'entrée qui serait écrite, sans l'écrire : ni ledger, ni journal hors run, ni verrou. Un agent en lecture seule qui veut
+tester l'usage de l'écrivain le fait par `--essai` : sans lui, un `oracles_verdict --etape x` joué pour voir a écrit une
+entrée définitive au ledger d'un run (retour factory-digit-ai-fr, 14/11/2026, entrée 84, neutralisable seulement par un
+retour). Le `seq` affiché est celui que prendrait l'écriture à cet instant, à titre indicatif : une autre session peut le prendre.
 
 HORS RUN (TF-2223). Sans ledger de run, `retour`, `question_humain`, `reponse_humain` et `demande_humain` s'écrivent à
 `forge/hors-run.jsonl`, pas au ledger du run : R-42 exige que celui-ci s'ouvre par `run_open`. Le prochain lot de retours les compile.
@@ -32,6 +39,7 @@ planter : l'écriture a eu lieu, le code de sortie le dit.
 import json
 import os
 import pathlib
+import re
 import sys
 import time
 
@@ -71,6 +79,10 @@ RUNS = FORGE.parent / "runs"
 # `rectification_doublon` désigne, sans les effacer, des entrées écrites deux fois par un script rejoué (`entrees: [{seq,
 # doublon_de, cause}]`) : `ledger.mjs` de forge-agents l'a reçu le 14/11/2026 (TF-2424) et sa parité de vocabulaire avec ce
 # fichier rougit sans lui.
+# `decision_retiree` dit qu'une décision posée est retirée, sans réponse ni décision de remplacement : `oracles/lib-decisions.mjs` la lit
+# comme une sortie de la décision depuis TF-2415, et ni cet écrivain ni `ledger.mjs` ne l'acceptaient (TF-2527, 14/11/2026) ; une retraite
+# s'écrivait en `reponse_humain --decision D-M --remplace D-N`. Elle nomme la décision retirée (`decision`, `decisions` ou
+# `decisions_retirees`, au format D-N) et sa `cause` (20 caractères au moins) : une décision qui disparaît sans motif ne se relit pas.
 # `secret_range` reste le DERNIER type : la chirurgie du banc de `scripts/ranger-secret.test.mjs` le retire par sa position.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
@@ -78,7 +90,7 @@ TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_mo
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
          "deplacement_en_attente", "demande_humain", "qualification_enclenchement",
-         "anteriorite_ledger", "rectification_doublon", "secret_range"}
+         "anteriorite_ledger", "rectification_doublon", "decision_retiree", "secret_range"}
 
 
 # TF-2223 (RP-2, 06/11/2026) : hors run, ces types s'écrivent à `forge/hors-run.jsonl`, jamais au ledger du run, dont R-42
@@ -109,6 +121,29 @@ def controler_remplacement(type_: str, champs: dict) -> None:
         if not isinstance(a, list) or not a or not all(
                 isinstance(x, dict) and str(x.get("artefact", "")).strip() and x.get("sort") in SORTS for x in a):
             raise SystemExit(f"`artefacts_remplaces` : liste non vide de {{artefact, sort}}, sort parmi {', '.join(SORTS)}")
+
+
+# TF-2527 : les champs où `oracles/lib-decisions.mjs` (`decisionsRetirees`) lit la décision qu'une entrée `decision_retiree` retire.
+CHAMPS_DECISION_RETIREE = ("decision", "decisions", "decisions_retirees")
+CAUSE_MIN = 20
+
+
+def controler_retrait(type_: str, champs: dict) -> None:
+    """Une `decision_retiree` nomme la ou les décisions retirées (« D-12 », en `decision`, `decisions` ou `decisions_retirees`, chaîne ou
+    liste) et dit pourquoi (`cause`, 20 caractères au moins). Refusée AVANT d'écrire : une entrée écrite ne se réécrit pas, et un
+    retrait sans décision nommée ne sort rien chez `lib-decisions.mjs`."""
+    if type_ != "decision_retiree":
+        return
+    nommees = []
+    for c in CHAMPS_DECISION_RETIREE:
+        v = champs.get(c)
+        nommees += v if isinstance(v, list) else ([] if v is None else [v])
+    if not nommees or not all(isinstance(x, str) and re.fullmatch(r"D-?\s*\d{1,4}", x.strip(), re.IGNORECASE) for x in nommees):
+        raise SystemExit("`decision_retiree` doit nommer la ou les décisions retirées au format « D-12 » "
+                         "(`--decision`, `--decisions` ou `--decisions_retirees`) — rien n'est écrit")
+    cause = champs.get("cause")
+    if not isinstance(cause, str) or len(cause.strip()) < CAUSE_MIN:
+        raise SystemExit(f"`decision_retiree` doit dire pourquoi : `--cause` d'au moins {CAUSE_MIN} caractères — rien n'est écrit")
 
 
 def chemin(run: str = "") -> pathlib.Path:
@@ -152,17 +187,20 @@ def prendre_verrou(verrou: pathlib.Path) -> None:
                      f"processus détient {verrou} (s'il est mort, supprimer ce fichier)")
 
 
-def ajouter(archive: str, type_: str, /, **champs) -> dict:
-    # Paramètres POSITIONNELS SEULEMENT (TF-2174) : un champ d'entrée nommé `run`, `archive` ou `type_` ne collisionne plus avec eux
+def ajouter(archive: str, type_: str, essai: bool = False, /, **champs) -> dict:
+    # Paramètres POSITIONNELS SEULEMENT (TF-2174) : un champ d'entrée nommé `run`, `archive`, `type_` ou `essai` ne collisionne plus avec eux
     # (un second `--run` levait « multiple values for argument 'run' »).
+    # `essai` (TF-2549) : tous les contrôles sont joués et l'entrée est rendue, mais ni le journal ni le verrou ne sont touchés.
     if type_ not in TYPES:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
     controler_remplacement(type_, champs)
+    controler_retrait(type_, champs)
     # Hors run (aucune entrée au ledger du run, hors archive), un retour ou une décision s'écrit au journal hors run.
     hors_run = type_ in HORS_RUN and not archive and not lignes(chemin(archive))
     p = JOURNAL_HORS_RUN if hors_run else chemin(archive)
     verrou = p.with_name(p.name + ".lock")
-    prendre_verrou(verrou)
+    if not essai:
+        prendre_verrou(verrou)
     try:
         dejà = lignes(p)                         # relu SOUS verrou : la fin du fichier au moment d'écrire
         if not dejà and type_ != "run_open" and not hors_run:
@@ -175,13 +213,18 @@ def ajouter(archive: str, type_: str, /, **champs) -> dict:
         if dejà and ts < dejà[-1]["ts"]:
             ts = dejà[-1]["ts"]                  # `ts` non décroissant, jamais falsifié
         e = {"seq": seq, "ts": ts, "type": type_, **({"hors_run": True} if hors_run else {}), **champs}
-        with p.open("a", encoding="utf-8", newline="\n") as fh:
-            fh.write(json.dumps(e, ensure_ascii=False) + "\n")
+        if not essai:
+            with p.open("a", encoding="utf-8", newline="\n") as fh:
+                fh.write(json.dumps(e, ensure_ascii=False) + "\n")
     finally:
-        try:
-            verrou.unlink()
-        except FileNotFoundError:
-            pass
+        if not essai:
+            try:
+                verrou.unlink()
+            except FileNotFoundError:
+                pass
+    if essai:
+        print(f"[ESSAI] rien n'est écrit : cette entrée serait écrite à {p.name} (seq {e['seq']}, indicatif)", file=sys.stderr)
+        return e
     if hors_run:
         print(f"[HORS RUN] aucun run ouvert : entrée écrite à {JOURNAL_HORS_RUN.name} (seq {e['seq']}), pas au ledger du run ; "
               "le prochain lot de retours la compile (`python forge/ledger.py --hors-run` la liste)", file=sys.stderr)
@@ -273,6 +316,10 @@ if __name__ == "__main__":
         if i + 1 < len(a):
             archive = a[i + 1]
             del a[i:i + 2]
+    # TF-2549 : `--essai` est un DRAPEAU, retiré avant la lecture des champs (sinon il avalerait la valeur qui le suit).
+    essai = "--essai" in a
+    while "--essai" in a:
+        a.remove("--essai")
     if a and a[0] == "--hors-run":
         # TF-2223 : le journal hors run, tel quel, pour le prochain lot de retours.
         for x in lignes(JOURNAL_HORS_RUN):
@@ -312,7 +359,7 @@ if __name__ == "__main__":
         # publication du pilot, qui exige `r38 === true`, ignorait le feu vert (TF-1990).
         elif v in ("true", "false"):
             champs[k] = v == "true"
-    afficher(ajouter(archive, type_, **champs))
+    afficher(ajouter(archive, type_, essai, **champs))
     # TF-2206 : une décision qui en remplace une autre dit ce que la première avait créé, et son sort.
     if "remplace" in champs and "artefacts_remplaces" not in champs:
         print("[À PORTER] remplace sans artefacts_remplaces : lister ce que la décision remplacée avait créé (ressources, exigences, "

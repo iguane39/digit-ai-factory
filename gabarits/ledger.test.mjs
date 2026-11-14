@@ -15,6 +15,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { decisionsSansReponse, DECISION_RETIREE } from "../oracles/lib-decisions.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // Fins de ligne normalisées : un poste qui extrait le gabarit en CRLF faisait manquer la chirurgie du
@@ -54,7 +55,7 @@ const entrees = (d) => readFileSync(join(d, "forge", "ledger.jsonl"), "utf8").sp
 
 // Le témoin rouge : le gabarit privé de ses deux protections. La chirurgie est VÉRIFIÉE, sans quoi le rouge serait vide.
 const sansFlux = GABARIT.replace(/for _flux in \(sys\.stdout, sys\.stderr\):[\s\S]*?pass\n/, "");
-const MUTANT = sansFlux.replace("    afficher(ajouter(archive, type_, **champs))", "    print(json.dumps(ajouter(archive, type_, **champs), ensure_ascii=False))");
+const MUTANT = sansFlux.replace("    afficher(ajouter(archive, type_, essai, **champs))", "    print(json.dumps(ajouter(archive, type_, essai, **champs), ensure_ascii=False))");
 
 const dossiers = [];
 try {
@@ -136,11 +137,11 @@ try {
   });
 
   // ---- TF-1575 (écriture concurrente : seq 283 porté deux fois le 22/09/2026) ------------------------
-  const SANS_VERROU = GABARIT.replace("    prendre_verrou(verrou)\n", "");
+  const SANS_VERROU = GABARIT.replace("        prendre_verrou(verrou)\n", "        pass\n");
   const SANS_NOMMER = GABARIT.replace(/        lignes_par_seq: dict = \{\}[\s\S]*?(?=        if e\[0\]\["type"\] != "run_open":)/, "");
 
   check("témoin — la chirurgie des rouges TF-1575 a bien retiré le verrou et le nommage du doublon", () => {
-    att(SANS_VERROU !== GABARIT && !/\n    prendre_verrou\(verrou\)\n/.test(SANS_VERROU), "le verrou n'a pas été retiré");
+    att(SANS_VERROU !== GABARIT && !/\n {8}prendre_verrou\(verrou\)\n/.test(SANS_VERROU), "le verrou n'a pas été retiré");
     att(SANS_NOMMER !== GABARIT && !/lignes_par_seq/.test(SANS_NOMMER), "le nommage du doublon n'a pas été retiré");
   });
 
@@ -614,6 +615,104 @@ try {
     att(v.status === 0 && /2 entrée\(s\)/.test(v.stdout), `--verifier --archive : ${v.stdout}${v.stderr}`);
     const ancien = ecrire(script, "--verifier", "--run", "ARCH");
     att(ancien.status === 0 && /2 entrée\(s\)/.test(ancien.stdout), `l'ancien --verifier --run n'est plus lu : ${ancien.stdout}${ancien.stderr}`);
+  });
+
+  // ---- TF-2549 (retour factory-digit-ai-fr 20261114h, 14/11/2026) : un agent en lecture seule écrivait au ledger en testant l'écrivain ----
+  // Le fait : `oracles_verdict --etape x` joué « pour voir l'usage » a écrit l'entrée 84 au ledger d'un run, définitive. `--essai`
+  // joue tous les contrôles et rend l'entrée sans rien écrire : ni ledger, ni journal hors run, ni verrou.
+  const octets = (d) => readFileSync(join(d, "forge", "ledger.jsonl"));
+  check("rouge → vert — TF-2549 : --essai rend l'entrée sans rien écrire, et l'écriture qui suit prend le seq annoncé", () => {
+    const { d, script } = unProduit();
+    const avant = octets(d);
+    const r = ecrire(script, "oracles_verdict", "--essai", "--etape", "x", "--verdict", "PASS");
+    att(r.status === 0, `--essai refusé : exit ${r.status} ${r.stderr}`);
+    att(Buffer.compare(avant, octets(d)) === 0, "--essai a modifié le ledger");
+    att(!existsSync(join(d, "forge", "ledger.jsonl.lock")) && !existsSync(join(d, "forge", "hors-run.jsonl")), "--essai a laissé un verrou ou un journal hors run");
+    const montre = JSON.parse(r.stdout.trim().split("\n").at(-1));
+    att(montre.type === "oracles_verdict" && montre.etape === "x" && montre.verdict === "PASS" && montre.seq === 2 && !("essai" in montre), `entrée montrée : ${r.stdout}`);
+    att(/\[ESSAI\] rien n'est écrit/.test(r.stderr), `l'essai ne se dit pas : ${r.stderr}`);
+    const vrai = ecrire(script, "oracles_verdict", "--etape", "x", "--verdict", "PASS");
+    att(vrai.status === 0 && entrees(d).at(-1).seq === 2 && entrees(d).length === 2, "l'écriture réelle ne prend pas le seq annoncé");
+  });
+  check("vert — TF-2549 : --essai joue les contrôles d'une écriture (type inconnu, première entrée) et refuse comme elle, sans rien créer", () => {
+    const { d, script } = unProduit();
+    const inconnu = ecrire(script, "type_qui_n_existe_pas", "--essai");
+    att(inconnu.status !== 0 && /type inconnu/.test(inconnu.stderr), `type inconnu accepté en essai : ${inconnu.stderr}`);
+    const vide = mkdtempSync(join(tmpdir(), "ledger-essai-")); dossiers.push(vide); mkdirSync(join(vide, "forge"));
+    const s = join(vide, "forge", "ledger.py"); writeFileSync(s, GABARIT, "utf8");
+    const o = ecrire(s, "oracles_verdict", "--essai", "--etape", "x");
+    att(o.status !== 0 && /run_open/.test(o.stderr), `première entrée non juge en essai : ${o.stderr}`);
+    att(!existsSync(join(vide, "forge", "ledger.jsonl")), "l'essai a créé un ledger");
+    att(entrees(d).length === 1, "le ledger du produit a changé");
+  });
+  check("vert — TF-2549 : hors run, --essai d'un retour n'écrit pas le journal hors run (et le dit comme un essai)", () => {
+    const vide = mkdtempSync(join(tmpdir(), "ledger-essai-")); dossiers.push(vide); mkdirSync(join(vide, "forge"));
+    const s = join(vide, "forge", "ledger.py"); writeFileSync(s, GABARIT, "utf8");
+    const r = ecrire(s, "retour", "--essai", "--resume", "pour voir");
+    att(r.status === 0 && /\[ESSAI\]/.test(r.stderr) && !/\[HORS RUN\]/.test(r.stderr), `sortie : ${r.status} ${r.stderr}`);
+    att(!existsSync(join(vide, "forge", "hors-run.jsonl")) && !existsSync(join(vide, "forge", "ledger.jsonl")), "l'essai a écrit un journal");
+  });
+  check("rouge — TF-2549 : sans le drapeau, --essai devient un champ et l'entrée s'écrit (le témoin voit la chirurgie)", () => {
+    const mutant = GABARIT.replace('essai = "--essai" in a', "essai = False");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = unProduit(mutant);
+    ecrire(script, "oracles_verdict", "--essai", "--etape", "x", "--verdict", "PASS");
+    att(entrees(d).length === 2, "le mutant n'a rien écrit : le défaut du 14/11 n'est pas reproduit");
+  });
+
+  // ---- TF-2527 (14/11/2026) : decision_retiree, lu par lib-decisions.mjs depuis TF-2415, n'était écrivable ni ici ni par ledger.mjs ----
+  // Le fait : une décision retirée restait rappelée comme ouverte (D-12, D-178 le 10/11), et la seule retraite écrivable était un
+  // `reponse_humain --decision D-M --remplace D-N`. Le type nomme la décision retirée et sa cause (20 caractères au moins).
+  const CAUSE_RETRAIT = "la question ne se pose plus depuis l'abandon du lot";
+  const posee = (script) => ecrire(script, "question_humain", "--decisions_posees", '{"D-12": "Faut-il garder le lot ?"}');
+  const ouvertes = (d) => decisionsSansReponse(d).map((x) => x.n);
+  check("TF-2527 vert — decision_retiree est au vocabulaire, que lib-decisions.mjs lit : la décision posée en sort", () => {
+    att(vocabulaire(GABARIT).has(DECISION_RETIREE), `${DECISION_RETIREE} absent du vocabulaire du gabarit`);
+    const { d, script } = unProduit();
+    att(posee(script).status === 0 && ouvertes(d).includes("D-12"), "D-12 n'est pas posée : le cas est vide");
+    const r = ecrire(script, "decision_retiree", "--decision", "D-12", "--cause", CAUSE_RETRAIT);
+    att(r.status === 0, `écriture refusée : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "decision_retiree" && e.decision === "D-12" && e.cause === CAUSE_RETRAIT, `entrée écrite : ${JSON.stringify(e)}`);
+    att(!ouvertes(d).includes("D-12"), "D-12 reste rappelée comme ouverte après son retrait");
+    const v = ecrire(script, "--verifier");
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+  });
+  check("TF-2527 vert — le retrait de plusieurs décisions par `--decisions` (liste) les sort toutes", () => {
+    const { d, script } = unProduit();
+    att(ecrire(script, "question_humain", "--decisions_posees", '{"D-12": "a ?", "D-13": "b ?"}').status === 0, "questions non posées");
+    const r = ecrire(script, "decision_retiree", "--decisions", '["D-12", "D-13"]', "--cause", CAUSE_RETRAIT);
+    att(r.status === 0 && ouvertes(d).length === 0, `exit ${r.status} ${r.stderr} ; ouvertes ${ouvertes(d)}`);
+  });
+  check("TF-2527 vert — sans décision nommée, ou sous 20 caractères de cause, ou avec un nom qui n'est pas D-N : refusé, rien n'est écrit", () => {
+    const { d, script } = unProduit();
+    for (const [args, motif] of [
+      [["--cause", CAUSE_RETRAIT], /nommer/],
+      [["--decision", "D-12"], /pourquoi/],
+      [["--decision", "D-12", "--cause", "trop court"], /pourquoi/],
+      [["--decision", "la décision de lundi", "--cause", CAUSE_RETRAIT], /nommer/],
+      [["--decisions", '["D-12", "lundi"]', "--cause", CAUSE_RETRAIT], /nommer/],
+    ]) {
+      const r = ecrire(script, "decision_retiree", ...args);
+      att(r.status !== 0 && motif.test(r.stderr), `${args.join(" ")} : exit ${r.status} ${r.stderr}`);
+    }
+    att(entrees(d).length === 1, "un retrait refusé a écrit une entrée");
+  });
+  check("TF-2527 rouge — sans decision_retiree au vocabulaire, l'écrivain refuse le type que lib-decisions.mjs lit", () => {
+    const mutant = GABARIT.replace(' "decision_retiree",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    att(!vocabulaire(mutant).has(DECISION_RETIREE), "le mutant passe le croisement");
+    const { d, script } = unProduit(mutant);
+    const r = ecrire(script, "decision_retiree", "--decision", "D-12", "--cause", CAUSE_RETRAIT);
+    att(r.status !== 0 && /type inconnu/.test(r.stderr), `le mutant écrit : exit ${r.status} ${r.stderr}`);
+    att(entrees(d).length === 1, "le mutant a écrit");
+  });
+  check("TF-2527 rouge — sans le contrôle, un retrait sans cause ni décision nommée serait écrit (il ne sortirait rien)", () => {
+    const mutant = GABARIT.replace("    controler_retrait(type_, champs)\n", "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = unProduit(mutant);
+    const r = ecrire(script, "decision_retiree", "--decision", "D-12");
+    att(r.status === 0 && entrees(d).at(-1).type === "decision_retiree" && !entrees(d).at(-1).cause, `le mutant refuse : exit ${r.status} ${r.stderr}`);
   });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }

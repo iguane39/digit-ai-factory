@@ -43,6 +43,12 @@ Le brief delta déclare le **plus haut niveau ISTO** qu'il touche (I, S, T ou O)
 dit quelle part de l'aval se rejoue (`references\INTENTION.md`, section « Quand la cascade
 change »). Une intention touchée se revalide avant toute exigence.
 
+Le brief delta porte aussi sa section **Délégation aux agents**, dans la forme de `PROMPT-PRODUIT.md` : ce que l'orchestrateur
+garde, l'agent nommé de chaque activité de chaque étape rejouée (ou « session seule » avec son motif), et la condition des
+écritures en parallèle (arbres `git worktree` disjoints ; une racine de session en minuscule interdit l'isolation, TF-2443).
+Le fait : le brief d'un refresh à 4 lots, 15 clips et 15 animations ne nommait aucun agent, et la conception a été tenue par la
+session seule, sans une seule invocation au ledger (TF-2547, 14/11/2026).
+
 Étapes rejouées **en delta** :
 - **conception** : exigences nouvelles/modifiées dans `EXIGENCES.json` (ids retirés via
   `identifiants_retires`, jamais réaffectés), oracles rejoués sur le référentiel entier ; la

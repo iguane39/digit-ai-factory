@@ -1,9 +1,9 @@
 {
-  "cible": "references/JETON-ABONNEMENT.md",
-  "date_iso": "2026-10-20T06:51:57.898Z",
-  "registre_version": "2.45.0",
+  "cible": "C:\\dev\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
+  "date_iso": "2026-11-14T17:07:42.474Z",
+  "registre_version": "2.63.0",
   "profil": "digit-ai",
-  "niveau": "diffuse",
+  "niveau": "note",
   "verdict": "PASS",
   "perimetre": "disque",
   "perimetre_motif": null,
@@ -15,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "references\\JETON-ABONNEMENT.md"
+      "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -26,49 +26,49 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "SKIP",
       "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "SKIP",
       "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "SKIP",
       "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "SKIP",
       "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     },
     {
       "domaine": "Autorité d'une décision affirmée",
-      "file": "references\\JETON-ABONNEMENT.md",
+      "file": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
       "verdict": "SKIP",
       "detail": "aucun bloc se déclarant décision (ni table Décision/Décideur, ni champ « Décision : ») — hors périmètre"
     }
@@ -76,10 +76,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "references\\JETON-ABONNEMENT.md",
-    "ts": "2026-10-20T06:51:57.898Z",
+    "release": "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md",
+    "ts": "2026-11-14T17:07:42.474Z",
     "fichiers": {
-      "references\\JETON-ABONNEMENT.md": "4c36bbd892f6622dc595408590e891218bbbcecd9dc9871f5ca4e5e3f1e3dcae"
+      "..\\_wt-pilot-ph\\references\\JETON-ABONNEMENT.md": "de7b40d2cfe23d04a396a8678cec32356d665ac537c39c9aa45b87e02477b2da"
     }
   },
   "empreinte_motif": null,

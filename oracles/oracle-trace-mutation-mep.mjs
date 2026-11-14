@@ -82,7 +82,11 @@
  *        Paramètre à `false` ou absent, le défaut de l'écosystème : un verdict absent, FAIL ou SKIP AVERTIT
  *        (un manque déclaré, jamais un refus). Paramètre à `true` : un verdict absent, FAIL ou SKIP est un FAIL,
  *        le GO est bloqué. Avant TF-2506, aucun contrôle ne lisait le paramètre ni le verdict : armer le gate
- *        n'avait aucun effet exécutable.
+ *        n'avait aucun effet exécutable ;
+ *   TM18 le dossier qui cite une fiche de sécurité porte le verdict de FS12 de forge-audit, rejoué AVEC l'étiquette
+ *        déployée (`verifier-fiche-securite.mjs <fiche.html> --etiquette-deployee <x.y.z>` ; M-24, TF-2419, TF-2536).
+ *        Aucune fiche citée : SANS_OBJET. Verdict absent, SKIP ou FAIL : AVERTISSEMENT (règle neuve, jamais un refus) ;
+ *        FS12 PASS : PASS. Sans étiquette donnée, FS12 reste inerte : c'est ce silence que la règle fait dire.
  *
  * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
  * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
@@ -460,6 +464,30 @@ function confronterWebsec(texte, param) {
   return { statut: "PASS", message: `verdict websec porté au dossier (${dit})` };
 }
 
+/**
+ * TM18 — la fiche de sécurité remise se juge contre l'étiquette DÉPLOYÉE (M-24, FS12 de forge-audit, TF-2419, TF-2536, 14/11/2026).
+ * Le fait : la fiche CDC-SEC-HPR-20261104a citait v1.10.0 alors que v1.13.0 était qualifiée et servie, et la session l'a jointe telle quelle à un
+ * courriel du référent sécurité (16 champs sur 29 changés à la réémission). `verifier-fiche-securite` de forge-audit compare depuis la version citée à
+ * l'étiquette que la chaîne lui DONNE par `--etiquette-deployee` ; sans elle FS12 n'est pas jouée et le dit : la règle était inerte hors appel explicite.
+ * Un dossier qui cite une fiche de sécurité porte donc le verdict de FS12, rejoué AVEC l'étiquette. Même forme que TM15 et TM16 : le silence est le
+ * défaut, AVERTISSEMENT pour une règle neuve, y compris pour le FAIL que le dossier porte (la fiche périmée se réémet, elle ne bloque pas le GO d'elle-même).
+ */
+const FICHE_SECURITE = /fiche\s+(?:de\s+)?s[ée]curit[ée]|\b[A-Z0-9]{2,}-SEC-(?:DEV|HPR|PRD)-\d{8}[a-z]?\b/i;
+const COMMANDE_FS12 = "node <audit>/oracles/verifier-fiche-securite.mjs <fiche.html> --etiquette-deployee <x.y.z>";
+function confronterFicheSecurite(texte) {
+  if (!FICHE_SECURITE.test(texte)) return { statut: "SANS_OBJET", message: "aucune fiche de sécurité citée au dossier : FS12 sans objet" };
+  const re = /\bFS12\b[^\n]*?\b(PASS|FAIL|SKIP)\b/g;
+  let verdict = null, m;
+  while ((m = re.exec(texte)) !== null) verdict = m[1];                        // le dernier verdict compte : un FAIL suivi d'un rejeu PASS se lit PASS
+  if (verdict === "PASS") return { statut: "PASS", message: "fiche de sécurité citée et FS12 PASS : la version citée est la dernière étiquette déployée" };
+  if (verdict === "FAIL") return avertirNeuve("le dossier porte un FAIL de FS12 : la fiche de sécurité cite une version qui n'est pas la dernière étiquette déployée. "
+    + `La réémettre depuis le canevas de forge-audit, rejouer \`${COMMANDE_FS12}\`, puis écrire le nouveau verdict (M-24, TF-2419)`);
+  return avertirNeuve(verdict === "SKIP"
+    ? "FS12 rend SKIP : la fiche de sécurité ne cite aucune version (ligne « Version déployée » absente), la fraîcheur n'est pas jugée"
+    : `le dossier cite une fiche de sécurité et ne porte pas le verdict de FS12. Sans \`--etiquette-deployee\` FS12 n'est pas jouée : \`${COMMANDE_FS12}\`, `
+      + "l'étiquette étant celle du commit servi lu à M-22 (ETAPE-MEP.md § 3 quaterdecies, M-24)");
+}
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -586,6 +614,13 @@ export function juger(racine) {
     try { texte = readFileSync(chemin, "utf8"); } catch { continue; }
     const ws = confronterWebsec(texte, parametreWebsec);
     findings.push({ regle: "TM17", statut: ws.statut, ou: chemin, message: ws.message });
+  }
+  // TM18 — une fois par dossier : la fiche de sécurité citée porte le verdict de FS12, rejoué avec l'étiquette déployée (M-24, TF-2536).
+  for (const chemin of dossiers) {
+    let texte;
+    try { texte = readFileSync(chemin, "utf8"); } catch { continue; }
+    const fs12 = confronterFicheSecurite(texte);
+    findings.push({ regle: "TM18", statut: fs12.statut, ou: chemin, message: fs12.message });
   }
   return findings;
 }
@@ -988,6 +1023,34 @@ function selfTest() {
     if (arme.status !== 1) casse.push("un gate websec armé sans verdict au dossier ne sort pas en 1 — armer `websec_bloquant` doit bloquer (R-33 bis)");
     const desarme = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm17-muet-false")], { encoding: "utf8" });
     if (desarme.status !== 0) casse.push("le MÊME dossier muet, gate non armé, fait sortir l'oracle en échec — TM17 devait AVERTIR sans bloquer (R-33 bis)");
+  }
+
+  // ---- TM18 : LA FICHE DE SÉCURITÉ CITÉE PORTE LE VERDICT DE FS12, REJOUÉ AVEC L'ÉTIQUETTE DÉPLOYÉE (M-24, TF-2419, TF-2536) ----
+  // Le cas fondateur du 10/11/2026 : la fiche CDC-SEC-HPR-20261104a citait v1.10.0 quand v1.13.0 était servie, et partait telle quelle chez le référent sécurité.
+  // Sans `--etiquette-deployee`, FS12 n'est pas jouée : le dossier qui cite une fiche sans le verdict de FS12 le dit.
+  const FICHE = (corps) => `${DOSSIER_OK}\n## Fiche de sécurité\n\n${corps}\n`;
+  const CITEE = "Fiche CDC-SEC-HPR-20261110a remise au référent sécurité, version citée v1.13.0.\n";
+  attendre("tm18-sans-objet", produit("tm18-sans-objet", DOSSIER_OK, MARQUEUR), "TM18", "SANS_OBJET");
+  attendre("tm18-muet", produit("tm18-muet", FICHE(CITEE), MARQUEUR), "TM18", "AVERTISSEMENT");
+  attendre("tm18-pass", produit("tm18-pass", FICHE(`${CITEE}FS12 : PASS (version citée 1.13.0, étiquette déployée 1.13.0).`), MARQUEUR), "TM18", "PASS");
+  attendre("tm18-fail", produit("tm18-fail", FICHE(`${CITEE}FS12 : FAIL (citée 1.10.0, déployée 1.13.0).`), MARQUEUR), "TM18", "AVERTISSEMENT");
+  attendre("tm18-skip", produit("tm18-skip", FICHE(`${CITEE}FS12 : SKIP, aucune version citée.`), MARQUEUR), "TM18", "AVERTISSEMENT");
+  attendre("tm18-rejoue", produit("tm18-rejoue", FICHE(`${CITEE}FS12 : FAIL le 2026-11-10 (citée 1.10.0).\nFiche réémise, FS12 : PASS le 2026-11-10 (1.13.0).`), MARQUEUR), "TM18", "PASS");
+  attendre("tm18-mention-libre", produit("tm18-mention-libre", `${DOSSIER_OK}\nLa fiche de sécurité du produit est tenue par le référent.\n`, MARQUEUR), "TM18", "AVERTISSEMENT");
+  {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm18-fail")], { encoding: "utf8" });
+    if (r.status !== 0) casse.push("un dossier qui porte un FAIL de FS12 sort en échec — TM18 devait AVERTIR, règle neuve (la fiche périmée se réémet, elle ne bloque pas le GO d'elle-même)");
+    const msg = JSON.parse(spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm18-muet")], { encoding: "utf8" }).stdout || "{}");
+    const f = (msg.findings || []).find((x) => x.regle === "TM18");
+    if (!f || !/--etiquette-deployee/.test(f.message)) casse.push("l'avertissement de TM18 ne donne pas la commande qui joue FS12 avec l'étiquette déployée : un remède prescrit doit se lire (TF-1013)");
+  }
+  // Le remède que la doctrine prescrit se joue : la forme écrite à ETAPE-MEP.md § 3 quaterdecies (M-24) passe son oracle.
+  {
+    const etape = join(dirname(fileURLToPath(import.meta.url)), "..", "ETAPE-MEP.md");
+    const doc = existsSync(etape) ? readFileSync(etape, "utf8").replace(/\r\n/g, "\n") : "";
+    const m = /```\n(## Fiche de sécurité\n[\s\S]*?)```/.exec(doc);
+    if (!m) casse.push("ETAPE-MEP.md ne porte pas la forme du dossier pour « Fiche de sécurité » (M-24)");
+    else attendre("tm18-forme-doctrine", produit("tm18-forme-doctrine", `${DOSSIER_OK}\n${m[1]}`, MARQUEUR), "TM18", "PASS");
   }
 
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.

@@ -164,6 +164,7 @@ function jugerFlotte(entree, { maison } = {}) {
     + (flotte.length
       ? `Agents nommés disponibles, chacun avec son modèle, son effort et ses outils : ${flotte.join(", ")} `
         + "(explorateur : lecture et comptage mécaniques ; verificateur : rejouer et dire si c'est fait ; "
+        + "relecteur : relecture aveugle en lecture seule, sans Write, Edit ni shell ; "
         + "campagne : écrire dans UN dépôt sous le contrat AGENT-CAMPAGNE ; constructeur : construction complexe ; "
         + "redacteur : document sous gabarit). Relancer l'appel avec `subagent_type` à l'un d'eux, "
       : "Aucun agent nommé n'est visible ici (`.claude/agents/` absent) : ")

@@ -28,7 +28,8 @@ Une page de documentation n'a pas de date de publication : la date est celle de 
   Claude Code l'emploie à la place de l'abonnement, et la facturation passe à l'usage (source 8).
 - **Le mode `--bare`.** Il ne lit aucun identifiant OAuth et exige une clé d'API. La documentation le recommande pour les appels
   scriptés et annonce qu'il deviendra le défaut de `-p` dans une version future (source 5). Le jour de ce changement, tout
-  `claude -p` qui tourne sur la connexion du poste demandera une clé d'API.
+  `claude -p` qui tourne sur la connexion du poste demandera une clé d'API. Pour isoler un lecteur de tout contexte sans clé,
+  la commande et sa recette sont à `references\LECTEUR-ISOLE-ABONNEMENT.md` (TF-2553).
 - **Le quota.** L'usage d'un jeton est inclus dans l'abonnement et consomme les limites de 5 heures et hebdomadaire, partagées
   entre Claude et Claude Code. Le dépassement peut basculer sur des crédits d'usage mesurés, si le compte les a activés (sources 8 et 9).
 - **Les routines.** Elles s'exécutent chez Anthropic, en aperçu de recherche, et consomment l'abonnement comme une session

@@ -128,6 +128,13 @@
         "fondement": "plancher medium du rejeu pour l'extraction (Opus) ; 17 sous-agents Sonnet 5.5 du pilot servis à medium depuis le 13/10 sans escalade consignée ; re-test dû"
       },
       {
+        "id": "relecteur",
+        "famille": "opus",
+        "effort": "high",
+        "classe": "relecture aveugle en lecture seule (boucle L99, contre-lecture), sans Write, Edit ni shell",
+        "fondement": "modèle des relecteurs actuels (agents génériques sur Opus, relevé du 06/11/2026, TF-2241) ; effort high de la classe analyse-de-prompt de effort_par_classe (plancher mesuré medium) ; TF-2554 du 14/11/2026 : 2 relecteurs génériques sur 2 ont écrit des fichiers malgré « aucune écriture » ; le changement de modèle se teste à part (étude 20261106b, section 5)"
+      },
+      {
         "id": "campagne",
         "famille": "sonnet",
         "effort": "high",
