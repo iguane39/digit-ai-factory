@@ -88,8 +88,9 @@ try {
   // TF-1528 : le hook des droits accordés rejoue `scripts/verifier-droits-accordes.mjs` et sa table datée.
   // TF-1947 : le hook de fin de tour lit les écritures par commande avec `scripts/relecture-intention.mjs` (et son import).
   // TF-2483 : le hook des gestes distants résout la racine de configuration par `scripts/lib-config-installee.mjs`, comme le pilot réel.
+  // TF-2410 : le juge de restitution (S145) lit le relevé des personnes de l'accueil des lots, `todo/noms-de-personnes.mjs`.
   for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs",
-    "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs", "scripts/lib-config-installee.mjs"]) {
+    "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs", "scripts/lib-config-installee.mjs", "todo/noms-de-personnes.mjs"]) {
     mkdirSync(join(copie, dirname(f)), { recursive: true });
     copyFileSync(join(PILOT, f), join(copie, f));
   }
