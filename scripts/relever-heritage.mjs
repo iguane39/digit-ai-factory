@@ -477,6 +477,28 @@ function versionsDeSource(racinePilot, posix, ctx) {
   return versions;
 }
 
+/**
+ * TF-2408 (14/11/2026) — UN NOM DE HOOK PRÉSENT AU PRODUIT ET ABSENT DU GABARIT SE SIGNALE, IL NE S'ÉCRASE PAS. Le 10/11/2026, la recopie de
+ * `gabarits/hooks-factory.mjs` (pilot 8483b9fd) a retiré chez Produit-79 le nom `fichiers-env` que l'autre poste avait posé au produit le 04/11
+ * (846af92, D-106 (b)) : le conflit de fusion a été résolu à la main par l'union, et le hook, absent du pilot, sautait en exit 0 — une règle de
+ * sécurité inactive sur un poste. Le lanceur déclare ses hooks dans `const NOMS = new Set([...])`. Rend les noms que la copie du produit déclare et
+ * qu'AUCUNE version du gabarit ne déclare : ni la source actuelle, ni les 30 dernières révisions publiées. Un nom que le gabarit a retiré depuis
+ * (présent dans une révision) n'est pas signalé : c'est le pilot qui a avancé, recopier suffit. Vide quand la copie ne déclare aucun `NOMS`
+ * (autre fichier, lanceur jouet) : aucun appel git dans ce cas.
+ */
+const NOMS_DE_HOOK = /const NOMS = new Set\(\[([^\]]*)\]\)/;
+const nomsDeHook = (texte) => { const m = NOMS_DE_HOOK.exec(String(texte)); return m ? [...m[1].matchAll(/["']([^"']+)["']/g)].map((x) => x[1]) : null; };
+export function nomsDeHookHorsGabarit(contenuProduit, sourceRel, racinePilot, ctx = undefined) {
+  const duProduit = nomsDeHook(contenuProduit);
+  if (!duProduit?.length) return [];
+  const connus = new Set();
+  const lire = (contenu) => { const n = contenu == null ? null : nomsDeHook(contenu); if (n) for (const x of n) connus.add(x); };
+  try { lire(readFileSync(join(racinePilot, String(sourceRel)), "utf8")); } catch { /* source absente : rien à lire */ }
+  const histo = versionsDeSource(racinePilot, String(sourceRel).replaceAll("\\", "/"), ctx);
+  if (histo) { lire(histo.tete); for (const r of histo.revs) lire(r.contenu); }
+  return duProduit.filter((n) => !connus.has(n));
+}
+
 export function attribuerDivergence(sourceRel, contenuProduit, racinePilot, ctx = undefined) {
   const posix = String(sourceRel).replaceAll("\\", "/");
   const histo = versionsDeSource(racinePilot, posix, ctx);
@@ -510,6 +532,12 @@ export function attribuerDivergence(sourceRel, contenuProduit, racinePilot, ctx 
         `(date du commit, pas la version que le fichier déclare)${versions} — ` +
         "le PILOT a avancé depuis : recopier suffit (aucune faute côté produit)" };
     }
+  }
+  const noms = nomsDeHookHorsGabarit(contenuProduit, sourceRel, racinePilot, ctx);
+  if (noms.length) {
+    return { qui: "produit", noms_hors_gabarit: noms, detail: "votre copie ne correspond à AUCUNE des 30 dernières versions publiées, et elle déclare le(s) nom(s) de hook " +
+      `${noms.map((n) => `« ${n} »`).join(", ")} qu'aucune version de ${sourceRel} ne déclare : la recopier le RETIRERAIT (TF-2408). ` +
+      `Ne pas écraser : remonter le hook au pilot (le nom dans ${sourceRel}, son entrée dans gabarits/settings-produit.json, son oracle), puis recopier` };
   }
   return { qui: "produit", detail: "votre copie ne correspond à AUCUNE des 30 dernières versions publiées — " +
     "elle a été modifiée côté produit, ou tirée d'un état jamais publié : ne pas écraser sans lire la différence" };

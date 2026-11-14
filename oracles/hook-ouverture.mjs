@@ -224,6 +224,17 @@ if (iPilot >= 0) {
         if (!existsSync(src)) { refus.push(`${a.source} — source absente du pilot, rien à recopier`); continue; }
         const avant = existsSync(dst) ? norme(readFileSync(src, "utf8")) === norme(readFileSync(dst, "utf8")) : false;
         if (avant) continue;
+        // TF-2408 (14/11/2026) — UN NOM DE HOOK QUE LE GABARIT NE PORTE PAS NE S'ÉCRASE PAS. Le 10/11/2026, la recopie du lanceur a retiré chez un produit le nom
+        // `fichiers-env` posé par l'autre poste, et le hook de sécurité sautait en exit 0. Une copie qui déclare un nom qu'aucune version du gabarit ne déclare
+        // reste en place et se SIGNALE ; le verdict R-47 ci-dessous la tient pour divergente et en dit la cause (relever-heritage.mjs, attribuerDivergence).
+        if (existsSync(dst)) {
+          const { nomsDeHookHorsGabarit } = await import(pathToFileURL(join(PILOT, "scripts", "relever-heritage.mjs")).href);
+          const noms = nomsDeHookHorsGabarit(readFileSync(dst, "utf8"), a.source, PILOT);
+          if (noms.length) {
+            refus.push(`${a.cible} — déclare le(s) nom(s) de hook ${noms.map((n) => `« ${n} »`).join(", ")} qu'aucune version de ${a.source} ne déclare : l'écraser le retirerait (TF-2408). Remonter le hook au pilot (le nom dans le gabarit, son entrée dans settings-produit.json, son oracle), puis recopier`);
+            continue;
+          }
+        }
         const etat = existsSync(dst) ? "remplacé" : "créé";
         mkdirSync(dirname(dst), { recursive: true });
         copyFileSync(src, dst);

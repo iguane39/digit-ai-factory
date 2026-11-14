@@ -636,6 +636,36 @@ try {
     att(cause.qui === "inconnu", `attribution « ${cause.qui} » sur un dépôt sans historique`);
   });
 
+  // ── TF-2408 — UN NOM DE HOOK PRÉSENT AU PRODUIT ET ABSENT DU GABARIT SE SIGNALE, IL NE S'ÉCRASE PAS ──
+  // Le fait : le 10/11/2026, la recopie de gabarits/hooks-factory.mjs a retiré chez un produit le nom `fichiers-env` que l'autre poste lui avait posé ;
+  // le hook de sécurité sautait en exit 0. Rouge : la copie qui déclare un nom qu'aucune version du gabarit ne déclare le NOMME, et dit que la recopier
+  // le retirerait. Vert : une copie périmée aux noms connus, ou à un nom que le gabarit a retiré depuis, n'est pas signalée comme un retrait de hook.
+  check("TF-2408 rouge — une copie du lanceur qui déclare un nom de hook qu'aucune version du gabarit ne déclare : la cause le NOMME, dit que la recopier le retirerait, et garde « ne pas écraser »", () => {
+    const courante = spawnSync("git", ["-C", PILOT_REEL, "show", "HEAD:gabarits/hooks-factory.mjs"], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }).stdout;
+    const copie = courante.replace(/(const NOMS = new Set\(\[[^\]]*)\]\)/, "$1, \"hook-pose-par-le-produit\"])");
+    att(copie !== courante, "témoin mal construit : le lanceur d'essai ne diffère pas du gabarit");
+    const cause = attribuerDivergence("gabarits/hooks-factory.mjs", copie, PILOT_REEL);
+    att(cause.qui === "produit", `attribution « ${cause.qui} »`);
+    att(JSON.stringify(cause.noms_hors_gabarit) === "[\"hook-pose-par-le-produit\"]", `noms_hors_gabarit : ${JSON.stringify(cause.noms_hors_gabarit)}`);
+    att(/« hook-pose-par-le-produit »/.test(cause.detail) && /RETIRERAIT/.test(cause.detail) && /Ne pas écraser/.test(cause.detail), `message : ${cause.detail}`);
+    const sansNom = attribuerDivergence("gabarits/hooks-factory.mjs", courante + "\n// modif locale du produit\n", PILOT_REEL);
+    att(sansNom.qui === "produit" && sansNom.noms_hors_gabarit === undefined && /ne pas écraser sans lire/.test(sansNom.detail), "une modification locale sans nom de hook neuf garde le message d'avant");
+  });
+  check("TF-2408 vert — un nom de hook que le gabarit a RETIRÉ depuis (présent dans son historique) n'est pas signalé, un nom jamais publié l'est ; une copie égale à une version publiée accuse le pilot", () => {
+    const pilotH = join(T, "tf2408");
+    mkdirSync(join(pilotH, "gabarits"), { recursive: true });
+    const g = (...a) => spawnSync("git", ["-C", pilotH, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+    g("init", "-q", "-b", "main");
+    const lanceur = (noms) => `// lanceur\nconst NOMS = new Set([${noms.map((n) => `"${n}"`).join(", ")}]);\nexport {};\n`;
+    writeFileSync(join(pilotH, "gabarits", "hooks-factory.mjs"), lanceur(["a", "b", "c"]), "utf8"); g("add", "-A"); g("commit", "-q", "-m", "v1 : trois hooks");
+    writeFileSync(join(pilotH, "gabarits", "hooks-factory.mjs"), lanceur(["a", "b"]), "utf8"); g("add", "-A"); g("commit", "-q", "-m", "v2 : c retiré");
+    const retire = attribuerDivergence("gabarits/hooks-factory.mjs", lanceur(["a", "b", "c"]) + "// modif locale\n", pilotH);
+    att(retire.qui === "produit" && retire.noms_hors_gabarit === undefined, `un nom retiré par le gabarit est signalé : ${JSON.stringify(retire)}`);
+    const inconnu = attribuerDivergence("gabarits/hooks-factory.mjs", lanceur(["a", "b", "x"]) + "// modif locale\n", pilotH);
+    att(JSON.stringify(inconnu.noms_hors_gabarit) === "[\"x\"]", `un nom jamais publié n'est pas signalé : ${JSON.stringify(inconnu)}`);
+    const ancienne = attribuerDivergence("gabarits/hooks-factory.mjs", lanceur(["a", "b", "c"]), pilotH);
+    att(ancienne.qui === "pilot", `une copie égale à la version 1 n'accuse pas le pilot : ${JSON.stringify(ancienne)}`);
+  });
   // ---- TF-2184 (06/11/2026) : LE RELEVÉ DU PARC NE LANCE PAS UN `git` PAR QUESTION --------------
   // Le 05/11, 92 s pour 31 produits sous charge, environ 1 838 sous-processus : `ls-files` + `diff` par
   // artefact et par produit, et `git log` + jusqu'à 30 `git show` par copie divergente. Le banc compte les
