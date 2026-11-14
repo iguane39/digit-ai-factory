@@ -81,6 +81,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - A1 et A2 de l apres-midi du 13-11 - 20261113h.md` | fichier | 5,4 Ko | markdown |
 | `Digit-AI - Synthese Mandat - Accueil des lots au sas un ingere quatre refuses - 20261004a.md` | fichier | 9,9 Ko | Synthèse Mandat — votre décision D-56 est exécutée : le sas est vide, 1 lot sur 5 est entr |
 | `Digit-AI - Synthese Mandat - Accueil du sas et trois lots ingeres - 20261012a.md` | fichier | 10,3 Ko | Synthèse Mandat — 4 lots du sas accueillis, 3 ingérés au registre (7 candidats), publicati |
+| `Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md` | fichier | 6,8 Ko | Synthèse Mandat — Actions A-1, A-3 et A-4 exécutées, la lettre de D-108 demandée (14/11/20 |
 | `Digit-AI - Synthese Mandat - Affichage double corrige revue - 20261001e.md` | fichier | 9,9 Ko | Synthèse Mandat — affichage double de la réponse corrigé, et revue hebdomadaire accélérée  |
 | `Digit-AI - Synthese Mandat - Appel de preuve Gemini et cadence mensuelle des modeles - 20261104d.md` | fichier | 5,6 Ko | Synthèse Mandat — appel de preuve du générateur d'images et contrôle mensuel des modèles t |
 | `Digit-AI - Synthese Mandat - Archives classees en sous-dossiers - 20261016h.md` | fichier | 9,0 Ko | Synthèse Mandat — archives d'input et d'output classées en sous-dossiers (16/10/2026) |
@@ -247,4 +248,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_226 fichier(s), 4 sous-dossier(s)_
+_227 fichier(s), 4 sous-dossier(s)_

@@ -1,0 +1,81 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+  "date_iso": "2026-11-14T15:43:29.030Z",
+  "registre_version": "2.63.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 6,
+    "fail": 0,
+    "skip": 1,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+      "verdict": "PASS",
+      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; pourcentage « 1% » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 3 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 0 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+    "ts": "2026-11-14T15:43:29.030Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md": "f644caeeeeb394fa0dfd327515e932a7ad080dc92d3f2d83a014e2062fbf8526"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
