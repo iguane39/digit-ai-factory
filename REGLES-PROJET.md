@@ -546,7 +546,7 @@ Quand il passe à `true`, un verdict websec absent ou FAIL bloque le GO — et l
 consigne comme toute décision (qui, quand, sur quel constat). Deux raisons de ne pas l'armer
 d'office : aucun produit n'a encore de verdict websec de bout en bout, et armer un gate que
 personne n'a exercé le ferait désarmer au premier faux positif — un gate qu'on apprend à
-contourner ne protège plus rien.
+contourner ne protège plus rien. Mécanisme (TF-2506, 14/11/2026) : O — contrôle TM17 de `oracles\oracle-trace-mutation-mep.mjs`, qui lit `websec_bloquant` dans `docs\projet\PARAMETRAGE.md` et le verdict websec du dossier de MEP : à `false`, un verdict absent, FAIL ou SKIP avertit ; à `true`, il rend FAIL. Non jugé : la vérité du verdict recopié au dossier, et la consignation du passage à `true`.
 
 **R-33 ter — l'admission d'un skill tiers passe par le scan, en avertissement d'abord.** Tout
 skill venu de l'extérieur passe `oracle-scan-agentdef.mjs` (CAP-1..4) **avant** admission au

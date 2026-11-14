@@ -76,7 +76,13 @@
  *   TM16 le dossier porte la section « Version servie et inventaire » : le commit lu par
  *        `version-servie.mjs lire`, le verdict d'O-26 et celui d'O-27 de forge-ops (M-22, TF-2243). Absente
  *        ou incomplète : AVERTISSEMENT. Un FAIL d'O-26 ou d'O-27 porté par le dossier : FAIL, puisque la
- *        décision de TF-2243 fait de ce FAIL un refus de la porte « prêt ».
+ *        décision de TF-2243 fait de ce FAIL un refus de la porte « prêt » ;
+ *   TM17 le dossier porte le verdict websec du gate (oracle-exposition, oracle-sca), lu AVEC le paramètre
+ *        `[gates] websec_bloquant` de `docs\projet\PARAMETRAGE.md` (R-33 bis, TF-2506, ETAPE-MEP.md § 4, M-23).
+ *        Paramètre à `false` ou absent, le défaut de l'écosystème : un verdict absent, FAIL ou SKIP AVERTIT
+ *        (un manque déclaré, jamais un refus). Paramètre à `true` : un verdict absent, FAIL ou SKIP est un FAIL,
+ *        le GO est bloqué. Avant TF-2506, aucun contrôle ne lisait le paramètre ni le verdict : armer le gate
+ *        n'avait aucun effet exécutable.
  *
  * TM9 EST UN AVERTISSEMENT, ET C'EST LA DOCTRINE DE LA CAMPAGNE DU 13/10/2026 : une règle NEUVE, opposable
  * à tous les produits, entre en avertissement et jamais en blocage (précédent D-70 (b)). Le verbe rend
@@ -406,6 +412,54 @@ function confronterVersionServie(texte) {
     : { statut: "PASS", message: `version servie lue (O-26 ${o26}) et inventaire confronté aux sorties d'état (O-27 ${o27})` };
 }
 
+/**
+ * TM17 — le verdict websec du gate MEP, lu avec le paramètre qui l'arme (R-33 bis, TF-2506).
+ * R-33 bis pose le verdict websec au gate, non bloquant par défaut, armable produit par produit par
+ * `[gates] websec_bloquant = true` dans `docs\projet\PARAMETRAGE.md`. Rien ne lisait ce paramètre ni ce
+ * verdict : le passer à `true` ne changeait aucun résultat. Les deux se lisent ici, sans verbe ni outil.
+ * Un « Websec : sans objet : <motif> » écrit au dossier est reçu (produit sans surface web), dans les deux modes.
+ */
+function lireWebsecBloquant(racine) {
+  const f = join(racine, "docs", "projet", "PARAMETRAGE.md");
+  if (!existsSync(f)) return { valeur: false, source: null };
+  let texte;
+  try { texte = readFileSync(f, "utf8"); } catch { return { valeur: false, source: f, illisible: "fichier illisible" }; }
+  const m = /^[ \t]*websec_bloquant[ \t]*=[ \t]*["']?([^\s#"']*)/im.exec(texte);
+  if (!m) return { valeur: false, source: f };
+  const v = m[1].toLowerCase();
+  if (v === "true" || v === "false") return { valeur: v === "true", source: f };
+  return { valeur: false, source: f, illisible: m[1] || "(vide)" };
+}
+const VERDICT_WEBSEC = /\b(oracle-exposition|oracle-sca|forge-websec|websec)\b[^\n]*?\b(PASS|FAIL|SKIP)\b/gi;
+function verdictsWebsec(texte) {
+  const par = new Map();
+  for (const m of texte.matchAll(VERDICT_WEBSEC)) {
+    const nom = m[1].toLowerCase();
+    par.set(nom === "oracle-exposition" || nom === "oracle-sca" ? nom : "websec", m[2].toUpperCase());   // le dernier verdict d'un oracle compte
+  }
+  return par;
+}
+function confronterWebsec(texte, param) {
+  const verdicts = [...verdictsWebsec(texte).entries()];
+  const dit = verdicts.map(([n, v]) => `${n} ${v}`).join(", ");
+  if (/websec[^\n]*sans objet\s*:\s*\S.{8,}/i.test(texte)) return { statut: "PASS", message: "verdict websec sans objet, motivé au dossier" };
+  const valeurs = verdicts.map(([, v]) => v);
+  const manque = !valeurs.length ? "le dossier ne porte aucun verdict websec"
+    : valeurs.includes("FAIL") ? `le dossier porte un FAIL websec (${dit})`
+      : valeurs.includes("SKIP") ? `un verdict websec est SKIP (${dit}) : l'audit n'a pas eu lieu, ce n'est pas un PASS` : null;
+  if (param.valeur === true) {
+    return manque
+      ? { statut: "FAIL", message: `le gate websec est ARMÉ (\`websec_bloquant = true\`, docs\\projet\\PARAMETRAGE.md) et ${manque} : le GO est bloqué (R-33 bis). `
+        + "Écrire le verdict de `oracle-exposition` et `oracle-sca` (ETAPE-MEP.md § 4), corriger puis rejouer ce qui a échoué, ou « Websec : sans objet : <motif> »" }
+      : { statut: "PASS", message: `gate websec armé et verdict porté au dossier (${dit})` };
+  }
+  const avertir = (m) => ({ statut: "AVERTISSEMENT", message: `R-33 bis, gate websec NON bloquant (${param.source ? "`websec_bloquant = false`" : "défaut de l'écosystème : `websec_bloquant` absent"}) — ${m}` });
+  if (param.illisible) return avertir(`la valeur de \`websec_bloquant\` est illisible (« ${param.illisible} », docs\\projet\\PARAMETRAGE.md) : lue comme \`false\`. Écrire \`true\` ou \`false\``);
+  if (manque) return avertir(`${manque}. Un manque se déclare au dossier (verdict d'\`oracle-exposition\` et d'\`oracle-sca\`, ou « Websec : sans objet : <motif> »), il ne passe pas en silence ; `
+    + "le passage au bloquant se décide par `[gates] websec_bloquant = true` (REGLES-PROJET.md, R-33 bis)");
+  return { statut: "PASS", message: `verdict websec porté au dossier (${dit})` };
+}
+
 export function juger(racine) {
   const findings = [];
   const ok = (regle, ou, message) => findings.push({ regle, statut: "PASS", ou, message });
@@ -525,6 +579,14 @@ export function juger(racine) {
     const vs = confronterVersionServie(texte);
     findings.push({ regle: "TM16", statut: vs.statut, ou: chemin, message: vs.message });
   }
+  // TM17 — une fois par dossier : le verdict websec du gate, lu avec le paramètre `websec_bloquant` du produit (R-33 bis, TF-2506).
+  const parametreWebsec = lireWebsecBloquant(racine);
+  for (const chemin of dossiers) {
+    let texte;
+    try { texte = readFileSync(chemin, "utf8"); } catch { continue; }
+    const ws = confronterWebsec(texte, parametreWebsec);
+    findings.push({ regle: "TM17", statut: ws.statut, ou: chemin, message: ws.message });
+  }
   return findings;
 }
 
@@ -561,14 +623,19 @@ const NON_JUGE = [
   + "non plus, faute de savoir lesquelles il emploie. TM15 avertit sans bloquer, TM16 ne bloque que le FAIL que le dossier porte lui-même",
   "l'HEURE du rejeu des portes à base externe (TM5) : la règle est le jour du lancement ; une base qui "
   + "change entre le rejeu du matin et un lancement du soir n'est pas vue",
+  "la VÉRITÉ du verdict websec recopié au dossier (TM17) et la justesse d'un « Websec : sans objet » : la règle lit le dossier et le "
+  + "paramètre `[gates] websec_bloquant` de docs\\projet\\PARAMETRAGE.md, elle ne rejoue ni `oracle-exposition` ni `oracle-sca` ; le passage du "
+  + "paramètre à `true` se consigne comme toute décision (qui, quand, sur quel constat), ce que cet oracle ne vérifie pas ; "
+  + "TM17 avertit sans bloquer tant que le produit n'a pas armé le gate lui-même",
 ];
 
 // --- Banc a double sens ------------------------------------------------------------------------
 function selfTest() {
   const dir = mkdtempSync(join(tmpdir(), "trace-mutation-"));
-  const produit = (nom, dossier, note) => {
+  const produit = (nom, dossier, note, parametrage) => {
     const racine = join(dir, nom);
     mkdirSync(join(racine, "forge", "etapes", "mep"), { recursive: true });
+    if (parametrage !== undefined) { mkdirSync(join(racine, "docs", "projet"), { recursive: true }); writeFileSync(join(racine, "docs", "projet", "PARAMETRAGE.md"), parametrage, "utf8"); }
     if (dossier !== null) writeFileSync(join(racine, "forge", "etapes", "mep", "DOSSIER-MEP.md"), dossier, "utf8");
     if (note) writeFileSync(join(racine, "forge", "mutation-derniere-campagne.json"), JSON.stringify(note), "utf8");
     return racine;
@@ -897,6 +964,32 @@ function selfTest() {
     }
   }
 
+  // ---- TM17 : LE VERDICT WEBSEC DU GATE, LU AVEC LE PARAMÈTRE QUI L'ARME (R-33 bis, TF-2506) ----------
+  // Le cas fondateur du 13/11/2026 : `git grep` du pilot, aucun contrôle ne lit `websec_bloquant` ni le verdict du gate.
+  // Même dossier, deux sens : paramètre à false, le manque se déclare (AVERTISSEMENT) ; à true, il bloque (FAIL).
+  const PARAM = (v) => `# Paramétrage\n\n[gates]\nwebsec_bloquant = ${v}   # R-33 bis\n`;
+  const WS_PASS = "\n## Verdict websec du gate\n\nOrigine déployée : oracle-exposition PASS le 2026-11-14. Dépendances : oracle-sca PASS le 2026-11-14.\n";
+  const WS_FAIL = "\n## Verdict websec du gate\n\nOrigine déployée : oracle-exposition FAIL (EX-3, en-tête absent). Dépendances : oracle-sca PASS.\n";
+  const WS_SKIP = "\n## Verdict websec du gate\n\nOrigine déployée : oracle-exposition PASS. Dépendances : oracle-sca SKIP, registre injoignable.\n";
+  attendre("tm17-muet", produit("tm17-muet", DOSSIER_OK, MARQUEUR), "TM17", "AVERTISSEMENT");
+  attendre("tm17-muet-false", produit("tm17-muet-false", DOSSIER_OK, MARQUEUR, PARAM("false")), "TM17", "AVERTISSEMENT");
+  attendre("tm17-pass", produit("tm17-pass", DOSSIER_OK + WS_PASS, MARQUEUR, PARAM("false")), "TM17", "PASS");
+  attendre("tm17-fail-non-bloquant", produit("tm17-fail-non-bloquant", DOSSIER_OK + WS_FAIL, MARQUEUR, PARAM("false")), "TM17", "AVERTISSEMENT");
+  attendre("tm17-skip-non-bloquant", produit("tm17-skip-non-bloquant", DOSSIER_OK + WS_SKIP, MARQUEUR, PARAM("false")), "TM17", "AVERTISSEMENT");
+  attendre("tm17-sans-objet", produit("tm17-sans-objet", `${DOSSIER_OK}\nWebsec : sans objet : produit sans surface web, aucun service servi.\n`, MARQUEUR, PARAM("true")), "TM17", "PASS");
+  attendre("tm17-arme-muet", produit("tm17-arme-muet", DOSSIER_OK, MARQUEUR, PARAM("true")), "TM17", "FAIL");
+  attendre("tm17-arme-fail", produit("tm17-arme-fail", DOSSIER_OK + WS_FAIL, MARQUEUR, PARAM("true")), "TM17", "FAIL");
+  attendre("tm17-arme-skip", produit("tm17-arme-skip", DOSSIER_OK + WS_SKIP, MARQUEUR, PARAM("true")), "TM17", "FAIL");
+  attendre("tm17-arme-pass", produit("tm17-arme-pass", DOSSIER_OK + WS_PASS, MARQUEUR, PARAM("true")), "TM17", "PASS");
+  attendre("tm17-arme-rejoue", produit("tm17-arme-rejoue", DOSSIER_OK + WS_FAIL + "\nRejeu après correction : oracle-exposition PASS le 2026-11-14.\n", MARQUEUR, PARAM("true")), "TM17", "PASS");
+  attendre("tm17-illisible", produit("tm17-illisible", DOSSIER_OK + WS_PASS, MARQUEUR, PARAM("oui")), "TM17", "AVERTISSEMENT");
+  {
+    const arme = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm17-arme-muet")], { encoding: "utf8" });
+    if (arme.status !== 1) casse.push("un gate websec armé sans verdict au dossier ne sort pas en 1 — armer `websec_bloquant` doit bloquer (R-33 bis)");
+    const desarme = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm17-muet-false")], { encoding: "utf8" });
+    if (desarme.status !== 0) casse.push("le MÊME dossier muet, gate non armé, fait sortir l'oracle en échec — TM17 devait AVERTIR sans bloquer (R-33 bis)");
+  }
+
   // Le VERDICT d'ensemble se lit aussi : un vert doit sortir en 0, un rouge en 1.
   const rv = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "vert")], { encoding: "utf8" });
   const rr = spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "muet")], { encoding: "utf8" });
@@ -906,7 +999,7 @@ function selfTest() {
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test trace-mutation-MEP : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
-    : "Self-test trace-mutation-MEP : 70/70 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
+    : "Self-test trace-mutation-MEP : 83/83 PASS (campagne jouée, chiffrée et adossée au marqueur PASS ; "
       + "dossier MUET FAIL — le cas fondateur ; campagne jouée SANS preuve chiffrée FAIL ; campagne jouée "
       + "SANS marqueur FAIL — la règle qu'une phrase ne peut pas satisfaire ; marqueur SANS point de "
       + "référence FAIL ; campagne PROPOSÉE puis refusée PASS avec TM2 et TM3 sans objet ; produit sans "
@@ -938,7 +1031,11 @@ function selfTest() {
       + "motivé PASS ; TM15 ne bloque PAS, code de sortie 0 vérifié ; TM16 dossier muet sur la version servie AVERTISSEMENT ; "
       + "TM16 commit lu, O-26 et O-27 PASS ; TM16 FAIL d'O-26 ou d'O-27 porté par le dossier FAIL, code de sortie 1 vérifié ; "
       + "TM16 O-27 rejoué PASS après un FAIL, le dernier verdict compte ; TM16 O-27 absent, SKIP, commit absent AVERTISSEMENT ×3 ; "
-      + "TM16 « Sans objet » motivé PASS ; TM16 muet ne bloque PAS ; les deux formes écrites à ETAPE-MEP.md passent TM15 et TM16)");
+      + "TM16 « Sans objet » motivé PASS ; TM16 muet ne bloque PAS ; les deux formes écrites à ETAPE-MEP.md passent TM15 et TM16 ; "
+      + "TM17 dossier muet sur le verdict websec AVERTISSEMENT, paramètre absent ou à false ; TM17 verdicts PASS PASS ; TM17 FAIL ou SKIP "
+      + "websec, gate non armé, AVERTISSEMENT ; TM17 « sans objet » motivé PASS ; TM17 gate ARMÉ — dossier muet, FAIL, SKIP — FAIL, "
+      + "le même dossier muet n'étant qu'un AVERTISSEMENT à false ; TM17 armé, verdict PASS ou rejoué après un FAIL, PASS ; TM17 valeur "
+      + "illisible AVERTISSEMENT ; codes de sortie 1 (armé) et 0 (non armé) vérifiés)");
   return casse.length ? 1 : 0;
 }
 
