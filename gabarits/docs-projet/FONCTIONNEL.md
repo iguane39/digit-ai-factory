@@ -12,6 +12,12 @@ verifie_le: {AAAA-MM-JJ}
 > (forge-conception), ce fichier en est la projection — l'exigence fait foi.
 > Pour un produit importé sans référentiel, il est rédigé depuis le code et
 > chaque affirmation est datée comme toute valeur volatile.
+>
+> **Toute table de ce fichier, celles du modèle comme celles que le produit ajoute (table de
+> correspondance, de statuts, de parcours), est précédée de sa phrase de lecture** : ce que vaut
+> une ligne, ce que vaut chaque colonne, comment la table est triée, ce qui en est exclu. Le hook
+> d'écriture refuse un chapitre de plus de 12 lignes de table sans cette phrase (M10) et un
+> chapitre qui s'ouvre sur une table nue (M7) ; le modèle la montre donc avant chaque table.
 
 ## À quoi sert le produit
 
@@ -19,12 +25,16 @@ verifie_le: {AAAA-MM-JJ}
 
 ## Utilisateurs & rôles
 
+{Phrase de lecture : une ligne est un rôle ; dire ce que vaut chaque colonne, comment les rôles sont triés et ce que la table exclut.}
+
 | Rôle | Qui | Droits | Limites |
 |---|---|---|---|
 | {admin} | {…} | {…} | {…} |
 | {utilisateur} | {…} | {…} | {…} |
 
 ## Objets métier & cycle de vie
+
+{Phrase de lecture : une ligne est un objet métier ; dire ce que vaut chaque colonne, comment les objets sont triés et ce que la table exclut.}
 
 | Objet | États | Transitions clés | Où il vit |
 |---|---|---|---|
