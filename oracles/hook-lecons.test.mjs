@@ -37,6 +37,10 @@ const TABLE = JSON.parse(readFileSync(join(ICI, "..", "references", "LECONS.json
 let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
 const base = mkdtempSync(join(tmpdir(), "hook-lecons-"));
+// TF-2529 : la recette ne dépend pas de la session qui la joue. `hook-restitution --prejuger` retrouve la transcription de la
+// session par CLAUDE_CODE_SESSION_ID et juge alors le tour réel de la session (sans écriture : « affichable ») au lieu du brouillon ;
+// 80/0 hors session, 79/1 dans une session au tour sans écriture. Comme `hook-restitution.test.mjs`, la variable est retirée.
+delete process.env.CLAUDE_CODE_SESSION_ID;
 
 /** Joue un hook (le réel par défaut) sur une entrée ; la racine du projet est `racine` (jamais le vrai pilot). */
 function jouer(entree, racine, hook = HOOK) {
@@ -168,6 +172,21 @@ try {
     let j = null;
     try { j = JSON.parse(r.stdout); } catch { /* sortie non JSON */ }
     if (!j || j.outil !== "hook-restitution --prejuger" || j.affichable !== false || r.status !== 1) throw new Error(`exit ${r.status} ${String(r.stdout).slice(0, 200)} ${String(r.stderr).slice(0, 200)}`);
+  });
+  check("rouge/vert (TF-2529) — une session au tour sans écriture changerait le verdict du remède : la recette n'en porte aucune, et le cas le prouve des deux côtés", () => {
+    const brouillon = join(base, "brouillon-attente.md");
+    const config = join(base, "config-session");
+    mkdirSync(join(config, "projects", "p"), { recursive: true });
+    writeFileSync(join(config, "projects", "p", "S-fixture.jsonl"), JSON.stringify({ type: "user", message: { role: "user", content: "bonjour" } }) + "\n", "utf8");
+    const joue = (env) => {
+      const r = spawnSync(process.execPath, [join(ICI, "hook-restitution.mjs"), "--prejuger", brouillon], { encoding: "utf8", cwd: base, env: { ...env, CLAUDE_PROJECT_DIR: base, CLAUDE_CONFIG_DIR: config } });
+      try { return JSON.parse(r.stdout).affichable; } catch { return `<illisible : ${r.stdout}>`; }
+    };
+    if (process.env.CLAUDE_CODE_SESSION_ID) throw new Error("la recette porte encore CLAUDE_CODE_SESSION_ID");
+    const avec = joue({ ...process.env, CLAUDE_CODE_SESSION_ID: "S-fixture" });
+    if (avec !== true) throw new Error(`cas rouge perdu : avec une session au tour sans écriture le préjugement devait rendre affichable=true, rendu ${avec}`);
+    const sans = joue(process.env);
+    if (sans !== false) throw new Error(`sans session, le brouillon d'attente devait être refusé, affichable=${sans}`);
   });
 
   // --- Câblage (TF-1947) : l'outil Agent et l'outil Task sont au matcher de hook-lecons, au pilot et au gabarit produit ---
