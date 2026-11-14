@@ -389,6 +389,21 @@ const ETAT_DU_PARC = [
     motif: "expression régulière morte : frontière de mot ASCII collée à une lettre accentuée, classe de majuscules sous drapeau i, octet de contrôle dans une source",
     remede: "frontière Unicode `(?<![\\wà-ÿ])…(?![\\wà-ÿ])` ou forme non accentuée à la ligne nommée ; une expression juste se déclare `// piege-ok : <motif>` sur sa ligne",
   },
+  {
+    // TF-2505 (14/11/2026) : l'oracle ne se jouait que sur ses fixtures, et le parc réel lui rendait BD1 (hook-controles-produit.mjs : « banc » dans l'en-tête,
+    // aucun banc trouvé) sans que personne le lise. C'est un état du PARC : un contrôle nouveau naît sans banc, ou avec un en-tête qui en affirme un.
+    nom: "oracle-banc-double-sens.mjs",
+    args: ["--json"],
+    motif: "contrôle en service dont l'en-tête affirme un banc qui n'existe pas (BD1), banc sans cas écrit pour échouer (BD2), `--self-test` annoncé et non lu (BD3)",
+    remede: "écrire le banc voisin `<contrôle>.test.mjs`, ou déclarer le banc existant dans oracles\\lib-recettes-dediees.mjs avec sa raison, ou retirer du texte d'en-tête l'affirmation d'un banc",
+  },
+  {
+    // TF-2505 (14/11/2026) : même constat pour CI2 — `scripts/verifier-etape-chaine.mjs:166` rendait FAIL sur le parc et personne ne le lisait.
+    nom: "oracle-controles-injoignables.mjs",
+    args: ["--json"],
+    motif: "contrôle que rien n'appelle (CI1), chemin d'outil externe codé en dur (CI2), codes de sortie non déclarés (CI3), contrôle sans recette (CI4) ou sans chemin d'échec (CI5)",
+    remede: "variable d'environnement d'abord, liste de repli ensuite, échec bruyant sinon ; un chemin volontairement littéral se marque `outil-en-dur-ok : <motif>` en fin de ligne",
+  },
 ];
 for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // Certains oracles d'etat jugent des ARTEFACTS nommes plutot qu'un parc entier : ils portent
