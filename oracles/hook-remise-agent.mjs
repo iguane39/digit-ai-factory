@@ -24,7 +24,6 @@
  * Chez un produit, le hook n'est pas posé : l'héritage ne le porte pas.
  *
  * Usage : node oracles\hook-remise-agent.mjs      (stdin : JSON du hook SubagentStop : `agent_transcript_path` ou `transcript_path` + `agent_id`)
- *         node oracles\hook-remise-agent.mjs --self-test    → joue `oracles\hook-remise-agent.test.mjs`
  * Exit : toujours 0 ; le refus sort sur stdout en JSON `decision: "block"`, l'avertissement en `systemMessage`.
  */
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
@@ -64,10 +63,6 @@ export const messageRefus = (j, agent) => `[remise d'agent — TF-2548] ${agent 
   + "C'est la remise qui exige le verdict, quel que soit le moyen par lequel le fichier a été écrit (outil, commande, après un refus du hook d'écriture). " + RAPPEL_CRITIQUE;
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  if (process.argv.includes("--self-test")) {
-    const { spawnSync } = await import("node:child_process");
-    process.exit(spawnSync(process.execPath, [join(ICI, "hook-remise-agent.test.mjs")], { stdio: "inherit" }).status ?? 1);
-  }
   let entree = {};
   try { entree = JSON.parse(readFileSync(0, "utf8") || "{}"); } catch { /* entrée illisible : rien à juger */ }
   try {
