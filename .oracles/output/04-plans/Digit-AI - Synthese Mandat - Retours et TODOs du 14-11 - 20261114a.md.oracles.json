@@ -1,6 +1,6 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
-  "date_iso": "2026-11-14T13:58:31.661Z",
+  "date_iso": "2026-11-14T14:01:19.231Z",
   "registre_version": "2.61.0",
   "profil": "digit-ai",
   "niveau": "note",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
-    "ts": "2026-11-14T13:58:31.661Z",
+    "ts": "2026-11-14T14:01:19.230Z",
     "fichiers": {
-      "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md": "ca8cd6ca2d21da31f057651b11cb20ab2b5b23e94d7950b2bf5ea650b8564e85"
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md": "3622366de0518d18f1b993b7cd24c1425ef9a82dbb3249c224f1d0dbda828417"
     }
   },
   "empreinte_motif": null,

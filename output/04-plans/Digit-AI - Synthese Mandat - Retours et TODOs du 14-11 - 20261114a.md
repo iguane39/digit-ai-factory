@@ -41,7 +41,7 @@ Une décision nouvelle vous revient, sur ce que la Factory publie en clair. Le s
 
 > **D-214 — Comment traiter le nom « factory-digit-ai-fr », émetteur de 7 lots au sas, inconnu de la table des pseudonymes et déjà cité en clair dans 21 fichiers suivis du pilot ?**
 > - **De quoi s'agit-il** : la table des pseudonymes remplace le nom de chaque produit par un nom neutre avant qu'un lot de retours entre au dépôt publié ; un nom déjà cité en clair ailleurs n'y est jamais inscrit d'office, l'accueil le refuse et attend votre arbitrage (`todo/accueillir-lot.mjs`).
-> - **Le problème** : ni « factory-digit-ai-fr » ni « forge-digit-ai-fr » n'ont de pseudonyme ; leurs lots d'août sont entrés en clair, avant la pseudonymisation.
+> - **Le problème** : ni « factory-digit-ai-fr » ni « forge-digit-ai-fr » n'ont de pseudonyme ; leurs lots d'août sont entrés en clair, avant la pseudonymisation. Mesuré par `git grep` sur l'état du pilot à l'ouverture : 21 fichiers suivis citent l'une des deux graphies, dont 14 la première.
 > - **Pourquoi vous** : D-5 (a) et D-36 (a) ont tranché les 2 cas voisins (un nom de l'écosystème cité en clair) ; c'est un choix de doctrine sur ce qui se publie.
 > - **Recommandation : (a)** — c'est le site public de la Factory, au nom de domaine public, déjà cité en clair 21 fois : le cacher désormais ne retirerait rien de ce qui est publié, comme pour `digit-ai-marketing`. Source consultée : `scripts/lib-parc.mjs`, `PRODUITS_DE_L_ECOSYSTEME` (D-5 (a), D-36 (a)).
 
@@ -72,6 +72,7 @@ D-180 (moment de traiter les 7 sujets de la boucle L99, posée le 06/11) et D-18
   - forge-agents, lots fa1 et fa2, TF-2510, TF-2295, TF-2296, TF-2508, TF-2509, TF-2494, TF-2424, TF-2425 et TF-2500 : fusion des deux branches avec conflits de version résolus (quality-oracles 2.36.0, registre 2.63.0), self-test 121 PASS avec le pilot présent, routage 15 sur 15 ; publié d4e19947.
   - pilot, lots pf (10 sujets) et pe (7 sujets) : fusions 63d5af57 et 7b4278f3 sans conflit ; recettes rejouées : relecture-intention 97, readme-dossiers 41, lib-decisions 13, relever-heritage 51, trace-mutation 83, conformité 254, installer-projet 31, toutes sans échec.
   - pilot, `gabarits/ledger.py` accepte `rectification_doublon`, héritage 1.66.0 (a07fca7f) : sans lui, la parité de vocabulaire de forge-agents rougissait dès que le pilot était présent.
+- Publication : les 8 forges et le pilot sont à 0 commit d'écart après `git fetch` ; le pilot est parti sous le feu vert permanent D-54 (b) du 03/10 (fb6ea025..ee0b8569), après un premier refus de sa garde, faute de la déclaration de ce feu vert.
 - Relevé de la flotte consigné : `node scripts\relever-flotte.mjs --depuis 2026-11-14`, pic de 11 agents simultanés.
 
 Relecture d'intention : sert, gravité mineure, 1 écart de nature choix humain (RI-20261114-01, les sujets hors campagne déclarés avec leur motif).

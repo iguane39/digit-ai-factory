@@ -217,7 +217,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Retours et TODOs du 06-11 seconde passe - 20261106b.md` | fichier | 13,2 Ko | Synthèse Mandat — 11 lots de retours ingérés, 44 sujets du registre clos (06/11/2026, seco |
 | `Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 - 20261109d.md` | fichier | 10,5 Ko | Synthèse Mandat — 14 sujets du registre clos, boîte des retours vide (09/11/2026) |
 | `Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 au soir - 20261109h.md` | fichier | 13,6 Ko | Synthèse Mandat — 10 lots reçus, 17 sujets clos, 82 candidats en attente de tri (09/11/202 |
-| `Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md` | fichier | 15,6 Ko | Synthèse Mandat — 45 sujets du registre clos, 4 lots ingérés ou refusés, une variable de p |
+| `Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md` | fichier | 16,0 Ko | Synthèse Mandat — 45 sujets du registre clos, 4 lots ingérés ou refusés, une variable de p |
 | `Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` | fichier | 10,3 Ko | Synthèse Mandat — retours du jour ingérés, 19 sujets du registre clos (29/10/2026) |
 | `Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` | fichier | 16,6 Ko | Synthèse Mandat — revue des 6 décisions posée, 6 restes de la campagne clos (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` | fichier | 8,3 Ko | Synthèse Mandat — revue de code proposée à la mise en production (03/11/2026) |
