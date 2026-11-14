@@ -1,6 +1,6 @@
 {
   "schema": "lecons@1",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "date": "2026-11-14",
   "_commentaire": "Table des leçons génériques du pilot (TF-2150, décision humaine D-172 (a) du 04/11/2026, étude « Apprentissage des erreurs par les produits et la Factory » 20261104b, option O2). Lue au moment du geste par oracles/hook-lecons.mjs (PreToolUse sur Bash, PowerShell, Write, Edit, MultiEdit, Agent et Task ; `declencheur.sur` vaut `commande`, `chemin` ou `agent`, ce dernier jugeant la description d'un lancement d'agent, TF-1947), au pilot et chez chaque produit par `forge/hooks/factory.mjs lecons` ; rien n'est chargé à l'ouverture. Une leçon générique entre ici après décision au registre, avec une preuve qui se vérifie : le hook la revérifie avant chaque rappel et tait la leçon dont la preuve ne se vérifie plus. Jugée par `node scripts/lecons.mjs --verifier` ; passée de `rappel` à `barriere` par `--appliquer` quand elle récidive après son rappel (BOUCLE-AMELIORATION.md, section T1). Champs facultatifs : `declencheur.chaines` (`retirees` par défaut, `interpretees`, `gardees` : ce que le motif voit d'une commande, voir l'en-tête du hook), `barriere_le` et `motif_barriere` (écrits par --appliquer), `mesure` (calibrage du motif sur les gestes réels des transcriptions du poste).",
   "lecons": [
@@ -316,7 +316,16 @@
       "revue_le": "2026-12-15",
       "source": "TF-2416 (10/11/2026, RT-60 de Produit-84, 3e occurrence de RT-58 ; décision R-58 « A1 et A2 » du 10/11/2026 : la barrière de RT-58 couvre tout geste de remise) ; geste réel : `check_markdown.py`, `git commit`, `git push` en une commande, contrôle en FAIL (M7)",
       "barriere_le": "2026-11-14",
-      "motif_barriere": "décision du 10/11/2026 (TF-2416, R-58) : barrière dès la 3e occurrence de RT-58, et la remise se refuse dès qu'un contrôle la précède dans la commande, puisque le verdict ne se lit qu'après"
+      "motif_barriere": "décision du 10/11/2026 (TF-2416, R-58) : barrière dès la 3e occurrence de RT-58, et la remise se refuse dès qu'un contrôle la précède dans la commande, puisque le verdict ne se lit qu'après",
+      "mesure": {
+        "le": "2026-11-14",
+        "periode": "2026-09-29 au 2026-11-14",
+        "gestes_juges": 23979,
+        "gestes_rappeles": 24,
+        "echantillon_relu": 24,
+        "faux_positifs_vus": 3,
+        "note": "relevé par `node scripts/lecons.mjs --mesurer L-007` sur 695 transcriptions des profils du poste (sous-agents compris, un geste compté une fois par identifiant de tool_use) : 23 979 gestes Bash ou PowerShell jugés, 24 refusés par le motif, soit 0,100 % (Bash 24 sur 23 490, PowerShell 0 sur 489), les 24 relus un à un. 21 sont la forme visée : un contrôle (`node <oracle>.mjs`, `*.test.mjs`, `--self-test`) puis `git commit` ou `git push` dans la même commande, dont un `cp` d'un lot au sas. 3 sont des faux positifs, aucun contrôle n'y est joué : un `git add … ledger.py … ledger.test.mjs && git commit` (deux fois) et un `git add … forge/ledger.py … forge/retours/oracle-lot.mjs … && git commit`, où le motif lit le `py` de fin de `ledger.py` comme l'interpréteur `py` (`\\b` s'arrête au point), puis le nom d'un test ou d'un oracle cité dans le `git add` comme un contrôle joué. Faux positifs : 3 sur 24 refus, 3 sur 23 979 gestes. Non mesuré : le verdict des 21 contrôles (PASS ou FAIL) ; la barrière les refuse tous, par décision du 10/11/2026, puisque le verdict ne se lit qu'après. Correction du motif non faite ici, hors de la décision de TF-2530 : elle est portée au rapport de la campagne."
+      }
     }
   ]
 }
