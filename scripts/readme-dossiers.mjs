@@ -24,9 +24,16 @@
  *     colonne supprime la CAUSE. La fraîcheur d'un fichier se lit dans git, qui la tient déjà.
  *
  * Usage : node scripts\readme-dossiers.mjs [--check] [--silencieux] [--base <dépôt>]
- *                                          [--racines input,output]
+ *                                          [--racines input,output] [--help]
  *   --check      n'écrit rien ; exit 1 si un README manque, diverge, ou porte un rôle non rédigé
  *   --silencieux n'imprime que les défauts (mode hook PostToolUse)
+ *   --base       le dépôt à régénérer (défaut : le pilot) ; l'écrire hors du dépôt courant exige de le déclarer (TF-1201)
+ *   --racines    la PORTÉE : les dossiers parcourus, séparés par des virgules ou des espaces (défaut : input,output).
+ *                Pour ré-indexer UN dossier : `--racines output/<dossier>`. Sans l'option, tout input\ et output\ est
+ *                parcouru, et des README sans rapport avec le dossier visé se créent ou se modifient (TF-2517, rapporté par le ledger seq 640 du
+ *                02/11/2026 : 6 créés, 2 modifiés). Toutes les racines passées sont traitées ; `--racines` sans valeur, ou
+ *                un argument qui n'est la valeur d'aucune option, est REFUSÉ (exit 2) au lieu d'être ignoré.
+ *   --help       affiche cet usage et rend 0, sans rien régénérer
  * Appelants : hook PostToolUse (après toute écriture) · oracle-readme-dossiers (recette I4,
  * parc réel) · la main. Les dossiers cachés (`.oracles\`, `.git\`) ne reçoivent pas de README
  * et sont comptés dans le README de leur parent.
@@ -44,7 +51,37 @@ const lireArg = (nom, defaut) => { const i = args.indexOf(nom); return i >= 0 ? 
 // `--check` n ecrit rien : le garde de depot ne le concerne pas, et il est lu avant lui.
 const CHECK_TOT = args.includes("--check");
 const BASE = resolve(lireArg("--base", join(ICI, "..")));
-const RACINES = lireArg("--racines", "input,output").split(",").map((s) => s.trim()).filter(Boolean);
+// TF-2517 : `--help` s'explique lui-même, et la portée se lit en entier. Avant, `--racines a b c` ne traitait que `a` en silence (ledger seq 613)
+// et `--racines` sans valeur plantait sur `undefined.split` ; un argument orphelin (`output/dossier` sans option) était ignoré, tout input\ et
+// output\ étaient alors régénérés. Désormais : les valeurs consécutives qui suivent `--racines` sont toutes des racines, et ce qui n'est la valeur
+// d'aucune option est refusé en le disant. Un drapeau inconnu (`--strict`) reste ignoré, comme avant.
+if (args.includes("--help") || args.includes("-h")) {
+  const src = readFileSync(fileURLToPath(import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const usage = src.slice(src.indexOf(" * Usage :"), src.indexOf(" * Appelants :")).split("\n").map((l) => l.replace(/^ \* ?/, "")).join("\n").trimEnd();
+  console.log(usage);
+  process.exit(0);
+}
+const RACINES_DEFAUT = ["input", "output"];
+const lireRacines = () => {
+  const i = args.indexOf("--racines");
+  if (i < 0) return { racines: RACINES_DEFAUT, consommes: new Set() };
+  const racines = [], consommes = new Set();
+  for (let k = i + 1; k < args.length && !args[k].startsWith("--"); k++) { consommes.add(k); racines.push(...args[k].split(",")); }
+  return { racines: racines.map((s) => s.trim()).filter(Boolean), consommes };
+};
+const { racines: RACINES, consommes: INDEX_RACINES } = lireRacines();
+{
+  const iBase = args.indexOf("--base");
+  const orphelins = args.map((a, k) => [a, k]).filter(([a, k]) => !a.startsWith("-") && !INDEX_RACINES.has(k) && !(iBase >= 0 && k === iBase + 1));
+  if (args.includes("--racines") && !RACINES.length) {
+    console.error("refus : `--racines` sans valeur. Donner les dossiers à parcourir, séparés par des virgules ou des espaces (ex. `--racines output/03-etudes`) ; sans l'option, input,output sont parcourus en entier. `--help` détaille l'usage.");
+    process.exit(2);
+  }
+  if (orphelins.length) {
+    console.error(`refus : argument(s) non reconnu(s) : ${orphelins.map(([a]) => `« ${a} »`).join(", ")}. Un dossier à ré-indexer se donne par \`--racines <dossier>\` ; sans cette option, tout input\\ et output\\ serait régénéré et l'argument ignoré en silence. \`--help\` détaille l'usage.`);
+    process.exit(2);
+  }
+}
 // TF-1451 et TF-1452 (28/09/2026) — UN DÉPÔT DE PRODUIT N'EST NI LE PILOT NI UN DÉPÔT PUBLIABLE.
 // Relancé chez un produit (`--base .`), ce générateur y posait les rôles du pilot (« Entrants du
 // pilot », familles `05-`) et pseudonymisait son dépôt privé jusque dans le bloc Rôle écrit à la main :

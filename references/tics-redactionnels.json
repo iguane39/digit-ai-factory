@@ -380,7 +380,7 @@
   },
   "non_juge": [
     "la JUSTESSE d'une voix, la véracité d'un fait, la pertinence d'un choix : l'oracle compte des tournures, il ne lit pas",
-    "le jargon hors des référentiels existants (JARGON-A-GLOSER.json, jargon-a-gloser.json du socle) : couvert par S20, S23, M18, L30, jamais ici",
+    "le jargon hors des référentiels existants (JARGON-A-GLOSER.json, jargon-a-gloser.json du socle) : couvert par S20, S23, M18, L30 (chapitre), jamais ici",
     "les textes d'application (T4 : libellés, erreurs, états vides) : leurs chaînes vivent dans du code ou des fichiers de ressources que cet oracle ne lit pas — lot de travaux forge-design",
     "un tic hors liste : un motif qui n'a encore coûté aucun aller-retour n'est pas détecté ; la liste grossit par les retours humains, jamais par la devinette"
   ],

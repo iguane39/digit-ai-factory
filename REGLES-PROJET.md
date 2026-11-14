@@ -498,6 +498,8 @@ non bloquant ; les livrables antérieurs sont une antériorité déclarée. Non 
 que l'historique dit avoir changé. La bascule en bloquant est une décision humaine, prise sur une
 mesure du bruit chez les produits, comme pour R-32 quater.
 
+**R-32 sexies (TF-2495, 13/11/2026 ; ligne de règle TF-2514) — un journal d'oracles qui consigne un FAIL n'est pas un verdict de conformité, en AVERTISSEMENT.** R-32 exige la PRÉSENCE du journal, la preuve que les oracles ont été joués, pas qu'il dise PASS. Mesuré le 13/11/2026 chez un produit : 9 pages sur 10 satisfaisaient R-32 avec un journal qui consigne un FAIL. R-32 ne change pas : un journal présent reste PASS, sinon un produit apprendrait à ne plus consigner ses échecs. Règle : le contrôle lit, dans chaque journal `forge\oracles\<page>.json`, le champ `verdict` et chaque valeur de `verdicts{}`, et AVERTIT en nommant la page, l'oracle et le champ quand l'un d'eux dit FAIL (« 0 FAIL » n'en est pas un). Mécanisme : O — contrôle R-32 sexies d'`oracle-conformite-projet.mjs`, non bloquant, avec son cas rouge et son cas de borne (sans journal, R-32 reste FAIL et R-32 sexies se tait) dans `oracles\self-test.mjs`. Non jugé : la justesse d'un verdict consigné, et un journal illisible, ignoré. La bascule en bloquant est une décision humaine, prise sur une mesure du bruit chez les produits, comme pour R-32 quater.
+
 ## M. Sécurité offensive — sur mandat, jamais dans la voie automatique (règle 33 — 14/08, TF-0189)
 
 Constat de l'étude du 14/08 (`output\03-etudes\2026-08\20260814-etude-opportunite-pentest-owasp.md`) :
@@ -544,7 +546,7 @@ Quand il passe à `true`, un verdict websec absent ou FAIL bloque le GO — et l
 consigne comme toute décision (qui, quand, sur quel constat). Deux raisons de ne pas l'armer
 d'office : aucun produit n'a encore de verdict websec de bout en bout, et armer un gate que
 personne n'a exercé le ferait désarmer au premier faux positif — un gate qu'on apprend à
-contourner ne protège plus rien.
+contourner ne protège plus rien. Mécanisme (TF-2506, 14/11/2026) : O — contrôle TM17 de `oracles\oracle-trace-mutation-mep.mjs`, qui lit `websec_bloquant` dans `docs\projet\PARAMETRAGE.md` et le verdict websec du dossier de MEP : à `false`, un verdict absent, FAIL ou SKIP avertit ; à `true`, il rend FAIL. Non jugé : la vérité du verdict recopié au dossier, et la consignation du passage à `true`.
 
 **R-33 ter — l'admission d'un skill tiers passe par le scan, en avertissement d'abord.** Tout
 skill venu de l'extérieur passe `oracle-scan-agentdef.mjs` (CAP-1..4) **avant** admission au

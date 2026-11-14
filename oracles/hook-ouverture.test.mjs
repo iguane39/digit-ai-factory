@@ -545,6 +545,37 @@ check("TF-1942 — permissions allow, ask, deny et defaultMode d'un produit inta
   if (/^\s*- \.claude\/settings\.json — (remplacé|créé) depuis/m.test(s)) throw new Error("settings.json listé parmi les fichiers recopiés");
 });
 
+veut(2408);
+// ---- TF-2408 (14/11/2026) : LA RECOPIE DU LANCEUR NE RETIRE PAS UN NOM DE HOOK QUE LE GABARIT NE PORTE PAS ---------
+// Le fait : le 10/11/2026, la recopie de gabarits/hooks-factory.mjs a retiré chez un produit le nom `fichiers-env` posé par l'autre poste ;
+// le hook de sécurité sautait en exit 0. Rouge : un lanceur qui déclare un nom qu'aucune version du gabarit ne déclare n'est PAS écrasé,
+// et l'ouverture le dit. Vert : un lanceur périmé qui ne déclare que des noms déjà portés par le gabarit est recopié, comme avant.
+check("TF-2408 — un lanceur qui déclare un nom de hook absent du gabarit n'est pas écrasé et l'ouverture le dit ; un lanceur périmé aux noms connus est recopié", () => {
+  const gabarit = readFileSync(join(PILOT, "gabarits", "hooks-factory.mjs"), "utf8");
+  const NOMS = /const NOMS = new Set\(\[([^\]]*)\]\)/;
+  const m = NOMS.exec(gabarit);
+  if (!m || !/"fichiers-env"/.test(m[1])) throw new Error("témoin mal construit : le gabarit ne déclare pas fichiers-env");
+  const avecNom = gabarit.replace(NOMS, (tout, noms) => `const NOMS = new Set([${noms}, "hook-pose-par-le-produit"])`);
+  const sansConnu = gabarit.replace(NOMS, (tout, noms) => `const NOMS = new Set([${noms.replace(/,\s*"fichiers-env"/, "")}])`);
+  if (avecNom === gabarit || sansConnu === gabarit) throw new Error("témoin mal construit : le lanceur d'essai ne diffère pas du gabarit");
+  const produit = (nom, lanceur) => {
+    const P = mkdtempSync(join(tmpdir(), `ouverture-noms-${nom}-`));
+    mkdirSync(join(P, ".claude"), { recursive: true });
+    mkdirSync(join(P, "forge", "hooks"), { recursive: true });
+    writeFileSync(join(P, "forge", "hooks", "factory.mjs"), lanceur, "utf8");
+    writeFileSync(join(P, ".claude", "settings.json"), SETTINGS_ANCIEN, "utf8");
+    return P;
+  };
+  const P1 = produit("inconnu", avecNom);
+  const s1 = joue(P1);
+  if (readFileSync(join(P1, "forge", "hooks", "factory.mjs"), "utf8") !== avecNom) throw new Error("rouge : le lanceur qui déclare un nom absent du gabarit a été écrasé, le nom est perdu");
+  if (!/non recopié : forge\/hooks\/factory\.mjs — déclare le\(s\) nom\(s\) de hook « hook-pose-par-le-produit »/.test(s1)) throw new Error(`l'ouverture ne dit pas le nom : ${s1.slice(0, 600)}`);
+  if (/forge\/hooks\/factory\.mjs — remplacé depuis/.test(s1)) throw new Error("le lanceur est listé comme remplacé alors qu'il ne l'a pas été");
+  const P2 = produit("connus", sansConnu);
+  const s2 = joue(P2);
+  if (readFileSync(join(P2, "forge", "hooks", "factory.mjs"), "utf8") !== gabarit) throw new Error("vert : un lanceur périmé aux noms connus du gabarit n'a pas été recopié");
+  if (!/forge\/hooks\/factory\.mjs — remplacé depuis/.test(s2) || /non recopié : forge\/hooks\/factory\.mjs/.test(s2)) throw new Error("vert : la recopie du lanceur périmé n'est pas dite comme telle");
+});
 // ---- TF-1758 et TF-1760 (15/10/2026) : LOTS NON REMIS ET SORT DES RETOURS, À L'OUVERTURE DU PRODUIT --
 // Vert : un lot `a_remettre` de plus de 24 h, jamais parvenu au pilot, est NOMMÉ ; les TF du registre qui
 // désignent le produit (par son pseudonyme, retrouvé par une table jetable) sont comptés, et la seconde

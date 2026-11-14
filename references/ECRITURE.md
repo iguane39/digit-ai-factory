@@ -120,7 +120,7 @@ compté est celui qui surgit après du texte, au milieu d'une phrase : un averti
 (deux textes sur 171 le 12/09, de 73 à 193 mots en gras).
 
 ### E-10 — Un sigle ou un identifiant porte son sens à son premier emploi
-*Tous types. Juge : S20, S23 (restitutions), M18 (Markdown), L18 / L30 (HTML), T2 (lecture par un tiers). Déléguée.*
+*Tous types. Juge : S20, S23 (restitutions), M18 (Markdown), L18 / L30 (chapitre) (HTML), T2 (lecture par un tiers). Déléguée.*
 Le référentiel de jargon est une donnée fermée (`gabarits\JARGON-A-GLOSER.json`) qui grossit par
 les retours.
 Avant (TF-0511) : « justificatif fédéré, identité system-assigned, UAMI, constat H2 ». Après : la

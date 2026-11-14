@@ -163,12 +163,24 @@ export function numerosDuLedger(produit) {
 /** TF-2223 (RP-2, 06/11/2026) : le journal des entrées écrites hors run, à côté du ledger — `forge/ledger.py` l'écrit de la même façon. */
 export const HORS_RUN_NOM = "hors-run.jsonl";
 
+/** TF-2415 : le type de ledger qui dit qu'une décision posée est retirée, sans réponse ni décision de remplacement. */
+export const DECISION_RETIREE = "decision_retiree";
+/** Les décisions qu'une entrée `decision_retiree` retire, au format « D-N » : champs `decision`, `decisions` et `decisions_retirees` (chaîne ou liste). */
+export function decisionsRetirees(e) {
+  return [].concat(e?.decision ?? [], e?.decisions ?? [], e?.decisions_retirees ?? [])
+    .map((x) => /^D-?\s*(\d{1,4})$/i.exec(String(x).trim())).filter(Boolean).map((m) => `D-${Number(m[1])}`);
+}
+
 /**
  * Les décisions POSÉES au ledger d'un produit et SANS RÉPONSE NOMMÉE (TF-2214, 06/11/2026). Le 03/11/2026, D-48 (« Supprime-t-on le réseau vide créé en Europe du Nord ?
  * ») a été posée, n'a reçu ni réponse ni rappel, et les ressources qu'elle visait sont restées facturées deux jours. Une décision est POSÉE par une entrée `question_humain`
  * (`decisions_posees` : { "D-N": question }, ou `decision` : "D-N") ; elle est RÉPONDUE quand une entrée `reponse_humain` POSTÉRIEURE la nomme, où que ce soit dans l'entrée.
  * Limite dite : une réponse que le produit n'a pas consignée avec son numéro compte comme absente (la mesure du 06/11/2026 sur 11 ledgers locaux : 25 décisions sur 40 sans réponse
  * nommée, dont beaucoup de réponses probablement non consignées) ; c'est pourquoi la fenêtre est bornée (`fenetreJours`, 14 par défaut) et que les contrôles qui s'en servent avertissent.
+ * TF-2415 (14/11/2026) — UNE DÉCISION RETIRÉE EST SORTIE, ELLE N'ATTEND PLUS. Le 10/11/2026, D-12 (retirée au seq 58) et D-178 (retirée au seq 231) étaient rappelées au porteur
+ * comme ouvertes : 5 décisions sur 8 pendant 2 tours, la seule sortie connue étant une `reponse_humain` qui nomme la décision. Deux autres sorties : une entrée de type
+ * `decision_retiree` (`DECISION_RETIREE`) qui nomme la décision retirée (`decision`, `decisions` ou `decisions_retirees`), et le rattachement « D-N remplacée par D-M » : une
+ * `reponse_humain` de D-M qui porte `remplace: "D-N"` (écrite par `forge/ledger.py --remplace`) sort D-N, comme toute entrée de ce type qui la nomme.
  * Rend [{ n: "D-48", question, ts, seq }], de la plus ancienne à la plus récente. `maintenant` s'injecte pour les essais.
  */
 export function decisionsSansReponse(produit, { maintenant = Date.now(), fenetreJours = 14 } = {}) {
@@ -197,7 +209,7 @@ export function decisionsSansReponse(produit, { maintenant = Date.now(), fenetre
     const t = ts ? Date.parse(ts) : NaN;
     if (!Number.isFinite(t) || t < limite) continue;
     const re = new RegExp(`\\b${n}\\b`);
-    if (entrees.some((e, j) => j > i && e.type === "reponse_humain" && re.test(JSON.stringify(e)))) continue;
+    if (entrees.some((e, j) => j > i && ((e.type === "reponse_humain" && re.test(JSON.stringify(e))) || (e.type === DECISION_RETIREE && decisionsRetirees(e).includes(n))))) continue;
     ouvertes.push({ n, question, ts, seq });
   }
   return ouvertes.sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));

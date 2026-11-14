@@ -497,6 +497,48 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   rmSync(R, { recursive: true, force: true });
 }
 
+// ----- TF-2517 (14/11/2026) : la portée `--racines` se lit en entier, `--help` s'explique, un argument orphelin est refusé -----
+// Le 02/11/2026, lancé pour ré-indexer un seul dossier, le script a parcouru input\ et output\ en entier (6 README créés, 2 modifiés dans des dossiers sans
+// rapport) ; `--racines a b c` ne traitait que `a` (ledger seq 613) ; l'option n'avait aucune ligne d'explication et `--help` aucune réponse.
+{
+  const arbre = (nom) => {
+    const D = mkdtempSync(join(tmpdir(), `readme-racines-${nom}-`));
+    mkdirSync(join(D, "input"), { recursive: true }); mkdirSync(join(D, "output"), { recursive: true });
+    writeFileSync(join(D, "input", "a.md"), "# A\n", "utf8"); writeFileSync(join(D, "output", "b.md"), "# B\n", "utf8");
+    spawnSync("git", ["-C", D, "init", "-q", "-b", "main"], { encoding: "utf8" });
+    return D;
+  };
+  const jouer = (D, ...a) => spawnSync(process.execPath, [OUTIL, "--base", D, ...a], { encoding: "utf8" });
+  const P = arbre("plusieurs"), Q = arbre("orphelin"), H = arbre("aide");
+  check("TF-2517 rouge → vert — `--help` explique `--base`, `--racines` et `--help` à son usage, rend 0 et ne régénère rien", () => {
+    const r = jouer(H, "--help");
+    if (r.status !== 0) throw new Error(`exit ${r.status} attendu 0 : ${(r.stderr || "").slice(0, 200)}`);
+    for (const m of ["--racines", "--base", "--help", "PORTÉE"]) if (!(r.stdout || "").includes(m)) throw new Error(`l'usage ne dit pas « ${m} » : ${(r.stdout || "").slice(0, 300)}`);
+    if (existsSync(join(H, "input", "README.md")) || existsSync(join(H, "output", "README.md"))) throw new Error("`--help` a régénéré des README");
+  });
+  check("TF-2517 rouge → vert — `--racines input output` (valeurs séparées par une espace) traite TOUTES les racines : les deux README sont écrits, et `--check` nomme les deux", () => {
+    const r = jouer(P, "--racines", "input", "output");   // exit 1 : les rôles sont à rédiger, ce n'est pas un refus
+    if (r.status === 2) throw new Error(`refusé (exit 2) : ${(r.stderr || "").slice(0, 200)}`);
+    if (!existsSync(join(P, "input", "README.md"))) throw new Error("la première racine n'est pas traitée");
+    if (!existsSync(join(P, "output", "README.md"))) throw new Error("la seconde racine est ignorée en silence (le défaut de ledger seq 613)");
+    const c = jouer(P, "--check", "--racines", "input", "output");
+    if (c.status !== 1 || !/input/.test(c.stderr || "") || !/output/.test(c.stderr || "")) throw new Error(`--check devait refuser les rôles non rédigés des DEUX racines (exit ${c.status}) : ${(c.stderr || "").slice(0, 300)}`);
+  });
+  check("TF-2517 rouge → vert — `--racines` sans valeur est REFUSÉ (exit 2, motif dit) au lieu de planter ; la forme à virgule reste admise", () => {
+    const r = jouer(P, "--racines");
+    if (r.status !== 2 || !/sans valeur/.test(r.stderr || "")) throw new Error(`exit ${r.status} attendu 2, « sans valeur » absent : ${(r.stderr || "").slice(0, 200)}`);
+    const v = jouer(P, "--racines", "input,output");
+    if (v.status === 2) throw new Error(`la forme à virgule est refusée (exit 2) : ${(v.stderr || "").slice(0, 200)}`);
+  });
+  check("TF-2517 rouge → vert — un argument qui n'est la valeur d'aucune option (`output` nu) est REFUSÉ (exit 2, nommé) et rien n'est écrit, au lieu de régénérer input\\ et output\\ en entier", () => {
+    const r = jouer(Q, "output");
+    if (r.status !== 2 || !/non reconnu/.test(r.stderr || "") || !/« output »/.test(r.stderr || "")) throw new Error(`exit ${r.status} attendu 2, argument non nommé : ${(r.stderr || "").slice(0, 200)}`);
+    if (existsSync(join(Q, "input", "README.md")) || existsSync(join(Q, "output", "README.md"))) throw new Error("des README ont été écrits malgré le refus");
+    const ok = jouer(Q, "--racines", "output");
+    if (ok.status === 2 || !existsSync(join(Q, "output", "README.md")) || existsSync(join(Q, "input", "README.md"))) throw new Error(`la portée --racines output devait écrire output seul (exit ${ok.status})`);
+  });
+  for (const D of [P, Q, H]) rmSync(D, { recursive: true, force: true });
+}
 rmSync(T, { recursive: true, force: true });
 rmSync(TABLES, { recursive: true, force: true });
 console.log(`\nreadme-dossiers, table sans dates (TF-0503) : ${pass} PASS, ${fail} FAIL`);

@@ -25,7 +25,7 @@
         "regle": "Aucun livrable ne passe par un outil de publication hébergée (artifact, page web, partage cloud) sans GO humain préalable et consigné : un livrable est un fichier autoportant sur disque.",
         "source": {
           "fichier": "REGLES-PROJET.md",
-          "ligne": 713,
+          "ligne": 715,
           "ancre": "**R-38.**"
         },
         "fait": "17/08/2026 (TF-0302) : un rapport citant deux écarts de sécurité exploitables a été rendu aussi comme page hébergée hors du poste, avant toute validation humaine, parce qu'aucune règle écrite ne l'interdisait."
@@ -35,7 +35,7 @@
         "regle": "Seules reviennent à l'humain les décisions qui portent une dépense, une publication, un geste irréversible, un changement de doctrine, un arbitrage de préférence ou une écriture chez un produit autonome hors run demandé ; les autres s'exécutent et se rendent pour information.",
         "source": {
           "fichier": "REGLES-PROJET.md",
-          "ligne": 1667,
+          "ligne": 1669,
           "ancre": "Toute décision envisagée s'analyse avant d'être posée."
         },
         "fait": "01/10/2026 : à la première revue hebdomadaire, 6 décisions sur 7 posées à l'humain n'avaient pas à l'être (2 clôtures sur preuve, 2 corrections de forge, 2 corrections du pilot réversibles et sans dépense)."
@@ -127,7 +127,7 @@
         "regle": "Une phrase entre guillemets attribuée à une page tierce se vérifie par recherche exacte dans le texte brut de la page avant d'être écrite, et une déduction ne se publie pas comme un fait.",
         "source": {
           "fichier": "REGLES-PROJET.md",
-          "ligne": 1712,
+          "ligne": 1714,
           "ancre": "**Une phrase entre guillemets attribuée à une page tierce"
         },
         "fait": "TF-1581 et TF-1582 : le 29/09/2026 l'outil de lecture résumée a rendu « limite de dépense mensuelle » là où la page dit « limite de dépense quotidienne de 20 € » ; le 24/09/2026 des livrets remis au client final affirmaient un studio « de plain-pied », accessibilité déduite, alors que le gîte est au 1er étage."
@@ -191,7 +191,7 @@
         "regle": "Une recette d'un livrable défini par un périmètre juge aussi l'exclusivité : un contrôle cherche dans le livrable ce qui ne doit pas y figurer et échoue s'il l'y trouve.",
         "source": {
           "fichier": "REGLES-PROJET.md",
-          "ligne": 829,
+          "ligne": 831,
           "ancre": "**Une recette de livrable défini par un PÉRIMÈTRE juge aussi l'EXCLUSIVITÉ**"
         },
         "fait": "TF-0989, 09/09/2026 : une recette de 20 contrôles a rendu PASS sur une page qui affichait 342 colonnes au lieu de 66 ; le contrôle manquant tenait en 12 lignes."
@@ -201,7 +201,7 @@
         "regle": "Un produit n'est « livré » que si toutes les exigences de sa fiche sont implémentées et testées, seuls les secrets restant à saisir ; un run qui s'arrête avant écrit « N exigences sur M tenues » et n'emploie ni « livré », ni « fini », ni « complet ».",
         "source": {
           "fichier": "REGLES-PROJET.md",
-          "ligne": 1769,
+          "ligne": 1771,
           "ancre": "**Un produit n'est « livré » que si toutes les exigences"
         },
         "fait": "TF-1708, TF-1709, TF-1711, 14/10/2026 : un service déclaré « P4 close » et « le brief mené jusqu'au bout » ne servait que des réponses de mock, le navigateur le rendait en 401, et 10 exigences sur 35 n'étaient pas tenues."
@@ -211,7 +211,7 @@
         "regle": "Une requête vers un service tiers ne porte aucune donnée d'identité de l'utilisateur (adresse électronique, nom, téléphone) dans son adresse, ses en-têtes ou son corps, sauf demande explicite de sa part.",
         "source": {
           "fichier": "REGLES-PROJET.md",
-          "ligne": 1803,
+          "ligne": 1805,
           "ancre": "**Une requête vers un service tiers ne porte aucune donnée d'identité"
         },
         "fait": "TF-1716, 14/10/2026 : la session a placé l'adresse électronique de l'utilisateur dans l'en-tête User-Agent d'un appel à une API publique tierce, sans qu'il l'ait demandé."
@@ -306,7 +306,7 @@
         "source": {
           "fichier": "gabarits/RETOURS-FORGES.md",
           "ligne": 25,
-          "ancre": "node forge\\retours\\oracle-lot.mjs"
+          "ancre": "> node forge\\retours\\oracle-lot.mjs \"<ce fichier>.md\""
         },
         "fait": "TF-0597, 24/08/2026 : en une seule journée, six lots ont dû être admis par dérogation, tous pour les deux mêmes sections absentes."
       }
@@ -401,7 +401,7 @@
         "regle": "Un produit qui a un référentiel d'exigences tient sa cascade (forge\\etapes\\conception\\cascade\\CASCADE.json, format pilot/cascade-isto@1), écrite à la conception et rejouée avant run_close.",
         "source": {
           "fichier": "REGLES-PROJET.md",
-          "ligne": 1734,
+          "ligne": 1736,
           "ancre": "**Un produit qui a un référentiel d'exigences tient sa cascade**"
         },
         "fait": "TF-1678 : chez Produit-12 le 02/10/2026, 99 exigences, 8 besoins, 0 stratégie et 0 tactique écrites ; l'humain : « ça aurait dû être fait suite directement à ma demande, et devra être fait pour les autres futurs produits »."
