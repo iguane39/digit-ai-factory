@@ -47,8 +47,8 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 50,
-  "vu_le": "2026-11-06"
+  "cas": 53,
+  "vu_le": "2026-11-14"
  },
  "gabarits/ledger.test.mjs": {
   "cas": 52,
@@ -363,16 +363,16 @@
   "vu_le": "2026-11-13"
  },
  "oracle-synthese.mjs": {
-  "cas": 364,
-  "vu_le": "2026-11-12"
+  "cas": 377,
+  "vu_le": "2026-11-14"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
   "cas": 31,
   "vu_le": "2026-10-18"
  },
  "oracle-trace-mutation-mep.mjs": {
-  "cas": 70,
-  "vu_le": "2026-11-06"
+  "cas": 83,
+  "vu_le": "2026-11-14"
  },
  "oracle-unicite.mjs": {
   "cas": 14,
@@ -422,6 +422,10 @@
   "cas": 5,
   "vu_le": "2026-10-13"
  },
+ "oracles/hook-fichiers-env.test.mjs": {
+  "cas": 173,
+  "vu_le": "2026-11-14"
+ },
  "oracles/hook-flotte.test.mjs": {
   "cas": 32,
   "vu_le": "2026-11-12"
@@ -439,8 +443,8 @@
   "vu_le": "2026-11-10"
  },
  "oracles/hook-lecons.test.mjs": {
-  "cas": 62,
-  "vu_le": "2026-11-05"
+  "cas": 80,
+  "vu_le": "2026-11-14"
  },
  "oracles/hook-lexique.test.mjs": {
   "cas": 29,
@@ -451,8 +455,8 @@
   "vu_le": "2026-11-04"
  },
  "oracles/hook-ouverture.test.mjs": {
-  "cas": 91,
-  "vu_le": "2026-11-12"
+  "cas": 96,
+  "vu_le": "2026-11-14"
  },
  "oracles/hook-publication-hebergee.test.mjs": {
   "cas": 12,
@@ -479,8 +483,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 77,
-  "vu_le": "2026-11-13"
+  "cas": 79,
+  "vu_le": "2026-11-14"
  },
  "oracles/hook-suivi-agents.test.mjs": {
   "cas": 45,
@@ -493,6 +497,10 @@
  "oracles/lib-chiffres-releves.test.mjs": {
   "cas": 20,
   "vu_le": "2026-11-03"
+ },
+ "oracles/lib-decisions.test.mjs": {
+  "cas": 13,
+  "vu_le": "2026-11-14"
  },
  "oracles/lib-enumeration-liste.test.mjs": {
   "cas": 39,
@@ -646,6 +654,10 @@
   "cas": 6,
   "vu_le": "2026-10-02"
  },
+ "scripts/env-masque.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-11-14"
+ },
  "scripts/fraicheur-depot.test.mjs": {
   "cas": 5,
   "vu_le": "2026-10-14"
@@ -679,8 +691,8 @@
   "vu_le": "2026-09-27"
  },
  "scripts/installer-projet.test.mjs": {
-  "cas": 27,
-  "vu_le": "2026-10-15"
+  "cas": 31,
+  "vu_le": "2026-11-14"
  },
  "scripts/lecons.test.mjs": {
   "cas": 48,
@@ -743,8 +755,8 @@
   "vu_le": "2026-11-05"
  },
  "scripts/readme-dossiers.test.mjs": {
-  "cas": 37,
-  "vu_le": "2026-11-03"
+  "cas": 41,
+  "vu_le": "2026-11-14"
  },
  "scripts/rebatir-clone.test.mjs": {
   "cas": 7,
@@ -763,8 +775,8 @@
   "vu_le": "2026-10-12"
  },
  "scripts/relecture-intention.test.mjs": {
-  "cas": 95,
-  "vu_le": "2026-11-13"
+  "cas": 97,
+  "vu_le": "2026-11-14"
  },
  "scripts/relever-appelants.test.mjs": {
   "cas": 21,
@@ -787,8 +799,8 @@
   "vu_le": "2026-10-26"
  },
  "scripts/relever-heritage.test.mjs": {
-  "cas": 49,
-  "vu_le": "2026-11-06"
+  "cas": 51,
+  "vu_le": "2026-11-14"
  },
  "scripts/reserver-decision.test.mjs": {
   "cas": 116,

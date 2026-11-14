@@ -1,0 +1,81 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+  "date_iso": "2026-11-14T13:58:31.661Z",
+  "registre_version": "2.61.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 6,
+    "fail": 0,
+    "skip": 1,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "6 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; pourcentage « 11% » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · fond : 7 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 0 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md",
+    "ts": "2026-11-14T13:58:31.661Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md": "ca8cd6ca2d21da31f057651b11cb20ab2b5b23e94d7950b2bf5ea650b8564e85"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
