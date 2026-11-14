@@ -1539,7 +1539,7 @@ export function controlerExplication({ dernierHumain = "", dernierTexte = "", fi
 const RAPPEL_PREJUGEMENT = "PRÉJUGEMENT — cette réponse n'a pas été préjugée avant affichage, d'où le doublon à l'écran : écris la "
   + "prochaine restitution dans un fichier du dossier temporaire, joue `node oracles/hook-restitution.mjs --prejuger <fichier>` "
   + "(chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), corrige jusqu'à l'exit 0 (chaque avertissement corrigé, ou motivé par `--motif <CODE>=\"<raison>\"` ; S48 et FRICTIONS ne se motivent pas tant que le texte ne cite aucun lot « <projet> - RETOURS - AAAAMMJJx »), puis affiche "
-  + "ce texte tel quel (TF-1647, TF-1666, TF-2171, TF-2303).";
+  + "ce texte tel quel. Un tour qui n'a rien écrit se rend en réponse courte, sans restitution (references\\NIVEAUX.md) : `--prejuger` la juge comme ce hook et rend le motif de l'exemption, `--pre-vol` la joue depuis un heredoc (TF-1647, TF-1666, TF-2171, TF-2303, TF-2516).";
 // TF-2303 — un lot de retours remis se cite par son nom : « <projet> - RETOURS - AAAAMMJJ<indice> » (gabarits\RETOURS-FORGES.md), comme S48 le lit.
 const LOT_REMIS_NOMME = /[\p{L}\p{N}][\p{L}\p{N} ._()-]{0,60} - RETOURS - \d{8}[a-z]+/u;
 const RAPPEL_GESTE = "Un mot de décision reçoit la PREUVE du geste au bloc 4, jamais la décision reposée.";
