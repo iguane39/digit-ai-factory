@@ -31,11 +31,15 @@
  * NON JUGÉ de ce volet : une isolation posée par la définition d'un agent (`isolation: worktree` en tête de son `.md`), que
  * l'entrée du hook ne porte pas.
  *
+ * Et quand l'appel demande `isolation: "worktree"`, il REFUSE (exit 2) si le dossier courant n'est pas dans le dépôt du produit de la session, ou si la
+ * consigne ne nomme pas le dépôt de la copie de travail (TF-2426, voir `jugerIsolation`).
+ *
  * Usage : node oracles\hook-flotte.mjs      (stdin : JSON du hook PreToolUse)
- * Exit : toujours 0 ; l'avertissement sort sur stdout en JSON `hookSpecificOutput.additionalContext`.
+ * Exit : 0 ; l'avertissement sort sur stdout en JSON `hookSpecificOutput.additionalContext`. 2 pour un refus d'isolation (TF-2426), motif sur stderr.
  */
+import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { racineDuProjet } from "./lib-racine-projet.mjs";
@@ -78,8 +82,49 @@ const messageRacine = (racine) => "RACINE DE SESSION EN MINUSCULE (TF-2443, 12/1
   + "Rouvrir la session sur « " + racine[0].toUpperCase() + racine.slice(1) + " » (lettre de lecteur en majuscule), ou lancer l'agent sans `isolation` sur un arbre "
   + "créé par `git worktree add` (consigne de campagne). Avertissement seulement : l'appel part tel quel.";
 
-/** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message } ou { decision: "rappelle", message }. */
+/**
+ * TF-2426 (14/11/2026, décision R-58 du 10/11/2026) — L'ISOLATION SUIT LE DOSSIER COURANT DE LA SESSION, PAS LE PRODUIT QUE LA CONSIGNE NOMME.
+ * Le fait (RP-62 de Produit-86, ledger seq 882) : un agent `constructeur` lancé avec `isolation: "worktree"` a reçu une copie de travail du dépôt de
+ * Produit-84 au lieu de Produit-86, parce que la session venait d'y lire des migrations (son dossier courant y était resté). L'agent s'est arrêté sans rien
+ * écrire ; sa relance a coûté environ 5 minutes. Le harnais crée la copie dans le dépôt du dossier courant, et rien dans l'appel ne le disait.
+ * LA RÈGLE, en deux refus (PreToolUse, exit 2) : 1) le dépôt du dossier courant (`cwd` de l'entrée) est celui du PRODUIT de la session (`CLAUDE_PROJECT_DIR`) —
+ * même dépôt, un arbre lié du même dépôt compris, jugé à son répertoire git commun ; 2) la consigne NOMME le dépôt de la copie de travail (son dossier, ou le
+ * chemin du dépôt) : sans cette ligne, l'agent ne peut pas voir qu'il travaille ailleurs que chez le produit nommé.
+ * NON JUGÉ, dit : un dossier courant qui n'est pas un dépôt git (le harnais refusera lui-même), une session sans `CLAUDE_PROJECT_DIR` (le refus 1 n'a rien à
+ * comparer, le refus 2 reste joué), et une isolation posée par la définition d'un agent (`isolation: worktree` en tête de son `.md`), que l'entrée n'a pas.
+ */
+const norme = (p) => String(p || "").replace(/\\/g, "/").replace(/\/+$/, "").toLowerCase();
+export function depotDe(dossier) {
+  if (typeof dossier !== "string" || !dossier || !existsSync(dossier)) return null;
+  const r = spawnSync("git", ["-C", dossier, "rev-parse", "--path-format=absolute", "--show-toplevel", "--git-common-dir"], { encoding: "utf8", timeout: 10000 });
+  if (r.status !== 0) return null;
+  const [racine, commun] = String(r.stdout).split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return racine && commun ? { racine, commun, nom: basename(dirname(commun)), dossier: basename(racine) } : null;
+}
+export function jugerIsolation(entree, env = process.env) {
+  const ti = entree?.tool_input || {};
+  if (!OUTILS.has(entree?.tool_name) || typeof ti.isolation !== "string" || ti.isolation.trim() !== "worktree") return null;
+  const courant = depotDe(entree?.cwd);
+  if (!courant) return null;
+  const session = env?.CLAUDE_PROJECT_DIR ? depotDe(env.CLAUDE_PROJECT_DIR) : null;
+  if (session && norme(session.commun) !== norme(courant.commun))
+    return "ISOLATION REFUSÉE (TF-2426, 14/11/2026) — cet appel demande `isolation: \"worktree\"` : le harnais crée la copie de travail du dépôt du DOSSIER COURANT de la session (« "
+      + courant.racine + " »), qui n'est pas le dépôt du produit de la session (« " + session.racine + " »). Le 10/11/2026, un agent isolé a reçu la copie d'un autre produit que celui que "
+      + "sa consigne nommait, parce que la session venait d'y lire des migrations ; il s'est arrêté sans rien écrire et sa relance a coûté environ 5 minutes. "
+      + "Remède : revenir au dépôt du produit (`cd " + session.racine + "`) avant l'appel, ou lancer l'agent sans `isolation` sur un arbre créé par `git worktree add` (consigne de campagne).";
+  const texte = norme(`${ti.prompt || ""}\n${ti.description || ""}`);
+  const noms = [courant.nom, courant.dossier, courant.racine].filter(Boolean).map(norme);
+  if (!noms.some((n) => texte.includes(n)))
+    return "ISOLATION REFUSÉE (TF-2426, 14/11/2026) — l'appel d'un agent isolé doit NOMMER le dépôt de sa copie de travail : le harnais la crée dans le dépôt du dossier courant (« "
+      + courant.nom + " », " + courant.racine + "), et ni la consigne ni la description ne le disent. Remède : ajouter à la consigne la ligne « Dépôt de la copie de travail : "
+      + courant.nom + " », ou le chemin du dépôt ; l'agent voit ainsi qu'il travaille ailleurs que chez le produit nommé.";
+  return null;
+}
+
+/** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message }, { decision: "rappelle", message } ou { decision: "refuse", message } (TF-2426). */
 export function juger(entree, options = {}) {
+  const refus = jugerIsolation(entree, options.env);
+  if (refus) return { decision: "refuse", message: refus };
   const v = jugerFlotte(entree, options);
   const racine = OUTILS.has(entree?.tool_name) ? racineEnMinuscule(entree) : null;
   if (!racine) return v;
@@ -134,6 +179,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try { entree = JSON.parse(brut || "{}"); } catch { /* entrée illisible : pas un appel d'outil */ }
   let v = { decision: "laisse" };
   try { v = juger(entree); } catch { /* une panne du juge ne bloque jamais un outil */ }
+  if (v.decision === "refuse") { process.stderr.write(v.message + "\n"); process.exit(2); }
   if (v.decision === "avertit" || v.decision === "rappelle") {
     process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: v.message } }) + "\n");
   }

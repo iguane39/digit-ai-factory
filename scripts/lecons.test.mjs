@@ -11,6 +11,10 @@
  * --appliquer : la leçon qui récidive passe en barrière, datée et motivée, la version de la table monte, la table
  * rejugée passe ; sans frictions, rien n'est écrit. La boucle entière est jouée sur un pilot jetable : le hook rappelle
  * et journalise, une friction suit, --appliquer pose la barrière, le hook REFUSE le même geste.
+ * --mesurer (TF-2530) : sur des transcriptions de fixture, les gestes jugés (outils de la leçon, un geste compté une fois, sous-agents
+ * compris) et rappelés (motif) se comptent ; une leçon sans geste correspondant rend 0 rappelé ; `--depuis` écarte l'ancien ; le motif
+ * réel de L-007 rappelle un contrôle suivi d'un commit dans une commande et laisse le commit seul et le contrôle seul ; leçon absente :
+ * exit 1, aucune transcription : exit 2.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { spawnSync } from "node:child_process";
@@ -212,6 +216,56 @@ try {
     if (a.code !== 0 || !/passée\(s\) en barrière — L-901/.test(a.out)) throw new Error(`--appliquer : exit ${a.code} ${a.out}`);
     const second = hook("S-boucle");
     if (second.status !== 2 || !/LEÇON EN BARRIÈRE L-901/.test(second.stderr) || !/correction_humaine/.test(second.stderr)) throw new Error(`second geste : exit ${second.status} ${second.stderr.slice(0, 200)}`);
+  });
+
+  // --- --mesurer (TF-2530) : le bruit d'une leçon relevé sur des transcriptions de fixture ----------------------------
+  const ligne = (ts, outil, id, input) => JSON.stringify({ type: "assistant", timestamp: ts, message: { content: [{ type: "text", text: "x" }, { type: "tool_use", id, name: outil, input }] } });
+  const transcriptions = (nom, lignes, sous = "") => {
+    const d = join(base, nom, sous);
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, "session.jsonl"), lignes.join("\n") + "\n", "utf8");
+    return join(base, nom);
+  };
+  const mesurer = (p, id, dossier, extra = []) => lancer(["--mesurer", id, "--pilot", p, "--racine", p, "--dossier", dossier, "--json", ...extra]);
+  const fixtures = transcriptions("tr-fixture", [
+    ligne("2026-10-20T10:00:00Z", "Bash", "t1", { command: "geste-l-901 a" }),
+    ligne("2026-10-20T10:00:01Z", "Bash", "t1", { command: "geste-l-901 a" }),          // le même geste, écrit deux fois par le flux : compté une fois
+    ligne("2026-10-20T10:01:00Z", "Bash", "t2", { command: "autre chose" }),
+    ligne("2026-10-20T10:02:00Z", "Write", "t3", { file_path: "geste-l-901.txt", content: "x" }),   // outil que la leçon ne juge pas
+    "{ ligne de transcription illisible",
+    ligne("2026-09-01T09:00:00Z", "Bash", "t4", { command: "geste-l-901 b" }),
+  ]);
+  const sousAgent = transcriptions("tr-fixture", [ligne("2026-10-21T10:00:00Z", "Bash", "t5", { command: "geste-l-901 c" })], join("projet", "session", "subagents"));
+  check("rouge — --mesurer compte les gestes jugés (outils de la leçon, un geste une fois) et rappelés (motif), sous-agents compris", () => {
+    const r = mesurer(pilote("mes-1"), "L-901", sousAgent);
+    const m = r.json;
+    if (r.code !== 0 || !m) throw new Error(`exit ${r.code} ${r.out.slice(0, 200)} ${r.err.slice(0, 200)}`);
+    if (m.gestes_juges !== 4 || m.gestes_rappeles !== 3 || m.fichiers !== 2) throw new Error(`attendu 4 jugés, 3 rappelés, 2 fichiers : ${JSON.stringify({ j: m.gestes_juges, r: m.gestes_rappeles, f: m.fichiers })}`);
+    if (m.echantillon.length !== 3 || m.periode !== "2026-09-01 au 2026-10-21" || m.par_outil.Bash?.rappeles !== 3) throw new Error(JSON.stringify(m));
+  });
+  check("vert — --mesurer : une leçon dont le motif ne correspond à aucun geste rend 0 rappelé ; --depuis écarte les gestes d'avant la date", () => {
+    const p = pilote("mes-2", { t: table([lecon("L-901"), lecon("L-902", { declencheur: { outils: ["Bash"], sur: "commande", motif: "\\bjamais-vu\\b" } })]) });
+    const aucun = mesurer(p, "L-902", sousAgent).json;
+    if (aucun?.gestes_juges !== 4 || aucun?.gestes_rappeles !== 0 || aucun?.taux !== 0 || aucun?.echantillon.length) throw new Error(JSON.stringify(aucun));
+    const recent = mesurer(p, "L-901", sousAgent, ["--depuis", "2026-10-01"]).json;
+    if (recent?.gestes_juges !== 3 || recent?.gestes_rappeles !== 2) throw new Error(`--depuis : ${JSON.stringify({ j: recent?.gestes_juges, r: recent?.gestes_rappeles })}`);
+  });
+  check("rouge — --mesurer rejoue le motif RÉEL de L-007 : un contrôle suivi d'un commit dans la même commande est rappelé, le commit seul et le contrôle seul ne le sont pas", () => {
+    const d = transcriptions("tr-l007", [
+      ligne("2026-11-14T10:00:00Z", "Bash", "a1", { command: "node oracles/hook-lecons.test.mjs 2>&1 | tail -1; git commit -q -m \"x\"" }),
+      ligne("2026-11-14T10:01:00Z", "Bash", "a2", { command: "git commit -q -m \"x\"" }),
+      ligne("2026-11-14T10:02:00Z", "Bash", "a3", { command: "node oracles/hook-lecons.test.mjs 2>&1 | tail -1" }),
+    ]);
+    const m = mesurer(PILOT_REEL, "L-007", d).json;
+    if (m?.gestes_juges !== 3 || m?.gestes_rappeles !== 1 || m?.echantillon[0]?.geste.includes("git commit") !== true) throw new Error(JSON.stringify(m));
+  });
+  check("vert — --mesurer : leçon absente de la table : exit 1 ; aucune transcription : exit 2, rien de conclu", () => {
+    const p = pilote("mes-3");
+    const inconnue = mesurer(p, "L-999", sousAgent);
+    if (inconnue.code !== 1 || !/absente de la table/.test(inconnue.err)) throw new Error(`exit ${inconnue.code} ${inconnue.err}`);
+    const vide = mkdtempSync(join(base, "tr-vide-"));
+    const rien = mesurer(p, "L-901", vide);
+    if (rien.code !== 2 || rien.json?.fichiers !== 0 || rien.json?.gestes_juges !== 0) throw new Error(`exit ${rien.code} ${JSON.stringify(rien.json)}`);
   });
 } finally {
   try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ }

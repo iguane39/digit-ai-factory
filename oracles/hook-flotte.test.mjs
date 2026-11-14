@@ -5,6 +5,9 @@
  * sans modèle ni effort), un appel sans type, `Explore` sans modèle, un générique avec modèle mais sans effort,
  * et l'ancien nom d'outil `Task`. Sens vert (silence, exit 0) : un agent nommé du projet, un générique qui
  * déclare modèle ET effort, un agent intégré à modèle fixe, un autre outil, une entrée illisible.
+ * Isolation (TF-2426) : `isolation: "worktree"` refusée (exit 2) quand le dossier courant est le dépôt d'un autre produit que celui de la session, ou
+ * quand la consigne ne nomme pas le dépôt de la copie de travail ; elle passe pour un arbre lié du même dépôt, un sous-dossier, un dépôt nommé, sans
+ * isolation, ou hors d'un dépôt git (non jugé). Dépôts git réels jetables.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { spawnSync } from "node:child_process";
@@ -33,7 +36,7 @@ const jouer = (entree, projetDir = null) => {
   const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: typeof entree === "string" ? entree : JSON.stringify(entree), env });
   let ctx = "";
   try { ctx = JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { ctx = "<stdout illisible>"; }
-  return { code: r.status, ctx, out: r.stdout || "" };
+  return { code: r.status, ctx, out: r.stdout || "", err: r.stderr || "" };
 };
 const appel = (tool_input, tool_name = "Agent") => ({ tool_name, tool_input: { prompt: "x", description: "y", ...tool_input }, cwd: projet });
 
@@ -175,6 +178,61 @@ check("vert — isolation sans lettre de lecteur (chemin POSIX, UNC, relatif) : 
 check("vert — un autre outil que l'agent, même avec isolation et racine en minuscule : silence", () => {
   const r = racineMin("c:\\dev\\produit", ISOLE, "Bash");
   if (r.code !== 0 || r.out.trim()) throw new Error(`exit ${r.code}, sortie « ${r.out.slice(0, 120)} »`);
+});
+
+// ---- TF-2426 (14/11/2026) : l'isolation suit le dossier courant de la session, pas le produit que la consigne nomme -------------------------------
+// Le fait : un agent isolé a reçu la copie du dépôt de Produit-84 au lieu de Produit-86, la session venant d'y lire des migrations. Des dépôts git RÉELS,
+// jetables : deux dépôts (alpha, beta), un arbre lié d'alpha et un sous-dossier d'alpha.
+const git = (cwd, ...a) => spawnSync("git", ["-C", cwd, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+const alpha = join(racine, "depot-alpha"), beta = join(racine, "depot-beta"), alphaLie = join(racine, "arbre-lie-d-alpha");
+for (const d of [alpha, beta]) { mkdirSync(d, { recursive: true }); git(d, "init", "-q", "-b", "main"); writeFileSync(join(d, "a.txt"), "a\n"); git(d, "add", "-A"); git(d, "commit", "-q", "-m", "init"); }
+git(alpha, "worktree", "add", "-q", alphaLie);
+mkdirSync(join(alpha, "src", "migrations"), { recursive: true });
+const isole = (cwd, projetDir, extra = {}, tool_name = "Agent") =>
+  jouer({ tool_name, tool_input: { prompt: "Corrige le sujet et rends le rapport.", description: "Campagne", subagent_type: "campagne", isolation: "worktree", ...extra }, cwd }, projetDir);
+const refus = (r) => r.code === 2 && /ISOLATION REFUSÉE \(TF-2426/.test(r.err);
+
+check("rouge — TF-2426 : isolation depuis le dépôt d'un AUTRE produit que celui de la session : refusée (exit 2), les deux dépôts nommés, le remède dit", () => {
+  const r = isole(beta, alpha, { prompt: "Corrige le sujet dans depot-alpha." });
+  if (!refus(r) || !/dossier courant/i.test(r.err)) throw new Error(`exit ${r.code} ${r.err.slice(0, 200)}`);
+  if (!r.err.toLowerCase().includes("depot-beta") || !r.err.toLowerCase().includes("depot-alpha") || !/git worktree add/.test(r.err)) throw new Error(`dépôts ou remède non nommés : ${r.err.slice(0, 400)}`);
+});
+check("rouge — TF-2426 : le dossier courant est un sous-dossier d'un autre dépôt (le cas des migrations lues) : refusée de même", () => {
+  mkdirSync(join(beta, "migrations"), { recursive: true });
+  const r = isole(join(beta, "migrations"), alpha, { prompt: "Corrige le sujet dans depot-alpha." });
+  if (!refus(r)) throw new Error(`exit ${r.code} ${r.err.slice(0, 200)}`);
+});
+check("rouge — TF-2426 : la consigne ne nomme pas le dépôt de la copie de travail : refusée, le nom du dépôt et la ligne à écrire donnés", () => {
+  const r = isole(alpha, alpha);
+  if (!refus(r) || !/NOMMER le dépôt/.test(r.err) || !/Dépôt de la copie de travail : depot-alpha/.test(r.err)) throw new Error(`exit ${r.code} ${r.err.slice(0, 300)}`);
+});
+check("vert — TF-2426, remède joué : la même consigne qui nomme le dépôt (dans la consigne, ou dans la description) passe, sans refus", () => {
+  for (const extra of [{ prompt: "Dépôt de la copie de travail : depot-alpha. Corrige le sujet." }, { description: "Campagne depot-alpha" }]) {
+    const r = isole(alpha, alpha, extra);
+    if (r.code !== 0 || r.err.trim()) throw new Error(`exit ${r.code} ${r.err.slice(0, 200)}`);
+  }
+});
+check("vert — TF-2426 : un arbre lié du MÊME dépôt (dossier d'un autre nom) et un sous-dossier du dépôt sont le produit de la session ; le chemin du dépôt vaut nom", () => {
+  const lie = isole(alphaLie, alpha, { prompt: `Dépôt de la copie de travail : ${alpha}` });
+  if (lie.code !== 0) throw new Error(`arbre lié refusé : exit ${lie.code} ${lie.err.slice(0, 200)}`);
+  const sous = isole(join(alpha, "src", "migrations"), alpha, { prompt: "Travail dans depot-alpha." });
+  if (sous.code !== 0) throw new Error(`sous-dossier refusé : exit ${sous.code} ${sous.err.slice(0, 200)}`);
+});
+check("vert — TF-2426 : sans isolation, un dossier courant d'un autre dépôt n'est pas refusé (le refus ne vise que l'isolation)", () => {
+  const r = isole(beta, alpha, { isolation: undefined });
+  if (r.code !== 0 || r.err.trim()) throw new Error(`exit ${r.code} ${r.err.slice(0, 200)}`);
+});
+check("vert — TF-2426 : non jugé, dit : dossier courant hors d'un dépôt git, ou session sans CLAUDE_PROJECT_DIR (le refus 1 n'a rien à comparer, le refus 2 reste joué)", () => {
+  const horsGit = isole(join(racine, "vide"), alpha);
+  if (horsGit.code !== 0) throw new Error(`hors git refusé : exit ${horsGit.code} ${horsGit.err.slice(0, 200)}`);
+  const sansProjet = isole(beta, null, { prompt: "Travail dans depot-beta." });
+  if (sansProjet.code !== 0) throw new Error(`sans CLAUDE_PROJECT_DIR, le refus 1 a joué : ${sansProjet.err.slice(0, 200)}`);
+  if (!refus(isole(beta, null))) throw new Error("sans CLAUDE_PROJECT_DIR, le refus 2 (dépôt non nommé) n'est plus joué");
+});
+check("vert — TF-2426 : l'ancien nom d'outil Task est jugé comme Agent ; un autre outil avec isolation reste silencieux", () => {
+  if (!refus(isole(beta, alpha, {}, "Task"))) throw new Error("Task n'est pas refusé");
+  const r = isole(beta, alpha, {}, "Bash");
+  if (r.code !== 0 || r.out.trim() || r.err.trim()) throw new Error(`exit ${r.code} ${r.out.slice(0, 100)} ${r.err.slice(0, 100)}`);
 });
 
 rmSync(racine, { recursive: true, force: true });

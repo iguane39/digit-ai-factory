@@ -60,6 +60,7 @@ import { tmpdir, hostname } from "node:os";
 import { spawnSync } from "node:child_process";
 import { empreinteFichier, empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 import { emetteurDuNom } from "../scripts/ranger-dossiers.mjs";
+import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";   // B9 (TF-2559) : le juge de forme des lots du sas
 
 const VERSION = "1.0.0";
 const ORACLE = "oracle-boite-entree";
@@ -502,10 +503,20 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     const ages = auSas.map((n) => { try { return (Date.now() - statSync(join(sasArrivee, n)).mtimeMs) / 3600000; } catch { return 0; } });
     const plusVieux = Math.max(...ages);
     const oubli = plusVieux > SEUIL_OUBLI_H;
-    findings.push({ regle: "B9", statut: oubli ? "FAIL" : "AVERTISSEMENT", ou: "_arrivee", depuis_h: Number(plusVieux.toFixed(1)),
+    // TF-2559 (14/11/2026) : le juge de forme des lots (`gabarits\oracle-lot-retours.mjs`) joue AUSSI sur ceux du sas, comptés et jamais
+    // nommés. Deux lots de produits y attendaient avec 4 sections absentes chacun, et seule l'ingestion, des jours plus tard, les refusait.
+    const reglesEnForme = [], lotsEnForme = [];
+    for (const n of readdirSync(sasArrivee).filter((f) => /^.+ - RETOURS - \d{8}[a-z]?\.md$/i.test(f) && !pieceJointe(f))) {
+      let r = null;
+      try { r = verifierFormeLot(join(sasArrivee, n)); } catch { /* un lot que le juge ne lit pas n'est pas compté ici */ }
+      if (r && r.verdict === "FAIL") { lotsEnForme.push(n); reglesEnForme.push(...(r.constats || []).filter((c) => c.statut === "FAIL").map((c) => c.regle)); }
+    }
+    findings.push({ regle: "B9", statut: oubli ? "FAIL" : "AVERTISSEMENT", ou: "_arrivee", depuis_h: Number(plusVieux.toFixed(1)), forme_fail: lotsEnForme.length,
       message: `${auSas.length} lot(s) au sas d'arrivée, le plus ancien depuis ${plusVieux.toFixed(0)} h — `
         + (oubli ? `au-delà de ${SEUIL_OUBLI_H} h ce n'est plus une arrivée, c'est un OUBLI : le producteur croit son travail remonté et personne ne le traite. `
           : "ils attendent leur accueil. ")
+        + (lotsEnForme.length ? `${lotsEnForme.length} d'entre eux rendent FAIL au juge de forme (${[...new Set(reglesEnForme)].join(", ")}) : refusés à l'ingestion tels quels, `
+          + "à faire corriger par le produit ; `node todo/accueillir-lot.mjs` les juge à l'arrivée et les nomme, pseudonymisés. " : "")
         + "À jouer : `node todo/accueillir-lot.mjs` (pseudonymise et déplace), puis `node todo/ingerer-lot.mjs <sidecar>` pour chacun. "
         + "Les noms ne sont pas imprimés ici : ils sont réels, et c'est ce que le sas protège" });
   }
@@ -859,6 +870,21 @@ function selfTest() {
     !!f9 && f9.statut === "FAIL" && r.verdict === "FAIL" && /30 h/.test(f9.message) && /accueillir-lot\.mjs/.test(f9.message), r.verdict]);
   cas.push(["B9 quater— le constat ne porte JAMAIS le nom réel du lot : le sas existe pour qu'il ne sorte pas",
     !!f9 && !/NomReelDuClient/.test(JSON.stringify(r)), r.verdict]);
+  // B9 (TF-2559, 14/11/2026) — LE JUGE DE FORME SUR LES LOTS DU SAS. Rouge : le lot du sas, sans les sections R-45 et R-46, est DIT
+  // rendre FAIL au juge de forme, règles et compte nommés, sans son nom. Vert : un lot qui les porte n'est pas accusé.
+  cas.push(["B9 quinquies— un lot du sas qui rend FAIL au juge de forme est DIT (compte et règles), sans nom de lot",
+    !!f9 && f9.forme_fail === 1 && /1 d'entre eux rendent FAIL au juge de forme \(R-45, R-46/.test(f9.message) && !/NomReelDuClient/.test(JSON.stringify(r)), r.verdict]);
+  const boite9v = join(base, "b9v", "00-retours");
+  mkdirSync(join(boite9v, "_arrivee"), { recursive: true });
+  const reg9v = join(base, "b9v", "TODO.jsonl");
+  writeFileSync(reg9v, "");
+  writeFileSync(join(boite9v, "_arrivee", "NomReelBis - RETOURS - 20260824a.tf.jsonl"), '{"titre":"x"}\n');
+  writeFileSync(join(boite9v, "_arrivee", "NomReelBis - RETOURS - 20260824a.md"),
+    "# lot\n\n## Remarques restées au produit\n\nAucune remarque n'est restée au produit.\n\n## Retours sur les documents produits\n\nAucun document produit depuis un gabarit sur ce lot.\n");
+  r = juger(boite9v, reg9v, regIns);
+  const f9v = r.findings.find(surB9);
+  cas.push(["B9 sexies— vert : un lot conforme au sas n'est pas accusé, B9 reste un simple avertissement d'accueil",
+    !!f9v && f9v.forme_fail === 0 && f9v.statut === "AVERTISSEMENT" && !/juge de forme/.test(f9v.message), r.verdict]);
 
   // B10 (TF-1215, 13/10/2026) — LA PIÈCE JOINTE D'UN LOT, dans ses DEUX sens. Le cas fondateur du 14/09 :
   // une étude annoncée par son lot rendait B3, B6, B7 et B8 sur une remise conforme. Boîte neuve.

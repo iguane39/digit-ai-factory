@@ -404,6 +404,14 @@ const ETAT_DU_PARC = [
     motif: "contrôle que rien n'appelle (CI1), chemin d'outil externe codé en dur (CI2), codes de sortie non déclarés (CI3), contrôle sans recette (CI4) ou sans chemin d'échec (CI5)",
     remede: "variable d'environnement d'abord, liste de repli ensuite, échec bruyant sinon ; un chemin volontairement littéral se marque `outil-en-dur-ok : <motif>` en fin de ligne",
   },
+  {
+    // TF-2528 (14/11/2026) : l'oracle rendait FAIL sur le parc (gabarit 2.68.0, ligne des gates de hook-ouverture.mjs en 2.67.0) et
+    // aucun pas ne le jouait ; la ligne des gates, relue à chaque ouverture, annonçait une version périmée du gabarit.
+    nom: "oracle-coherence-restitution.mjs",
+    args: ["--json"],
+    motif: "les trois porteurs de la version de RESTITUTION.md (en-tête du gabarit, étiquette du rappel de hook-restitution.mjs, ligne des gates de hook-ouverture.mjs) divergent (RC1)",
+    remede: "mettre les deux porteurs en retard à la version du gabarit, qui fait foi (le message du verdict les nomme)",
+  },
 ];
 for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // Certains oracles d'etat jugent des ARTEFACTS nommes plutot qu'un parc entier : ils portent

@@ -34,27 +34,35 @@
  *     cran mineur et sa date devient celle du jour. La table réécrite est rejugée : si elle compte plus de constats
  *     qu'avant, elle est rétablie à l'octet près et rien n'est passé en barrière (exit 1).
  *
+ *   --mesurer <ID>  (lecture seule, TF-2530) rejoue le déclencheur de la leçon sur les gestes des transcriptions du poste (blocs
+ *     `tool_use` des dossiers `projects` des profils `~/.claude*`, sous-agents compris, un geste compté une fois) et rend sa
+ *     mesure de bruit : gestes jugés (ceux des outils de la leçon), gestes rappelés (le motif y correspond), taux d'accusation, et
+ *     un échantillon réparti à relire à la main ; le champ `mesure` de la leçon s'écrit ensuite de la main de l'auteur, échantillon relu.
+ *
  * NON JUGÉ : voir `NON_JUGE`, rendu par `--json`.
  *
  * Usage : node scripts/lecons.mjs --verifier  [--racine <dossier>] [--pilot <dossier>] [--au AAAA-MM-JJ] [--json]
  *         node scripts/lecons.mjs --recidives [--racine <dossier>] [--pilot <dossier>] [--json]
  *         node scripts/lecons.mjs --appliquer [--racine <dossier>] [--pilot <dossier>] [--au AAAA-MM-JJ]
+ *         node scripts/lecons.mjs --mesurer <ID> [--dossier <transcriptions>]... [--depuis AAAA-MM-JJ] [--echantillon N] [--json]
  * Exit : 0 conforme, ou rien à passer en barrière · 1 constat de --verifier, ou réécriture annulée · 2 rien à conclure
- *        (`frictions.jsonl` absent).
+ *        (`frictions.jsonl` absent, ou aucune transcription pour --mesurer).
  */
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  MODES_CHAINES, OUTILS, OUTILS_AGENT, OUTILS_CHEMIN, OUTILS_COMMANDE, PILOT, STATUTS, chargerTableProduit, estPilot, verifierPreuve,
+  MODES_CHAINES, OUTILS, OUTILS_AGENT, OUTILS_CHEMIN, OUTILS_COMMANDE, PILOT, STATUTS, chargerTableProduit, correspond, estPilot, verifierPreuve,
 } from "../oracles/hook-lecons.mjs";
 import { racineDuProjet } from "../oracles/lib-racine-projet.mjs";
 
 export const NON_JUGE = [
   "la JUSTESSE d'une leçon : V7 vérifie que sa preuve existe encore, pas qu'elle établit ce que dit le symptôme",
-  "la PRÉCISION d'un motif sur les gestes réels : elle se mesure sur les transcriptions (champ facultatif `mesure`), pas ici",
+  "la PRÉCISION d'un motif sur les gestes réels : elle se mesure sur les transcriptions (champ facultatif `mesure`, relevé par --mesurer), pas par --verifier",
   "le lien de CAUSE entre un rappel et la friction qui le suit : --recidives compte une friction postérieure de la même session, même outil quand elle le nomme ; une friction sans rapport avec la leçon compte aussi",
   "les récidives d'une leçon générique chez les AUTRES produits : --recidives lit les journaux d'une seule racine",
+  "--mesurer compte les gestes des transcriptions que le harnais a gardées (profils du poste, sous-agents compris) : un geste d'un autre poste ou d'une transcription supprimée n'y est pas ; il ne dit pas si le geste rappelé était fautif, seule la relecture de l'échantillon le dit",
   "V11 juge la FORMULATION d'une solution (attente en avant-plan avec délai, dite par ces mots), pas le sens : une prescription équivalente en d'autres termes passe ; elle ne lit pas le contrat d'agent, elle en porte la règle de TF-2463",
 ];
 
@@ -282,6 +290,70 @@ export function appliquer({ pilot = PILOT, racine = pilot, au = aujourdHui() } =
   return { ...rec, passees: touchees.flatMap(({ t, ids, versions }) => ids.map((id) => ({ id, table: relative(pilot, t.chemin) || t.chemin, versions }))), annulee: false, verdict_apres: apres.verdict };
 }
 
+/** Les dossiers de transcriptions du poste : `projects` de chaque profil (`CLAUDE_CONFIG_DIR`, `~/.claude`, `~/.claude-*`). */
+export function dossiersTranscriptions(env = process.env, maison = homedir()) {
+  const profils = new Set([env.CLAUDE_CONFIG_DIR].filter(Boolean));
+  try { for (const n of readdirSync(maison)) if (/^\.claude(?:-[\w-]+)?$/i.test(n)) profils.add(join(maison, n)); } catch { /* maison illisible */ }
+  return [...profils].map((p) => join(p, "projects")).filter((d) => existsSync(d));
+}
+
+function transcriptionsSous(dossier, profondeur = 0, sortie = []) {
+  let entrees = [];
+  try { entrees = readdirSync(dossier, { withFileTypes: true }); } catch { return sortie; }
+  for (const e of entrees) {
+    if (e.isDirectory()) { if (profondeur < 4) transcriptionsSous(join(dossier, e.name), profondeur + 1, sortie); }
+    else if (e.name.endsWith(".jsonl")) sortie.push(join(dossier, e.name));
+  }
+  return sortie;
+}
+
+/**
+ * TF-2530 — la mesure de bruit d'une leçon : son déclencheur rejoué sur les gestes (blocs `tool_use`) des transcriptions.
+ * Rend { lecon, le, periode, fichiers, gestes_juges, gestes_rappeles, taux, par_outil, echantillon: [{ ts, outil, geste }] } ;
+ * l'échantillon est réparti sur toute la liste des gestes rappelés (au plus `taille`), à relire à la main.
+ */
+export function mesurer(id, { pilot = PILOT, dossiers = dossiersTranscriptions(), depuis = null, taille = 20, maintenant = new Date() } = {}) {
+  const lecon = lireTables({ pilot }).flatMap((t) => t.lecons).find((l) => l?.id === id);
+  if (!lecon) return { erreur: `leçon ${id} absente de la table du pilot` };
+  const outils = new Set(lecon.declencheur?.outils || []);
+  const fichiers = dossiers.flatMap((d) => transcriptionsSous(d));
+  const vus = new Set();
+  const parOutil = {};
+  const rappeles = [];
+  let juges = 0, premier = null, dernier = null;
+  for (const f of fichiers) {
+    let brut = "";
+    try { brut = readFileSync(f, "utf8"); } catch { continue; }
+    for (const ligne of brut.split("\n")) {
+      if (!ligne.includes('"tool_use"')) continue;
+      let o = null;
+      try { o = JSON.parse(ligne); } catch { continue; }
+      const ts = typeof o?.timestamp === "string" ? o.timestamp : null;
+      if (depuis && (!ts || ts.slice(0, 10) < depuis)) continue;
+      for (const c of Array.isArray(o?.message?.content) ? o.message.content : []) {
+        if (c?.type !== "tool_use" || !outils.has(c.name) || !c.input || typeof c.input !== "object") continue;
+        if (c.id) { if (vus.has(c.id)) continue; vus.add(c.id); }
+        juges++;
+        if (ts) { if (!premier || ts < premier) premier = ts; if (!dernier || ts > dernier) dernier = ts; }
+        parOutil[c.name] = parOutil[c.name] || { juges: 0, rappeles: 0 };
+        parOutil[c.name].juges++;
+        let ok = false;
+        try { ok = correspond(lecon, { tool_name: c.name, tool_input: c.input }); } catch { ok = false; }
+        if (!ok) continue;
+        parOutil[c.name].rappeles++;
+        rappeles.push({ ts, outil: c.name, geste: String(c.input.command ?? c.input.file_path ?? c.input.description ?? "") });
+      }
+    }
+  }
+  rappeles.sort((a, b) => String(a.ts).localeCompare(String(b.ts)));
+  const pas = rappeles.length > taille ? rappeles.length / taille : 1;
+  const echantillon = Array.from({ length: Math.min(taille, rappeles.length) }, (_, i) => rappeles[Math.floor(i * pas)]);
+  return {
+    lecon: id, le: maintenant.toISOString().slice(0, 10), periode: premier ? `${premier.slice(0, 10)} au ${dernier.slice(0, 10)}` : null, fichiers: fichiers.length,
+    gestes_juges: juges, gestes_rappeles: rappeles.length, taux: juges ? rappeles.length / juges : null, par_outil: parOutil, echantillon,
+  };
+}
+
 function option(args, nom) { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : undefined; }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
@@ -299,6 +371,21 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
       console.log(`lecons --verifier : ${v.verdict} — ${v.tables.map((t) => `${t.chemin} (${t.lecons} leçon(s))`).join(", ")}, jugé au ${au}, ${v.constats.length} constat(s)`);
     }
     process.exit(v.verdict === "PASS" ? 0 : 1);
+  }
+  if (args.includes("--mesurer")) {
+    const id = option(args, "--mesurer");
+    const dossiers = args.flatMap((a, i) => (a === "--dossier" ? [resolve(args[i + 1] || "")] : []));
+    const depuis = option(args, "--depuis");
+    if (depuis !== undefined && !dateValide(depuis)) { console.error(`lecons : --depuis « ${depuis} » hors forme AAAA-MM-JJ`); process.exit(1); }
+    const m = mesurer(id, { pilot, dossiers: dossiers.length ? dossiers : dossiersTranscriptions(), depuis: depuis || null, taille: Number(option(args, "--echantillon") || 20) });
+    if (m.erreur) { console.error(`lecons --mesurer : ${m.erreur}`); process.exit(1); }
+    if (json) console.log(JSON.stringify(m, null, 1));
+    else {
+      console.log(`lecons --mesurer ${m.lecon} — ${m.fichiers} transcription(s), période ${m.periode ?? "aucune"} : ${m.gestes_juges} geste(s) jugé(s), ${m.gestes_rappeles} rappelé(s)${m.taux === null ? "" : ` (taux d'accusation ${(m.taux * 100).toFixed(2)} %)`}`);
+      for (const [o, c] of Object.entries(m.par_outil)) console.log(`  ${o} : ${c.juges} jugé(s), ${c.rappeles} rappelé(s)`);
+      for (const e of m.echantillon) console.log(`  [${e.ts}] ${e.outil} : ${e.geste.replace(/\s+/g, " ").slice(0, 200)}`);
+    }
+    process.exit(m.fichiers ? 0 : 2);
   }
   if (args.includes("--recidives") || args.includes("--appliquer")) {
     const appl = args.includes("--appliquer");
@@ -326,6 +413,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     }
     process.exit(appl && r.annulee ? 1 : 0);
   }
-  console.error("Usage : node scripts/lecons.mjs --verifier | --recidives | --appliquer  [--racine <dossier>] [--pilot <dossier>] [--au AAAA-MM-JJ] [--json]");
+  console.error("Usage : node scripts/lecons.mjs --verifier | --recidives | --appliquer | --mesurer <ID> [--dossier <d>]... [--depuis AAAA-MM-JJ] [--echantillon N]  [--racine <dossier>] [--pilot <dossier>] [--au AAAA-MM-JJ] [--json]");
   process.exit(1);
 }

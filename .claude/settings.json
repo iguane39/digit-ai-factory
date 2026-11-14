@@ -44,9 +44,25 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-taches-actives.mjs\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-suivi-agents.mjs\" --veille",
             "timeout": 1200,
             "asyncRewake": true
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-remise-agent.mjs\"",
+            "timeout": 60
           }
         ]
       }
