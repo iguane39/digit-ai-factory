@@ -62,6 +62,7 @@ import { PRODUITS_DE_L_ECOSYSTEME } from "../scripts/lib-parc.mjs";
 import { aQualifier as adressesAQualifier, messageAQualifier } from "./adresses-ip.mjs";
 import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
 import { aQualifier as designationsAQualifier, messageAQualifier as messageDesignations } from "./designation-projet.mjs";
+import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const BOITE = join(ICI, "..", "input", "00-retours");
@@ -132,6 +133,46 @@ function possiblementInconnuDesTables(nom) {
   try { return anonymiser(nom).texte === nom; } catch { return false; }
 }
 
+// ============================================================================================
+// TF-2559 (14/11/2026) — LE JUGE DE FORME SE JOUE À L'ARRIVÉE, PAS DES JOURS PLUS TARD À L'INGESTION
+// ============================================================================================
+//
+// LE FAIT, mesuré le 14/11/2026 chez deux produits : leurs lots 20261102a et 20261028a rendaient FAIL à
+// leur propre juge de forme (`gabarits\oracle-lot-retours.mjs`, 4 sections absentes chacun : R-45, R-46, R-57
+// et GFP-LOT) et ont été copiés au sas quand même. L'accueil pseudonymisait et déposait sans juger ; seule
+// l'ingestion jouait le juge, des jours plus tard, quand le produit n'était plus là pour corriger.
+//
+// CE QUE FAIT L'ACCUEIL : après avoir déposé (ou, en essai, relevé) ses lots, il joue le juge de forme sur
+// chaque LOT (`<projet> - RETOURS - AAAAMMJJx.md`, ni sidecar ni pièce jointe) tel qu'il est désormais déposé,
+// pseudonymisé, comme la porte de l'ingestion le jugera. Le verdict entre au compte rendu (`juge_de_forme`)
+// et un FAIL est NOMMÉ à l'écran, par le nom pseudonymisé : avertissement, jamais refus, comme les adresses,
+// les personnes et les désignations — le lot reste accueilli, et c'est le produit qui le corrige. Le relevé
+// d'ouverture le dit aussi, par le sas : `oracles\oracle-boite-entree.mjs` (B9) juge les lots qui y attendent.
+// CE QU'IL NE FAIT PAS : refuser un lot, ni le corriger.
+
+const RE_LOT_DE_RETOURS = /^.+ - RETOURS - \d{8}[a-z]?\.md$/i;
+/** Un lot de retours : ni un sidecar, ni une pièce jointe (`<base du lot> - PJ - <libellé>`). */
+export const estUnLot = (nom) => RE_LOT_DE_RETOURS.test(String(nom)) && !/ - PJ - /.test(String(nom));
+
+/** Joue le juge de forme sur un lot ; rend { verdict, constats_fail: [{ regle, message }] } ou un verdict ILLISIBLE. */
+export function jugerFormeDuLot(chemin) {
+  try {
+    const r = verifierFormeLot(chemin);
+    return { verdict: r.verdict, constats_fail: (r.constats || []).filter((c) => c.statut === "FAIL").map((c) => ({ regle: c.regle, message: String(c.message).slice(0, 240) })) };
+  } catch (e) { return { verdict: "ILLISIBLE", erreur: String(e && e.message || e).slice(0, 160), constats_fail: [] }; }
+}
+
+/** Le message à l'écran pour un lot dont le juge de forme rend FAIL (ou n'a pas pu juger) ; null sinon. */
+export function messageFormeDuLot(vers, juge) {
+  if (!juge || juge.verdict === "PASS") return null;
+  if (juge.verdict === "ILLISIBLE") return `[JUGE DE FORME] ${vers} : le juge n'a pas pu lire le lot (${juge.erreur}) — sa forme n'est pas jugée à l'accueil`;
+  if (juge.verdict !== "FAIL") return null;
+  const regles = [...new Set(juge.constats_fail.map((c) => c.regle))];
+  return `[JUGE DE FORME] ${vers} : FAIL sur ${regles.join(", ")} — ce lot serait REFUSÉ à l'ingestion (\`node todo\\ingerer-lot.mjs\`). Il est accueilli quand même : `
+    + "la correction est celle du produit (`node forge/retours/oracle-lot.mjs \"<lot>.md\"`, lot de travaux au produit), et une dérogation est une décision humaine. "
+    + `Détail : \`node gabarits\\oracle-lot-retours.mjs "input\\00-retours\\${vers}"\``;
+}
+
 /**
  * Accueille tout ce qui attend dans l'arrivée : pseudonymise le NOM et le CONTENU, puis dépose
  * dans la boîte suivie. Rend la liste de ce qui a été fait, sans jamais écrire si `essai`.
@@ -195,6 +236,8 @@ export function accueillir({ arrivee = ARRIVEE, boite = BOITE, essai = false, ra
       contenu_reecrit: contenu.texte !== brut, ecrit: true, adresses_ip_a_qualifier: adresses, noms_de_personnes_a_qualifier: personnes, designations_a_qualifier: designations,
       produit_neuf_inscrit: produitInscrit });
   }
+  // TF-2559 : le juge de forme, une fois tous les lots (et leurs sidecars) déposés, sur le fichier tel qu'il est déposé — en essai, sur celui de l'arrivée.
+  for (const f of faits) if (estUnLot(f.vers)) f.juge_de_forme = jugerFormeDuLot(f.ecrit ? join(boite, f.vers) : join(arrivee, f.de));
   return { arrivee, boite, en_attente: entrants.length, faits, refuses };
 }
 
@@ -322,6 +365,35 @@ async function selfTest() {
     if ((f9b.designations_a_qualifier || []).length) casse.push("TF-1540 : un pseudonyme qui tient une séquence est relevé à tort");
   }
 
+  // 11) TF-2559 (14/11/2026) — LE JUGE DE FORME SE JOUE À L'ARRIVÉE, dans les deux sens. Rouge sur l'ancien accueil : un lot
+  // sans les sections R-45 et R-46 (le cas des deux produits du 14/11, 4 sections absentes chacun) était déposé sans un mot
+  // et ne rendait FAIL qu'à l'ingestion. Vert : un lot qui les porte rend PASS et ne dit rien ; un sidecar et une pièce jointe
+  // ne sont pas des lots et ne sont pas jugés ; en essai, le lot de l'arrivée est jugé sans rien écrire.
+  const SECTIONS_OK = "## Remarques restées au produit\n\nAucune remarque n'est restée au produit.\n\n## Retours sur les documents produits\n\nAucun document produit depuis un gabarit sur ce lot.\n";
+  writeFileSync(join(arr, "Produit-14 - RETOURS - 20260824a.md"), "# lot\n\nrien\n", "utf8");
+  writeFileSync(join(arr, "Produit-15 - RETOURS - 20260824a.md"), `# lot\n\n${SECTIONS_OK}`, "utf8");
+  writeFileSync(join(arr, "Produit-15 - RETOURS - 20260824a - PJ - note.md"), "# pièce jointe\n", "utf8");
+  writeFileSync(join(arr, "Produit-15 - RETOURS - 20260824a.tf.jsonl"), "{}\n", "utf8");
+  const r11 = accueillir({ arrivee: arr, boite: bo });
+  const f11a = r11.faits.find((x) => x.de.startsWith("Produit-14")), f11b = r11.faits.find((x) => x.de === "Produit-15 - RETOURS - 20260824a.md");
+  if (!f11a || !f11a.juge_de_forme || f11a.juge_de_forme.verdict !== "FAIL") casse.push("TF-2559 : un lot sans sections R-45 et R-46 n'est pas jugé FAIL à l'accueil : " + JSON.stringify(f11a && f11a.juge_de_forme));
+  else {
+    const regles11 = f11a.juge_de_forme.constats_fail.map((c) => c.regle);
+    if (!regles11.includes("R-45") || !regles11.includes("R-46")) casse.push("TF-2559 : le FAIL ne nomme pas R-45 et R-46 : " + regles11.join(","));
+    const m11 = messageFormeDuLot(f11a.vers, f11a.juge_de_forme);
+    if (!m11 || !/REFUSÉ à l'ingestion/.test(m11) || !/R-45/.test(m11) || !m11.includes(f11a.vers)) casse.push("TF-2559 : le message à l'écran ne nomme pas le lot, ses règles et le refus à venir : " + m11);
+    if (!existsSync(join(bo, f11a.vers))) casse.push("TF-2559 : le lot FAIL n'est pas accueilli — c'est un avertissement, jamais un refus");
+  }
+  if (!f11b || !f11b.juge_de_forme || f11b.juge_de_forme.verdict !== "PASS") casse.push("TF-2559 : un lot conforme ne rend pas PASS à l'accueil : " + JSON.stringify(f11b && f11b.juge_de_forme));
+  else if (messageFormeDuLot(f11b.vers, f11b.juge_de_forme) !== null) casse.push("TF-2559 : un lot conforme est signalé à l'écran");
+  if (r11.faits.filter((x) => / - PJ - |\.tf\.jsonl$/.test(x.de)).some((x) => x.juge_de_forme)) casse.push("TF-2559 : un sidecar ou une pièce jointe est jugé comme un lot");
+  writeFileSync(join(arr, "Produit-16 - RETOURS - 20260824a.md"), "# lot\n\nrien\n", "utf8");
+  const r11e = accueillir({ arrivee: arr, boite: bo, essai: true });
+  const f11e = r11e.faits.find((x) => x.de.startsWith("Produit-16"));
+  if (!f11e || f11e.ecrit || !f11e.juge_de_forme || f11e.juge_de_forme.verdict !== "FAIL") casse.push("TF-2559 : en essai, le lot de l'arrivée n'est pas jugé sans rien écrire : " + JSON.stringify(f11e));
+  if (existsSync(join(bo, "Produit-16 - RETOURS - 20260824a.md"))) casse.push("TF-2559 : l'essai a déposé le lot");
+  rmSync(join(arr, "Produit-16 - RETOURS - 20260824a.md"));
+
   // 5) et 6) L'ANALYSE DES ARGUMENTS, DANS SES DEUX SENS (17/09/2026). Le défaut s'est produit
   // DANS LA COUCHE CLI, pas dans `accueillir()` : le banc doit donc lancer le module comme un
   // outil. Les deux cas ne diffèrent que par l'argument — `--zzz` refuse, `--aide` explique — et
@@ -342,7 +414,7 @@ async function selfTest() {
 
   rmSync(T, { recursive: true, force: true });
   for (const m of casse) console.log("  [FAIL] " + m);
-  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289, TF-1540, TF-1721) : ${10 - casse.length}/10 cas, ${casse.length} FAIL`
+  console.log(`\nSelf-test accueillir-lot (TF-0981, TF-1289, TF-1540, TF-1721, TF-2559) : ${11 - casse.length}/11 cas, ${casse.length} FAIL`
     + (casse.length ? "" : " — cas rouges : un lot du même nom REFUSÉ sans écraser le déposé, un nom inconnu déjà cité dans le parc REFUSÉ et gardé au sas, un nom cité par un dépôt voisin REFUSÉ même quand le produit a son propre dépôt, une option inconnue REFUSÉE sans lancer l'accueil réel"));
   return casse.length ? 1 : 0;
 }
@@ -357,6 +429,7 @@ export const USAGE = [
   "  Pseudonymise le NOM et le CONTENU de chaque lot déposé dans input\\00-retours\\_arrivee\\",
   "  (ignoré par git), puis le redépose dans input\\00-retours\\ (suivi). Il n'INGÈRE pas :",
   "  `node todo\\ingerer-lot.mjs <lot>` reste le geste suivant.",
+  "  Joue aussi le juge de forme des lots (R-45, R-46…) et nomme un FAIL à l'écran, sans refuser le lot (TF-2559).",
   "",
   "  --essai        relève ce qui serait fait : n'écrit rien, ne vide pas l'arrivée",
   "  --self-test    joue le banc du module",
@@ -393,8 +466,11 @@ if (process.argv[1] && fileURLToPath(import.meta.url).toLowerCase().replaceAll("
   for (const f of r.faits) { const m = messagePersonnes(f.noms_de_personnes_a_qualifier || [], f.vers); if (m) console.error(m); }
   // TF-1540 : la désignation du projet par le lot, de même — nommée à l'écran, jamais écrite ailleurs.
   for (const f of r.faits) { const m = messageDesignations(f.designations_a_qualifier || [], f.vers); if (m) console.error(m); }
+  // TF-2559 : le verdict du juge de forme de chaque lot, nommé à l'écran — avertissement, jamais refus.
+  for (const f of r.faits) { const m = messageFormeDuLot(f.vers, f.juge_de_forme); if (m) console.error(m); }
+  const enForme = r.faits.filter((f) => f.juge_de_forme && f.juge_de_forme.verdict === "FAIL").length;
   console.log(JSON.stringify({ ...r, message: r.en_attente
-    ? `${r.faits.length} lot(s) accueilli(s), ${r.refuses.length} refusé(s)`
+    ? `${r.faits.length} lot(s) accueilli(s), ${r.refuses.length} refusé(s)${enForme ? `, ${enForme} au juge de forme FAIL (refusé(s) à l'ingestion tels quels)` : ""}`
     : "rien n'attend dans l'arrivée" }, null, 1));
   process.exit(r.refuses.length ? 1 : 0);
 }
