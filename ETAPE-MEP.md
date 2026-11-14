@@ -319,6 +319,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-21 | **Réglages de plateforme lus contre leur attendu** (AVERTISSEMENT, règle neuve du 06/11/2026) | Le dossier porte la section « Réglages de plateforme » : pour chaque réglage de `references\REGLAGES-SURS-PAR-DEFAUT.json` que le produit emploie, l'état lu le jour du dossier par la commande `cmd_lire` de l'entrée, l'attendu et un verdict ; un écart accepté nomme sa décision (`D-nn`) ; ou « Aucun réglage de plateforme : <motif> ». Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM15 — § 3 quaterdecies, R-66, D-178 (a), TF-2233 |
 | M-22 | **Version servie lue, inventaire confronté** (AVERTISSEMENT, FAIL pour un FAIL porté par le dossier) | Le dossier porte la section « Version servie et inventaire » : le commit lu par `version-servie.mjs lire`, le verdict d'O-26 de forge-ops et celui d'O-27 rejoué par la porte « prêt » ; ou « Sans objet : <motif> ». Un FAIL d'O-26 ou d'O-27 vaut refus. Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM16 — § 3 quaterdecies, TF-2201, TF-2209, TF-2243 |
 | M-23 | **Verdict websec du gate, lu avec son paramètre** (AVERTISSEMENT ; FAIL si le produit a armé `websec_bloquant`) | Le dossier porte le verdict de `oracle-exposition` et celui d'`oracle-sca`, ou « Websec : sans objet : <motif> ». Gate non armé (le défaut de l'écosystème : `[gates] websec_bloquant = false` dans `docs\projet\PARAMETRAGE.md`) : un verdict absent, FAIL ou SKIP est un manque déclaré, jamais un refus. Gate armé (`true`) : un verdict absent, FAIL ou SKIP bloque le GO. Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM17 — § 4, R-33 bis, TF-2506 |
+| M-24 | **Fiche de sécurité rejouée avec l'étiquette déployée** (AVERTISSEMENT, règle neuve du 14/11/2026) | Un dossier qui cite une fiche de sécurité porte le verdict de FS12, rejoué par `node <audit>\oracles\verifier-fiche-securite.mjs <fiche.html> --etiquette-deployee <x.y.z>`, l'étiquette étant celle du commit servi lu à M-22. Sans l'étiquette FS12 n'est pas jouée. Contrôle exécutable : règle TM18 — § 3 quaterdecies, TF-2419, TF-2536 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -944,6 +945,27 @@ O-27 : PASS (sorties d'état : terraform state list, docker ps filtré sur le pr
 « Aucun réglage de plateforme : <motif> » et « Sans objet : <motif> » (un produit statique sans point de santé) sont
 des réponses valides. Le silence n'en est pas une.
 
+**M-24 — la fiche de sécurité remise se juge contre l'étiquette déployée (TF-2419, TF-2536).** Le 10/11/2026, la fiche
+CDC-SEC-HPR-20261104a citait v1.10.0 alors que v1.13.0 était qualifiée et servie, et la session l'a jointe telle quelle au
+courriel du référent sécurité : 16 champs sur 29 ont changé à la réémission. `verifier-fiche-securite.mjs` de forge-audit
+porte la règle FS12, qui compare la version citée à l'étiquette que la chaîne lui donne, mais elle reste inerte sans
+l'option. La chaîne de qualification la donne donc : `node <audit>\oracles\verifier-fiche-securite.mjs <fiche.html>
+--etiquette-deployee <x.y.z>`, où `<x.y.z>` est la dernière étiquette déployée sur l'environnement, celle du commit servi
+lu à M-22 (`git describe --tags --abbrev=0 <commit servi>`). Le canevas de la fiche pose la ligne « Version déployée » que
+FS12 lit (forge-audit, gabarit 1.1.0). Le dossier de MEP qui cite une fiche de sécurité écrit le verdict ; un FAIL se
+corrige par la réémission de la fiche, puis un rejeu qui se lit au dernier verdict :
+
+```
+## Fiche de sécurité
+
+Fiche CDC-SEC-HPR-20261110a remise au référent sécurité, version citée v1.13.0.
+FS12 : PASS (version citée 1.13.0, étiquette déployée 1.13.0), rejoué le 2026-11-10.
+```
+
+« Aucune fiche de sécurité » se passe de section : sans fiche citée au dossier, TM18 est sans objet. **Le contrôle
+exécutable** de cette forme est TM18, qui AVERTIT (règle neuve, précédent D-70 (b)) une fiche citée sans verdict de FS12,
+ou un FS12 en FAIL ou SKIP, et nomme la commande ; la vérité du verdict recopié n'est pas rejouée.
+
 **Le contrôle exécutable.** `node oracles\oracle-trace-mutation-mep.mjs <produit>` joue TM15 (la section des réglages
 existe, chaque ligne est datée et porte son verdict, un écart accepté nomme sa décision) et TM16 (la section de la
 version servie existe, porte le commit lu et les verdicts d'O-26 et d'O-27). **Sévérité.** TM15 AVERTIT : règle neuve,
@@ -1052,6 +1074,8 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   et la décision nommée de chaque écart accepté (M-21, § 3 quaterdecies, R-66) ;
 - la version servie lue par `version-servie.mjs lire` et les verdicts d'O-26 et d'O-27, un FAIL valant refus
   (M-22, § 3 quaterdecies, TF-2243) ;
+- la fiche de sécurité remise au référent, quand il y en a une, avec le verdict de FS12 rejoué avec l'étiquette déployée
+  (M-24, § 3 quaterdecies, TF-2536) ;
 - les limites déclarées du run (modes dégradés, `non_juge`, hypothèses prises) ;
 - le geste exact qui déclenche la mise en production — l'approbation de la porte de la chaîne, ou la
   poussée d'un commit nommé (§4 bis), jamais une commande de déploiement lancée d'un poste vers un

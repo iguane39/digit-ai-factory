@@ -1,7 +1,7 @@
 {
-  "cible": "C:\\dev\\digit-ai-factory\\ETAPE-MEP.md",
-  "date_iso": "2026-10-21T06:43:54.914Z",
-  "registre_version": "2.45.0",
+  "cible": "C:\\dev\\_wt-pilot-ph\\ETAPE-MEP.md",
+  "date_iso": "2026-11-14T17:30:59.936Z",
+  "registre_version": "2.63.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "FAIL",
@@ -15,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "ETAPE-MEP.md"
+      "..\\_wt-pilot-ph\\ETAPE-MEP.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -26,49 +26,49 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "FAIL",
-      "detail": "1 constat(s) · M18 identifiant muet : « RA-77 » employé sans son sens (ligne 683) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
+      "detail": "1 constat(s) · M18 identifiant muet : « RA-77 » employé sans son sens (ligne 746) — première occurrence dans le document. Hors HTML il n'y a ni infobulle ni ancre : la glose est EN LIGNE, entre parenthèses, après un tiret, ou après deux-points. Retour client du 22/08 : « je ne sais pas ce qu'est E2 »."
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "FAIL",
-      "detail": "2 constat(s) · N2 — compte contradictoire dans le même document : « 6 règles » alors que le cardinal réel mesuré est 3 ; N2 — compte contradictoire dans le même document : « Deux règles » alors que le cardinal réel mesuré est 3"
+      "detail": "1 constat(s) · N2 — compte contradictoire dans le même document : « 6 règles » alors que le cardinal réel mesuré est 3"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "PASS",
-      "detail": "6 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; date d'engagement non sourcée : « **Le fait, du 29/09/2026 chez Produit-03.** La première livraison de production  »"
+      "detail": "9 constat(s) · 8 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (8 avertissement(s)) ; date d'engagement non sourcée : « **Le fait, du 29/09/2026 chez Produit-03.** La première livraison de production  »"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "SKIP",
       "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "PASS",
-      "detail": "1 constat(s) · fond : 6 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 1 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
+      "detail": "1 constat(s) · fond : 8 ligne(s) classée(s) confrontée(s) à leur statut (CF1), 0 affirmation(s) absolue(s) tenue(s) (CF2), 1 compte(s) recalculé(s) juste(s) (CF3), 0 bloquant"
     },
     {
       "domaine": "Livrabilité d'une conséquence déclarée",
-      "file": "ETAPE-MEP.md",
+      "file": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
       "verdict": "SKIP",
       "detail": "aucune forme de subissance en contexte de repli — hors périmètre"
     }
@@ -76,10 +76,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "ETAPE-MEP.md",
-    "ts": "2026-10-21T06:43:54.913Z",
+    "release": "..\\_wt-pilot-ph\\ETAPE-MEP.md",
+    "ts": "2026-11-14T17:30:59.936Z",
     "fichiers": {
-      "ETAPE-MEP.md": "865fd951450a6ec6b7d3d101f5494b5db35bc371eb38b1e5208d9ddf6737a6a1"
+      "..\\_wt-pilot-ph\\ETAPE-MEP.md": "2b61c8468e5d4e6c549eea53a17cd5a2eee93a94a82c7afcf02e85bce788c69c"
     }
   },
   "empreinte_motif": null,
