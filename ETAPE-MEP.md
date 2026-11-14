@@ -1040,6 +1040,11 @@ La mise en **production** exige un GO humain explicite, donné sur `DOSSIER-MEP.
   la portée cible, et chaque contrainte avec son verdict contre la séquence retenue (M-11, § 1 ter) ;
 - les trois sections des exigences fatales du référentiel d'audit : « Chaîne de déploiement »,
   « Sauvegarde et restauration », « Fournisseur d'identité » (M-16 à M-18, § 3 terdecies) ;
+- le verdict websec du gate (R-33 bis) : l'exposition de l'origine déployée, par `node oracles\oracle-exposition.mjs <capture.json>`,
+  et les dépendances vulnérables, par `node oracles\oracle-sca.mjs <racine-produit>` (npm audit, pip-audit), tous deux
+  depuis `<racine>\digit-ai-forge-websec` ; **présent et non bloquant** tant que `[gates] websec_bloquant = false`, un
+  verdict absent se déclare comme un manque. Un SKIP d'`oracle-sca` (outil ou manifeste absent, registre injoignable) se
+  consigne avec son motif : l'audit des dépendances n'a pas eu lieu, ce n'est pas un PASS (TF-2513) ;
 - la section « Revue de code » : jouée, avec les constats élevés et critiques posés au GO, ou
   proposée puis refusée (M-19, § 1 quater) ;
 - les réglages de plateforme que le produit emploie, avec leur état lu le jour du dossier contre l'attendu du registre,
