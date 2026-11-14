@@ -66,6 +66,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` | fichier | 31,8 Ko | Diagnostic de la Factory — œil critique, proposition révisée (20/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
+| `Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md` | fichier | 8,9 Ko | Diagnostic Factory — Sessions concurrentes sur forge-digit-ai-fr — 20261114b |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 7,7 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md.experience.json` | fichier | 98,8 Ko | JSON |
 | `Digit-AI - Étude - Apprentissage des erreurs par les produits et la Factory - 20261104b.md` | fichier | 22,5 Ko | Étude d'opportunité — Apprentissage des erreurs par les produits et la Factory — 20261104b |
@@ -74,6 +75,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Bases de donnees de dev et qualification - 20261029a.md` | fichier | 8,8 Ko | Étude — ce que les forges savent faire des bases de développement et de qualification |
 | `Digit-AI - Étude - Competences Cloudflare GitHub Supabase - 20261028a.md` | fichier | 12,6 Ko | Étude — compétences Cloudflare, GitHub et Supabase à construire dans les forges (28/10/202 |
 | `Digit-AI - Étude - Competences OpenAI et Gemini - 20261103l.md` | fichier | 199,3 Ko | Étude — Compétences OpenAI et Gemini dans la Factory |
+| `Digit-AI - Étude - Coordination des sessions multiples d'un projet - 20261114c.md` | fichier | 18,2 Ko | Étude d'opportunité — Coordination des sessions multiples d'un projet — 20261114c |
 | `Digit-AI - Étude - Cout et qualite de la boucle L99 - 20261106b.md` | fichier | 24,3 Ko | Coût et qualité de la boucle L99 : pourquoi elle ne s'arrête jamais où elle le dit, et ce  |
 | `Digit-AI - Étude - Étape de revue de code par un seul agent - 20261103k.md` | fichier | 13,0 Ko | Étude d'opportunité — Étape de revue de code par un seul agent — 20261103k |
 | `Digit-AI - Étude - Huit outils de motion design pour la Factory - 20261102t.md` | fichier | 25,3 Ko | Étude d'opportunité — huit outils de motion design pour la Factory — 20261102t |
@@ -121,4 +123,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_101 fichier(s), 3 sous-dossier(s)_
+_103 fichier(s), 3 sous-dossier(s)_
