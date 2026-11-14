@@ -906,7 +906,10 @@ if (iPilot < 0) {
 if (iPilot < 0) {
   const rf = join(PILOT, "scripts", "relever-flotte.mjs");
   if (existsSync(rf)) {
-    const r = spawnSync(process.execPath, [rf, "--jours", "14", "--json"], { encoding: "utf8", cwd: PILOT, timeout: 60000 });
+    // TF-2511 (14/11/2026) : le délai du relevé de la flotte vaut 60 s, et `FORGE_DELAI_RELEVE_FLOTTE_S` le pose autrement (secondes, supérieur à 0). Sous la charge
+    // du poste, la recette le voyait tué à 60 s alors qu'il rend en 2 s au repos : elle pose un délai à l'échelle d'une mesure témoin au lieu d'une borne absolue.
+    const delaiFlotte = Number(process.env.FORGE_DELAI_RELEVE_FLOTTE_S);
+    const r = spawnSync(process.execPath, [rf, "--jours", "14", "--json"], { encoding: "utf8", cwd: PILOT, timeout: delaiFlotte > 0 ? Math.round(delaiFlotte * 1000) : 60000 });
     let j = null;
     try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
     if (!j) alarmesOeil.push(`- relevé de la flotte ILLISIBLE (exit ${r.status}) — ce n'est pas un constat sur la flotte : ${(r.stderr || "").trim().slice(0, 160)}`);
