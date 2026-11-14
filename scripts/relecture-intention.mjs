@@ -52,6 +52,7 @@
  *        citée ne porte plus l'ancre prend la ligne où l'ancre se trouve (la plus proche de la ligne citée si elle figure plusieurs fois) ;
  *        seuls les numéros changent dans le fichier. Une ancre disparue n'est pas recalée : la ligne reste, la source reste une erreur de la
  *        recette, le rapport la nomme (exit 1, comme un fichier de source absent). `--racine` : le dossier d'où se lisent les chemins de source.
+ *        (TF-2503, 14/11/2026) une ancre qui figure plusieurs fois dans son fichier est SIGNALÉE, recalée ou non (« ANCRE RÉPÉTÉE », `repetees` en --json), sans changer le code de sortie.
  * Options communes : --registre <fichier> (registre autre que celui du pilot, pour un essai), --sortie <dossier>, --json.
  * Exit : 0 · 1 (point « reception » seulement) l'oracle de forme rend FAIL, rien n'est préparé ; (--actualiser) une ancre disparue ou un fichier de
  *        source absent, ce qui reste à la main · 2 usage invalide, pièce illisible, ou aucune
@@ -348,7 +349,7 @@ export function verifierSources(ref, racine) {
  * de `verifierSources`, et le rapport la nomme. Une source de forge sœur absente de ce poste n'est pas rejouée. Pur sauf lecture de fichiers.
  */
 export function actualiserSources(ref, racine) {
-  const corrections = [], disparues = [], absentes = [], nonRejouees = [];
+  const corrections = [], disparues = [], absentes = [], nonRejouees = [], repetees = [];
   let lues = 0, justes = 0;
   const cache = new Map();
   const lire = (f) => { if (!cache.has(f)) { try { cache.set(f, readFileSync(resolve(racine, f), "utf8").split(/\r?\n/)); } catch { cache.set(f, null); } } return cache.get(f); };
@@ -359,14 +360,17 @@ export function actualiserSources(ref, racine) {
       const L = lire(s.fichier);
       if (!L && s.fichier.startsWith("../")) { nonRejouees.push({ id: r.id, fichier: s.fichier }); continue; }
       if (!L) { absentes.push({ id: r.id, fichier: s.fichier }); continue; }
-      if (s.ligne >= 1 && s.ligne <= L.length && L[s.ligne - 1].includes(s.ancre)) { justes++; continue; }
       const trouvees = []; L.forEach((l, k) => { if (l.includes(s.ancre)) trouvees.push(k + 1); });
+      // TF-2503 (14/11/2026) — UNE ANCRE QUI SE RÉPÈTE SE SIGNALE, JUSTE OU RECALÉE. Le 13/11/2026, l'ancre de la source L2 figurait trois fois dans son fichier :
+      // le recalage choisissait la plus proche de la ligne citée, et un décalage de 7 la faisait tomber sur une autre occurrence, sans que la recette le voie.
+      if (trouvees.length > 1) repetees.push({ id: r.id, fichier: s.fichier, ligne: s.ligne, ancre: s.ancre, lignes: trouvees });
+      if (s.ligne >= 1 && s.ligne <= L.length && L[s.ligne - 1].includes(s.ancre)) { justes++; continue; }
       if (!trouvees.length) { disparues.push({ id: r.id, fichier: s.fichier, ligne: s.ligne, ancre: s.ancre }); continue; }
       const a = trouvees.reduce((meilleure, k) => (Math.abs(k - s.ligne) < Math.abs(meilleure - s.ligne) ? k : meilleure), trouvees[0]);
       corrections.push({ id: r.id, fichier: s.fichier, de: s.ligne, a, occurrences: trouvees.length });
     }
   }
-  return { lues, justes, corrections, disparues, absentes, nonRejouees };
+  return { lues, justes, corrections, disparues, absentes, nonRejouees, repetees };
 }
 
 /**
@@ -1166,10 +1170,11 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     if (a.json) return { code, sortie: JSON.stringify(resume, null, 1), actualiser: resume };
     const L = [`relecture-intention ${VERSION} — actualiser les sources (${chemin}, chemins lus depuis ${racine}) : ${r.lues} source(s) lue(s)`];
     for (const c of r.corrections) L.push(`  recalée   ${c.id} : ${c.fichier} ligne ${c.de} → ${c.a}${c.occurrences > 1 ? ` (ancre présente ${c.occurrences} fois, la plus proche de la ligne citée)` : ""}`);
+    for (const d of r.repetees) L.push(`  ANCRE RÉPÉTÉE   ${d.id} : l'ancre « ${d.ancre.slice(0, 50)} » figure ${d.lignes.length} fois dans ${d.fichier} (lignes ${d.lignes.join(", ")}) — un recalage ne peut que choisir la plus proche de la ligne citée : allonger l'ancre jusqu'à ce qu'elle soit unique`);
     for (const d of r.disparues) L.push(`  ANCRE DISPARUE  ${d.id} : l'ancre « ${d.ancre.slice(0, 50)} » n'est plus dans ${d.fichier} — ligne ${d.ligne} laissée, la source reste une erreur de la recette`);
     for (const d of r.absentes) L.push(`  FICHIER ABSENT  ${d.id} : ${d.fichier} — ligne laissée`);
     for (const d of r.nonRejouees) L.push(`  non rejouée     ${d.id} : source d'une forge sœur absente de ce poste (${d.fichier})`);
-    L.push(`  bilan : ${r.corrections.length} recalée(s), ${r.justes} déjà juste(s), ${r.disparues.length} ancre(s) disparue(s), ${r.absentes.length} fichier(s) absent(s), ${r.nonRejouees.length} non rejouée(s)${r.corrections.length ? ` — ${chemin} réécrit (seuls les numéros de ligne ont changé)` : " — rien à réécrire"}`);
+    L.push(`  bilan : ${r.corrections.length} recalée(s), ${r.justes} déjà juste(s), ${r.disparues.length} ancre(s) disparue(s), ${r.absentes.length} fichier(s) absent(s), ${r.nonRejouees.length} non rejouée(s), ${r.repetees.length} ancre(s) répétée(s)${r.corrections.length ? ` — ${chemin} réécrit (seuls les numéros de ligne ont changé)` : " — rien à réécrire"}`);
     return { code, sortie: L.join("\n"), actualiser: resume };
   }
 

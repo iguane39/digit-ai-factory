@@ -306,7 +306,7 @@
         "source": {
           "fichier": "gabarits/RETOURS-FORGES.md",
           "ligne": 25,
-          "ancre": "node forge\\retours\\oracle-lot.mjs"
+          "ancre": "> node forge\\retours\\oracle-lot.mjs \"<ce fichier>.md\""
         },
         "fait": "TF-0597, 24/08/2026 : en une seule journée, six lots ont dû être admis par dérogation, tous pour les deux mêmes sections absentes."
       }

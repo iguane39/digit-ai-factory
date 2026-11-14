@@ -611,6 +611,35 @@ try {
     egal(apres.avertissements.filter((x) => /citée, ancre trouvée/.test(x)).length, 0, "après : plus de ligne glissée");
     egal(apres.erreurs.length, avant.erreurs.length, "les erreurs de la recette sont inchangées");
   });
+  // ----- TF-2503 : --actualiser signale une ancre qui figure plusieurs fois dans son fichier (14/11/2026) -----
+  check("rouge → vert — TF-2503 : une ancre qui figure plusieurs fois est SIGNALÉE (« ANCRE RÉPÉTÉE », `repetees` avec ses lignes), qu'elle soit déjà juste ou recalée ; une ancre unique ne l'est pas ; le code de sortie reste 0 et seule une ligne glissée est réécrite", () => {
+    const doctrine = "la règle\nb\nc\nd\ne\nf\ng\nh\nla règle\nj\nk\nl\nm\nla règle\n";   // lignes 1, 9 et 14
+    const juste = poserActualiser("repetee-juste", [{ fichier: "d.md", ligne: 9, ancre: "la règle" }], doctrine);
+    const rj = executer(["--actualiser", "--regles", juste.f, "--racine", juste.rac], {}, new Date("2026-11-14T12:00:00Z"));
+    egal(rj.code, 0, "exit : ancre répétée déjà juste");
+    egal(rj.actualiser.repetees.length, 1, "repetees : source déjà juste"); egal(rj.actualiser.repetees[0].lignes.join(","), "1,9,14", "lignes de l'ancre");
+    if (!/ANCRE RÉPÉTÉE   P1 : .*figure 3 fois dans d\.md \(lignes 1, 9, 14\)/.test(rj.sortie)) throw new Error(`la sortie ne signale pas l'ancre répétée : ${rj.sortie}`);
+    if (!/1 ancre\(s\) répétée\(s\)/.test(rj.sortie)) throw new Error(`le bilan ne compte pas l'ancre répétée : ${rj.sortie}`);
+    egal(readFileSync(juste.f, "utf8"), juste.avant, "aucune écriture : la ligne citée était juste");
+    const glissee = poserActualiser("repetee-glissee", [{ fichier: "d.md", ligne: 12, ancre: "la règle" }], doctrine);
+    const rg = executer(["--actualiser", "--regles", glissee.f, "--racine", glissee.rac], {}, new Date("2026-11-14T12:00:00Z"));
+    egal(rg.code, 0, "exit : ancre répétée recalée"); egal(rg.actualiser.corrections.length, 1, "la ligne glissée est recalée"); egal(rg.actualiser.repetees.length, 1, "repetees : source recalée");
+    const unique = poserActualiser("unique", [{ fichier: "d.md", ligne: 3, ancre: "la règle unique" }], "un\ndeux\ntrois\nla règle unique\n");
+    const ru = executer(["--actualiser", "--regles", unique.f, "--racine", unique.rac], {}, new Date("2026-11-14T12:00:00Z"));
+    egal(ru.actualiser.repetees.length, 0, "repetees : ancre unique"); if (/ANCRE RÉPÉTÉE/.test(ru.sortie)) throw new Error(`une ancre unique est signalée : ${ru.sortie}`);
+    if (!/0 ancre\(s\) répétée\(s\)/.test(ru.sortie)) throw new Error(`le bilan ne compte pas zéro ancre répétée : ${ru.sortie}`);
+  });
+  check("rouge → vert — TF-2503 : la source L2 du référentiel RÉEL a une ancre unique dans gabarits/RETOURS-FORGES.md, et aucune source du référentiel n'a une ancre répétée ; avec l'ancre d'avant (3 occurrences) le contrôle la signale (rejoué sur une copie, le fichier du dépôt n'est pas touché)", () => {
+    const joue = (nom, mutation) => {
+      const copie = JSON.parse(JSON.stringify(REGLES_REEL)); mutation(copie);
+      const f = join(T, `regles-reel-${nom}.json`); writeFileSync(f, JSON.stringify(copie, null, 2));
+      return executer(["--actualiser", "--regles", f, "--racine", RACINE], {}, new Date("2026-11-14T12:00:00Z")).actualiser;
+    };
+    egal(joue("ancres-actuelles", () => {}).repetees.length, 0, "ancres répétées dans le référentiel réel");
+    const ancienne = joue("ancre-ancienne", (ref) => { for (const r of ref.types.lot) if (r.id === "L2") r.source.ancre = "node forge\\retours\\oracle-lot.mjs"; });
+    egal(ancienne.repetees.length, 1, "avec l'ancre d'avant : une ancre répétée"); egal(ancienne.repetees[0].id, "L2", "la source signalée");
+    if (ancienne.repetees[0].lignes.length < 3) throw new Error(`l'ancre d'avant devait figurer 3 fois au moins : ${ancienne.repetees[0].lignes}`);
+  });
   const preparerType = (type, nom, extra = []) => {
     const d = join(T, `sortie-${nom}`);
     const r = executer(["--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", d, ...(type ? ["--type", type] : []), ...extra], {}, new Date("2026-10-18T12:00:00Z"), CTX);
