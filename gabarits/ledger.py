@@ -68,6 +68,9 @@ RUNS = FORGE.parent / "runs"
 # `anteriorite_ledger` est le type que le message de R-42 d'oracle-conformite-projet PRESCRIT (TF-1203) pour couvrir en bloc les
 # écarts de `seq` ou d'horodatage antérieurs à une date (`--avant <date ISO> --cause "<≥ 20 caractères>"`) : refusé ici comme type
 # inconnu, le produit qui suivait le message de l'oracle voyait son remède refusé (TF-2494, 13/11/2026, même classe que TF-2018).
+# `rectification_doublon` désigne, sans les effacer, des entrées écrites deux fois par un script rejoué (`entrees: [{seq,
+# doublon_de, cause}]`) : `ledger.mjs` de forge-agents l'a reçu le 14/11/2026 (TF-2424) et sa parité de vocabulaire avec ce
+# fichier rougit sans lui.
 # `secret_range` reste le DERNIER type : la chirurgie du banc de `scripts/ranger-secret.test.mjs` le retire par sa position.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
@@ -75,7 +78,7 @@ TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_mo
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
          "deplacement_en_attente", "demande_humain", "qualification_enclenchement",
-         "anteriorite_ledger", "secret_range"}
+         "anteriorite_ledger", "rectification_doublon", "secret_range"}
 
 
 # TF-2223 (RP-2, 06/11/2026) : hors run, ces types s'écrivent à `forge/hors-run.jsonl`, jamais au ledger du run, dont R-42
