@@ -109,6 +109,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` | fichier | 9,2 Ko | Synthèse Mandat — Supabase outillé dans quatre forges et au pilot, publication du pilot à  |
 | `Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` | fichier | 6,5 Ko | Synthèse Mandat — conseil de cinq agents avant un arbitrage : étude instruite (20/10/2026) |
 | `Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` | fichier | 8,0 Ko | Synthèse Mandat — correctif d'ouverture reporté sur la base actuelle et appliqué, recette  |
+| `Digit-AI - Synthese Mandat - D-108 (b) appliquee aux forges ops et design - 20261114d.md` | fichier | 5,5 Ko | Synthèse Mandat — D-108 (b) appliquée aux forges ops et design (14/11/2026) |
 | `Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md` | fichier | 4,1 Ko | markdown |
 | `Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` | fichier | 3,2 Ko | Synthèse Mandat — D-209 appliquée au prompt de suivi des agents, 12/11/2026 |
 | `Digit-AI - Synthese Mandat - D-214 et actions A-2 a A-7 executees - 20261114b.md` | fichier | 8,6 Ko | Synthèse Mandat — D-214 (a) et actions A-2 à A-7 exécutées (14/11/2026) |
@@ -248,4 +249,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` | fichier | 11,2 Ko | Synthèse Mandat — tri des favoris TikTok et skill de tri (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 
-_227 fichier(s), 4 sous-dossier(s)_
+_228 fichier(s), 4 sous-dossier(s)_

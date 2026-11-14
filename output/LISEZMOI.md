@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 707 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 708 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -612,6 +612,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md | 20261016g | 9.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Competences Supabase dans les forges - 20261016g.md` |
 | Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md | 20261020f | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Conseil avant arbitrage instruit - 20261020f.md` |
 | Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md | 20261013b | 8 Ko | `04-plans/Digit-AI - Synthese Mandat - Correctif d'ouverture reporte et applique - 20261013b.md` |
+| Digit-AI - Synthese Mandat - D-108 (b) appliquee aux forges ops et design - 20261114d.md | 20261114d | 5.5 Ko | `04-plans/Digit-AI - Synthese Mandat - D-108 (b) appliquee aux forges ops et design - 20261114d.md` |
 | Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md | 20261112d | 4.1 Ko | `04-plans/Digit-AI - Synthese Mandat - D-208 appliquee - 20261112d.md` |
 | Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md | 20261112h | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - D-209 appliquee - 20261112h.md` |
 | Digit-AI - Synthese Mandat - D-214 et actions A-2 a A-7 executees - 20261114b.md | 20261114b | 8.6 Ko | `04-plans/Digit-AI - Synthese Mandat - D-214 et actions A-2 a A-7 executees - 20261114b.md` |
