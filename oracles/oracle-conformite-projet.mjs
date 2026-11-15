@@ -2026,6 +2026,14 @@ else {
   for (const { e } of entrees) {
     if (!e || (e.type || e.ev) !== "rectification_horodatage") continue;
     for (const d of (Array.isArray(e.entrees) ? e.entrees : [])) {
+      // TF-2587 (15/11/2026) — LE `seq` D'UNE DÉCLARATION : `ledger.mjs verify` (forge-agents, TF-1425) refuse une déclaration qui n'est pas un objet ou
+      // dont le `seq` n'est pas un ENTIER ≥ 1 (« 3 » en texte, 3.5, 0, -1, absent), même à côté d'une déclaration valide ; R-42 lisait `Number(d.seq)`
+      // et ignorait en silence ce qui n'était pas un nombre (« 3 » comptait pour 3, 0 et -1 ne couvraient rien sans rien dire) — mesuré le 15/11/2026 :
+      // 5 formes sur 10 où R-42 rendait PASS et `verify` exit 1. Même prédicat qu'à `verify`. Aucun ledger du parc ne porte un seq invalide (31 déclarations lues).
+      if (d === null || typeof d !== "object" || !Number.isInteger(d.seq) || d.seq < 1) {
+        rectificationsInvalides.push(`rectification du seq ${e.seq} : déclaration ${JSON.stringify(d)} — \`seq\` absent ou invalide (entier ≥ 1 attendu) : une déclaration invalide ne couvre rien, comme chez \`ledger.mjs verify\` (TF-2587)`);
+        continue;
+      }
       const seq = Number(d && d.seq);
       if (!Number.isFinite(seq) || (Number.isFinite(Number(e.seq)) && seq >= Number(e.seq))) continue;
       const tsCollision = String((d && (d.ts_consigne || d.ts_reel_estime)) || "");
@@ -2041,6 +2049,14 @@ else {
       const manquantsTs = ["ts_consigne", "ts_reel_estime"].filter((c) => d[c] === undefined || d[c] === null || String(d[c]).trim() === "");
       if (manquantsTs.length) {
         rectificationsInvalides.push(`seq ${seq} : déclaration incomplète — champ(s) ${manquantsTs.map((c) => `\`${c}\``).join(", ")} manquant(s) : une déclaration incomplète ne couvre rien, comme chez \`ledger.mjs verify\` (TF-2573)`);
+        continue;
+      }
+      // TF-2587 (15/11/2026) — LA `cause` : `verify` l'exige (`CHAMPS_RECTIFICATION`) comme les trois autres champs, absente, null, vide ou faite d'espaces ;
+      // R-42 la remplaçait par « cause non dite » et couvrait quand même (mesuré le 15/11/2026 : cause absente et cause vide, R-42 PASS, verify exit 1).
+      // Aucune déclaration du parc n'est sans cause ; le repli « cause non dite » plus bas n'est plus atteint, laissé tel quel (diff minimal). La VALEUR de `ts_reel_estime` reste non lue, ici comme chez `verify` : une estimation en prose
+      // (« inconnu, antérieur à 2026-10-02T05:36:52.000Z », 4 déclarations d'un produit du parc) la refuser rendrait ce ledger irrémédiable.
+      if (d.cause === undefined || d.cause === null || String(d.cause).trim() === "") {
+        rectificationsInvalides.push(`seq ${seq} : déclaration incomplète — champ(s) \`cause\` manquant(s) : une déclaration sans cause ne couvre rien, comme chez \`ledger.mjs verify\` (TF-2587)`);
         continue;
       }
       const instantRectif = Date.parse(String(e.ts || ""));
