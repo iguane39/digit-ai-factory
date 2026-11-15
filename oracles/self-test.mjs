@@ -1904,12 +1904,14 @@ check("TF-2573 rouge : sans le contrôle des champs, le témoin voit la chirurgi
 // ---- TF-2587 (15/11/2026, quatrième campagne, lot pc) — LA `cause` ET LE `seq` D'UNE DÉCLARATION, R-42 CONTRE `ledger.mjs verify`.
 // TF-2573 a aligné `ts_reel_estime` ; il restait la `cause` et le `seq`, lus au code par le lot pb et REPRODUITS le 15/11/2026 (10 formes) : cause absente
 // ou vide, `seq` en texte (« 3 »), `seq` 0 ou -1 à côté d'une déclaration valide → R-42 PASS, `verify` exit 1 (5 formes sur 10). R-42 remplaçait la cause
-// absente par « cause non dite » et lisait `Number(d.seq)`. Rouge : la forme fautive est refusée et NOMMÉE. Vert : la déclaration complète couvre, quelle que
-// soit la valeur de `ts_reel_estime` — que NI R-42 NI `verify` ne lisent ; la refuser rendrait irrémédiable un ledger du parc dont 4 déclarations portent une
-// estimation en prose (« inconnu, antérieur à 2026-10-02T05:36:52.000Z », mesuré le 15/11/2026 sur 31 déclarations de 8 rectifications). ---
+// absente par « cause non dite » et lisait `Number(d.seq)`. Rouge : la forme fautive est refusée et NOMMÉE. Vert : la déclaration complète couvre.
+// LA LISIBILITÉ DE `ts_reel_estime` (suite du 15/11/2026, forge-agents 451a2b3) : `verify` exige un INSTANT (date ET heure ISO 8601) d'une rectification écrite à partir du
+// 15/11/2026 ; une rectification antérieure n'est pas jugée sur ce point — 4 déclarations d'un produit du parc portent « inconnu, antérieur à 2026-10-02T05:36:52.000Z »
+// (mesuré le 15/11/2026 sur 31 déclarations de 8 rectifications), et un ledger est en ajout seul. R-42 prend le même prédicat et la même date. Les formes illisibles
+// du tableau ci-dessous sont donc d'une rectification du 01/09/2026 : couvertes ; le tableau FORMES_TS_INSTANT les juge avant et après la naissance. ---
 const DECL_2587 = declarationTs(3, TS_CONSIGNE_2573);
 const FORMES_2587 = [
-  // [nom, déclarations de la rectification, intègre ?, motif attendu au message du FAIL, nature : « complete » | « refusee » | « tolerance » (valeur de ts_reel_estime, non lue)]
+  // [nom, déclarations de la rectification, intègre ?, motif attendu au message du FAIL, nature : « complete » | « refusee » | « anterieur » (ts_reel_estime illisible, rectification d avant le 15/11/2026 : non jugé)]
   ["complète", [DECL_2587], true, null, "complete"],
   ["cause absente", [(({ cause: _c, ...reste }) => reste)(DECL_2587)], false, /champ\(s\) `cause`/, "refusee"],
   ["cause null", [{ ...DECL_2587, cause: null }], false, /champ\(s\) `cause`/, "refusee"],
@@ -1921,10 +1923,10 @@ const FORMES_2587 = [
   ["complète, plus une déclaration de seq -1", [DECL_2587, { ...DECL_2587, seq: -1 }], false, /`seq` absent ou invalide/, "refusee"],
   ["complète, plus une déclaration sans seq", [DECL_2587, (({ seq: _s, ...reste }) => reste)(DECL_2587)], false, /`seq` absent ou invalide/, "refusee"],
   ["complète, plus une déclaration qui n'est pas un objet", [DECL_2587, "seq 3"], false, /`seq` absent ou invalide/, "refusee"],
-  ["ts_reel_estime « vers midi »", [{ ...DECL_2587, ts_reel_estime: "vers midi" }], true, null, "tolerance"],
-  ["ts_reel_estime nombre", [{ ...DECL_2587, ts_reel_estime: 1788251400 }], true, null, "tolerance"],
-  ["ts_reel_estime « 2026-01-01 » (une date sans heure)", [{ ...DECL_2587, ts_reel_estime: "2026-01-01" }], true, null, "tolerance"],
-  ["ts_reel_estime en prose (la forme du parc)", [{ ...DECL_2587, ts_reel_estime: "inconnu, antérieur à 2026-10-02T05:36:52.000Z" }], true, null, "tolerance"],
+  ["ts_reel_estime « vers midi »", [{ ...DECL_2587, ts_reel_estime: "vers midi" }], true, null, "anterieur"],
+  ["ts_reel_estime nombre", [{ ...DECL_2587, ts_reel_estime: 1788251400 }], true, null, "anterieur"],
+  ["ts_reel_estime « 2026-01-01 » (une date sans heure)", [{ ...DECL_2587, ts_reel_estime: "2026-01-01" }], true, null, "anterieur"],
+  ["ts_reel_estime en prose (la forme du parc)", [{ ...DECL_2587, ts_reel_estime: "inconnu, antérieur à 2026-10-02T05:36:52.000Z" }], true, null, "anterieur"],
 ];
 const ledger2587 = (decls) => [...ENTETE_RECUL, rectifDe(4, "2026-09-01T10:00:00Z", decls)];
 check("TF-2587 rouge : une cause absente (absente, null, vide, espaces) ou un seq invalide (texte, non entier, 0, -1, absent, non objet) → FAIL, le champ fautif est NOMMÉ, même à côté d'une déclaration valide", () => {
@@ -1935,7 +1937,7 @@ check("TF-2587 rouge : une cause absente (absente, null, vide, espaces) ou un se
     if (!motif.test(f.message)) throw new Error(`${nom} : le défaut n'est pas nommé : ${f.message}`);
   }
 });
-check("TF-2587 vert : la déclaration complète couvre, quelle que soit la valeur de `ts_reel_estime` (texte, nombre, date sans heure, prose du parc) — [RECTIFIÉ] imprimé", () => {
+check("TF-2587 vert : la déclaration complète couvre, et une valeur illisible de `ts_reel_estime` (texte, nombre, date sans heure, prose du parc) ne se juge pas sur une rectification d'avant le 15/11/2026 — [RECTIFIÉ] imprimé", () => {
   for (const [nom, decls] of FORMES_2587.filter(([, , integre]) => integre)) {
     const d = projetLedger2540("cause-seq-vert", ledger2587(decls));
     const r42 = r42De(d);
@@ -1964,6 +1966,62 @@ for (const [quoi, ancien, nomForme] of [
     } finally { rmSync(dirname(copie), { recursive: true, force: true }); }
   });
 }
+// ---- TF-2587 (suite, 15/11/2026) — `ts_reel_estime` EST UN INSTANT, pour une rectification écrite à partir du 15/11/2026 (prédicat et naissance de `verify`, forge-agents 451a2b3).
+// [nom, valeur de `ts_reel_estime`, `ts` de la rectification, intègre ?]. Rouge : après la naissance, « vers midi », un nombre, « 2026-01-01 », « 01/09/2026 08:30 » et la prose
+// du parc ne couvrent rien, et le message NOMME `ts_reel_estime`. Vert : un instant (avec ou sans fuseau, espace ou T), et les mêmes valeurs illisibles d'une rectification d'avant
+// la naissance (« [ANTÉRIEUR] » chez `verify`). Borne : la naissance est le 2026-11-15T00:00:00Z, incluse.
+const PROSE_PARC = "inconnu, antérieur à 2026-10-02T05:36:52.000Z";
+const AVANT_NAISSANCE = "2026-09-01T10:00:00Z", APRES_NAISSANCE = "2026-11-16T10:00:00Z";
+const FORMES_TS_INSTANT = [
+  ["instant ISO avec fuseau Z, après la naissance", "2026-09-01T09:05:00Z", APRES_NAISSANCE, true],
+  ["instant avec décalage +02:00, après la naissance", "2026-09-01T11:05:00+02:00", APRES_NAISSANCE, true],
+  ["instant sans fuseau (T), après la naissance", "2026-09-01T09:05", APRES_NAISSANCE, true],
+  ["instant avec espace au lieu de T, après la naissance", "2026-09-01 09:05:00", APRES_NAISSANCE, true],
+  ["« vers midi », après la naissance", "vers midi", APRES_NAISSANCE, false],
+  ["nombre, après la naissance", 1788251400, APRES_NAISSANCE, false],
+  ["« 2026-01-01 » (date sans heure), après la naissance", "2026-01-01", APRES_NAISSANCE, false],
+  ["« 01/09/2026 08:30 », après la naissance", "01/09/2026 08:30", APRES_NAISSANCE, false],
+  ["prose du parc, après la naissance", PROSE_PARC, APRES_NAISSANCE, false],
+  ["instant impossible (mois 13), après la naissance", "2026-13-01T09:05:00Z", APRES_NAISSANCE, false],
+  ["« vers midi », avant la naissance", "vers midi", AVANT_NAISSANCE, true],
+  ["nombre, avant la naissance", 1788251400, AVANT_NAISSANCE, true],
+  ["« 2026-01-01 », avant la naissance", "2026-01-01", AVANT_NAISSANCE, true],
+  ["prose du parc, avant la naissance", PROSE_PARC, AVANT_NAISSANCE, true],
+  ["prose du parc, la veille de la naissance (2026-11-14T23:59:59Z)", PROSE_PARC, "2026-11-14T23:59:59Z", true],
+  ["prose du parc, à la naissance (2026-11-15T00:00:00Z)", PROSE_PARC, "2026-11-15T00:00:00Z", false],
+];
+const ledgerInstant = (valeur, tsRectif) => [...ENTETE_RECUL, rectifDe(4, tsRectif, [{ ...DECL_2587, ts_reel_estime: valeur }])];
+check("TF-2587 rouge : après la naissance (15/11/2026), un `ts_reel_estime` qui n'est pas un instant (texte, nombre, date sans heure, jj/mm/aaaa, prose, mois 13) ne couvre rien → FAIL, `ts_reel_estime` est NOMMÉ", () => {
+  for (const [nom, valeur, tsRectif, integre] of FORMES_TS_INSTANT.filter(([, , , integre]) => !integre)) {
+    const d = projetLedger2540("instant-rouge", ledgerInstant(valeur, tsRectif));
+    const f = r42De(d).find((x) => x.statut === "FAIL");
+    if (!f) throw new Error(`${nom} : R-42 ${JSON.stringify(r42De(d).map((x) => x.statut))} — la valeur illisible a couvert l'écart`);
+    if (!/`ts_reel_estime` illisible/.test(f.message)) throw new Error(`${nom} : le défaut n'est pas nommé : ${f.message}`);
+  }
+});
+check("TF-2587 vert : un instant couvre quelle que soit sa forme, et la prose du parc d'une rectification d'avant la naissance couvre toujours — [RECTIFIÉ] imprimé, jamais un FAIL", () => {
+  for (const [nom, valeur, tsRectif] of FORMES_TS_INSTANT.filter(([, , , integre]) => integre)) {
+    const d = projetLedger2540("instant-vert", ledgerInstant(valeur, tsRectif));
+    const r42 = r42De(d);
+    if (r42.some((x) => x.statut === "FAIL")) throw new Error(`${nom} : FAIL inattendu ${JSON.stringify(r42.map((x) => x.message))}`);
+    if (!r42.some((x) => /\[RECTIFIÉ\]/.test(x.message))) throw new Error(`${nom} : aucun [RECTIFIÉ] imprimé : ${r42.map((x) => x.message)}`);
+  }
+});
+check("TF-2587 rouge : sans le contrôle de l'instant, le témoin voit la chirurgie — « vers midi » après la naissance couvre de nouveau (le défaut du 15/11)", () => {
+  const source = readFileSync(oracle, "utf8");
+  const mutant = source.replace("if (exigerTsLisible && !tsReelLisible(d.ts_reel_estime)) {", "if (false) {");
+  if (mutant === source) throw new Error("chirurgie sans effet : le témoin est vide");
+  const absolu = mutant.replace(/from "(\.\.?\/[^"]+)"/g, (_m, rel) => `from "${pathToFileURL(resolve(dirname(oracle), rel)).href}"`);
+  const copie = join(mkdtempSync(join(tmpdir(), "conf-mutant-2587i-")), "oracle-conformite-projet.mjs");
+  writeFileSync(copie, absolu, "utf8");
+  try {
+    const d = projetLedger2540("instant-mutant", ledgerInstant("vers midi", APRES_NAISSANCE));
+    let r;
+    try { r = JSON.parse(sh("node", [copie, d])); } catch (e) { r = JSON.parse(String(e.stdout || "{}")); }
+    if (!(r.findings || []).some((x) => x.regle === "R-42")) throw new Error("le mutant ne rend aucun constat R-42 : le témoin est vide");
+    if ((r.findings || []).some((x) => x.regle === "R-42" && x.statut === "FAIL")) throw new Error("le mutant refuse encore « vers midi » : le rouge n'est pas le défaut du 15/11");
+  } finally { rmSync(dirname(copie), { recursive: true, force: true }); }
+});
 {
   const LEDGER_MJS_2540 = join("digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
   const racinesParc = [process.env.FORGE_ROOT, join(dirname(oracle), "..", ".."), "c:\\dev"].filter(Boolean);
@@ -2000,16 +2058,18 @@ for (const [quoi, ancien, nomForme] of [
         if (r42 !== integre || verify !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
       }
     });
-    check(`TF-2587 accord : sur ${FORMES_2587.length} formes (cause absente, null, vide, espaces ; seq texte, non entier, 0, -1, absent, non objet ; ts_reel_estime illisible), R-42 et \`ledger.mjs verify\` rendent le MÊME verdict ; seule la valeur de \`ts_reel_estime\` tolère un \`verify\` plus strict, et le dit`, () => {
-      for (const [nom, decls, integre, , nature] of FORMES_2587) {
+    check(`TF-2587 accord : sur ${FORMES_2587.length} formes (cause absente, null, vide, espaces ; seq texte, non entier, 0, -1, absent, non objet ; ts_reel_estime illisible d'une rectification antérieure à la règle), R-42 et \`ledger.mjs verify\` rendent le MÊME verdict`, () => {
+      for (const [nom, decls, integre] of FORMES_2587) {
         const d = projetLedger2540("cause-seq-accord", ledger2587(decls));
         const r42 = r42Integre(d), verify = verifyIntegre(d);
-        if (r42 !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}`);
-        if (verify === integre) continue;
-        // La valeur de `ts_reel_estime` est ce que la part forge-agents de TF-2587 peut encore lire : une divergence de `verify` ICI se nomme, elle ne rougit pas ;
-        // partout ailleurs (cause, seq), `verify` refuse déjà et l'accord est strict.
-        if (nature === "tolerance" && !verify) { console.log(`  [DIVERGENCE TOLÉRÉE] TF-2587 : « ${nom} » — R-42 couvre, \`ledger.mjs verify\` refuse (valeur de ts_reel_estime lue par verify : part forge-agents, à arbitrer après fusion)`); continue; }
-        throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
+        if (r42 !== integre || verify !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
+      }
+    });
+    check(`TF-2587 accord (instant) : sur ${FORMES_TS_INSTANT.length} valeurs de \`ts_reel_estime\` × la date de la rectification (avant, à la naissance du 15/11/2026, après), R-42 et \`ledger.mjs verify\` rendent le MÊME verdict, sans [DIVERGENCE PILOTE]`, () => {
+      for (const [nom, valeur, tsRectif, integre] of FORMES_TS_INSTANT) {
+        const d = projetLedger2540("instant-accord", ledgerInstant(valeur, tsRectif));
+        const r42 = r42Integre(d), verify = verifyIntegre(d);
+        if (r42 !== integre || verify !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
       }
     });
   }

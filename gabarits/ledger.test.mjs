@@ -748,13 +748,13 @@ try {
     }
     att(entrees(d).length === 1, `une rectification refusée a écrit une entrée : ${entrees(d).length} entrées`);
   });
-  check("TF-2586 vert — la déclaration complète s'écrit, seule ou à plusieurs ; la valeur de ts_reel_estime n'est pas lue (une estimation en prose reste écrivable : 4 déclarations d'un produit du parc, TF-2587)", () => {
+  check("TF-2586 vert — la déclaration complète s'écrit, seule ou à plusieurs", () => {
     const { d, script } = unProduit();
-    const prose = { ...DECL_2586, seq: 1, ts_reel_estime: "inconnu, antérieur à 2026-10-02T05:36:52.000Z" };
-    const r = ecrire(script, "rectification_horodatage", "--entrees", JSON.stringify([DECL_2586, prose]));
+    const seconde = { ...DECL_2586, seq: 1, ts_reel_estime: "2026-09-01T11:05:00+02:00" };
+    const r = ecrire(script, "rectification_horodatage", "--entrees", JSON.stringify([DECL_2586, seconde]));
     att(r.status === 0, `la déclaration complète est refusée : exit ${r.status} ${r.stderr}`);
     const e = entrees(d).at(-1);
-    att(e.type === "rectification_horodatage" && e.entrees.length === 2 && e.entrees[1].ts_reel_estime === prose.ts_reel_estime, JSON.stringify(e));
+    att(e.type === "rectification_horodatage" && e.entrees.length === 2 && e.entrees[1].ts_reel_estime === seconde.ts_reel_estime, JSON.stringify(e));
   });
   check("TF-2586 vert — un autre type n'est pas touché par le contrôle (un retour sans entrees s'écrit)", () => {
     const { d, script } = unProduit();
@@ -778,6 +778,49 @@ try {
     const r = ecrire(script, "rectification_horodatage", "--cause", "sans entrees");
     att(r.status === 0 && !("entrees" in entrees(d).at(-1)), `le mutant refuse : exit ${r.status} ${r.stderr}`);
   });
+
+  // ---- TF-2587 (suite, 15/11/2026) : `ts_reel_estime` d'une rectification NEUVE est un instant, comme chez `ledger.mjs verify` et R-42 ----
+  // Le fait (forge-agents 451a2b3) : `verify` exige, d'une rectification écrite à partir du 15/11/2026, un instant (date ET heure ISO 8601) dans `ts_reel_estime` ;
+  // l'écrivain, qui n'écrit que des entrées neuves, le refuse donc toujours. Les 4 déclarations en prose du parc (octobre 2026) restent valides : elles sont d'avant.
+  const INSTANTS_ECRITS = ["2026-09-01T09:05:00Z", "2026-09-01 09:05", "2026-09-01T09:05", "2026-09-01T11:05:00+02:00", "2026-09-01T09:05:00.250Z"];
+  const NON_INSTANTS = ["vers midi", 1788251400, "2026-01-01", "01/09/2026 08:30", "2026-13-01T09:05:00Z", "inconnu, antérieur à 2026-10-02T05:36:52.000Z", "T12:30"];
+  const avecTs = (v) => ["--entrees", JSON.stringify([{ ...DECL_2586, ts_reel_estime: v }])];
+  check(`TF-2587 rouge → vert — ${NON_INSTANTS.length} valeurs de ts_reel_estime qui ne sont pas un instant sont refusées avant écriture (même sous --essai), la valeur est NOMMÉE ; ${INSTANTS_ECRITS.length} instants s'écrivent`, () => {
+    const { d, script } = unProduit();
+    for (const v of NON_INSTANTS) {
+      for (const essai of [[], ["--essai"]]) {
+        const r = ecrire(script, "rectification_horodatage", ...essai, ...avecTs(v));
+        att(r.status !== 0 && /`ts_reel_estime` illisible/.test(r.stderr) && /rien n'est écrit/.test(r.stderr), `${JSON.stringify(v)}${essai.length ? " (--essai)" : ""} : exit ${r.status} ${r.stderr.slice(0, 300)}`);
+      }
+    }
+    att(entrees(d).length === 1, "un ts_reel_estime refusé a écrit une entrée");
+    for (const v of INSTANTS_ECRITS) {
+      const r = ecrire(script, "rectification_horodatage", ...avecTs(v));
+      att(r.status === 0 && entrees(d).at(-1).entrees[0].ts_reel_estime === v, `${JSON.stringify(v)} : exit ${r.status} ${r.stderr.slice(0, 300)}`);
+    }
+  });
+  check("TF-2587 rouge — sans le contrôle de l'instant, « vers midi » est écrit (le défaut : verify et R-42 le refusent d'une rectification neuve)", () => {
+    const mutant = GABARIT.replace("        if not est_un_instant(d[\"ts_reel_estime\"]):", "        if False:");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = unProduit(mutant);
+    const r = ecrire(script, "rectification_horodatage", ...avecTs("vers midi"));
+    att(r.status === 0 && entrees(d).at(-1).entrees[0].ts_reel_estime === "vers midi", `le mutant refuse : exit ${r.status} ${r.stderr}`);
+  });
+  if (existsSync(LEDGER_MJS)) check("TF-2587 accord des deux écrivains : ce que `ledger.py` écrit, `ledger.mjs append` l'écrit ; les valeurs qui ne sont pas un instant sont refusées des deux côtés (`ledger.py` est seul plus étroit : 24:00 et un 31 février)", () => {
+    const { d, script } = unProduit();
+    const lf = join(d, "forge", "ledger.jsonl");
+    const mjs = (v) => spawnSync(process.execPath, [LEDGER_MJS, "append", lf, JSON.stringify({ type: "rectification_horodatage", entrees: [{ ...DECL_2586, ts_reel_estime: v }] }), "--essai"], { encoding: "utf8" });
+    for (const v of [...INSTANTS_ECRITS, ...NON_INSTANTS]) {
+      const py = ecrire(script, "rectification_horodatage", "--essai", ...avecTs(v)).status === 0;
+      const js = mjs(v).status === 0;
+      att(py === js, `${JSON.stringify(v)} : ledger.py ${py ? "écrit" : "refuse"}, ledger.mjs ${js ? "écrit" : "refuse"}`);
+      att(py === INSTANTS_ECRITS.includes(v), `${JSON.stringify(v)} : verdict inattendu (${py})`);
+    }
+    for (const v of ["2026-09-01T24:00:00Z", "2026-02-31T10:00:00Z"]) {
+      att(ecrire(script, "rectification_horodatage", "--essai", ...avecTs(v)).status !== 0, `${v} : ledger.py devait refuser (calendrier)`);
+    }
+  });
+  else console.log("  [SAUTÉ] TF-2587 — ledger.mjs de forge-agents absent de ce poste : l'accord des deux écrivains n'est pas joué");
 
   // ---- D-218 (b), item I1 (15/11/2026, RP-25 du lot factory-digit-ai-fr 20261114u) : la session qui écrit chaque entrée -------------
   // Le fait : une session lancée depuis une autre hérite de CLAUDE_CODE_SESSION_ID, et D-218 a été signée du nom de la session mère.
