@@ -75,6 +75,11 @@ process.env.FORGE_TRACE_WORKFLOWS = join(TABLES, "workflows-heberges.json");
 process.env.FORGE_SANS_OBSERVATION = "1";
 const HERITAGE_JETABLE = join(TABLES, "HERITAGE-RELEVES.jsonl");
 process.env.FORGE_HERITAGE_RELEVES = HERITAGE_JETABLE;
+// D-219 (e), TF-2563 (lot L4) : l'ouverture du pilot joue `scripts/indicateurs-agents.mjs`, qui réécrit sa page à chaque appel. La page n'est pas suivie
+// (vue générée, D-4 (a)), mais un banc qui l'écrirait d'après ses profils synthétiques la ferait mentir jusqu'à l'ouverture suivante : elle est déroutée
+// ici, une fois pour tout le fichier, vers un fichier jetable que le banc « D-219 (e) » ci-dessous lit pour prouver qu'elle est réécrite.
+const PAGE_INDICATEURS_JETABLE = join(TABLES, "indicateurs-agents.md");
+process.env.FORGE_PAGE_INDICATEURS_AGENTS = PAGE_INDICATEURS_JETABLE;
 
 const NL = String.fromCharCode(10);
 const EXEMPLE = [
@@ -231,6 +236,56 @@ if (veut(23)) {
     const coupe = ouvrirAvec(profilRelecture("coupe", 2), 0.001);
     if (!/relevé de la flotte ILLISIBLE/.test(coupe) || /relectures d'intention \(essai/.test(coupe)) throw new Error((coupe.match(/relevé de la flotte[^\n]*|relectures d'intention[^\n]*/) || ["ni alarme ni ligne"])[0]);
     if (!/relectures d'intention \(essai/.test(sortieTenu) || /relevé de la flotte ILLISIBLE/.test(sortieTenu)) throw new Error("au délai de la recette, le relevé de la flotte n'a pas rendu");
+  });
+}
+// D-219 (e) du 15/11/2026 (TF-2563, mandat 20261115b, lot L4) — un seuil d'indicateur des agents franchi se dit en UNE ligne de la section « Œil critique »,
+// jamais un blocage, et un relevé coupé à son délai se dit ILLISIBLE. Données SYNTHÉTIQUES : un fichier de fiches vide (FORGE_FICHES_AGENTS) écarte les
+// fiches réelles, donc P1 à P3 sont non mesurables quel que soit le pilot ; le profil jetable porte un seul agent de 35 minutes, suivi à 15 et 30 minutes
+// ou jamais. Le seuil est celui du référentiel du dépôt (P4 : au moins 80 %), que 0 % franchit et que 100 % tient.
+if (veut(2563, 219)) {
+  const maisonIndicateurs = mkdtempSync(join(tmpdir(), "hook-ouverture-ind-maison-"));
+  const fichesVides = join(TABLES, "fiches-vides.jsonl");
+  writeFileSync(fichesVides, "", "utf8");
+  const profilAgent = (nom, points) => {
+    const p = mkdtempSync(join(tmpdir(), `hook-ouverture-ind-${nom}-`)), d = join(p, "projects", "projet-indicateurs"), sid = `banc-indicateurs-${nom}`;
+    mkdirSync(join(d, sid, "subagents"), { recursive: true });
+    const T0 = Date.now() - 40 * 60000, iso = (m) => new Date(T0 + m * 60000).toISOString();
+    const lignes = [JSON.stringify({ type: "user", timestamp: iso(0), message: { role: "user", content: "Lance le banc." } })];
+    for (const m of points) lignes.push(JSON.stringify({ type: "assistant", timestamp: iso(m), message: { role: "assistant", content: [{ type: "text", text: "Suivi agents\n- banc · actif (preuve de vie il y a 1 min) · faits : a · restants : b" }] } }));
+    lignes.push(JSON.stringify({ type: "assistant", timestamp: iso(36), message: { role: "assistant", content: [{ type: "text", text: "Fini." }] } }));
+    writeFileSync(join(d, `${sid}.jsonl`), lignes.join(NL) + NL, "utf8");
+    writeFileSync(join(d, sid, "subagents", "agent-banc01.jsonl"), [JSON.stringify({ type: "user", timestamp: iso(0.2), message: { role: "user", content: "banc" } }),
+      JSON.stringify({ type: "assistant", timestamp: iso(35), message: { role: "assistant", content: [{ type: "text", text: "fini" }] } })].join(NL) + NL, "utf8");
+    writeFileSync(join(d, sid, "subagents", "agent-banc01.meta.json"), JSON.stringify({ description: "banc", agentType: "campagne", finished: true }), "utf8");
+    return p;
+  };
+  // TF-2511 : délais de l'appel, du relevé de la flotte et des indicateurs à l'échelle de la charge ; `delaiS` pose celui des indicateurs pour le cas rouge.
+  const ouvrirIndicateurs = (profil, delaiS = null) => {
+    const f = facteurDeCharge();
+    return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"], { cwd: PILOT, encoding: "utf8", timeout: Math.round(120000 * f),
+      env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonIndicateurs, HOME: maisonIndicateurs,
+        FORGE_FICHES_AGENTS: fichesVides, FORGE_DELAI_RELEVE_FLOTTE_S: String(Math.round(60 * f)), FORGE_DELAI_INDICATEURS_AGENTS_S: String(delaiS ?? Math.round(60 * f)) } });
+  };
+  rmSync(PAGE_INDICATEURS_JETABLE, { force: true });
+  const sortieSuivi = ouvrirIndicateurs(profilAgent("suivi", [15.3, 30.4]));
+  const pageReecrite = existsSync(PAGE_INDICATEURS_JETABLE);
+  const sortieMuet = ouvrirIndicateurs(profilAgent("muet", []));
+  const sortieCoupe = ouvrirIndicateurs(profilAgent("coupe", []), 0.001);
+  const ligneIndicateurs = (s) => (s.match(/^- indicateurs des agents[^\n]*$/m) || [null])[0];
+  check("D-219 (e) vert — un agent de 35 minutes suivi à 15 et 30 minutes : aucun seuil franchi, aucune ligne des indicateurs, et la page réécrite hors du dépôt", () => {
+    if (ligneIndicateurs(sortieSuivi)) throw new Error(ligneIndicateurs(sortieSuivi));
+    if (!pageReecrite) throw new Error("la page des indicateurs n'a pas été réécrite à l'ouverture (FORGE_PAGE_INDICATEURS_AGENTS)");
+  });
+  check("D-219 (e) rouge — le même agent sans point de suivi : P4 passe sous son plancher de 80 %, UNE ligne dans « Œil critique », et l'ouverture rend 0", () => {
+    const l = ligneIndicateurs(sortieMuet);
+    if (!l || !/^- indicateurs des agents \(D-219 \(e\), `references\\INDICATEURS-AGENTS\.json` du \d{4}-\d{2}-\d{2}\) : \*\*1 seuil\(s\) franchi\(s\)\*\* — P4-qualite « [^»]+ » 0,0 % pour un plancher de 80,0 % \(1 agent\(s\) jugé\(s\)\)/.test(l)) throw new Error(l || "ligne d'alerte absente");
+    if (!(sortieMuet.split("## Œil critique")[1] || "").includes(l)) throw new Error("la ligne d'alerte n'est pas dans la section « Œil critique »");
+    if ((sortieMuet.match(/^- indicateurs des agents/gm) || []).length !== 1) throw new Error("plus d'une ligne des indicateurs");
+  });
+  check("D-219 (e) rouge — les indicateurs coupés à leur délai (1 ms) sont dits ILLISIBLES, sans ligne d'alerte, et l'ouverture continue", () => {
+    const l = ligneIndicateurs(sortieCoupe);
+    if (!l || !/^- indicateurs des agents ILLISIBLES \(exit/.test(l) || /seuil\(s\) franchi\(s\)/.test(sortieCoupe)) throw new Error(l || "ni alarme ni ligne");
+    if (!/## Œil critique/.test(sortieCoupe)) throw new Error("l'ouverture s'est arrêtée avant la section « Œil critique »");
   });
 }
 veut(1301);

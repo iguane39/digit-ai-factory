@@ -937,6 +937,23 @@ if (iPilot < 0) {
   }
 }
 
+// D-219 (e) du 15/11/2026 (TF-2563, mandat 20261115b, lot L4) — UN SEUIL D'INDICATEUR DES AGENTS FRANCHI SE DIT EN UNE LIGNE, À CÔTÉ DE L'ALARME DES
+// RELECTURES, ET NE BLOQUE RIEN. `scripts/indicateurs-agents.mjs` calcule les 4 paires de l'étude 20261114d (Q4) contre la base et le seuil de
+// `references/INDICATEURS-AGENTS.json`, réécrit sa page (`todo/observabilite/indicateurs-agents.md`, vue non versionnée) et rend `ligne_alerte` quand un
+// gardien passe sous son plancher ; sans seuil franchi, rien ne se dit. Délai de 60 s, comme le relevé de la flotte (TF-2511) : le relevé rend en 1 s
+// environ au repos (mesuré le 15/11/2026) ; `FORGE_DELAI_INDICATEURS_AGENTS_S` le pose autrement (secondes, supérieur à 0). Un relevé illisible se dit.
+if (iPilot < 0) {
+  const ia = join(PILOT, "scripts", "indicateurs-agents.mjs");
+  if (existsSync(ia)) {
+    const delaiIndicateurs = Number(process.env.FORGE_DELAI_INDICATEURS_AGENTS_S);
+    const r = spawnSync(process.execPath, [ia, "--json"], { encoding: "utf8", cwd: PILOT, timeout: delaiIndicateurs > 0 ? Math.round(delaiIndicateurs * 1000) : 60000 });
+    let j = null;
+    try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* dit ci-dessous */ }
+    if (!j) alarmesOeil.push(`- indicateurs des agents ILLISIBLES (exit ${r.status}) — ce n'est pas un constat sur les agents : ${(r.stderr || "").trim().slice(0, 160)}`);
+    else if (j.ligne_alerte) alarmesOeil.push(`- ${String(j.ligne_alerte).slice(0, 900)}`);
+  }
+}
+
 // La section « Œil critique » : le repère de chaque poste, la sortie de la dernière exécution du
 // poste courant (10 lignes au plus, écrite par le skill), puis les alarmes ci-dessus.
 // D-94 (a) du 29/10/2026 — LE RAPPEL DE LANCEMENT NE VISE QUE LE POSTE DONT LE REPÈRE A VIEILLI. Lancé
