@@ -9,7 +9,7 @@
  *
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -254,6 +254,48 @@ try {
   check("TF-1863 rouge : option inconnue → exit 2 (usage), pas d'indice deviné", () => {
     const r = lancer(["--hasard", "x"]);
     att(r.status === 2 && r.stdout === "" && /option inconnue/.test(r.stderr), `exit ${r.status}, stderr « ${r.stderr.trim()} »`);
+  });
+
+  // ---- D-218 (b), item I4 (15/11/2026) : l'indice réservé au registre des sessions du produit. Le fait : le 14/11/2026, l'indice
+  // 20261114g a été porté par deux livrables de radical distinct, deux sessions ayant demandé leur lettre sans écrire entre les deux.
+  const P4 = join(T, "produit-i4"), D4 = join(P4, "output", "03-etudes");
+  mkdirSync(join(P4, "forge"), { recursive: true }); mkdirSync(D4, { recursive: true });
+  const REG4 = join(P4, "forge", "sessions.jsonl");
+  const envDe = (id) => { const e = { ...process.env }; delete e.FORGE_SESSION_ID; delete e.CLAUDE_CODE_SESSION_ID; return id ? { ...e, FORGE_SESSION_ID: id } : e; };
+  const indice = (id, prefixe, ...plus) => spawnSync(process.execPath, [SCRIPT, "--dossier", D4, "--prefixe", prefixe, "--jour", JOUR, "--extension", ".md", ...plus], { encoding: "utf8", env: envDe(id) });
+  const reservations = () => (existsSync(REG4) ? readFileSync(REG4, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).filter((l) => l.origine === "allouer-indice --reserver") : []);
+
+  check("D-218 (b) rouge — deux sessions, deux appels sans écriture entre eux et sans réservation : la même lettre (le 20261114g du produit)", () => {
+    const a = indice("session-A", "Produit - Etude - X - "), b = indice("session-B", "Produit - Brief - Y - ");
+    att(a.status === 0 && b.status === 0 && a.stdout.trim() === "a" && b.stdout.trim() === "a", `A « ${a.stdout.trim()} », B « ${b.stdout.trim()} » ${a.stderr}${b.stderr}`);
+  });
+  check("D-218 (b) vert — avec --reserver, la lettre rendue à A est réservée sous verrou ; B la saute, et un appel ordinaire de C saute les deux", () => {
+    const a = indice("session-A", "Produit - Etude - X - ", "--reserver"), b = indice("session-B", "Produit - Brief - Y - ", "--reserver"), c = indice("session-C", "Produit - Note - Z - ");
+    att(a.stdout.trim() === "a" && b.stdout.trim() === "b" && c.stdout.trim() === "c", `A « ${a.stdout.trim()} », B « ${b.stdout.trim()} », C « ${c.stdout.trim()} » ${a.stderr}${b.stderr}${c.stderr}`);
+    const r = reservations();
+    att(r.length === 2 && r[0].session === "session-A" && r[0].chemin === `output/03-etudes/Produit - Etude - X - ${JOUR}a.md` && r[1].chemin.endsWith(`${JOUR}b.md`) && !existsSync(REG4 + ".lock"), JSON.stringify(r));
+    att(/réservé pour la session session-/.test(a.stderr), a.stderr);
+  });
+  check("D-218 (b) vert — la session qui redemande le même radical retrouve sa lettre, sans seconde réservation ; un autre radical saute sa propre réservation (R-4)", () => {
+    const encore = indice("session-A", "Produit - Etude - X - ", "--reserver");
+    att(encore.stdout.trim() === "a" && reservations().length === 2 && /déjà réservé/.test(encore.stderr), `« ${encore.stdout.trim()} », ${reservations().length} réservation(s)`);
+    const autre = indice("session-A", "Produit - Synthese - W - ", "--reserver");
+    att(autre.stdout.trim() === "c" && reservations().length === 3, `autre radical de A : « ${autre.stdout.trim()} » (attendu c : a et b réservés)`);
+  });
+  check("D-218 (b) vert — la réservation d'une session expirée (15 minutes sans preuve de vie) ne compte plus", () => {
+    const D4b = join(P4, "output", "04-plans"); mkdirSync(D4b, { recursive: true });
+    const vieille = { schema: "pilot/sessions@1", ev: "revendique", session: "session-morte", ts: new Date(Date.now() - 30 * 60_000).toISOString(), chemin: `output/04-plans/Produit - Plan - ${JOUR}a.md`, origine: "allouer-indice --reserver" };
+    writeFileSync(REG4, readFileSync(REG4, "utf8") + JSON.stringify(vieille) + "\n", "utf8");
+    const r = spawnSync(process.execPath, [SCRIPT, "--dossier", D4b, "--prefixe", "Produit - Plan - ", "--jour", JOUR, "--extension", ".md"], { encoding: "utf8", env: envDe("session-B") });
+    att(r.status === 0 && r.stdout.trim() === "a", `« ${r.stdout.trim()} » ${r.stderr}`);
+  });
+  check("D-218 (b) rouge — --reserver hors d'un produit, ou sans session identifiée : exit 2, rien d'écrit", () => {
+    const hors = join(T, "hors-produit-i4"); mkdirSync(hors, { recursive: true });
+    const h = spawnSync(process.execPath, [SCRIPT, "--dossier", hors, "--jour", JOUR, "--reserver"], { encoding: "utf8", env: envDe("session-A") });
+    att(h.status === 2 && h.stdout === "" && /n'est sous aucun produit/.test(h.stderr), `${h.status} ${h.stderr}`);
+    const avant = reservations().length;
+    const s = indice(null, "Produit - Etude - X - ", "--reserver");
+    att(s.status === 2 && /session identifiée/.test(s.stderr) && reservations().length === avant, `${s.status} ${s.stderr}`);
   });
 
   check("un jour hors format AAAAMMJJ est REFUSÉ — il fabriquerait un motif faux en silence", () => {
