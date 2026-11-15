@@ -423,7 +423,7 @@
   "vu_le": "2026-10-13"
  },
  "oracles/hook-fiches.test.mjs": {
-  "cas": 8,
+  "cas": 9,
   "vu_le": "2026-11-15"
  },
  "oracles/hook-fichiers-env.test.mjs": {
@@ -770,6 +770,10 @@
   "cas": 13,
   "vu_le": "2026-11-15"
  },
+ "scripts/noter-fiche.test.mjs": {
+  "cas": 10,
+  "vu_le": "2026-11-15"
+ },
  "scripts/oracles-design-page-generee.test.mjs": {
   "cas": 13,
   "vu_le": "2026-09-23"
@@ -823,8 +827,8 @@
   "vu_le": "2026-10-12"
  },
  "scripts/relecture-intention.test.mjs": {
-  "cas": 97,
-  "vu_le": "2026-11-14"
+  "cas": 102,
+  "vu_le": "2026-11-15"
  },
  "scripts/relever-appelants.test.mjs": {
   "cas": 21,
@@ -843,8 +847,8 @@
   "vu_le": "2026-09-03"
  },
  "scripts/relever-flotte.test.mjs": {
-  "cas": 16,
-  "vu_le": "2026-10-26"
+  "cas": 21,
+  "vu_le": "2026-11-15"
  },
  "scripts/relever-heritage.test.mjs": {
   "cas": 51,

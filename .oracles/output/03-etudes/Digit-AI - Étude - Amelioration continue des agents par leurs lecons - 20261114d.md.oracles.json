@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+  "date_iso": "2026-11-14T16:42:38.175Z",
+  "registre_version": "2.63.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+      "verdict": "PASS",
+      "detail": "6 constat(s) · 6 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; nombre « 200 000 » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md",
+    "ts": "2026-11-14T16:42:38.175Z",
+    "fichiers": {
+      "output\\03-etudes\\Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md": "faceedd3669fc29c3ae78b6a1f857b8edca0049e87bed82914cc46e2fbfd53b0"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

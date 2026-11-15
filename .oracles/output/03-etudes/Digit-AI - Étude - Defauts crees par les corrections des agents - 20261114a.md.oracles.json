@@ -1,0 +1,81 @@
+{
+  "cible": "C:\\dev\\digit-ai-factory\\output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+  "date_iso": "2026-11-14T15:44:09.874Z",
+  "registre_version": "2.63.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 6,
+    "fail": 0,
+    "skip": 1,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 0 total(aux) de colonne vérifié(s) par re-somme + 0 effectif(s) annoncé(s) rapproché(s) de leur cardinal réel + 3/3 mesure(s) publiée(s) portant leur dénominateur et leurs unités + 0 indicateur(s) à valeur unique, 0 écart"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "4 constat(s) · 3 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (3 avertissement(s)) ; pourcentage « 36 % » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md",
+    "ts": "2026-11-14T15:44:09.873Z",
+    "fichiers": {
+      "output\\03-etudes\\Digit-AI - Étude - Defauts crees par les corrections des agents - 20261114a.md": "01b0fdc294377c2f3870cf0a421fea7955459db2be894187600e73000d41e2d7"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

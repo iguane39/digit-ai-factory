@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 714 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 715 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -264,6 +264,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md | 20261110c | 12.7 Ko | `03-etudes/Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
+| Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md | 20261115a | 11.7 Ko | `03-etudes/Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md | 20261106a | 98.4 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` |
 | Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |

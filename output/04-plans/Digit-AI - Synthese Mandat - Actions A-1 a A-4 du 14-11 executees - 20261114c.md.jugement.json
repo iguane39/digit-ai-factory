@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Actions A-1 a A-4 du 14-11 executees - 20261114c.md",
+ "empreinte": "7e810bc0705ab1710678c357aaa6e3f0be12aff6d61cb9071226b2ca85c20ac9",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-14T15:45:22.905Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

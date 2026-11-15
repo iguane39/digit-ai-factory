@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - D-108 (b) appliquee aux forges ops et design - 20261114d.md",
+ "empreinte": "fe68a4f5b25cb2b3f6cdef9f94b09b3364f78f14b910a0690f6e536b813a8c32",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-14T16:36:04.763Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

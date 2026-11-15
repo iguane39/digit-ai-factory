@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Seconde campagne du 14-11 close et publiee - 20261114e.md",
+ "empreinte": "eca7c9b0f160ac2605709110916f2d132bc36af69b418c16de1c822c8ad998cf",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-14T18:43:20.008Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}
