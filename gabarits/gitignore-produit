@@ -107,6 +107,9 @@ forge/**/*motdepasse*
 # TF-2084 (04/11/2026) : registre transitoire des gestes distants ouverts par les sessions du produit. Il
 # change à chaque geste et vaut 15 minutes ; les gestes DÉCIDÉS sont dans gestes-approuves.jsonl, ignoré lui aussi plus bas (TF-2213).
 forge/gestes-en-cours.jsonl
+# D-218 (b) (15/11/2026) : registre des sessions du produit (forge/hooks/factory.mjs sessions) : qui est ouverte, son objet, les
+# chemins qu'elle revendique, la coordinatrice. Il porte des chemins de poste et vit le temps des sessions : il ne se commite jamais.
+forge/sessions.jsonl
 # TF-2150 (04/11/2026) : journaux de session des leçons, les rappels servis au geste (hook lecons) et les frictions
 # du tour (TF-2141) ; `scripts/lecons.mjs --recidives` du pilot les croise. Ils ne se commitent jamais.
 forge/lecons-rappels.jsonl

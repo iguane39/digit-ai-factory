@@ -38,6 +38,11 @@
       "chemin": "forge/gestes-en-cours.jsonl",
       "ecrit_par": "oracles/hook-gestes-distants.mjs (registre des gestes ouverts, TF-2084)",
       "contenu": "les gestes distants ouverts par les sessions du produit, 15 minutes"
+    },
+    {
+      "chemin": "forge/sessions.jsonl",
+      "ecrit_par": "oracles/lib-sessions.mjs (registre des sessions, D-218 (b)), appelé par oracles/hook-sessions.mjs (lanceur : forge/hooks/factory.mjs sessions) et scripts/allouer-indice.mjs --reserver",
+      "contenu": "les sessions ouvertes du produit, l'objet de chacune (200 premiers caractères de sa première demande), les chemins qu'elle revendique, la coordinatrice ; porte le chemin de la transcription de chaque session"
     }
   ],
   "journaux_de_hooks_regle": "TF-2213 et TF-2215 (06/11/2026) : un journal écrit par un hook de la factory sous forge/ recopie des commandes et des chemins de poste. Il ne se commite jamais (motif exigé du .gitignore socle) et un balayage de secrets du produit l'exclut par CETTE liste, jamais par une copie qui dérive. Les fichiers de données du produit (forge/couts-<poste>.jsonl, forge/ledger.jsonl, forge/hors-run.jsonl) ne sont pas des journaux de hooks : ils se commitent.",
@@ -291,7 +296,8 @@
         "forge/gestes-en-cours.jsonl",
         "forge/lecons-rappels.jsonl",
         "forge/frictions.jsonl",
-        "forge/gestes-approuves.jsonl"
+        "forge/gestes-approuves.jsonl",
+        "forge/sessions.jsonl"
       ],
       "motif": "LES EXCLUSIONS QUE LE SOCLE EDICTE, LIVREES COMME UN MOTIF DE FICHIER (TF-0649). La regle 10 du socle enumere ces exclusions depuis le 06/08 — en PROSE, dans un tableau de REGLES-PROJET.md, donc sans AUCUN point d'application. Un produit ne l'enfreignait pas : il ne la rencontrait jamais. Mesure remontee par un produit : un `.pyc` suivi par git, un second qui s'appretait a entrer. Mode `presence_et_motifs` et non `copie_conforme` : ce fichier est un SOCLE, pas un plafond — un produit y ajoute ce que sa pile impose, et exiger l'identite reviendrait a lui interdire d'ignorer ses propres artefacts. `.env` n'est PAS dans les motifs exiges parce que `.env.forge-tests` est deja couvert par le controle de forge-tests, et qu'un produit peut legitimement ecrire `.env*` ou `/.env` : exiger une graphie exacte ferait crier sur une protection equivalente. `old/` n'y est PAS NON PLUS, et c'est une decision : l'arbitrage C1, amende le 13/08 (TF-0150), le rend AUTORISE et VERSIONNE. TF-0713/TF-0714 (mesures du 30/08 chez un produit, decides le 01/09) : `forge/**/.env*` et `forge/**/*mdp*` RE-EXCLUENT ce que `!forge/**` rouvrait — en gitignore le dernier motif qui matche l'emporte, et deux fichiers de secrets reels etaient a un commit d'entrer dans l'histoire ; `!.env.example` re-inclut le fichier que R-13 exige VERSIONNE, que la seule negation en francais (`!.env.*.exemple`) ne couvrait pas.",
       "depuis": "2026-08-26",

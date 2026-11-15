@@ -471,8 +471,8 @@ try {
   const heritage22 = JSON.parse(readFileSync(join(PILOT, "gabarits", "HERITAGE.json"), "utf8"));
   const journaux22 = (heritage22.journaux_de_hooks || []).map((j) => j.chemin);
   check("22 journaux de hooks : le contrat d'héritage nomme les journaux écrits par les hooks, et chacun est cité par une source de hook du pilot",
-    journaux22.length >= 4 && ["forge/lecons-rappels.jsonl", "forge/gestes-approuves.jsonl", "forge/gestes-en-cours.jsonl", "forge/frictions.jsonl"].every((c) => journaux22.includes(c))
-      && journaux22.every((c) => ["oracles/hook-lecons.mjs", "oracles/hook-gestes-distants.mjs", "scripts/lecons.mjs", "oracles/lib-gestes-en-cours.mjs"]
+    journaux22.length >= 5 && ["forge/lecons-rappels.jsonl", "forge/gestes-approuves.jsonl", "forge/gestes-en-cours.jsonl", "forge/frictions.jsonl", "forge/sessions.jsonl"].every((c) => journaux22.includes(c))
+      && journaux22.every((c) => ["oracles/hook-lecons.mjs", "oracles/hook-gestes-distants.mjs", "scripts/lecons.mjs", "oracles/lib-gestes-en-cours.mjs", "oracles/lib-sessions.mjs"]
         .some((f) => { try { return readFileSync(join(PILOT, f), "utf8").includes(c.split("/").pop()); } catch { return false; } })),
     JSON.stringify(journaux22));
   const gitignore22 = (texte) => {
