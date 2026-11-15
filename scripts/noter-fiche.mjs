@@ -54,7 +54,7 @@ export const CAUSES_ANALYSEES = Object.freeze(["erreur_consigne", "depassement_c
 export const ID_AGENT = /^[\w-]{1,64}$/;
 
 /** Une cause écrite en toutes lettres, ramenée à la forme de son identifiant : minuscules, sans accents, espaces et tirets en `_`. */
-export const formeCause = (c) => String(c ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[\s-]+/g, "_");
+export const formeCause = (c) => String(c ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s-]+/g, "_");
 
 /**
  * Le contenu d'un fichier de fiches : { fiches (Map agent_id → dernière fiche), sansIdentifiant (fiches sans agent_id), verdicts
