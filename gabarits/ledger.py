@@ -167,6 +167,32 @@ def controler_retrait(type_: str, champs: dict) -> None:
         raise SystemExit(f"`decision_retiree` doit dire pourquoi : `--cause` d'au moins {CAUSE_MIN} caractères — rien n'est écrit")
 
 
+# TF-2586 (15/11/2026) : les quatre champs d'une déclaration de `rectification_horodatage`, ceux que `ledger.mjs verify` (CHAMPS_RECTIFICATION)
+# et R-42 d'oracle-conformite-projet exigent depuis TF-2573. Une déclaration à qui il manque l'un d'eux est INOPÉRANTE : elle ne couvre
+# rien, et l'entrée écrite ne se réécrit pas. Le fait : l'écrivain ne les exigeait pas et pouvait écrire une entrée que les deux juges refusent.
+CHAMPS_RECTIFICATION = ("seq", "ts_consigne", "ts_reel_estime", "cause")
+
+
+def controler_rectification(type_: str, champs: dict) -> None:
+    """Une `rectification_horodatage` porte `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]`, liste non vide, chaque déclaration avec
+    ses quatre champs (ni absent, ni null, ni vide, ni fait d'espaces — le prédicat de `verify`) et un `seq` entier ≥ 1. Refusée AVANT
+    d'écrire : une entrée écrite ne se réécrit pas."""
+    if type_ != "rectification_horodatage":
+        return
+    forme = "`--entrees '[{\"seq\": 7, \"ts_consigne\": \"<ts de l entrée visée>\", \"ts_reel_estime\": \"<heure réelle>\", \"cause\": \"<pourquoi>\"}]'`"
+    entrees = champs.get("entrees")
+    if not isinstance(entrees, list) or not entrees:
+        raise SystemExit(f"`rectification_horodatage` doit porter {forme} : une rectification qui ne déclare aucun seq ne rectifie rien — rien n'est écrit")
+    for d in entrees:
+        manquants = [c for c in CHAMPS_RECTIFICATION
+                     if not isinstance(d, dict) or d.get(c) is None or str(d[c]).strip() == ""]
+        if manquants:
+            raise SystemExit(f"`rectification_horodatage` : déclaration incomplète, champ(s) {', '.join(f'`{c}`' for c in manquants)} manquant(s) "
+                             f"dans {json.dumps(d, ensure_ascii=False)} — elle ne couvrirait rien chez `verify` ni chez R-42 ; forme attendue {forme} — rien n'est écrit")
+        if isinstance(d["seq"], bool) or not isinstance(d["seq"], int) or d["seq"] < 1:
+            raise SystemExit(f"`rectification_horodatage` : `seq` invalide ({json.dumps(d['seq'], ensure_ascii=False)}) — entier ≥ 1 attendu — rien n'est écrit")
+
+
 def chemin(run: str = "") -> pathlib.Path:
     """Le ledger du run COURANT vit a `forge/ledger.jsonl` — chemin de doctrine (R-19, R-42,
     ETAPES-RUN, CONTRAT-INTERFACE §3), et celui qu'annonce le CLAUDE.md de ce produit.
@@ -216,6 +242,7 @@ def ajouter(archive: str, type_: str, essai: bool = False, /, **champs) -> dict:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
     controler_remplacement(type_, champs)
     controler_retrait(type_, champs)
+    controler_rectification(type_, champs)
     # Hors run (aucune entrée au ledger du run, hors archive), un retour ou une décision s'écrit au journal hors run.
     hors_run = type_ in HORS_RUN and not archive and not lignes(chemin(archive))
     p = JOURNAL_HORS_RUN if hors_run else chemin(archive)

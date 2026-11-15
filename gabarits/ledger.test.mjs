@@ -716,6 +716,69 @@ try {
     att(r.status === 0 && entrees(d).at(-1).type === "decision_retiree" && !entrees(d).at(-1).cause, `le mutant refuse : exit ${r.status} ${r.stderr}`);
   });
 
+  // ---- TF-2586 (15/11/2026, troisième campagne, lot pb) : l'écrivain refuse une rectification_horodatage incomplète ----
+  // Le fait : depuis TF-2573, R-42 et `ledger.mjs verify` exigent les quatre champs d'une déclaration (seq, ts_consigne, ts_reel_estime, cause) ;
+  // l'écrivain ne les exigeait pas et écrivait une entrée que les deux juges refusent, et qui ne se réécrit pas.
+  const DECL_2586 = { seq: 2, ts_consigne: "2026-09-01T08:30:00Z", ts_reel_estime: "2026-09-01T08:30:00Z", cause: "deux sessions, même queue — seq attribué sans verrou" };
+  const sans2586 = (champ, valeur) => { const { [champ]: _omis, ...reste } = DECL_2586; return valeur === undefined ? reste : { ...reste, [champ]: valeur }; };
+  const FORMES_REFUSEES_2586 = [
+    // [nom, arguments de l'écrivain, motif attendu au message]
+    ["aucun --entrees", [], /doit porter/],
+    ["--entrees vide", ["--entrees", "[]"], /doit porter/],
+    ["--entrees qui n'est pas une liste", ["--entrees", JSON.stringify(DECL_2586)], /doit porter/],
+    ["une déclaration qui n'est pas un objet", ["--entrees", JSON.stringify(["seq 2"])], /incomplète/],
+    ...["seq", "ts_consigne", "ts_reel_estime", "cause"].map((c) => [`${c} absent`, ["--entrees", JSON.stringify([sans2586(c)])], new RegExp(`champ\\(s\\) .*\`${c}\``)]),
+    ["ts_reel_estime null", ["--entrees", JSON.stringify([{ ...DECL_2586, ts_reel_estime: null }])], /`ts_reel_estime`/],
+    ["cause vide", ["--entrees", JSON.stringify([{ ...DECL_2586, cause: "" }])], /`cause`/],
+    ["cause faite d'espaces", ["--entrees", JSON.stringify([{ ...DECL_2586, cause: "   " }])], /`cause`/],
+    ["la seconde déclaration est incomplète", ["--entrees", JSON.stringify([DECL_2586, sans2586("cause")])], /`cause`/],
+    ["seq en texte", ["--entrees", JSON.stringify([{ ...DECL_2586, seq: "2" }])], /`seq` invalide/],
+    ["seq 0", ["--entrees", JSON.stringify([{ ...DECL_2586, seq: 0 }])], /`seq` invalide/],
+    ["seq négatif", ["--entrees", JSON.stringify([{ ...DECL_2586, seq: -1 }])], /`seq` invalide/],
+    ["seq non entier", ["--entrees", JSON.stringify([{ ...DECL_2586, seq: 2.5 }])], /`seq` invalide/],
+    ["seq booléen", ["--entrees", JSON.stringify([{ ...DECL_2586, seq: true }])], /`seq` invalide/],
+  ];
+  check(`TF-2586 rouge → vert — ${FORMES_REFUSEES_2586.length} formes incomplètes ou invalides sont refusées avant écriture, le défaut est NOMMÉ, rien n'est écrit (même sous --essai)`, () => {
+    const { d, script } = unProduit();
+    for (const [nom, args, motif] of FORMES_REFUSEES_2586) {
+      for (const essai of [[], ["--essai"]]) {
+        const r = ecrire(script, "rectification_horodatage", ...essai, ...args);
+        att(r.status !== 0 && /rien n'est écrit/.test(r.stderr) && motif.test(r.stderr), `${nom}${essai.length ? " (--essai)" : ""} : exit ${r.status} ${r.stderr.slice(0, 300)}`);
+      }
+    }
+    att(entrees(d).length === 1, `une rectification refusée a écrit une entrée : ${entrees(d).length} entrées`);
+  });
+  check("TF-2586 vert — la déclaration complète s'écrit, seule ou à plusieurs ; la valeur de ts_reel_estime n'est pas lue (une estimation en prose reste écrivable : 4 déclarations d'un produit du parc, TF-2587)", () => {
+    const { d, script } = unProduit();
+    const prose = { ...DECL_2586, seq: 1, ts_reel_estime: "inconnu, antérieur à 2026-10-02T05:36:52.000Z" };
+    const r = ecrire(script, "rectification_horodatage", "--entrees", JSON.stringify([DECL_2586, prose]));
+    att(r.status === 0, `la déclaration complète est refusée : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "rectification_horodatage" && e.entrees.length === 2 && e.entrees[1].ts_reel_estime === prose.ts_reel_estime, JSON.stringify(e));
+  });
+  check("TF-2586 vert — un autre type n'est pas touché par le contrôle (un retour sans entrees s'écrit)", () => {
+    const { d, script } = unProduit();
+    att(ecrire(script, "retour", "--resume", "x").status === 0 && entrees(d).at(-1).type === "retour", "le contrôle déborde sur un autre type");
+  });
+  check("TF-2586 rouge — sans le contrôle, l'écrivain écrit la déclaration sans `ts_reel_estime`, que R-42 refuse déjà : l'entrée inopérante du défaut", () => {
+    const mutant = GABARIT.replace("    controler_rectification(type_, champs)\n", "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = unProduit(mutant);
+    // Le ledger de ce témoin : le seq 2 (un retour) puis une rectification qui le déclare sans `ts_reel_estime`.
+    const ts2 = (() => { ecrire(script, "retour", "--resume", "la collision visée"); return entrees(d).at(-1).ts; })();
+    const incomplete = [{ seq: 2, ts_consigne: ts2, cause: "déclaration sans ts_reel_estime" }];
+    const r = ecrire(script, "rectification_horodatage", "--entrees", JSON.stringify(incomplete));
+    att(r.status === 0 && entrees(d).at(-1).type === "rectification_horodatage", `le mutant refuse : exit ${r.status} ${r.stderr}`);
+    const f = r42(d);
+    att(f.some((x) => x.statut === "FAIL" && /déclaration incomplète/.test(x.message)), `R-42 ne refuse pas l'entrée écrite par le mutant : ${JSON.stringify(f)}`);
+  });
+  check("TF-2586 rouge — le mutant, sans le contrôle, écrit aussi une rectification sans entrees", () => {
+    const mutant = GABARIT.replace("    controler_rectification(type_, champs)\n", "");
+    const { d, script } = unProduit(mutant);
+    const r = ecrire(script, "rectification_horodatage", "--cause", "sans entrees");
+    att(r.status === 0 && !("entrees" in entrees(d).at(-1)), `le mutant refuse : exit ${r.status} ${r.stderr}`);
+  });
+
   // ---- D-218 (b), item I1 (15/11/2026, RP-25 du lot factory-digit-ai-fr 20261114u) : la session qui écrit chaque entrée -------------
   // Le fait : une session lancée depuis une autre hérite de CLAUDE_CODE_SESSION_ID, et D-218 a été signée du nom de la session mère.
   // L'écrivain lit d'abord FORGE_SESSION_ID, que le hook SessionStart de la session pose par CLAUDE_ENV_FILE (oracles/lib-session.mjs).
