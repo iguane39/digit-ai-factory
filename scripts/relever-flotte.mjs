@@ -24,6 +24,13 @@
  *   · les RELECTURES D'INTENTION de l'essai du 18/10/2026 (D-23 (a), `references/RELECTURE-INTENTION.md`) : les sous-agents
  *     `verificateur` dont la description commence par « Relecture d'intention », leurs jetons par jour, et si le SEUIL
  *     D'ARRÊT de l'essai (plus de 6 000 000 de jetons de relecture par jour, D-165 (c) du 04/11/2026 ; 4 000 000 par D-25 du 18/10/2026, 1 000 000 à l'ouverture de l'essai) est franchi — il se dit à part des critères.
+ *   · les FICHES D'EXÉCUTION (décision humaine D-219 (e) du 15/11/2026, TF-2563, mandat 20261115b, lot L2) : celles du pilot
+ *     (`todo/observabilite/fiches-agents.jsonl`) et de chaque `<parc>\*\forge\fiches-agents.jsonl`, le parc étant le dossier qui porte
+ *     le pilot (`c:\dev` sur ce poste), écrites par le hook de fin d'agent (`oracles/lib-fiches-agents.mjs`) et lues par la règle de
+ *     `scripts/noter-fiche.mjs` (`lireFiches`). Il publie PAR AGENT la durée, y compris en dessous des 17 minutes à partir desquelles
+ *     `oracle-suivi-agents.mjs` publie un agent (`SEUIL_MIN`), la cause de fin et les verdicts notés. Un agent lu dans deux fichiers (la
+ *     copie d'un arbre de travail lié) compte une fois, sa fiche la plus récente faisant foi ; un projet se dit par le pseudonyme que porte
+ *     la fiche, jamais par le dossier lu. Indicateur seul : il n'entre pas dans les critères de la flotte.
  * Et il juge les 4 critères de revue écrits d'avance par l'étude (revue du 2026-11-01) : part des appels vers un
  * agent nommé ≥ 90 % ; 0 délégation Opus sans effort déclaré ; 0 réponse hors génération courante ; et il donne la
  * médiane des jetons relus par sous-agent, à comparer à la période de l'étude.
@@ -33,17 +40,22 @@
  *
  * Usage : node scripts\relever-flotte.mjs [--jours N | --depuis AAAA-MM-JJ] [--transcripts <dossier>]…
  *           [--projet <motif>] [--referentiel <MODELES-EN-SERVICE.json>] [--json] [--journal <f.jsonl> [--etiquette <nom>]]
+ *           [--fiches <fiches-agents.jsonl>]…   (fichiers de fiches à lire au lieu de ceux du poste ; `FORGE_FICHES_AGENTS` de même)
  * Exit : 0 relevé rendu (PASS ou AVERT : un relevé n'échoue pas, il dit) · 2 option inconnue ou valeur invalide.
  * NON JUGÉ (déclaré) : la justesse de l'agent choisi pour la tâche ; les sous-agents lancés hors de l'outil Agent
  * (une CLI `claude -p` compte comme une SESSION) ; les postes et profils absents de ce poste ; les sessions principales
- * vivantes en parallèle (la simultanéité compte des sous-agents, pas des sessions).
+ * vivantes en parallèle (la simultanéité compte des sous-agents, pas des sessions) ; les fiches d'un autre poste qui ne sont
+ * pas sur ce disque, et celles d'un produit rangé hors du parc ; un `--projet` ne filtre pas les fiches.
  */
 import { existsSync, readFileSync, readdirSync, statSync, appendFileSync } from "node:fs";
 import { join, dirname, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dossiersParDefaut } from "./relever-contexte-sessions.mjs";
+import { lireFiches } from "./noter-fiche.mjs";
+import { FICHIER_PILOT, FICHIER_PRODUIT, VARIABLE_DESTINATION } from "../oracles/lib-fiches-agents.mjs";
+import { SEUIL_MIN } from "../oracles/oracle-suivi-agents.mjs";
 
-export const VERSION = "1.2.0";
+export const VERSION = "1.3.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const REF_DEFAUT = join(ICI, "..", "references", "MODELES-EN-SERVICE.json");
 export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan", ""]);
@@ -237,8 +249,103 @@ export function ligneEssaiRelecture(e) {
     + (e.seuil_franchi ? "FRANCHI : arrêter l'essai et demander à l'humain" : "tenu");
 }
 
+// ── Les fiches d'exécution (D-219 (e), lot L2) ───────────────────────────────────────────────────────────────────────────
+const PILOT = resolve(ICI, "..");
+const CAUSES_FIN = ["fini", "abandonne", "timeout", "erreur"];
+const PROJET_ADMIS = [/^Produit-\d{2,}$/, /^digit-ai-[a-z0-9-]+$/];
+
+/**
+ * Les fichiers de fiches du poste : `FORGE_FICHES_AGENTS` s'il est posé (bancs, essais), sinon celui du pilot, puis
+ * `<parc>/<dossier>/forge/fiches-agents.jsonl` de chaque dossier du parc qui en porte un. Le parc est le dossier qui porte le pilot.
+ */
+export function sourcesDesFiches({ pilot = PILOT, parc = dirname(resolve(pilot)), env = process.env } = {}) {
+  const designe = typeof env?.[VARIABLE_DESTINATION] === "string" ? env[VARIABLE_DESTINATION].trim() : "";
+  if (designe) return [designe];
+  const sources = [join(pilot, ...FICHIER_PILOT.split("/"))];
+  let entrees = [];
+  try { entrees = readdirSync(parc, { withFileTypes: true }); } catch { /* parc illisible : le pilot seul */ }
+  for (const e of entrees) {
+    if (!e.isDirectory() || resolve(join(parc, e.name)) === resolve(pilot)) continue;
+    const f = join(parc, e.name, ...FICHIER_PRODUIT.split("/"));
+    if (existsSync(f)) sources.push(f);
+  }
+  return sources;
+}
+
+/** Une durée en secondes, dite en minutes et secondes (heures au-delà de 60 minutes). */
+export function dureeLisible(s) {
+  if (!Number.isFinite(s)) return "durée inconnue";
+  const t = Math.max(0, Math.round(s));
+  if (t < 60) return `${t} s`;
+  if (t < 3600) return `${Math.floor(t / 60)} min ${String(t % 60).padStart(2, "0")} s`;
+  return `${Math.floor(t / 3600)} h ${String(Math.floor((t % 3600) / 60)).padStart(2, "0")} min`;
+}
+
+/**
+ * Le relevé des fiches depuis `depuisIso` : { indicateurs, agents }. `agents` : une ligne par agent (horodatage, projet, type, identifiant,
+ * session, modèle, effort, durée, cause de fin, verdicts notés, fiche partielle), du plus ancien au plus récent ; une fiche sans
+ * identifiant y figure aussi, une fois. Un projet que la fiche ne porte pas sous un pseudonyme admis se dit null.
+ */
+export function releverFiches(sources, depuisIso) {
+  const parAgent = new Map(), verdicts = new Map(), sansId = new Map();
+  let lues = 0, illisibles = 0;
+  for (const f of sources) {
+    let texte;
+    try { texte = readFileSync(f, "utf8"); } catch { continue; }
+    lues++;
+    const l = lireFiches(texte);
+    illisibles += l.illisibles;
+    for (const [id, fiche] of l.fiches) { const p = parAgent.get(id); if (!p || String(fiche.ts ?? "") > String(p.ts ?? "")) parAgent.set(id, fiche); }
+    for (const [id, v] of l.verdicts) { const p = verdicts.get(id); if (!p || String(v.ts ?? "") >= String(p.ts ?? "")) verdicts.set(id, v); }
+    for (const fiche of l.sansIdentifiant) sansId.set(JSON.stringify(fiche), fiche);
+  }
+  const projetDe = (p) => (typeof p === "string" && PROJET_ADMIS.some((re) => re.test(p)) ? p : null);
+  const agents = [...[...parAgent.values()], ...sansId.values()]
+    .filter((fiche) => String(fiche.ts ?? "") >= depuisIso)
+    .map((fiche) => {
+      const v = fiche.agent_id ? verdicts.get(fiche.agent_id) : null;
+      return { ts: fiche.ts ?? null, projet: projetDe(fiche.projet), type: fiche.type ?? null, agent_id: fiche.agent_id ?? null, session: fiche.session ?? null,
+        modele: fiche.modele ?? null, effort: fiche.effort ?? null, duree_s: Number.isFinite(fiche.duree_s) ? fiche.duree_s : null,
+        cause_fin: CAUSES_FIN.includes(fiche.cause_fin) ? fiche.cause_fin : null,
+        verdict_livrable: v?.verdict_livrable ?? null, verdict_relecture: v?.verdict_relecture ?? null, partielle: fiche.partielle === true };
+    })
+    .sort((x, y) => String(x.ts).localeCompare(String(y.ts)));
+  const durees = agents.map((x) => x.duree_s).filter((d) => d !== null);
+  const compte = (k, valeurs) => Object.fromEntries(valeurs.map((v) => [v, agents.filter((x) => x[k] === v).length]));
+  const indicateurs = {
+    fichiers_lus: lues, agents: agents.length, sans_identifiant: agents.filter((x) => !x.agent_id).length, lignes_illisibles: illisibles,
+    par_cause_fin: { ...compte("cause_fin", CAUSES_FIN), inconnue: agents.filter((x) => x.cause_fin === null).length },
+    duree: { seuil_min: SEUIL_MIN, sous_le_seuil: durees.filter((d) => d < SEUIL_MIN * 60).length, au_seuil_ou_plus: durees.filter((d) => d >= SEUIL_MIN * 60).length,
+      inconnue: agents.length - durees.length, mediane_s: mediane(durees) },
+    verdicts: { livrable: compte("verdict_livrable", ["PASS", "FAIL"]), relecture: compte("verdict_relecture", ["sert", "derive"]) },
+    partielles: agents.filter((x) => x.partielle).length,
+  };
+  return { indicateurs, agents };
+}
+
+const heureLocale = (iso) => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? "heure inconnue" : `${jourLocal(iso)} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+
+/** Les lignes du relevé sur les fiches : l'ensemble, puis un agent par ligne, sans borne d'affichage. */
+export function lignesFiches(f) {
+  const I = f.indicateurs;
+  if (!I.agents) return [`  fiches d'exécution (D-219 (e)) : aucune fiche sur la période (${I.fichiers_lus} fichier(s) de fiches lu(s))`];
+  const c = I.par_cause_fin, v = I.verdicts;
+  const L = [`  fiches d'exécution (D-219 (e)) : ${I.agents} agent(s) dans ${I.fichiers_lus} fichier(s) de fiches${I.sans_identifiant ? `, dont ${I.sans_identifiant} sans identifiant` : ""} ; `
+    + `cause de fin : fini ${c.fini}, abandonne ${c.abandonne}, timeout ${c.timeout}, erreur ${c.erreur}${c.inconnue ? `, inconnue ${c.inconnue}` : ""} ; `
+    + `durée : ${I.duree.sous_le_seuil} sous ${I.duree.seuil_min} min, ${I.duree.au_seuil_ou_plus} de ${I.duree.seuil_min} min ou plus${I.duree.inconnue ? `, ${I.duree.inconnue} inconnue(s)` : ""}, médiane ${dureeLisible(I.duree.mediane_s)} ; `
+    + `verdicts notés : livrable PASS ${v.livrable.PASS}, FAIL ${v.livrable.FAIL} · relecture sert ${v.relecture.sert}, derive ${v.relecture.derive}`
+    + `${I.partielles ? ` ; ${I.partielles} fiche(s) partielle(s)` : ""}${I.lignes_illisibles ? ` ; ${I.lignes_illisibles} ligne(s) illisible(s) sautée(s)` : ""}`,
+    `  par agent (${I.agents}, du plus ancien au plus récent) :`];
+  for (const x of f.agents) {
+    const verdictsDits = [x.verdict_livrable ? `livrable ${x.verdict_livrable}` : null, x.verdict_relecture ? `relecture ${x.verdict_relecture}` : null].filter(Boolean).join(", ");
+    L.push(`    ${heureLocale(x.ts)} · ${x.projet ?? "projet inconnu"} · ${x.type ?? "type inconnu"} · ${x.agent_id ?? "sans identifiant"} · ${dureeLisible(x.duree_s)} · ${x.cause_fin ?? "cause inconnue"}`
+      + `${verdictsDits ? ` · ${verdictsDits}` : ""}${x.partielle ? " · partielle" : ""}`);
+  }
+  return L;
+}
+
 export function executer(argv, env = process.env, maintenant = new Date()) {
-  const a = { transcripts: [], projet: null, jours: 14, depuis: null, referentiel: REF_DEFAUT, json: false, journal: null, etiquette: null };
+  const a = { transcripts: [], projet: null, jours: 14, depuis: null, referentiel: REF_DEFAUT, json: false, journal: null, etiquette: null, fiches: [] };
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
     const val = () => { const v = argv[++i]; if (v === undefined || v.startsWith("--")) throw new Error(`${x} attend une valeur`); return v; };
@@ -251,6 +358,7 @@ export function executer(argv, env = process.env, maintenant = new Date()) {
       else if (x === "--json") a.json = true;
       else if (x === "--journal") a.journal = val();
       else if (x === "--etiquette") a.etiquette = val();
+      else if (x === "--fiches") a.fiches.push(val());
       else return { code: 2, sortie: `relever-flotte : option inconnue : ${x}` };
     } catch (e) { return { code: 2, sortie: `relever-flotte : ${e.message}` }; }
   }
@@ -261,8 +369,13 @@ export function executer(argv, env = process.env, maintenant = new Date()) {
   if (a.projet) dossiers = dossiers.filter((d) => basename(d).toLowerCase().includes(a.projet));
   const courants = generationCourante(a.referentiel);
   const r = relever(dossiers, depuisIso, courants);
+  // D-219 (e) : les fiches d'exécution, publiées par agent ; leur ensemble entre aux indicateurs (et au journal), la liste par agent au rapport.
+  const fiches = releverFiches(a.fiches.length ? a.fiches : sourcesDesFiches({ env }), depuisIso);
+  r.indicateurs.fiches_agents = fiches.indicateurs;
   const rapport = { outil: "relever-flotte", version: VERSION, depuis: depuisIso, dossiers: dossiers.length, verdict: r.verdict, criteres: r.criteres, indicateurs: r.indicateurs,
-    non_juge: ["la justesse de l'agent choisi pour la tâche", "les sous-agents lancés hors de l'outil Agent (une CLI `claude -p` compte comme une session)", "les postes et profils absents de ce poste", "les sessions principales vivantes en parallèle (la simultanéité compte les sous-agents d'une session, et un sous-agent en attente compte comme actif)"] };
+    fiches_agents: fiches.agents,
+    non_juge: ["la justesse de l'agent choisi pour la tâche", "les sous-agents lancés hors de l'outil Agent (une CLI `claude -p` compte comme une session)", "les postes et profils absents de ce poste", "les sessions principales vivantes en parallèle (la simultanéité compte les sous-agents d'une session, et un sous-agent en attente compte comme actif)",
+      "les fiches d'un autre poste absentes de ce disque, celles d'un produit rangé hors du parc, et le filtre --projet, qui ne s'applique pas aux fiches"] };
   if (a.journal) appendFileSync(a.journal, JSON.stringify({ ts: maintenant.toISOString(), etiquette: a.etiquette, depuis: depuisIso, verdict: r.verdict, indicateurs: r.indicateurs }) + "\n");
   if (a.json) return { code: 0, sortie: JSON.stringify(rapport, null, 1), rapport };
   const I = r.indicateurs;
@@ -279,6 +392,7 @@ export function executer(argv, env = process.env, maintenant = new Date()) {
   out.push(ligneEssaiRelecture(I.essai_relecture_intention));
   for (const c of r.criteres) out.push(`  [${c.tenu === null ? "NON JUGÉ" : c.tenu ? "TENU" : "NON TENU"}] ${c.critere}`);
   if (a.journal) out.push(`  journal : une ligne ajoutée à ${a.journal}`);
+  out.push(...lignesFiches(fiches));
   return { code: 0, sortie: out.join("\n"), rapport };
 }
 

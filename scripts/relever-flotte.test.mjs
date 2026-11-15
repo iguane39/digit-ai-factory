@@ -8,17 +8,25 @@
  *   ROUGE : la forme mesurée le 18/10 (agent générique sans modèle ni effort) est HORS FLOTTE et fait tomber le
  *           critère ; une session servie par une version dépassée (le juge sur Opus 4.6) est nommée ; AVERT, exit 0 ;
  *   BORNES : `--journal` ajoute exactement une ligne ; une option inconnue rend 2.
+ *   FICHES (D-219 (e) du 15/11/2026, TF-2563, lot L2) : VERT, les fiches du pilot et d'un produit sont publiées par agent, durée sous
+ *           et au-dessus de 17 minutes et cause de fin, avec les verdicts notés ; les sources sont le fichier du pilot et chaque
+ *           `<parc>/*\/forge/fiches-agents.jsonl` ; ROUGE, une copie d'arbre de travail ne compte pas deux fois, un nom de projet non
+ *           pseudonymisé n'est jamais publié, une fiche d'avant la période n'est pas publiée ; BORNES, les fiches n'entrent pas aux critères.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { executer, classerAppel, estHorsGeneration } from "./relever-flotte.mjs";
+import { executer, classerAppel, estHorsGeneration, sourcesDesFiches, releverFiches, dureeLisible } from "./relever-flotte.mjs";
+import { SCHEMA } from "../oracles/lib-fiches-agents.mjs";
+import { SCHEMA_VERDICT } from "./noter-fiche.mjs";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
 
 const T = mkdtempSync(join(tmpdir(), "flotte-"));
+// D-219 (e) : sans fichier désigné, le relevé lirait les fiches réelles du poste ; la recette les désigne jetables (absentes ici).
+process.env.FORGE_FICHES_AGENTS = join(T, "fiches-absentes.jsonl");
 const REF = join(T, "MODELES.json");
 writeFileSync(REF, JSON.stringify({ generation_courante: {
   opus: { identifiant: "claude-opus-5-5", courante_depuis: "2026-09-23" },
@@ -159,6 +167,73 @@ try {
   check("bornes — une option inconnue rend 2", () => {
     if (executer(["--inconnue"]).code !== 2) throw new Error("code attendu 2");
     if (executer(["--depuis", "hier"]).code !== 2) throw new Error("date invalide acceptée");
+  });
+
+  // D-219 (e), lot L2 — les fiches d'exécution, publiées par agent.
+  const fiche = (id, plus = {}) => ({ schema: SCHEMA, ts: "2026-11-15T09:00:00.000Z", session: "cafe0000", session_source: "hook", agent_id: id, type: "explorateur",
+    modele: "claude-opus-5-5", effort: "high", duree_s: 41, jetons_entree: 1200, jetons_sortie: 300, appels_outils: 3, verdict_livrable: null, verdict_relecture: null,
+    frictions: 0, cause_fin: "fini", projet: "digit-ai-factory", partielle: false, lacunes: [], ...plus });
+  const ecrire = (chemin, lignes) => { mkdirSync(join(chemin, ".."), { recursive: true }); writeFileSync(chemin, lignes.map((l) => (typeof l === "string" ? l : JSON.stringify(l))).join("\n") + "\n", "utf8"); return chemin; };
+  const PARC = join(T, "parc");
+  const PILOT_JETABLE = join(PARC, "digit-ai-factory");
+  const fPilot = ecrire(join(PILOT_JETABLE, "todo", "observabilite", "fiches-agents.jsonl"), [
+    fiche("p1", { ts: "2026-11-15T08:00:00.000Z", duree_s: 41 }),
+    fiche("p2", { ts: "2026-11-15T08:30:00.000Z", duree_s: 25 * 60, cause_fin: "abandonne", type: "constructeur" }),
+    { schema: SCHEMA_VERDICT, ts: "2026-11-15T09:00:00.000Z", agent_id: "p1", verdict_livrable: "PASS", verdict_relecture: null, session: "cafe0000", session_source: "hook" },
+    { schema: SCHEMA_VERDICT, ts: "2026-11-15T09:05:00.000Z", agent_id: "p1", verdict_livrable: null, verdict_relecture: "derive", session: "cafe0000", session_source: "hook" },
+    fiche("ancien", { ts: "2026-09-01T08:00:00.000Z" })]);
+  const fProduit = ecrire(join(PARC, "produit-banc-omega", "forge", "fiches-agents.jsonl"), [
+    fiche("q1", { ts: "2026-11-15T10:00:00.000Z", projet: "Produit-41", duree_s: 125, cause_fin: "erreur" }),
+    fiche("q2", { ts: "2026-11-15T10:10:00.000Z", projet: "NomReelDuProduitBanc", duree_s: 5, cause_fin: "timeout" })]);
+  // La copie d'un arbre de travail lié du même produit : la même fiche q1, et une fiche plus récente du même agent.
+  const fCopie = ecrire(join(PARC, "produit-banc-omega-wt", "forge", "fiches-agents.jsonl"), [
+    fiche("q1", { ts: "2026-11-15T10:00:00.000Z", projet: "Produit-41", duree_s: 125, cause_fin: "erreur" }),
+    fiche("q1", { ts: "2026-11-15T10:20:00.000Z", projet: "Produit-41", duree_s: 300, cause_fin: "fini" })]);
+  mkdirSync(join(PARC, "dossier-sans-fiches", "forge"), { recursive: true });
+  check("vert — les sources des fiches : le fichier du pilot, puis chaque <parc>/*/forge/fiches-agents.jsonl ; FORGE_FICHES_AGENTS les remplace", () => {
+    const s = sourcesDesFiches({ pilot: PILOT_JETABLE, parc: PARC, env: {} }).map((x) => x.replaceAll("\\", "/"));
+    const attendu = [fPilot, fProduit, fCopie].map((x) => x.replaceAll("\\", "/"));
+    if (JSON.stringify([...s].sort()) !== JSON.stringify([...attendu].sort())) throw new Error(JSON.stringify(s));
+    const d = sourcesDesFiches({ pilot: PILOT_JETABLE, parc: PARC, env: { FORGE_FICHES_AGENTS: fProduit } });
+    if (d.length !== 1 || d[0] !== fProduit) throw new Error(JSON.stringify(d));
+  });
+  const parFiches = (...extra) => executer(["--transcripts", vert, "--depuis", "2026-11-01", "--referentiel", REF, "--json", "--fiches", fPilot, "--fiches", fProduit, "--fiches", fCopie, ...extra]);
+  check("vert — publié par agent : durée sous et au-dessus de 17 min, cause de fin, verdicts notés (le dernier l'emporte) ; l'ensemble aux indicateurs", () => {
+    const r = parFiches().rapport;
+    const a = Object.fromEntries(r.fiches_agents.map((x) => [x.agent_id, x]));
+    if (r.fiches_agents.length !== 4) throw new Error(`${r.fiches_agents.length} agents publiés, attendu 4 : ${JSON.stringify(r.fiches_agents.map((x) => x.agent_id))}`);
+    if (a.p1.duree_s !== 41 || a.p1.cause_fin !== "fini" || a.p1.verdict_livrable !== "PASS" || a.p1.verdict_relecture !== "derive") throw new Error(JSON.stringify(a.p1));
+    if (a.p2.duree_s !== 1500 || a.p2.cause_fin !== "abandonne" || a.q2.cause_fin !== "timeout") throw new Error(JSON.stringify([a.p2, a.q2]));
+    const I = r.indicateurs.fiches_agents;
+    if (I.agents !== 4 || I.duree.sous_le_seuil !== 3 || I.duree.au_seuil_ou_plus !== 1 || I.duree.seuil_min !== 17) throw new Error(JSON.stringify(I.duree));
+    if (JSON.stringify(I.par_cause_fin) !== JSON.stringify({ fini: 2, abandonne: 1, timeout: 1, erreur: 0, inconnue: 0 })) throw new Error(JSON.stringify(I.par_cause_fin));
+    if (I.verdicts.livrable.PASS !== 1 || I.verdicts.relecture.derive !== 1 || I.fichiers_lus !== 3) throw new Error(JSON.stringify(I));
+    const t = executer(["--transcripts", vert, "--depuis", "2026-11-01", "--referentiel", REF, "--fiches", fPilot, "--fiches", fProduit, "--fiches", fCopie]).sortie;
+    if (!/fiches d'exécution \(D-219 \(e\)\) : 4 agent\(s\) dans 3 fichier\(s\) de fiches ; cause de fin : fini 2, abandonne 1, timeout 1, erreur 0 ; durée : 3 sous 17 min, 1 de 17 min ou plus/.test(t)) throw new Error(t);
+    if (!/· digit-ai-factory · explorateur · p1 · 41 s · fini · livrable PASS, relecture derive/.test(t) || !/· Produit-41 · explorateur · q1 · 5 min 00 s · fini/.test(t)) throw new Error(t);
+  });
+  check("rouge — une copie d'arbre de travail ne compte pas deux fois, la fiche la plus récente fait foi ; une fiche d'avant la période n'est pas publiée", () => {
+    const r = parFiches().rapport;
+    const q1 = r.fiches_agents.filter((x) => x.agent_id === "q1");
+    if (q1.length !== 1 || q1[0].duree_s !== 300 || q1[0].cause_fin !== "fini") throw new Error(JSON.stringify(q1));
+    if (r.fiches_agents.some((x) => x.agent_id === "ancien")) throw new Error("une fiche du 01/09 est publiée pour une période depuis le 01/11");
+  });
+  check("rouge — un nom de projet que la fiche ne porte pas en pseudonyme n'est jamais publié, ni au texte ni au JSON", () => {
+    const j = parFiches();
+    const t = executer(["--transcripts", vert, "--depuis", "2026-11-01", "--referentiel", REF, "--fiches", fProduit]).sortie;
+    if (/NomReelDuProduitBanc/.test(j.sortie + t)) throw new Error("le nom réel est publié");
+    if (j.rapport.fiches_agents.find((x) => x.agent_id === "q2").projet !== null || !/projet inconnu · explorateur · q2/.test(t)) throw new Error(t);
+    if (/produit-banc-omega/.test(j.sortie + t)) throw new Error("le dossier lu d'un produit est publié");
+  });
+  check("bornes — les fiches n'entrent pas aux critères de la flotte ; sans fiche, le relevé le dit ; --fiches sans valeur rend 2 ; une durée se lit en minutes", () => {
+    const r = parFiches().rapport;
+    const sans = executer(["--transcripts", vert, "--depuis", "2026-11-01", "--referentiel", REF, "--json"]).rapport;
+    if (r.criteres.length !== 3 || r.verdict !== sans.verdict || JSON.stringify(r.criteres) !== JSON.stringify(sans.criteres)) throw new Error(`${JSON.stringify(r.criteres)} ≠ ${JSON.stringify(sans.criteres)}`);
+    const t = executer(["--transcripts", vert, "--depuis", "2026-10-01", "--referentiel", REF]).sortie;
+    if (!/fiches d'exécution \(D-219 \(e\)\) : aucune fiche sur la période \(0 fichier\(s\) de fiches lu\(s\)\)/.test(t)) throw new Error(t);
+    if (executer(["--fiches"]).code !== 2) throw new Error("--fiches sans valeur accepté");
+    if ([dureeLisible(41), dureeLisible(125), dureeLisible(3725), dureeLisible(null)].join("|") !== "41 s|2 min 05 s|1 h 02 min|durée inconnue") throw new Error("durées mal dites");
+    if (releverFiches([join(T, "absent.jsonl")], "2026-11-01T00:00:00.000Z").indicateurs.fichiers_lus !== 0) throw new Error("un fichier absent compté lu");
   });
 } finally {
   rmSync(T, { recursive: true, force: true });
