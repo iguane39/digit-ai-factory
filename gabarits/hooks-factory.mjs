@@ -93,7 +93,11 @@ const [nom, ...options] = process.argv.slice(2);
 // avertissement qui la nomme, et chaque tour reçoit 3 lignes au plus sur la coordinatrice, les sessions vivantes et les conflits.
 // Une session seule ne voit rien. `--revendiquer <chemin> --pour <session>` (la coordinatrice) n'a pas l'usage de l'entrée
 // standard. Avertit, ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents", "fichiers-env", "sessions"]);
+// `fiches` (15/11/2026, décision humaine D-219 (e), TF-2563, mandat 20261115b) : hook SubagentStop, en `async` — à la fin de chaque
+// agent, sa fiche d'exécution s'ajoute à forge/fiches-agents.jsonl (oracles/lib-fiches-agents.mjs du pilot) : type, modèle et effort
+// servis, durée, jetons, appels d'outils, frictions, cause de fin et projet sous son pseudonyme Produit-NN ; ni nom réel, ni chemin,
+// ni contenu de consigne ou de livrable. Une transcription illisible donne une fiche partielle. Aucune décision, ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents", "fichiers-env", "sessions", "fiches"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [

@@ -25,6 +25,8 @@
  *      permise du pilot ; `.env.example` et le script de masquage passent.
  *  23. Registre des sessions (D-218 (b), 15/11/2026) : la commande `sessions` câblée sur six événements, un cas par entrée de hook
  *      joué par le lanceur (open et identité posée, objet, revendication, avertissement, état à deux, preuve de vie, clôture).
+ *  24. Fiche d'exécution des agents (D-219 (e), TF-2563, 15/11/2026) : la commande `fiches`, jouée par le lanceur comme le SubagentStop
+ *      la joue, ajoute la fiche de l'agent à forge/fiches-agents.jsonl, projet en pseudonyme, sans décision ; une entrée sans agent n'écrit rien.
  * Joué par oracles/self-tests.mjs (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, readFileSync, existsSync } from "node:fs";
@@ -91,8 +93,10 @@ try {
   // TF-1947 : le hook de fin de tour lit les écritures par commande avec `scripts/relecture-intention.mjs` (et son import).
   // TF-2483 : le hook des gestes distants résout la racine de configuration par `scripts/lib-config-installee.mjs`, comme le pilot réel.
   // TF-2410 : le juge de restitution (S145) lit le relevé des personnes de l'accueil des lots, `todo/noms-de-personnes.mjs`.
+  // D-219 (e) : le hook des fiches pseudonymise le projet par `todo/anonymiser-entrant.mjs`, qui importe `scripts/lib-confidentiel.mjs` et `scripts/lib-parc.mjs`.
   for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs",
-    "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs", "scripts/lib-config-installee.mjs", "todo/noms-de-personnes.mjs"]) {
+    "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs", "scripts/lib-config-installee.mjs", "todo/noms-de-personnes.mjs",
+    "todo/anonymiser-entrant.mjs", "scripts/lib-confidentiel.mjs", "scripts/lib-parc.mjs"]) {
     mkdirSync(join(copie, dirname(f)), { recursive: true });
     copyFileSync(join(PILOT, f), join(copie, f));
   }
@@ -530,8 +534,34 @@ try {
   const fin23 = sessions23("SessionEnd", S23A, { reason: "prompt_input_exit" });
   check("23 octies sessions, SessionEnd : la session libère ses chemins puis se clôt, exit 0", fin23.status === 0 && reg23().some((l) => l.ev === "libere" && l.session === S23A && l.chemin === "site/index.html")
     && reg23().at(-1)?.ev === "close" && reg23().at(-1)?.session === S23A, `${fin23.status} ${JSON.stringify(reg23().slice(-2))}`);
+
+  // 24 — D-219 (e) (15/11/2026, TF-2563, mandat 20261115b, lot L1), la fiche d'exécution par le lanceur : la commande `fiches`, jouée chez un
+  // produit jetable avec l'entrée du SubagentStop, ajoute la fiche de l'agent à forge/fiches-agents.jsonl, projet en pseudonyme de la table
+  // JETABLE (jamais la table réelle), sans rien dire sur la sortie standard, exit 0 ; une entrée sans agent n'écrit rien.
+  const P24 = produit("produit-fiches-banc", false);
+  const tables24 = join(base, "tables-24");
+  mkdirSync(tables24, { recursive: true });
+  writeFileSync(join(tables24, "noms.json"), JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+  writeFileSync(join(tables24, "produits.json"), JSON.stringify({ produits: { "produit-fiches-banc": "Produit-42" } }), "utf8");
+  const env24 = { ...env, CLAUDE_PROJECT_DIR: P24, FORGE_NOMS_INTERDITS: join(tables24, "noms.json"), FORGE_PRODUITS_PSEUDO: join(tables24, "produits.json"), FORGE_CONTEXTE_BANC: "1" };
+  delete env24.FORGE_FICHES_AGENTS;
+  const t24 = join(base, "agent-fiche24.jsonl");
+  writeFileSync(t24, [
+    { type: "user", isSidechain: true, timestamp: "2026-11-15T08:00:00.000Z", message: { role: "user", content: "consigne du banc" } },
+    { type: "assistant", isSidechain: true, timestamp: "2026-11-15T08:00:41.000Z", message: { id: "m24", model: "claude-opus-5-5", content: [{ type: "text", text: "Rapport." }], stop_reason: "end_turn", usage: { output_tokens: 12 } } },
+  ].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  const fiches24 = (entree) => spawnSync(process.execPath, [join(P24, "forge", "hooks", "factory.mjs"), "fiches"], { encoding: "utf8", cwd: P24, env: env24, input: JSON.stringify(entree) });
+  const lignes24 = () => { try { return readFileSync(join(P24, "forge", "fiches-agents.jsonl"), "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)); } catch { return []; } };
+  const S24 = "d24d0000-0000-4000-8000-000000000024";
+  const r24 = fiches24({ hook_event_name: "SubagentStop", session_id: S24, agent_id: "fiche24", agent_type: "explorateur", agent_transcript_path: t24, cwd: P24, stop_hook_active: false, last_assistant_message: "Rapport." });
+  const f24 = lignes24()[0];
+  check("24 fiches : le lanceur ajoute la fiche de l'agent à forge/fiches-agents.jsonl du produit, projet en pseudonyme, sans décision, exit 0 (D-219 (e))",
+    r24.status === 0 && !r24.stdout.trim() && lignes24().length === 1 && f24?.agent_id === "fiche24" && f24?.projet === "Produit-42" && f24?.cause_fin === "fini" && f24?.duree_s === 41
+      && f24?.session === S24.slice(0, 8), `${r24.status} ${r24.stdout}${r24.stderr} ${JSON.stringify(f24)}`);
+  const vide24 = fiches24({ hook_event_name: "SubagentStop", session_id: S24, cwd: P24 });
+  check("24 bis fiches : une entrée sans agent n'écrit rien, exit 0, sans décision", vide24.status === 0 && !vide24.stdout.trim() && lignes24().length === 1, `${vide24.status} ${vide24.stdout}${vide24.stderr}`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b)), registre des sessions joué par le lanceur sur ses six événements, avertissement d'un chemin tenu par une autre session et rien pour une session seule (D-218 (b))`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b)), registre des sessions joué par le lanceur sur ses six événements, avertissement d'un chemin tenu par une autre session et rien pour une session seule (D-218 (b)), fiche d'exécution d'un agent écrite par le lanceur sous forge/, projet en pseudonyme, et rien pour une entrée sans agent (D-219 (e))`);
