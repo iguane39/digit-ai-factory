@@ -293,7 +293,7 @@
           "PowerShell"
         ],
         "sur": "commande",
-        "motif": "(?:\\b(?:node|python3?|py)(?:\\.exe)?[ \\t]+[^\\n;&|]*?(?:\\.test\\.mjs|\\boracle[\\w-]*\\.mjs|\\bself-tests?\\.mjs|\\bcheck_[\\w-]+\\.py|\\bverifier-[\\w-]+\\.mjs|\\brun-oracles?[\\w-]*\\.mjs|--self-test\\b)|(?:^|[;&|(][ \\t]*|\\n[ \\t]*)(?:pytest|ruff)\\b|\\bpython3?[ \\t]+-m[ \\t]+(?:pytest|ruff)\\b)(?:(?!\\bthen\\b)[\\s\\S]){0,3000}?(?:\\bgit(?:\\.exe)?(?:[ \\t]+-[Cc][ \\t]+\\S+)*[ \\t]+(?:commit|push)\\b|\\b(?:cp|copy|Copy-Item|mv|Move-Item)\\b[^\\n;&|]*_arrivee)"
+        "motif": "(?:(?<![\\w.-])(?:node|python3?|py)(?:\\.exe)?[ \\t]+[^\\n;&|]*?(?:\\.test\\.mjs|\\boracle[\\w-]*\\.mjs|\\bself-tests?\\.mjs|\\bcheck_[\\w-]+\\.py|\\bverifier-[\\w-]+\\.mjs|\\brun-oracles?[\\w-]*\\.mjs|--self-test\\b)|(?:^|[;&|(][ \\t]*|\\n[ \\t]*)(?:pytest|ruff)\\b|\\bpython3?[ \\t]+-m[ \\t]+(?:pytest|ruff)\\b)(?:(?!\\bthen\\b)[\\s\\S]){0,3000}?(?:\\bgit(?:\\.exe)?(?:[ \\t]+-[Cc][ \\t]+\\S+)*[ \\t]+(?:commit|push)\\b|\\b(?:cp|copy|Copy-Item|mv|Move-Item)\\b[^\\n;&|]*_arrivee)"
       },
       "solutions": [
         {
