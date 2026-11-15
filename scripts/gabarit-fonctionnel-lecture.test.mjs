@@ -9,8 +9,12 @@
  * CE QUE LA RECETTE JOUE, avec le juge du hook (`check_markdown.py` du socle digit-ai-page-html, forge-agents) : le gabarit PASSE ; le même gabarit
  * privé de ses phrases de lecture (chirurgie vérifiée) ÉCHOUE sur M7 pour chacune de ses deux tables ; une table de plus de 12 lignes sans phrase de
  * lecture ÉCHOUE sur M10 et PASSE avec elle (le cas du 14/11). Sans python ou sans forge-agents sur le poste, la recette se dit NON JOUÉE (exit 0).
+ *
+ * TF-2574 (15/11/2026) : la recette couvre tout le dossier `gabarits\docs-projet\`. Trois autres gabarits rendaient M7 (ARCHITECTURE : « Flux » et « Choix
+ * structurants » ; PARAMETRAGE : « Variables » ; TECHNOS : ses quatre chapitres) ; chacun montre désormais sa phrase de lecture avant sa table. Tous les gabarits
+ * `.md` du dossier PASSENT, et chacun de ces quatre, privé de ses phrases, ÉCHOUE sur M7 une fois par phrase retirée.
  */
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -67,7 +71,37 @@ try {
     const avec = juger(CORRESPONDANCE("Une ligne est un clip ; la colonne Section dit où il se joue, les clips sont triés par numéro et les clips retirés sont exclus.\n\n"));
     att(avec.exit === 0, `avec phrase : exit ${avec.exit} ${avec.sortie.slice(0, 400)}`);
   });
+
+  // TF-2574 : la même règle pour TOUT le dossier. Le 14/11/2026, trois autres gabarits (ARCHITECTURE, PARAMETRAGE, TECHNOS : 7 chapitres ouverts sur une table nue) rendaient M7.
+  const DOSSIER = readdirSync(dirname(GABARIT)).filter((f) => /\.md$/i.test(f)).sort();
+  const LU = Object.fromEntries(DOSSIER.map((f) => [f, readFileSync(join(dirname(GABARIT), f), "utf8").replace(/\r\n/g, "\n")]));
+  check(`vert — chacun des ${DOSSIER.length} gabarits de docs-projet passe le juge du hook (M7, M10, M14, M18)`, () => {
+    att(DOSSIER.length >= 9 && DOSSIER.includes("TECHNOS.md"), `dossier lu : ${DOSSIER.join(", ")}`);
+    const refus = DOSSIER.map((f) => [f, juger(LU[f])]).filter(([, r]) => r.exit !== 0 || !/Verdict : PASS/.test(r.sortie));
+    att(!refus.length, refus.map(([f, r]) => `${f} : exit ${r.exit} ${r.sortie.slice(0, 300)}`).join(" | "));
+  });
+  check("chaque phrase de lecture du dossier dit ce que vaut chaque colonne, le tri et l'exclusion, et précède une table", () => {
+    let total = 0;
+    for (const f of DOSSIER) {
+      const phrases = LU[f].match(PHRASE) || [];
+      total += phrases.length;
+      for (const p of phrases) att(/ce que vaut chaque colonne/.test(p) && /trié/.test(p) && /exclut/.test(p), `${f} : phrase incomplète : ${p}`);
+      const apres = (LU[f].match(/^\{Phrase de lecture : [^\n]*\}\n\n\|/gm) || []).length;
+      att(apres === phrases.length, `${f} : ${phrases.length} phrase(s), dont ${apres} seulement suivie(s) d'une table`);
+    }
+    att(total >= 9, `${total} phrase(s) au dossier, 9 attendues au moins (FONCTIONNEL 2, ARCHITECTURE 2, PARAMETRAGE 1, TECHNOS 4)`);
+  });
+  check("rouge — chaque gabarit du dossier privé de ses phrases de lecture échoue sur M7, une fois par phrase retirée (ARCHITECTURE 2, PARAMETRAGE 1, TECHNOS 4, FONCTIONNEL 2)", () => {
+    const attendus = { "ARCHITECTURE.md": 2, "FONCTIONNEL.md": 2, "PARAMETRAGE.md": 1, "TECHNOS.md": 4 };
+    for (const [f, nb] of Object.entries(attendus)) {
+      const ancien = LU[f].replace(PHRASE, "");
+      att(ancien !== LU[f], `${f} : chirurgie sans effet`);
+      const r = juger(ancien);
+      const m7 = (r.sortie.match(/M7 chapitre sans ouverture/g) || []).length;
+      att(r.exit !== 0 && m7 === nb, `${f} : attendu ${nb} refus M7, obtenu ${m7} (exit ${r.exit}) ${r.sortie.slice(0, 300)}`);
+    }
+  });
 } finally { rmSync(base, { recursive: true, force: true }); }
 
-console.log(`\ngabarit-fonctionnel-lecture (TF-2545) : ${ok} PASS, ${ko} FAIL — cas rouges : le gabarit sans ses phrases (M7 ×2), la table de 17 lignes sans phrase (M10)`);
+console.log(`\ngabarit-fonctionnel-lecture (TF-2545, TF-2574) : ${ok} PASS, ${ko} FAIL — cas rouges : le gabarit sans ses phrases (M7 ×2), la table de 17 lignes sans phrase (M10), les quatre gabarits du dossier sans leurs phrases (M7 ×9)`);
 process.exit(ko ? 1 : 0);

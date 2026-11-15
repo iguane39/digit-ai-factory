@@ -44,6 +44,8 @@ volontairement simple. 3 à 6 phrases.}
 
 ## Flux
 
+{Phrase de lecture : une ligne est un flux d'un composant vers un autre ; dire ce que vaut chaque colonne, comment la table est triée et ce que la table exclut.}
+
 | De | Vers | Protocole | Mode | Donnée portée |
 |---|---|---|---|---|
 | {front} | {api} | {HTTP/JSON} | {synchrone} | {requêtes métier} |
@@ -60,6 +62,8 @@ dans `MODELE-DONNEES.md` (renvoi, pas duplication).}
 Les gestes exécutables vivent dans `COMMANDES.md`, l'instancié dans `COMPOSANTS-OPS.md`.}
 
 ## Choix structurants & renvois ADR
+
+{Phrase de lecture : une ligne est un choix structurant ; dire ce que vaut chaque colonne, comment la table est triée et ce que la table exclut.}
 
 | Choix | Motif (une phrase) | ADR forge-audit |
 |---|---|---|

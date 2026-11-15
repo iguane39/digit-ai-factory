@@ -20,6 +20,8 @@ variables:
 
 ## Variables
 
+{Phrase de lecture : une ligne est une variable de `.env.example` ; dire ce que vaut chaque colonne, comment la table est triée et ce que la table exclut.}
+
 | Variable | Rôle | Format / exemple factice | Qui la fournit |
 |---|---|---|---|
 | {PORT} | {port d'écoute du back} | {8080} | défaut |

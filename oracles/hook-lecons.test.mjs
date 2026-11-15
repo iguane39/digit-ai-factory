@@ -355,6 +355,8 @@ try {
     [bash("node oracles/hook-lecons.test.mjs\ngit commit -am suite"), "un test, puis un commit à la ligne suivante de la même commande"],
     [bash("node oracles/oracle-synthese.mjs f.md | tail -3 ; git -C C:/dev/depot push"), "un oracle filtré, puis git -C … push"],
     [ps("node oracles/oracle-x.mjs; Copy-Item lot.md input\\00-retours\\_arrivee\\"), "la copie au sas sous PowerShell"],
+    [bash("C:/Python314/python.exe scripts/check_markdown.py rapport.md && git commit -F msg.txt"), "l'interpréteur donné par son chemin complet reste un contrôle joué (TF-2570 : la borne de mot ne l'exclut pas)"],
+    [bash("git add gabarits/ledger.py ; node oracles/oracle-synthese.mjs f.md ; git commit -F msg.txt"), "un `.py` cité par git add n'empêche pas de refuser le vrai contrôle joué ensuite (TF-2570)"],
   ];
   for (const [entree, nom] of L007_ROUGES) {
     check(`rouge — L-007 en barrière au pilot : ${nom} → refus, exit 2`, () => {
@@ -376,6 +378,10 @@ try {
     [bash("if node oracles/hook-lecons.test.mjs; then git commit -F msg.txt; fi"), "la remise gardée par un `if` sur le verdict (la forme du contrat, TF-1009)"],
     [bash("git push origin main > push.log 2>&1; node oracles/hook-lecons.test.mjs"), "la remise AVANT le contrôle : rien à garder"],
     [bash("node forge/retours/oracle-lot.mjs \"lot.md\" --remettre"), "le geste outillé --remettre, qui lie la copie au verdict (TF-2314)"],
+    // TF-2570 : les 3 faux positifs relevés par la mesure de TF-2530 (le `py` de fin de `ledger.py` lu comme l'interpréteur `py`, puis un test ou un oracle nommé par git add lu comme un contrôle joué).
+    [bash("git add gabarits/ledger.py gabarits/ledger.test.mjs && git commit -F msg.txt"), "TF-2570 : `ledger.py` et `ledger.test.mjs` nommés par git add (faux positif vu 2 fois)"],
+    [bash("git add gabarits/ledger.py scripts/lecons.test.mjs && git commit -m \"ledger\""), "TF-2570 : même forme, un autre test nommé, message de commit entre guillemets"],
+    [bash("git add forge/ledger.py forge/retours/oracle-lot.mjs && git commit -F msg.txt"), "TF-2570 : `forge/ledger.py` et `oracle-lot.mjs` nommés par git add (faux positif vu 1 fois)"],
   ];
   for (const [entree, nom] of L007_VERTS) {
     check(`vert — L-007 ne touche pas : ${nom}`, () => {
