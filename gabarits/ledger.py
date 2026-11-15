@@ -41,6 +41,7 @@ l'entrée : code de sortie 1, l'appelant lit un échec là où l'écriture a ré
 UTF-8 en tête de fichier, et l'affichage de confirmation retombe sur l'ASCII échappé plutôt que de
 planter : l'écriture a eu lieu, le code de sortie le dit.
 """
+import datetime
 import json
 import os
 import pathlib
@@ -167,6 +168,52 @@ def controler_retrait(type_: str, champs: dict) -> None:
         raise SystemExit(f"`decision_retiree` doit dire pourquoi : `--cause` d'au moins {CAUSE_MIN} caractères — rien n'est écrit")
 
 
+# TF-2586 (15/11/2026) : les quatre champs d'une déclaration de `rectification_horodatage`, ceux que `ledger.mjs verify` (CHAMPS_RECTIFICATION)
+# et R-42 d'oracle-conformite-projet exigent depuis TF-2573. Une déclaration à qui il manque l'un d'eux est INOPÉRANTE : elle ne couvre
+# rien, et l'entrée écrite ne se réécrit pas. Le fait : l'écrivain ne les exigeait pas et pouvait écrire une entrée que les deux juges refusent.
+CHAMPS_RECTIFICATION = ("seq", "ts_consigne", "ts_reel_estime", "cause")
+# TF-2587 (suite, 15/11/2026) : `ts_reel_estime` est un INSTANT — date ET heure ISO 8601 (« vers midi », un nombre, « 2026-01-01 » n'ordonnent rien).
+# `ledger.mjs verify` (`tsReelLisible`) et R-42 l'exigent d'une rectification écrite à partir du 15/11/2026 ; une entrée que l'écrivain écrit est toujours
+# neuve, il l'exige donc toujours. Forme volontairement plus étroite que `Date.parse` de Node (calendrier réel, fuseau Z ou ±hh:mm, secondes facultatives) :
+# ce qui passe ici passe chez les deux juges.
+INSTANT_ISO = re.compile(r"(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?")
+
+
+def est_un_instant(v) -> bool:
+    m = INSTANT_ISO.fullmatch(v.strip()) if isinstance(v, str) else None
+    if not m:
+        return False
+    a, mo, j, h, mi, sec = m.groups()
+    try:
+        datetime.datetime(int(a), int(mo), int(j), int(h), int(mi), int(sec or 0))
+    except ValueError:
+        return False
+    return True
+
+
+def controler_rectification(type_: str, champs: dict) -> None:
+    """Une `rectification_horodatage` porte `entrees: [{seq, ts_consigne, ts_reel_estime, cause}]`, liste non vide, chaque déclaration avec
+    ses quatre champs (ni absent, ni null, ni vide, ni fait d'espaces — le prédicat de `verify`) un `seq` entier ≥ 1 et un `ts_reel_estime` qui est un instant. Refusée AVANT
+    d'écrire : une entrée écrite ne se réécrit pas."""
+    if type_ != "rectification_horodatage":
+        return
+    forme = "`--entrees '[{\"seq\": 7, \"ts_consigne\": \"<ts de l entrée visée>\", \"ts_reel_estime\": \"<instant ISO 8601, 2026-01-01T12:30:00Z>\", \"cause\": \"<pourquoi>\"}]'`"
+    entrees = champs.get("entrees")
+    if not isinstance(entrees, list) or not entrees:
+        raise SystemExit(f"`rectification_horodatage` doit porter {forme} : une rectification qui ne déclare aucun seq ne rectifie rien — rien n'est écrit")
+    for d in entrees:
+        manquants = [c for c in CHAMPS_RECTIFICATION
+                     if not isinstance(d, dict) or d.get(c) is None or str(d[c]).strip() == ""]
+        if manquants:
+            raise SystemExit(f"`rectification_horodatage` : déclaration incomplète, champ(s) {', '.join(f'`{c}`' for c in manquants)} manquant(s) "
+                             f"dans {json.dumps(d, ensure_ascii=False)} — elle ne couvrirait rien chez `verify` ni chez R-42 ; forme attendue {forme} — rien n'est écrit")
+        if isinstance(d["seq"], bool) or not isinstance(d["seq"], int) or d["seq"] < 1:
+            raise SystemExit(f"`rectification_horodatage` : `seq` invalide ({json.dumps(d['seq'], ensure_ascii=False)}) — entier ≥ 1 attendu — rien n'est écrit")
+        if not est_un_instant(d["ts_reel_estime"]):
+            raise SystemExit(f"`rectification_horodatage` : `ts_reel_estime` illisible ({json.dumps(d['ts_reel_estime'], ensure_ascii=False)}) — une date ET une heure ISO 8601 "
+                             "sont attendues (2026-01-01T12:30:00Z), l'heure réelle estimée de l'action ; une rectification neuve qui n'en porte pas est refusée chez `verify` et R-42 — rien n'est écrit")
+
+
 def chemin(run: str = "") -> pathlib.Path:
     """Le ledger du run COURANT vit a `forge/ledger.jsonl` — chemin de doctrine (R-19, R-42,
     ETAPES-RUN, CONTRAT-INTERFACE §3), et celui qu'annonce le CLAUDE.md de ce produit.
@@ -216,6 +263,7 @@ def ajouter(archive: str, type_: str, essai: bool = False, /, **champs) -> dict:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
     controler_remplacement(type_, champs)
     controler_retrait(type_, champs)
+    controler_rectification(type_, champs)
     # Hors run (aucune entrée au ledger du run, hors archive), un retour ou une décision s'écrit au journal hors run.
     hors_run = type_ in HORS_RUN and not archive and not lignes(chemin(archive))
     p = JOURNAL_HORS_RUN if hors_run else chemin(archive)
