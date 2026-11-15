@@ -16,11 +16,15 @@ versions:
 
 ## Langages & runtimes
 
+{Phrase de lecture : une ligne est un langage ou un runtime ; dire ce que vaut chaque colonne, comment la table est triée et ce que la table exclut.}
+
 | Techno | Version | Rôle | Lien |
 |---|---|---|---|
 | {Python} | {3.12} | {backend} | {https://www.python.org} |
 
 ## Frameworks & librairies clés
+
+{Phrase de lecture : une ligne est un framework ou une librairie clé ; dire ce que vaut chaque colonne, comment la table est triée et ce que la table exclut.}
 
 | Techno | Version | Rôle | Lien |
 |---|---|---|---|
@@ -28,11 +32,15 @@ versions:
 
 ## Données & stockage
 
+{Phrase de lecture : une ligne est une technologie de données ou de stockage ; dire ce que vaut chaque colonne, comment la table est triée et ce que la table exclut.}
+
 | Techno | Version | Rôle | Lien |
 |---|---|---|---|
 | {PostgreSQL} | {16} | {BDD principale} | {https://www.postgresql.org} |
 
 ## Outillage (build, tests, qualité)
+
+{Phrase de lecture : une ligne est un outil de build, de test ou de qualité ; dire ce que vaut chaque colonne, comment la table est triée et ce que la table exclut.}
 
 | Techno | Version | Rôle |
 |---|---|---|
