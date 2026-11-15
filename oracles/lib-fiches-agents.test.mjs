@@ -5,6 +5,7 @@
  * Fixtures à double sens, toutes écrites sous le dossier temporaire, tables de pseudonymes jetables comprises :
  *   · un agent FINI : les 15 clés, les mesures exactes (une réponse comptée une fois, sur sa dernière ligne : la somme ligne à ligne,
  *     rouge, donnerait 615 jetons de sortie au lieu de 607) et la cause `fini` ;
+ *   · un agent REPRIS 13 jours plus tard : la durée somme ses courses (125 s), l'empan, rouge, compterait la pause ;
  *   · un agent ABANDONNÉ (fin sur un appel d'outil, interruption), en ERREUR (erreur d'API, limite de sortie), en TIMEOUT : jamais `fini` ;
  *   · le dernier message du hook prime sur une transcription en retard : `fini` avec lui, `abandonne` sans lui ;
  *   · une transcription ILLISIBLE (absente, faite de lignes cassées, partiellement lisible, dossier à la place du fichier) : une fiche
@@ -104,6 +105,22 @@ check("rouge — sommer les lignes d'une même réponse surcompte (615 et 5 114)
   const somme = FINI().filter((e) => e.type === "assistant").reduce((s, e) => s + e.message.usage.output_tokens, 0);
   att(somme === 615, `fixture : ${somme}`);
   att(mesurer(FINI()).jetons_sortie === 607 && mesurer(FINI()).jetons_entree === 3112, JSON.stringify(mesurer(FINI())));
+});
+check("double sens — agent repris 13 jours plus tard : la durée somme les courses (65 s + 60 s), la pause ne compte pas ; une interruption n'ouvre pas de course", () => {
+  const treize = 13 * 86400;
+  const repris = [...FINI(), humain("Reprends : vérifie aussi b.py.", treize), reponse([texte("Vérifié.")], treize + 60, { id: "m-reprise" })];
+  const empan = (Date.parse(repris[repris.length - 1].timestamp) - Date.parse(repris[0].timestamp)) / 1000;
+  att(empan === treize + 60, `fixture : empan ${empan} s`);
+  att(mesurer(repris).duree_s === 125, `durée ${mesurer(repris).duree_s} s au lieu de 125 (l'empan, rouge, donnerait ${empan} s)`);
+  const interrompu = [...FINI(), humain("[Request interrupted by user]", 70), reponse([texte("Repris.")], 75, { id: "m-int" })];
+  att(mesurer(interrompu).duree_s === 75, `interruption : ${mesurer(interrompu).duree_s} s au lieu de 75`);
+});
+check("rouge — le cas de l'essai réel : une notification de tâche (isMeta) reçue 13 jours après la fin, sans réponse, n'allonge pas la course", () => {
+  const treize = 13 * 86400;
+  const notifie = [...FINI(), { isSidechain: true, isMeta: true, type: "user", timestamp: iso(treize), origin: { kind: "task-notification", producer: "session-task" },
+    message: { role: "user", content: "<task-notification>tâche finie</task-notification>" } }, { isSidechain: true, type: "attachment", timestamp: iso(treize + 1), attachment: { type: "x" } }];
+  att(mesurer(notifie).duree_s === 65, `durée ${mesurer(notifie).duree_s} s au lieu de 65`);
+  att(causeFin(notifie).cause === "fini", `cause ${causeFin(notifie).cause}`);
 });
 check("rouge — aucun contenu de consigne ni de livrable, aucun chemin, aucune description dans la ligne écrite", () => {
   const dest = join(base, "secrets.jsonl");

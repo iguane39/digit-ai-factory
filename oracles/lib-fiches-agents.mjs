@@ -18,7 +18,12 @@
  *     d'un produit ;
  *   · `modele`, `effort` : le modèle et l'effort SERVIS le plus souvent (`message.model` et `effort` des réponses, TF-1557), hors
  *     réponse synthétique d'erreur ; à défaut d'effort lu, `effort.level` de l'entrée du hook ;
- *   · `duree_s` : du premier au dernier horodatage de la transcription (« dernier message − premier message », comme l'étude) ;
+ *   · `duree_s` : du premier message à la dernière activité (« dernier message − premier message », comme l'étude), course par course.
+ *     Une course finit à sa dernière ACTIVITÉ (réponse, résultat d'outil, message de texte) : une pièce jointe ou une notification qui
+ *     suit la fin ne l'allonge pas. Une REPRISE (tout message reçu après une réponse finale, notification comprise, interruption exceptée)
+ *     ouvre une course neuve, et la pause qui la précède ne compte pas. Le fait, à l'essai réel du 15/11/2026 : un agent `explorateur`
+ *     du pilot sur 12, fini le 29/10, a reçu le 12/11 une notification de tâche (`isMeta`) sans y répondre ; « dernier message −
+ *     premier message » lui comptait 1 147 307 s (13 jours) ;
  *   · `jetons_entree` (entrée, cache écrit et cache relu) et `jetons_sortie` : une réponse se compte une fois, sur sa DERNIÈRE ligne,
  *     la règle de `relever-flotte.mjs` (les jetons relus se répètent à chaque ligne d'une même réponse) ;
  *   · `appels_outils` : les blocs `tool_use` distincts ;
@@ -166,22 +171,46 @@ export function causeFin(entrees, { dernierMessage = undefined } = {}) {
   return { cause: "abandonne", regle: "sans_texte_final" };
 }
 
+/** Un message de texte adressé à l'agent : ni résultat d'outil, ni message système (`isMeta`). */
+const estMessageTexte = (e) => Boolean(e && e.type === "user" && !e.isMeta && !blocs(e).some((b) => b?.type === "tool_result"));
+
 /** Le nombre de frictions de l'agent, sa consigne exclue ; null si le relevé tombe en panne. */
 export function frictionsDe(entrees) {
-  const consigne = (entrees || []).findIndex((e) => e && e.type === "user" && !blocs(e).some((b) => b?.type === "tool_result"));
+  const consigne = (entrees || []).findIndex(estMessageTexte);
   const segment = [];
   (entrees || []).forEach((e, i) => { if (e && i !== consigne) segment.push(e.isSidechain ? { ...e, isSidechain: false } : e); });
   try { return releveFrictions(segment).length; } catch { return null; }
+}
+
+/**
+ * La durée en secondes, course par course (en-tête, `duree_s`) : une course va de son premier point à sa dernière activité ; un message
+ * reçu après une réponse finale (texte sans appel d'outil), interruption exceptée, ouvre une course neuve. Null sans horodatage.
+ */
+export function dureeDesCourses(entrees) {
+  const points = [];
+  (entrees || []).forEach((e, i) => {
+    const t = Date.parse(e?.timestamp ?? "");
+    if (!Number.isFinite(t)) return;
+    const recu = Boolean(e && e.type === "user" && !blocs(e).some((b) => b?.type === "tool_result"));
+    const finale = estReponse(e) && texteDe(e).trim() !== "" && !blocs(e).some((b) => b?.type === "tool_use");
+    points.push({ t, i, recu, interruption: recu && enChaine(e.message?.content).includes(INTERRUPTION), activite: estReponse(e) || (e?.type === "user" && !e.isMeta), finale });
+  });
+  if (!points.length) return null;
+  points.sort((a, b) => a.t - b.t || a.i - b.i);
+  let total = 0, debut = points[0].t, fin = points[0].t, apresFinale = false;
+  for (const p of points) {
+    if (p.recu && !p.interruption && apresFinale) { total += fin - debut; debut = p.t; fin = p.t; apresFinale = false; continue; }
+    if (p.activite) { fin = p.t; apresFinale = p.finale; }
+  }
+  return Math.round((total + fin - debut) / 1000);
 }
 
 /** Les mesures d'une transcription lue. `avecTotaux: false` (transcription bornée) : jetons, appels d'outils et frictions à null. */
 export function mesurer(entrees, { avecTotaux = true } = {}) {
   const reponses = new Map();
   const outils = new Set();
-  let sansId = 0, premier = Infinity, dernier = -Infinity;
+  let sansId = 0;
   (entrees || []).forEach((e, i) => {
-    const t = Date.parse(e?.timestamp ?? "");
-    if (Number.isFinite(t)) { if (t < premier) premier = t; if (t > dernier) dernier = t; }
     if (!estReponse(e) || estErreurApi(e)) return;
     reponses.set(e.message.id || `#${i}`, e);
     for (const b of blocs(e)) if (b?.type === "tool_use") { if (b.id) outils.add(b.id); else sansId++; }
@@ -197,7 +226,7 @@ export function mesurer(entrees, { avecTotaux = true } = {}) {
   }
   return {
     modele: plusFrequent(modeles), effort: plusFrequent(efforts),
-    duree_s: Number.isFinite(premier) ? Math.round((dernier - premier) / 1000) : null,
+    duree_s: dureeDesCourses(entrees),
     jetons_entree: avecTotaux ? entree : null, jetons_sortie: avecTotaux ? sortie : null,
     appels_outils: avecTotaux ? outils.size + sansId : null,
     frictions: avecTotaux ? frictionsDe(entrees) : null,
