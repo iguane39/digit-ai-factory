@@ -79,6 +79,23 @@ check("vert — aucun fichier servi : outillage .mjs, fixture, gabarit et brouil
     if (r.code !== 0 || r.out.trim()) throw new Error(`${p} : ${r.out.slice(0, 200)}`);
   }
 });
+// TF-2571 : le constat « le hook ne reconnaît ni *.template.html ni les pages sous fx/ » ne se reproduit pas (mesuré le 15/11/2026 : les deux formes sont des fichiers servis, la
+// remise sans critique est refusée). Un cas par forme le fige, pour qu'une exclusion future de ces formes soit une décision écrite et non un glissement du motif d'outillage.
+const FORMES_2571 = [
+  [`${PRODUIT}/demo/maquette.template.html`, "un gabarit de page `*.template.html` (la forme de forge-design/demo/maquette.template.html)"],
+  [`${PRODUIT}/site/fx/page-a.html`, "une page sous un dossier `fx/`"],
+];
+for (const [page, nom] of FORMES_2571) {
+  check(`rouge — TF-2571 : ${nom}, écrite sans critique, est un fichier servi : la remise est refusée et la page nommée`, () => {
+    const r = jouer([...ecrit("Write", { file_path: page, content: "<html></html>" }, 0)]);
+    if (!refuse(r) || !r.sortie.reason.includes(page.split("/").pop())) throw new Error(r.out.slice(0, 300));
+  });
+  check(`vert, remède joué — TF-2571 : ${nom}, la critique rendue après la dernière écriture et nommant la page : la remise passe en silence`, () => {
+    const r = jouer([...ecrit("Write", { file_path: page, content: "<html></html>" }, 0),
+      ...commande(`node C:/dev/digit-ai-forge-design/oracles/run-oracles-design.mjs ${page} --rendu --json-only`, 1, '{"orchestrateur":"run-oracles-design","verdict":"PASS"}')]);
+    if (r.code !== 0 || r.out.trim()) throw new Error(r.out.slice(0, 200));
+  });
+}
 check("vert — un agent qui n'écrit rien (lecture seule) se remet sans un mot", () => {
   const r = jouer([...commande("git status --short", 0)]);
   if (r.code !== 0 || r.out.trim()) throw new Error(r.out.slice(0, 200));
