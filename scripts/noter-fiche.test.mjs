@@ -10,6 +10,12 @@
  *   ROUGE : le même verdict noté deux fois n'écrit rien la seconde fois (« déjà noté », exit 0) ; un agent sans fiche rend 1 sans rien
  *           écrire ; sans fichier de fiches, 1, et aucun fichier n'est créé ; sans --agent, sans verdict, verdict hors vocabulaire,
  *           identifiant mal formé ou option inconnue, 2 sans rien écrire.
+ *   CAUSE ANALYSÉE (lot L5) — VERT : une cause notée ajoute une ligne qui porte `cause_analysee` et `analyste`, lue avec son analyste ;
+ *           une cause écrite en toutes lettres se ramène à son identifiant ; le porteur qui valide (même cause) puis corrige (autre
+ *           cause) ajoute chaque fois une ligne, la dernière l'emporte et la remplacée est dite ; cause et verdict tiennent sur une ligne.
+ *           ROUGE : la même cause par le même analyste notée deux fois n'écrit rien ; une cause hors du jeu fermé, une cause sans
+ *           analyste, un analyste sans cause ou un nom d'analyste mal formé rendent 2 sans rien écrire ; une cause hors du jeu fermé
+ *           lue dans le fichier est ignorée.
  * Fichiers jetables sous le répertoire temporaire ; le fichier des fiches du pilot n'est jamais touché. Joué par `oracles\self-tests.mjs` (I2).
  */
 import { spawnSync } from "node:child_process";
@@ -17,7 +23,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, wri
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { lireFiches, noterFiche, SCHEMA_VERDICT } from "./noter-fiche.mjs";
+import { CAUSES_ANALYSEES, lireFiches, noterFiche, SCHEMA_VERDICT } from "./noter-fiche.mjs";
 import { SCHEMA } from "../oracles/lib-fiches-agents.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -129,11 +135,69 @@ try {
     const v = l.verdicts.get("i1");
     att(v.verdict_livrable === null && v.verdict_relecture === "sert" && v.ts === "2026-11-15T09:02:00.000Z", JSON.stringify(v));
   });
+  // ── La cause analysée (D-219 (e), lot L5) : en ajout seul, comme les verdicts ───────────────────────────────────────────────────────────
+  const CLES_CAUSE = ["schema", "ts", "agent_id", "verdict_livrable", "verdict_relecture", "cause_analysee", "analyste", "session", "session_source"];
+  check("vert — une cause analysée notée : une ligne qui porte la cause et son analyste, signée, les lignes d'avant intactes ; la lecture la rend", () => {
+    att(CAUSES_ANALYSEES.join() === "erreur_consigne,depassement_contexte,erreur_outil,abandon,autre", `jeu fermé : ${CAUSES_ANALYSEES}`);
+    const f = fichierDe([fiche("k1", { duree_s: 2400, cause_fin: "abandonne" }), fiche("k2")]);
+    const avant = readFileSync(f, "utf8");
+    const r = jouer(["--agent", "k1", "--cause-analysee", "erreur_outil", "--analyste", "analyste-echecs"], { fichier: f });
+    att(r.code === 0 && /verdict noté sur la fiche de l'agent k1 \(cause erreur_outil par analyste-echecs\)/.test(r.out), `exit ${r.code} : ${r.out}${r.err}`);
+    att(readFileSync(f, "utf8").startsWith(avant), "les lignes d'avant ont changé");
+    const ev = lignesDe(f)[2];
+    att(ev.schema === SCHEMA_VERDICT && ev.agent_id === "k1" && ev.cause_analysee === "erreur_outil" && ev.analyste === "analyste-echecs"
+      && ev.verdict_livrable === null && ev.verdict_relecture === null && ev.session === SESSION.slice(0, 8), JSON.stringify(ev));
+    att(Object.keys(ev).every((k) => CLES_CAUSE.includes(k)), `clé hors contrat : ${Object.keys(ev)}`);
+    const v = lireFiches(readFileSync(f, "utf8")).verdicts.get("k1");
+    att(v.cause_analysee === "erreur_outil" && v.analyste === "analyste-echecs" && v.verdict_livrable === null, JSON.stringify(v));
+  });
+  check("rouge — la même cause par le même analyste notée deux fois : la seconde fois n'écrit rien, « déjà noté », exit 0", () => {
+    const f = fichierDe([fiche("l1", { duree_s: 1500, cause_fin: "erreur" })]);
+    att(jouer(["--agent", "l1", "--cause-analysee", "abandon", "--analyste", "analyste-echecs"], { fichier: f }).code === 0, "premier appel");
+    const avant = readFileSync(f, "utf8");
+    const r = jouer(["--agent", "l1", "--cause-analysee", "Abandon", "--analyste", "analyste-echecs"], { fichier: f });
+    att(r.code === 0 && /déjà noté/.test(r.out), `exit ${r.code} : ${r.out}${r.err}`);
+    att(readFileSync(f, "utf8") === avant, "une seconde ligne a été écrite");
+  });
+  check("vert — le porteur valide la cause (même cause, autre analyste) puis la corrige : une ligne chaque fois, la dernière l'emporte, la remplacée est dite", () => {
+    const f = fichierDe([fiche("m1", { duree_s: 3600, cause_fin: "timeout" })]);
+    att(jouer(["--agent", "m1", "--cause-analysee", "erreur_outil", "--analyste", "analyste-echecs"], { fichier: f }).code === 0, "analyse");
+    const valide = jouer(["--agent", "m1", "--cause-analysee", "erreur_outil", "--analyste", "porteur"], { fichier: f });
+    att(valide.code === 0 && /après cause erreur_outil par analyste-echecs/.test(valide.out), valide.out + valide.err);
+    const corrige = jouer(["--agent", "m1", "--cause-analysee", "depassement_contexte", "--analyste", "porteur"], { fichier: f });
+    att(corrige.code === 0 && /après cause erreur_outil par porteur/.test(corrige.out), corrige.out + corrige.err);
+    const v = lireFiches(readFileSync(f, "utf8")).verdicts.get("m1");
+    att(lignesDe(f).length === 4 && v.cause_analysee === "depassement_contexte" && v.analyste === "porteur", JSON.stringify(v));
+  });
+  check("vert — une cause écrite en toutes lettres se ramène à son identifiant ; cause et verdict de livrable tiennent sur une ligne", () => {
+    const f = fichierDe([fiche("n1", { duree_s: 1200, cause_fin: "abandonne" })]);
+    const r = jouer(["--agent", "n1", "--cause-analysee", "Dépassement contexte", "--analyste", "analyste-echecs", "--verdict-livrable", "FAIL", "--json"], { fichier: f });
+    const j = JSON.parse(r.out);
+    att(r.code === 0 && j.ecrit && j.ligne.cause_analysee === "depassement_contexte" && j.ligne.verdict_livrable === "FAIL", r.out + r.err);
+    att(lignesDe(f).length === 2, `${lignesDe(f).length} lignes`);
+  });
+  check("rouge — cause hors du jeu fermé, cause sans analyste, analyste sans cause, nom d'analyste mal formé : 2 sans rien écrire", () => {
+    const f = fichierDe([fiche("o1", { duree_s: 1800, cause_fin: "erreur" })]);
+    const avant = readFileSync(f, "utf8");
+    const cas = [["--agent", "o1", "--cause-analysee", "fatigue", "--analyste", "analyste-echecs"], ["--agent", "o1", "--cause-analysee", "abandon"],
+      ["--agent", "o1", "--analyste", "porteur"], ["--agent", "o1", "--cause-analysee", "abandon", "--analyste", "le porteur"],
+      ["--agent", "o1", "--cause-analysee", "abandon", "--analyste", "../porteur"], ["--agent", "o1", "--cause-analysee", "--analyste", "porteur"]];
+    for (const a of cas) { const r = jouer(a, { fichier: f }); att(r.code === 2, `${a.join(" ")} : exit ${r.code} ${r.out}${r.err}`); }
+    att(/jeu fermé \(erreur_consigne, depassement_contexte, erreur_outil, abandon, autre\)/.test(jouer(cas[0], { fichier: f }).err), "le refus ne cite pas le jeu fermé");
+    att(readFileSync(f, "utf8") === avant, "le fichier a changé");
+  });
+  check("rouge — la lecture ignore une cause hors du jeu fermé, et un nom d'analyste mal formé se lit null", () => {
+    const t = [fiche("p1"), { schema: SCHEMA_VERDICT, agent_id: "p1", verdict_livrable: null, verdict_relecture: null, cause_analysee: "fatigue", analyste: "porteur", ts: "2026-11-15T10:00:00.000Z" },
+      { schema: SCHEMA_VERDICT, agent_id: "p2", verdict_livrable: null, verdict_relecture: null, cause_analysee: "abandon", analyste: "x/../y", ts: "2026-11-15T10:01:00.000Z" }].map((l) => JSON.stringify(l)).join("\n");
+    const l = lireFiches(t);
+    att(l.verdicts.get("p1").cause_analysee === null && l.verdicts.get("p1").analyste === null, JSON.stringify(l.verdicts.get("p1")));
+    att(l.verdicts.get("p2").cause_analysee === "abandon" && l.verdicts.get("p2").analyste === null, JSON.stringify(l.verdicts.get("p2")));
+  });
   check("rouge — le banc n'a rien écrit au fichier des fiches du pilot", () => {
     att(etatDe(FICHES_DU_PILOT) === avantPilot, `${FICHES_DU_PILOT} : ${avantPilot} → ${etatDe(FICHES_DU_PILOT)}`);
   });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
-console.log(`\nnoter-fiche : ${pass} PASS, ${fail} FAIL — cas rouges : verdict noté deux fois, agent sans fiche, fichier absent, usage invalide`);
+console.log(`\nnoter-fiche : ${pass} PASS, ${fail} FAIL — cas rouges : verdict noté deux fois, agent sans fiche, fichier absent, usage invalide, cause notée deux fois, cause hors du jeu fermé ou sans analyste`);
 process.exit(fail ? 1 : 0);
