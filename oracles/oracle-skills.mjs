@@ -424,7 +424,10 @@ function identiqueAUnEtatAnterieurDeLaSource(srcFichier, cible) {
     const top = git(dirname(srcFichier), "rev-parse", "--show-toplevel");
     if (top.status !== 0) return false;
     const racineDepot = top.stdout.trim();
-    const rel = relative(racineDepot, srcFichier).split(sep).join("/");
+    // TF-2578 : le chemin du fichier DANS son dépôt se lit chez git (`--show-prefix`) ; `relative(racineDepot, srcFichier)` comparait le chemin que git rend (long, réel)
+    // à celui qu'on lui a donné (alias court 8.3, lien) : un chemin sans rapport, l'historique interrogé sur un fichier qui n'existe pas, K11 maintenue à tort.
+    const prefixe = git(dirname(srcFichier), "rev-parse", "--show-prefix");
+    const rel = prefixe.status === 0 ? `${prefixe.stdout.trim()}${basename(srcFichier)}` : relative(racineDepot, srcFichier).split(sep).join("/");
     const log = git(racineDepot, "log", "--format=%H", "--max-count=100", "--", rel);
     if (log.status !== 0) return false;
     const present = empreinte(cible);
@@ -1206,6 +1209,19 @@ function selfTest() {
   r = juger(racine, inst);
   cas.push(["K11   — copie identique à un état ANTÉRIEUR de la source : pas de K11 (K2 la dit en retard)",
             !echoue(r, "K11") && echoue(r, "K2")]);
+  // TF-2578 (15/11/2026) : la MÊME confrontation, la source désignée par un autre NOM de son dossier (un lien ; sur ce poste, l'alias court 8.3 du dossier
+  // temporaire, dont le chemin porte un caractère non ASCII, que git rend en chemin long). Le chemin de la source dans son dépôt se lit chez git, pas dans
+  // une différence de chemins : sans cela l'historique n'est jamais interrogé sur le bon fichier, et la copie périmée redevient « modifiée » (K11).
+  {
+    const racineAlias = join(base, "forges-alias");
+    let lien = true;
+    try { symlinkSync(racine, racineAlias, "junction"); } catch { lien = false; }
+    if (lien) {
+      const ra = juger(racineAlias, inst);
+      cas.push(["K11   — la même copie, la source désignée par un autre nom de son dossier (lien, alias court 8.3) : pas de K11 (le chemin se lit chez git)",
+                !echoue(ra, "K11") && echoue(ra, "K2")]);
+    }
+  }
   juger(racine, inst, true);
   cas.push(["K11 ter— --appliquer écrase une copie identique à un état antérieur", readFileSync(cibleI, "utf8") === "# iota v2\n"]);
   writeFileSync(cibleI, "# iota v1\nlignes propres à la copie\n"); // diffère de tous les états de l'historique

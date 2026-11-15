@@ -22,7 +22,7 @@
  *
  * Usage : node oracles\hook-ecriture.mjs [--fichier <note.md>] [--self-test]   (stdin : JSON du hook)
  */
-import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync, readdirSync, symlinkSync } from "node:fs";
 import { join, dirname, resolve, relative, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -242,7 +242,10 @@ export function famillesDeOutput(dossierOutput) {
       if (gitDans(racineGit, "rev-parse", "--verify", "-q", `refs/remotes/${c}`) !== null) { ref = c; break; }
     }
     if (ref) {
-      const rel = relative(racineGit, resolve(dossierOutput)).replace(/\\/g, "/");
+      // TF-2578 : le préfixe de `output\` dans le dépôt se LIT chez git (`--show-prefix`), il ne se déduit pas d'une différence de chemins : `racineGit` est le chemin que
+      // git rend (long, réel), `dossierOutput` celui que l'appelant a donné (alias court 8.3, lien) — leur différence était un chemin sans rapport, et le clone en retard sans signal.
+      const prefixe = gitDans(dossierOutput, "rev-parse", "--show-prefix");
+      const rel = (prefixe !== null ? prefixe.replace(/\/$/, "") : relative(racineGit, resolve(dossierOutput))).replace(/\\/g, "/");
       const arbre = gitDans(racineGit, "ls-tree", "-d", "--name-only", `refs/remotes/${ref}`, `${rel}/`);
       distantes = (arbre || "").split(/\r?\n/).map((l) => basename(l.trim())).filter((n) => EST_FAMILLE.test(n));
       retard = Number(gitDans(racineGit, "rev-list", "--count", `HEAD..refs/remotes/${ref}`)) || 0;
@@ -574,6 +577,13 @@ function selfTest() {
       const racineEnRetard = jouerRangement(poser(join(c2, "output", "Rapport-audit.pdf"), "%PDF-1.4\n"));
       if (!racineEnRetard.some((l) => /\[rangement\] Rapport-audit\.pdf[^\n]*RACINE de output[^\n]*lues sur origin\/main \(1 commit\(s\)[^\n]*l'arbre local n'en montre aucune[^\n]*01-etudes, 02-plans/.test(l)))
         casse.push(`RANGEMENT : un PDF déposé à la racine d'un output\\ dont seule la référence distante montre les familles (clone en retard, le cas du 30/10) n'est pas signalé (${racineEnRetard.join(" | ") || "aucune ligne"})`);
+      // TF-2578 (15/11/2026) : le MÊME clone en retard, désigné par un autre NOM de son dossier (un lien ; sur ce poste, l'alias court 8.3 du dossier temporaire,
+      // dont le chemin porte un caractère non ASCII, que git rend en chemin long). Le préfixe de `output\` dans le dépôt vient de git, pas d'une différence de chemins.
+      const alias = join(base, "c2-alias");
+      let lien = true;
+      try { symlinkSync(c2, alias, "junction"); } catch { lien = false; }
+      if (lien && !jouerRangement(poser(join(alias, "output", "Rapport-audit.pdf"), "%PDF-1.4\n")).some((l) => /lues sur origin\/main \(1 commit\(s\)[^\n]*01-etudes, 02-plans/.test(l)))
+        casse.push("RANGEMENT : un clone en retard désigné par un autre nom de son dossier (lien, alias court 8.3) ne signale pas le livrable posé à la racine d'output\\ — le préfixe se lit chez git (TF-2578)");
       const racineAJour = jouerRangement(poser(join(c1, "output", "Rapport-audit.pdf"), "%PDF-1.4\n"));
       if (!racineAJour.some((l) => /lues sur l'arbre local[^\n]*01-etudes, 02-plans/.test(l)))
         casse.push(`RANGEMENT : un livrable déposé à la racine d'un output\\ rangé en familles, clone à jour, n'est pas signalé sur l'arbre local (${racineAJour.join(" | ") || "aucune ligne"})`);

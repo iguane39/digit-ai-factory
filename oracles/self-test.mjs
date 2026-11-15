@@ -1539,8 +1539,8 @@ const collisionR42 = mkdtempSync(join(tmpdir(), "conf-collision-r42-"));
 ecrireDans(collisionR42, "forge/ledger.jsonl", LEDGER_COLLISION +
   JSON.stringify({ seq: 5, ts: "2026-09-01T20:57:22Z", type: "rectification_horodatage", resume: "collision de seq par sessions concurrentes",
     entrees: [
-      { seq: 3, ts_consigne: "2026-09-01T20:52:00Z", cause: "deux sessions, même queue (2) — seq attribué sans verrou" },
-      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
+      { seq: 3, ts_consigne: "2026-09-01T20:52:00Z", ts_reel_estime: "2026-09-01T20:52:00Z", cause: "deux sessions, même queue (2) — seq attribué sans verrou" },
+      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", ts_reel_estime: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
     ] }) + NL_TEST);
 check("TF-0794 : une collision de seq NOMMÉE dans entrees[] est [RECTIFIÉ] → PASS, la suite reprend au plus haut seq", () => {
   const { rapport } = lance(collisionR42);
@@ -1578,7 +1578,7 @@ ecrireDans(sansTsR42, "forge/ledger.jsonl", LEDGER_COLLISION +
   JSON.stringify({ seq: 5, ts: "2026-09-01T20:57:22Z", type: "rectification_horodatage", resume: "collision de seq par sessions concurrentes",
     entrees: [
       { seq: 3, cause: "deux sessions, même queue (2) — seq attribué sans verrou" }, // ts_consigne absent
-      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
+      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", ts_reel_estime: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
     ] }) + NL_TEST);
 check("TF-1466 rouge : une rectification SANS ts_consigne ni ts_reel_estime n'est pas opposable → FAIL, non [RECTIFIÉ]", () => {
   const { exit, rapport } = lance(sansTsR42);
@@ -1593,8 +1593,8 @@ ecrireDans(avantCollisionR42, "forge/ledger.jsonl", LEDGER_COLLISION +
     entrees: [
       // ts_consigne POSTÉRIEUR au ts de la rectification elle-même (20:57:22Z) : la rectification
       // aurait été écrite AVANT le fait qu'elle prétend corriger.
-      { seq: 3, ts_consigne: "2026-09-01T21:30:00Z", cause: "deux sessions, même queue (2) — seq attribué sans verrou" },
-      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
+      { seq: 3, ts_consigne: "2026-09-01T21:30:00Z", ts_reel_estime: "2026-09-01T21:30:00Z", cause: "deux sessions, même queue (2) — seq attribué sans verrou" },
+      { seq: 4, ts_consigne: "2026-09-01T20:56:15Z", ts_reel_estime: "2026-09-01T20:56:15Z", cause: "même collision, même fenêtre" },
     ] }) + NL_TEST);
 check("TF-1466 rouge : une rectification datée AVANT la collision qu'elle corrige → FAIL, non [RECTIFIÉ]", () => {
   const { exit, rapport } = lance(avantCollisionR42);
@@ -1713,7 +1713,7 @@ const LEDGER_SAUT = [
   { seq: 8, ts: "2026-09-02T10:05:00Z", type: "etape_close" },
 ];
 const DECL_SAUT = { seq: 9, ts: "2026-09-03T08:00:00Z", type: "rectification_horodatage",
-  entrees: [{ seq: 7, ts_consigne: "2026-09-02T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu avant la fusion" }] };
+  entrees: [{ seq: 7, ts_consigne: "2026-09-02T10:00:00Z", ts_reel_estime: "2026-09-02T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu avant la fusion" }] };
 const sautNuR42 = mkdtempSync(join(tmpdir(), "conf-saut-nu-r42-"));
 ecrireDans(sautNuR42, "forge/ledger.jsonl", LEDGER_SAUT.map((e) => JSON.stringify(e)).join(NL_TEST) + NL_TEST);
 check("TF-2494 rouge : un saut de seq EN AVANT (3 puis 7) que rien ne déclare → FAIL, et le message dit comment déclarer la lacune", () => {
@@ -1841,6 +1841,64 @@ check("TF-2540 rouge : sans le contrôle du ts, le témoin voit la chirurgie —
     if ((r.findings || []).some((x) => x.regle === "R-42" && x.statut === "FAIL")) throw new Error("le mutant refuse encore la déclaration divergente : le rouge n'est pas le défaut du 14/11");
   } finally { rmSync(dirname(copie), { recursive: true, force: true }); }
 });
+
+// ---- TF-2573 (15/11/2026, troisième campagne, lot pb) — LES FORMES DE `ts_reel_estime`, R-42 CONTRE `ledger.mjs verify`.
+// TF-2540 a aligné `ts_consigne` et l'antériorité (13 cas d'accord) ; il restait le traitement de `ts_reel_estime`. `verify` (forge-agents,
+// TF-1425) exige les quatre champs de la déclaration : `ts_reel_estime` ou `ts_consigne` absent, null, vide ou fait d'espaces, et la déclaration
+// ne couvre rien. R-42 couvrait avec l'un OU l'autre (`ts_consigne || ts_reel_estime`) : 5 formes sur 13 où R-42 rendait PASS et `verify` exit 1
+// (mesuré le 15/11/2026 par le lot pb). Un cas par forme. Rouge : la forme incomplète est refusée et NOMMÉE. Vert : la forme complète, même à valeur
+// illisible ou d'un autre type (`verify` ne la lit pas non plus), couvre. Accord : les deux juges rendent le même verdict, `verify` quand forge-agents est présent. ---
+const TS_CONSIGNE_2573 = "2026-09-01T08:30:00Z"; // le ts de l'entrée du seq 3 de ENTETE_RECUL
+const CAUSE_2573 = "deux sessions, même queue — seq attribué sans verrou";
+const FORMES_TS_REEL = [
+  // [nom, déclaration sans seq ni cause, intègre ?, nature : « complete » | « incomplete » | « aucun »]
+  ["ts_reel_estime ISO, identique à ts_consigne", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: TS_CONSIGNE_2573 }, true, "complete"],
+  ["ts_reel_estime ISO, lisible et différent", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: "2026-09-01T09:05:00Z" }, true, "complete"],
+  ["ts_reel_estime antérieur à ts_consigne", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: "2026-09-01T07:00:00Z" }, true, "complete"],
+  ["ts_reel_estime illisible (texte)", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: "demain matin" }, true, "complete"],
+  ["ts_reel_estime illisible (jj/mm/aaaa)", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: "01/09/2026 08:30" }, true, "complete"],
+  ["ts_reel_estime nombre", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: 1788251400 }, true, "complete"],
+  ["ts_reel_estime absent", { ts_consigne: TS_CONSIGNE_2573 }, false, "incomplete"],
+  ["ts_reel_estime null", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: null }, false, "incomplete"],
+  ["ts_reel_estime chaîne vide", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: "" }, false, "incomplete"],
+  ["ts_reel_estime fait d'espaces", { ts_consigne: TS_CONSIGNE_2573, ts_reel_estime: "   " }, false, "incomplete"],
+  ["ts_reel_estime seul, ts_consigne absent", { ts_reel_estime: TS_CONSIGNE_2573 }, false, "incomplete"],
+  ["ts_reel_estime seul et illisible, ts_consigne absent", { ts_reel_estime: "bientôt" }, false, "incomplete"],
+  ["ni ts_consigne ni ts_reel_estime", {}, false, "aucun"],
+];
+const ledgerFormeTs = (decl) => [...ENTETE_RECUL, rectifDe(4, "2026-09-01T10:00:00Z", [{ seq: 3, ...decl, cause: CAUSE_2573 }])];
+check("TF-2573 rouge : une déclaration sans `ts_reel_estime` (absent, null, vide, espaces) ou sans `ts_consigne` ne couvre rien → FAIL, le champ manquant est NOMMÉ", () => {
+  for (const [nom, decl, , nature] of FORMES_TS_REEL.filter(([, , integre]) => !integre)) {
+    const d = projetLedger2540("ts-reel-rouge", ledgerFormeTs(decl));
+    const f = r42De(d).find((x) => x.statut === "FAIL");
+    if (!f) throw new Error(`${nom} : R-42 ${JSON.stringify(r42De(d).map((x) => x.statut))} — la déclaration incomplète a couvert l'écart`);
+    const attendu = nature === "aucun" ? /rectification sans ts_consigne ni ts_reel_estime/ : /déclaration incomplète — champ\(s\) `ts_(consigne|reel_estime)`/;
+    if (!attendu.test(f.message)) throw new Error(`${nom} : le défaut n'est pas nommé : ${f.message}`);
+  }
+});
+check("TF-2573 vert : la déclaration complète couvre, quelle que soit la valeur de `ts_reel_estime` (lisible, antérieure, illisible, nombre) — [RECTIFIÉ] imprimé", () => {
+  for (const [nom, decl] of FORMES_TS_REEL.filter(([, , integre]) => integre)) {
+    const d = projetLedger2540("ts-reel-vert", ledgerFormeTs(decl));
+    const r42 = r42De(d);
+    if (r42.some((x) => x.statut === "FAIL")) throw new Error(`${nom} : FAIL inattendu ${JSON.stringify(r42.map((x) => x.message))}`);
+    if (!r42.some((x) => /\[RECTIFIÉ\]/.test(x.message))) throw new Error(`${nom} : aucun [RECTIFIÉ] imprimé : ${r42.map((x) => x.message)}`);
+  }
+});
+check("TF-2573 rouge : sans le contrôle des champs, le témoin voit la chirurgie — une déclaration sans `ts_reel_estime` couvre de nouveau (le défaut du 15/11)", () => {
+  const source = readFileSync(oracle, "utf8");
+  const mutant = source.replace("if (manquantsTs.length) {", "if (false) {");
+  if (mutant === source) throw new Error("chirurgie sans effet : le témoin est vide");
+  const absolu = mutant.replace(/from "(\.\.?\/[^"]+)"/g, (_m, rel) => `from "${pathToFileURL(resolve(dirname(oracle), rel)).href}"`);
+  const copie = join(mkdtempSync(join(tmpdir(), "conf-mutant-2573-")), "oracle-conformite-projet.mjs");
+  writeFileSync(copie, absolu, "utf8");
+  try {
+    const d = projetLedger2540("ts-reel-mutant", ledgerFormeTs(FORMES_TS_REEL.find(([n]) => n === "ts_reel_estime absent")[1]));
+    let r;
+    try { r = JSON.parse(sh("node", [copie, d])); } catch (e) { r = JSON.parse(String(e.stdout || "{}")); }
+    if (!(r.findings || []).some((x) => x.regle === "R-42")) throw new Error("le mutant ne rend aucun constat R-42 : le témoin est vide");
+    if ((r.findings || []).some((x) => x.regle === "R-42" && x.statut === "FAIL")) throw new Error("le mutant refuse encore la déclaration sans `ts_reel_estime` : le rouge n'est pas le défaut du 15/11");
+  } finally { rmSync(dirname(copie), { recursive: true, force: true }); }
+});
 {
   const LEDGER_MJS_2540 = join("digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
   const racinesParc = [process.env.FORGE_ROOT, join(dirname(oracle), "..", ".."), "c:\\dev"].filter(Boolean);
@@ -1868,6 +1926,13 @@ check("TF-2540 rouge : sans le contrôle du ts, le témoin voit la chirurgie —
       for (const [nom, entrees, integre] of ACCORD_LEDGER.filter(([, , , nature]) => nature === "etendue")) {
         const d = projetLedger2540("accord-etendue", entrees);
         if (verifyIntegre(d) !== integre || r42Integre(d) !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42Integre(d)}, verify ${verifyIntegre(d)}`);
+      }
+    });
+    check("TF-2573 accord : sur chaque forme de `ts_reel_estime` (13 cas : complète lisible, antérieure, illisible, nombre ; absent, null, vide, espaces ; seul ; aucun), R-42 et `ledger.mjs verify` rendent le MÊME verdict", () => {
+      for (const [nom, decl, integre] of FORMES_TS_REEL) {
+        const d = projetLedger2540("ts-reel-accord", ledgerFormeTs(decl));
+        const r42 = r42Integre(d), verify = verifyIntegre(d);
+        if (r42 !== integre || verify !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
       }
     });
   }

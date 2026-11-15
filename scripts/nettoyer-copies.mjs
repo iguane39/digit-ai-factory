@@ -22,7 +22,7 @@
  * Usage : node scripts/nettoyer-copies.mjs [--racine <dépôt>] [--json] [--supprimer] [--self-test]
  * Exit 0 ; 1 si une suppression demandée a échoué ; 2 sur entrée illisible.
  */
-import { existsSync, mkdtempSync, writeFileSync, rmSync, realpathSync, statSync } from "node:fs";
+import { existsSync, mkdtempSync, writeFileSync, rmSync, realpathSync, statSync, symlinkSync } from "node:fs";
 import { join, dirname, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -30,7 +30,9 @@ import { fileURLToPath } from "node:url";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const BRANCHE_JETABLE = /^(worktree-agent-|camp\d)/;
-const norm = (p) => resolve(p).replaceAll("\\", "/").toLowerCase();
+// TF-2578 : un chemin se compare sous son nom RÉEL (git rend le chemin long ; un alias court 8.3 ou un lien désigne le même dossier sous un autre nom).
+const reel = (p) => { try { return realpathSync.native(p); } catch { return resolve(p); } };
+const norm = (p) => reel(p).replaceAll("\\", "/").toLowerCase();
 
 const git = (args, cwd) => spawnSync("git", args, { cwd, encoding: "utf8" });
 
@@ -53,7 +55,7 @@ export function relever(racine, principale = "main", { recenceMin = RECENCE_MIN 
     const fus = c.branche ? fusionnee(c.branche) : false;
     const age = present ? (Date.now() - Math.max(statSync(c.chemin).mtimeMs, 1000 * Number(git(["log", "-1", "--format=%ct", c.branche || "HEAD"], racine).stdout.trim() || 0))) / 60000 : Infinity;
     const motif = !present ? "dossier absent" : c.verrou ? "verrouillée (agent vivant)" : !c.branche ? "tête détachée" : !fus ? "branche non fusionnée" : !propre ? "modifications, fichiers non suivis ou ignorés" : age < recenceMin ? `touchée il y a moins de ${recenceMin} minutes` : null;
-    return { ...c, chemin_relatif: relative(racine, c.chemin).replaceAll("\\", "/"), fusionnee: fus, propre, supprimable: motif === null, motif };
+    return { ...c, chemin_relatif: relative(reel(racine), reel(c.chemin)).replaceAll("\\", "/"), fusionnee: fus, propre, supprimable: motif === null, motif };
   });
   const avecCopie = new Set(copies.map((c) => c.branche).filter(Boolean));
   const branches = git(["branch", "--format=%(refname:short)"], racine).stdout.split(/\r?\n/).filter((b) => b && b !== principale && !avecCopie.has(b)).map((b) => {
@@ -83,6 +85,7 @@ function selfTest() {
   const T = realpathSync(mkdtempSync(join(tmpdir(), "nettoyer-copies-")));
   const depot = join(T, "depot");
   const casse = [];
+  let lien = false; // TF-2578 : vrai quand le banc a pu poser un lien (le cas du dépôt désigné par un autre nom est alors joué et compté)
   const g = (...a) => { const r = git(a, depot); if (r.status) throw new Error(`git ${a.join(" ")} : ${r.stderr}`); return r; };
   try {
     spawnSync("git", ["init", "-q", "-b", "main", depot]);
@@ -110,6 +113,16 @@ function selfTest() {
     if (!br("worktree-agent-orpheline").supprimable || !br("camp1013-q9").supprimable) casse.push("une branche d'agent ou de campagne fusionnée n'est pas supprimable");
     if (br("sauvegarde-avant-x").supprimable) casse.push("une branche de sauvegarde est supprimable");
     if (r.supprimables.copies !== 1 || r.supprimables.branches !== 2) casse.push(`1 copie et 2 branches supprimables attendues, ${JSON.stringify(r.supprimables)}`);
+    // TF-2578 (15/11/2026) : le MÊME dépôt, désigné par un autre NOM de son dossier (un lien ; sur ce poste, l'alias court 8.3 du dossier temporaire, dont le chemin
+    // porte un caractère non ASCII, que git rend en chemin long). Le dépôt principal n'est pas une copie, quel que soit le nom qu'on lui donne : sans cela, `git worktree
+    // remove` le refuse (« is a main working tree »), la suppression est en échec et le chemin relatif d'une copie est un « ../../.. » sans rapport.
+    const alias = join(T, "depot-alias");
+    try { symlinkSync(depot, alias, "junction"); lien = true; } catch { /* pas de lien sur ce poste : le cas n est ni joué ni compté */ }
+    if (lien) {
+      const ra = relever(alias, "main", { recenceMin: 0 });
+      if (ra.copies.some((c) => c.branche === "main")) casse.push("le dépôt principal, désigné par un autre nom de son dossier (lien, alias court 8.3), est compté comme une copie");
+      if (ra.copies.find((c) => c.branche === "worktree-agent-fini")?.chemin_relatif !== "../fini") casse.push(`le chemin relatif d'une copie, depuis un dépôt désigné par un autre nom, est faux : ${ra.copies.find((c) => c.branche === "worktree-agent-fini")?.chemin_relatif}`);
+    }
     const faits = supprimer(depot, r);
     if (faits.some((f) => f.erreur)) casse.push(`suppression en échec : ${JSON.stringify(faits)}`);
     const apres = relever(depot, "main", { recenceMin: 0 });
@@ -118,7 +131,7 @@ function selfTest() {
     if (apres.supprimables.copies !== 0 || apres.supprimables.branches !== 0) casse.push("des supprimables restent après la suppression");
   } catch (e) { casse.push(`erreur : ${e.message}`); }
   finally { git(["worktree", "unlock", join(T, "vivant")], depot); rmSync(T, { recursive: true, force: true }); }
-  console.log(JSON.stringify({ outil: "nettoyer-copies", self_test: casse.length ? "FAIL" : "PASS", cas: 12, couverture: "double sens : 7 cas rouges, 5 cas verts", casse }));
+  console.log(JSON.stringify({ outil: "nettoyer-copies", self_test: casse.length ? "FAIL" : "PASS", cas: 12 + (lien ? 1 : 0), couverture: `double sens : 7 cas rouges, ${5 + (lien ? 1 : 0)} cas verts`, casse }));
   process.exit(casse.length ? 1 : 0);
 }
 
