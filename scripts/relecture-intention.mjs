@@ -36,10 +36,13 @@
  *        `--type` ajoute à la demande, SOUS UN TITRE QUI LES DISTINGUE d'elle, les règles de la Factory que tout livrable de ce
  *        type doit tenir (`references/RELECTURE-INTENTION-REGLES.json`, ou `--regles <fichier>`) ;
  *   --consigner <verdict.json> --point <fin-de-tour|consigne|reception|coherence> --type <type> [--fichier <livrable>]
- *        [--passe <n> --suite-de <identifiant>]
+ *        [--passe <n> --suite-de <identifiant>] [--agent <identifiant>]
  *        ajoute une ligne horodatée à todo/relectures-intention.jsonl ; `--passe` et `--suite-de` chaînent les passes d'un
  *        même travail (au plus 2 passes de correction, soit 3 relectures) ; au point « reception », `--fichier` est exigé : le
  *        point « fin-de-tour » cite ensuite ce livrable par son seul chemin tant qu'il n'a pas changé depuis sa relecture ;
+ *        au point « reception » seulement, `--agent` nomme l'agent qui a rendu le livrable (D-219 (e) du 15/11/2026, TF-2563) :
+ *        la ligne porte `agent_id`, puis `scripts/noter-fiche.mjs` inscrit le verdict de relecture sur sa fiche d'exécution, sans
+ *        la réécrire ; une note impossible (aucune fiche de cet agent) se dit sous la ligne, la relecture reste consignée ;
  *        le champ `projet` et les citations des écarts sont PSEUDONYMISÉS par les tables du canal avant l'écriture (TF-2146 : le journal
  *        est publié) ; sans tables ni anonymiseur, rien n'est consigné (2) ;
  *   --boucle <identifiant>                          l'état de la chaîne d'un travail : passes faites, passe suivante permise ou non,
@@ -84,7 +87,7 @@ import { decouperCommande } from "../oracles/lib-decoupe-commande.mjs";
 let anonymiserTexte = null;
 try { ({ anonymiser: anonymiserTexte } = await import("../todo/anonymiser-entrant.mjs")); } catch { /* dit au refus de --consigner */ }
 
-export const VERSION = "2.2.0";
+export const VERSION = "2.3.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const REGISTRE_DEFAUT = join(ICI, "..", "todo", "relectures-intention.jsonl");
 export const REGLES_DEFAUT = join(ICI, "..", "references", "RELECTURE-INTENTION-REGLES.json");
@@ -1028,6 +1031,29 @@ export function pseudonymiserLigne(ligne) {
   return sortie;
 }
 
+/** L'identifiant d'un agent, tel que le harnais le donne (`agent-<id>.jsonl`) et que `scripts/noter-fiche.mjs` l'attend. */
+export const ID_AGENT = /^[\w-]{1,64}$/;
+
+/**
+ * D-219 (e), TF-2563 (mandat 20261115b, lot L2) : inscrit le verdict d'une relecture de réception sur la fiche d'exécution de l'agent, par
+ * `scripts/noter-fiche.mjs` lancé en PROCESSUS FILS. Un import lierait ce script, que le hook de fin de tour charge à chaque tour
+ * (`hook-restitution.mjs`), à la chaîne du hook de fin d'agent (`lib-fiches-agents.mjs`, qui importe `hook-restitution.mjs`). Ne lève pas ;
+ * la relecture est déjà consignée. Rend { code, ecrit, deja, motif, texte }.
+ */
+export function noterSurLaFiche(agent, verdict, { env = process.env, cwd = process.cwd() } = {}) {
+  const r = spawnSync(process.execPath, [join(ICI, "noter-fiche.mjs"), "--agent", agent, "--verdict-relecture", verdict, "--json"], { encoding: "utf8", env, cwd, timeout: 30000 });
+  let j = null;
+  try { j = JSON.parse(String(r.stdout || "").trim().split(/\r?\n/).pop() || "null"); } catch { j = null; }
+  if (!j || typeof j !== "object") {
+    const cause = r.error ? (r.error.code || "lancement impossible") : `exit ${r.status}`;
+    return { code: r.status ?? null, ecrit: false, deja: false, motif: `noter-fiche.mjs n'a rien rendu de lisible (${cause})`, texte: `fiche de l'agent ${agent} non notée : noter-fiche.mjs n'a rien rendu de lisible (${cause})` };
+  }
+  const texte = j.ecrit ? `fiche de l'agent ${agent} : verdict de relecture « ${verdict} » noté`
+    : j.deja ? `fiche de l'agent ${agent} : verdict de relecture « ${verdict} » déjà noté`
+    : `fiche de l'agent ${agent} non notée : ${j.motif}`;
+  return { code: j.code, ecrit: Boolean(j.ecrit), deja: Boolean(j.deja), motif: j.motif, texte };
+}
+
 const estAlerte = (l) => l.alerte === true || (l.verdict === "derive" && ["majeure", "bloquante"].includes(l.gravite));
 const horsDemande = (l) => (l.detail_ecarts || []).filter((e) => e.nature === "hors_demande");
 
@@ -1123,7 +1149,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   const cwd = contexte.cwd || process.cwd();
   const projetDir = contexte.projet || env.CLAUDE_PROJECT_DIR || cwd;   // le projet dont on lit la transcription
   const maison = contexte.maison || homedir();
-  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null, racine: null };
+  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null, racine: null, agent: null };
   const usage = (m) => ({ code: 2, sortie: `relecture-intention : ${m}` });
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
@@ -1145,6 +1171,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       else if (x === "--type") a.type = val();
       else if (x === "--passe") a.passe = val();
       else if (x === "--suite-de") a.suiteDe = val();
+      else if (x === "--agent") a.agent = val();
       else if (x === "--session") a.session = val();
       else if (x === "--depuis") a.depuis = val();
       else if (x === "--json") a.json = true;
@@ -1224,6 +1251,9 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   if (a.mode === "consigner") {
     if (!POINTS.includes(a.point)) return usage(`--point attend ${POINTS.join(" ou ")}`);
     if (!TYPES.includes(a.type)) return usage(`--type attend ${TYPES.join(", ")}`);
+    // D-219 (e), TF-2563 (mandat 20261115b, lot L2) : au point « reception », la relecture porte sur le livrable d'un agent ; `--agent` le nomme.
+    if (a.agent !== null && a.point !== "reception") return usage(`--agent ne vaut qu'au point reception, où la relecture porte sur le livrable d'un agent (D-219 (e)) ; ici le point est « ${a.point} »`);
+    if (a.agent !== null && !ID_AGENT.test(a.agent)) return usage(`--agent attend l'identifiant d'un agent (lettres, chiffres, - et _, 64 au plus), reçu « ${String(a.agent).slice(0, 40)} »`);
     let brut; try { brut = readFileSync(resolve(cwd, a.verdict), "utf8"); } catch (e) { return usage(`verdict illisible : ${e.message}`); }
     const v = lireVerdict(brut);
     if (!v.ok) return usage(`verdict inexploitable (${v.raison}) : rien n'est consigné`);
@@ -1260,7 +1290,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
     const n = registre.filter((l) => l.ev === "relecture" && String(l.id).startsWith(`RI-${jour}-`)).length + 1;
     const alerte = v.verdict.verdict === "derive" && ["majeure", "bloquante"].includes(v.verdict.gravite);
     const id = `RI-${jour}-${String(n).padStart(2, "0")}`;
-    let ligne = { ts: maintenant.toISOString(), ev: "relecture", id, point: a.point, type: a.type, ...v.verdict, alerte, passe, suite_de: suiteDe, chaine: chaine || id, projet: basename(resolve(projetDir)), session, ...(fichier ? { fichier } : {}) };
+    let ligne = { ts: maintenant.toISOString(), ev: "relecture", id, point: a.point, type: a.type, ...v.verdict, alerte, passe, suite_de: suiteDe, chaine: chaine || id, projet: basename(resolve(projetDir)), session, ...(fichier ? { fichier } : {}), ...(a.agent ? { agent_id: a.agent } : {}) };
     try { ligne = pseudonymiserLigne(ligne); } catch (e) { return usage(`pseudonymisation impossible (tables de pseudonymes ou anonymiseur du canal) : ${e.message} — rien n'est consigné (TF-2146 : le journal est publié)`); }
     mkdirSync(dirname(resolve(a.registre)), { recursive: true });
     appendFileSync(a.registre, JSON.stringify(ligne) + "\n");
@@ -1272,7 +1302,9 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       ? ` — ALERTE : passe de correction ${apres.prochaine_passe} permise (corriger les écarts hors_demande, puis relire avec --passe ${apres.prochaine_passe} --suite-de ${id}) ; ${apres.a_poser_a_l_humain.length} écart(s) à poser à l'humain tout de suite`
       : ` — ALERTE : à poser à l'humain (bloc 3), ${apres.motif}, réponse par --confirmer ${id} <oui|non>`;
     const nat = v.verdict.ecarts ? ` [${v.verdict.natures.hors_demande} hors_demande, ${v.verdict.natures.choix_humain} choix_humain${v.verdict.natures.non_precisee ? `, ${v.verdict.natures.non_precisee} de nature non précisée (traité(s) comme choix de l'humain)` : ""}]` : "";
-    return { code: 0, sortie: `relecture-intention : ${id} consignée (${a.point}, ${a.type})${suiteTexte} — ${v.verdict.verdict}, gravité ${v.verdict.gravite}, ${v.verdict.ecarts} écart(s)${nat}${alerteTexte}${avis}`, ligne };
+    // La relecture est consignée avant la note : une note impossible se dit, elle ne défait rien (D-219 (e)).
+    const fiche = a.agent ? noterSurLaFiche(a.agent, v.verdict.verdict, { env, cwd: projetDir }) : null;
+    return { code: 0, sortie: `relecture-intention : ${id} consignée (${a.point}, ${a.type})${suiteTexte} — ${v.verdict.verdict}, gravité ${v.verdict.gravite}, ${v.verdict.ecarts} écart(s)${nat}${alerteTexte}${avis}${fiche ? `\n  ${fiche.texte}` : ""}`, ligne, ...(fiche ? { fiche } : {}) };
   }
 
   // --preparer

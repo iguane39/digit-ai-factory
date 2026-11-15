@@ -10,6 +10,9 @@
  *           compaction n'est PAS un message humain ; une écriture antérieure au dernier message humain n'est pas citée ; un
  *           `.env` n'est jamais cité ; une borne est DITE ; un verdict inexploitable, un point ou un type inconnu, un
  *           identifiant inconnu, une confirmation sans alerte et une option inconnue rendent 2 sans rien écrire.
+ *   FICHE (D-219 (e) du 15/11/2026, TF-2563) : au point « reception », `--agent` inscrit l'identifiant à la relecture et son verdict sur la
+ *           fiche d'exécution de l'agent, sans la réécrire ; la même relecture consignée deux fois ne note rien de plus ; `--agent` hors du
+ *           point reception ou mal formé rend 2 sans rien écrire ; un agent sans fiche laisse la relecture consignée, et la sortie le dit.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, utimesSync } from "node:fs";
@@ -18,6 +21,8 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { executer, STRICTE, FORME_JSON, FORME_JSON_V1, CONSIGNE_V2, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, MAX_PASSES, TYPES, texteHumain, lireVerdict, etatChaine, releverRegistre, numerosDeDecision, problemesReferentiel, verifierSources, reglesDesTypes, relusALaReception, sectionsDeConclusion, jugerForme, ecrituresParCommande } from "./relecture-intention.mjs";
+import { SCHEMA } from "../oracles/lib-fiches-agents.mjs";
+import { SCHEMA_VERDICT } from "./noter-fiche.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
@@ -876,6 +881,54 @@ try {
     const d2 = join(T, "sortie-fin-relus-change");
     executer(["--preparer", "fin-de-tour", "--transcript", TRANSCRIPT, "--sortie", d2, "--registre", REGR], {}, new Date(), CTX);
     if (!readFileSync(join(d2, "livrables.md"), "utf8").includes("Le contenu du petit livrable")) throw new Error("un livrable modifié après sa relecture n'est pas recité");
+  });
+  // ---- D-219 (e) du 15/11/2026, TF-2563, mandat 20261115b, lot L2 : la relecture du livrable d'un agent s'inscrit sur sa fiche d'exécution ----
+  // Fichier des fiches JETABLE (FORGE_FICHES_AGENTS) et projet jetable (CLAUDE_PROJECT_DIR) : le fichier des fiches du pilot n'est jamais touché.
+  const REGA = join(T, "registre-agent.jsonl");
+  const FICHES_A = join(T, "fiches-agents.jsonl");
+  const ficheA = (id) => JSON.stringify({ schema: SCHEMA, ts: "2026-11-15T09:00:00.000Z", session: "cafe0000", session_source: "hook", agent_id: id, type: "constructeur", modele: "claude-opus-5-5",
+    effort: "max", duree_s: 1500, jetons_entree: 1000, jetons_sortie: 100, appels_outils: 9, verdict_livrable: null, verdict_relecture: null, frictions: 0, cause_fin: "fini",
+    projet: "digit-ai-factory", partielle: false, lacunes: [] });
+  writeFileSync(FICHES_A, ficheA("agent-recu-1") + "\n", "utf8");
+  const ENV_A = { ...process.env, FORGE_FICHES_AGENTS: FICHES_A, CLAUDE_PROJECT_DIR: PROJET, FORGE_SESSION_ID: "5e550000-aaaa-4000-8000-000000000000" };
+  const vDerive = join(T, "verdict-agent-derive.json");
+  writeFileSync(vDerive, JSON.stringify({ verdict: "derive", gravite: "mineure", ecarts: [{ nature: "hors_demande", la_demande_dit: "x", le_livrable_fait: "y", pourquoi: "z" }], confiance: "elevee" }));
+  const consignerAgent = (agent, point = "reception") => executer(["--consigner", vDerive, "--point", point, "--type", "etude", ...(point === "reception" ? ["--fichier", PETIT] : []),
+    "--registre", REGA, "--session", "s", "--agent", agent], ENV_A, PLUS_TARD, CTX);
+  check("vert — réception d'un livrable d'agent (D-219 (e)) : --agent inscrit son identifiant à la relecture, et le verdict de relecture s'ajoute à sa fiche sans la réécrire", () => {
+    const avant = readFileSync(FICHES_A, "utf8");
+    const c = consignerAgent("agent-recu-1");
+    egal(c.code, 0, "exit consigner"); egal(c.ligne.agent_id, "agent-recu-1", "agent_id de la relecture");
+    if (!/fiche de l'agent agent-recu-1 : verdict de relecture « derive » noté/.test(c.sortie)) throw new Error(c.sortie);
+    const apres = readFileSync(FICHES_A, "utf8");
+    if (!apres.startsWith(avant)) throw new Error("la fiche a été réécrite");
+    const ev = JSON.parse(apres.trim().split("\n").pop());
+    if (ev.schema !== SCHEMA_VERDICT || ev.agent_id !== "agent-recu-1" || ev.verdict_relecture !== "derive" || ev.verdict_livrable !== null) throw new Error(JSON.stringify(ev));
+  });
+  check("rouge — la même relecture consignée deux fois : la fiche ne reçoit pas un second verdict identique (« déjà noté »)", () => {
+    const n = readFileSync(FICHES_A, "utf8").trim().split("\n").length;
+    const c = consignerAgent("agent-recu-1");
+    egal(c.code, 0, "exit consigner"); if (!/déjà noté/.test(c.sortie)) throw new Error(c.sortie);
+    egal(readFileSync(FICHES_A, "utf8").trim().split("\n").length, n, "lignes du fichier des fiches");
+  });
+  check("rouge — --agent hors du point reception, ou mal formé : 2, rien n'est consigné ni noté", () => {
+    const avantReg = existsSync(REGA) ? readFileSync(REGA, "utf8") : "", avantFiches = readFileSync(FICHES_A, "utf8");
+    egal(consignerAgent("agent-recu-1", "consigne").code, 2, "--agent au point consigne");
+    egal(consignerAgent("../agent", "reception").code, 2, "--agent mal formé");
+    egal(existsSync(REGA) ? readFileSync(REGA, "utf8") : "", avantReg, "registre"); egal(readFileSync(FICHES_A, "utf8"), avantFiches, "fiches");
+  });
+  check("vert — un agent sans fiche : la relecture reste consignée, la sortie dit que la fiche n'est pas notée, le fichier des fiches est intact", () => {
+    const avant = readFileSync(FICHES_A, "utf8");
+    const c = consignerAgent("agent-sans-fiche");
+    egal(c.code, 0, "exit consigner"); egal(c.ligne.agent_id, "agent-sans-fiche", "agent_id");
+    if (!/fiche de l'agent agent-sans-fiche non notée : aucune fiche de l'agent agent-sans-fiche/.test(c.sortie)) throw new Error(c.sortie);
+    egal(readFileSync(FICHES_A, "utf8"), avant, "fiches");
+  });
+  check("bornes — sans --agent, la relecture de réception ne porte pas d'identifiant et ne touche aucune fiche", () => {
+    const avant = readFileSync(FICHES_A, "utf8");
+    const c = executer(["--consigner", vDerive, "--point", "reception", "--type", "etude", "--fichier", PETIT, "--registre", REGA, "--session", "s"], ENV_A, PLUS_TARD, CTX);
+    egal(c.code, 0, "exit"); if ("agent_id" in c.ligne || /fiche de l'agent/.test(c.sortie)) throw new Error(c.sortie);
+    egal(readFileSync(FICHES_A, "utf8"), avant, "fiches");
   });
   check("vert — cohérence (A-3) : chapeau et verdict de chaque livrable côte à côte, sans leur milieu ; moins de deux livrables, 2", () => {
     const d = join(T, "sortie-coherence");
