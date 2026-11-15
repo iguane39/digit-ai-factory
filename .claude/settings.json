@@ -72,6 +72,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-remise-agent.mjs\"",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/oracles/hook-fiches.mjs\"",
+            "timeout": 10,
+            "async": true
           }
         ]
       }

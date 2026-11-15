@@ -9,6 +9,8 @@
  * médiane de 5 passages sous 300 ms sur des transcriptions synthétiques de la taille médiane (0,51 Mo) et du 99e centile (6,59 Mo) des
  * 350 transcriptions de sous-agents du poste au 15/11/2026, et par le lanceur d'un produit ; la taille maximale (30,34 Mo) est mesurée
  * et dite. Le banc n'écrit jamais au fichier des fiches du pilot. Tables de pseudonymes jetables. Joué par `oracles\self-tests.mjs` (I2).
+ * Câblage (reste du lot L1, 15/11/2026) : au SubagentStop de `.claude/settings.json` du pilot, dans le groupe de `hook-remise-agent.mjs`
+ * qui reste en place, en `async: true` ; sens rouge sur deux copies du réglage, l'une sans l'entrée, l'autre sans `async`.
  */
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -140,6 +142,32 @@ try {
     console.log(`  [MESURE] budget par le lanceur du produit, 6,59 Mo : médiane ${m.mediane} ms (max ${m.max})`);
     att(lignes().length === avant + 5, `${lignes().length - avant} ligne(s) par le lanceur au lieu de 5`);
     att(m.mediane < 300, `${m.mediane} ms`);
+  });
+  // Le câblage du pilot (reste du lot L1). `async: true` : la documentation (https://code.claude.com/docs/en/hooks, « Configure an async
+  // hook ») dit « This field is only available on `type: "command"` hooks » et « Async hooks can't block or control Claude's behavior » :
+  // la fiche s'écrit en tâche de fond et ne peut ni retenir l'agent, ni changer le verdict du hook de remise, qui reste dans le même groupe.
+  const defautsDeCablage = (reglages) => {
+    const groupes = reglages?.hooks?.SubagentStop || [];
+    const groupe = groupes.find((g) => (g.hooks || []).some((h) => /hook-remise-agent\.mjs/.test(String(h.command))));
+    if (!groupe) return ["hook-remise-agent.mjs absent du SubagentStop"];
+    const fiches = (groupe.hooks || []).filter((h) => /oracles\/hook-fiches\.mjs/.test(String(h.command)));
+    if (fiches.length !== 1) return [`${fiches.length} entrée(s) hook-fiches.mjs dans le groupe de hook-remise-agent.mjs, 1 attendue`];
+    const h = fiches[0], d = [];
+    if (h.type !== "command") d.push(`type « ${h.type} »`);
+    if (h.async !== true) d.push("async absent");
+    if (String(h.command) !== 'node "${CLAUDE_PROJECT_DIR}/oracles/hook-fiches.mjs"') d.push(`commande non ancrée : ${h.command}`);
+    return d;
+  };
+  check("câblage — le hook est au SubagentStop de `.claude/settings.json` du pilot, à côté de hook-remise-agent.mjs, en async ; sans l'entrée ou sans async, le contrôle le dit", () => {
+    const reglages = JSON.parse(readFileSync(join(ICI, "..", ".claude", "settings.json"), "utf8"));
+    const d = defautsDeCablage(reglages);
+    att(!d.length, d.join(" ; "));
+    const sans = JSON.parse(JSON.stringify(reglages));
+    for (const g of sans.hooks.SubagentStop) g.hooks = g.hooks.filter((x) => !/hook-fiches\.mjs/.test(String(x.command)));
+    att(/0 entrée\(s\)/.test(defautsDeCablage(sans).join()), `copie sans l'entrée : ${defautsDeCablage(sans).join()}`);
+    const synchrone = JSON.parse(JSON.stringify(reglages));
+    for (const g of synchrone.hooks.SubagentStop) for (const x of g.hooks) if (/hook-fiches\.mjs/.test(String(x.command))) delete x.async;
+    att(defautsDeCablage(synchrone).includes("async absent"), `copie sans async : ${defautsDeCablage(synchrone).join()}`);
   });
   check("rouge — le banc n'a rien écrit au fichier des fiches du pilot", () => {
     att(etatDe(FICHES_DU_PILOT) === avantPilot, `${FICHES_DU_PILOT} : ${avantPilot} → ${etatDe(FICHES_DU_PILOT)}`);
