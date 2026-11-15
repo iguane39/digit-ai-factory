@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 716 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 717 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -683,6 +683,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md | 20261001a | 8.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Opus 5.5 Medium defaut prouve 2 profils - 20261001a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md | 20261013a | 9.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` |
 | Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md | 20261013c | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` |
+| Digit-AI - Synthese Mandat - Parc et Drive synchronises - 20261115e.md | 20261115e | 5.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Parc et Drive synchronises - 20261115e.md` |
 | Digit-AI - Synthese Mandat - Pilot pousse sur GitHub - 20261026u.md | 20261026u | 2.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot pousse sur GitHub - 20261026u.md` |
 | Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md | 20261016k | 5.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` |
 | Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md | 20261026p | 3.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` |
