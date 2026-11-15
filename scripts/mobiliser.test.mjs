@@ -34,9 +34,10 @@ const produit = (nom, { profil = true } = {}) => {
   return d;
 };
 // TF-2045 : l'écrivain lit CLAUDE_CODE_SESSION_ID ; la recette le retire de l'environnement hérité, pour que ses cas ne dépendent pas de
-// la session qui la joue, et le pose cas par cas (`session`).
+// la session qui la joue, et le pose cas par cas (`session`). D-218 (b) : il lit d'abord FORGE_SESSION_ID (lib-session.mjs), retirée de même.
 const lancer = (cwd, args, session = null, extra = {}) => {
-  const env = { ...process.env, ...extra }; delete env.CLAUDE_CODE_SESSION_ID;
+  const env = { ...process.env }; delete env.CLAUDE_CODE_SESSION_ID; delete env.FORGE_SESSION_ID;
+  Object.assign(env, extra);
   if (session) env.CLAUDE_CODE_SESSION_ID = session;
   const r = spawnSync(process.execPath, [ECRIVAIN, ...args], { cwd, encoding: "utf8", env });
   let sortie = null;
@@ -389,6 +390,17 @@ try {
     lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-B");
     const sansSession = lancer(d, ["--verifier"]);
     att(sansSession.code === 0 && sansSession.sortie.repli === "session-non-identifiee", `sans session, dernière ligne du fichier : exit ${sansSession.code}`);
+  });
+  // D-218 (b), items I1 et I4 (15/11/2026, RP-25) : une session enfant hérite CLAUDE_CODE_SESSION_ID de sa mère ; la variable que son propre
+  // hook SessionStart pose (FORGE_SESSION_ID, lib-session.mjs) passe d'abord. Rouge : sans elle, la ligne est signée du nom de la mère.
+  check("D-218 (b) rouge → vert — une session enfant signe sa ligne de la variable posée par son SessionStart, pas de celle qu'elle hérite", () => {
+    const d = produit("session-enfant");
+    att(lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-mere").code === 0, "écriture sans variable posée");
+    att(trace(d)[0].session === "sess-mere", `rouge : la seule variable héritée signe du nom de la mère, attendu sess-mere, lu ${trace(d)[0].session}`);
+    att(lancer(d, ["--type", "produit-neuf", "--verdicts", ecrireVerdicts(d, verdictsSansRien())], "sess-mere", { FORGE_SESSION_ID: "sess-enfant" }).code === 0, "écriture avec la variable posée");
+    att(trace(d)[1].session === "sess-enfant", `vert : la ligne de l'enfant porte session: ${trace(d)[1].session}`);
+    const v = lancer(d, ["--verifier"], "sess-mere", { FORGE_SESSION_ID: "sess-enfant" });
+    att(v.sortie?.session === "sess-enfant" && v.sortie?.repli === null, `--verifier juge la session ${v.sortie?.session} : ${v.brut.slice(0, 200)}`);
   });
 
   // TF-2144 (RT-44 du 04/11/2026) : forge-audit mobilisée chez un produit dont le client publie une porte d'audit → la sortie de CETTE porte

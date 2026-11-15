@@ -16,6 +16,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { sessionCourante } from "./lib-session.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const CHEMIN_CARTE = join(ICI, "..", "references", "CARTE-FORGES.json");
@@ -285,8 +286,10 @@ export function ecrireProfil(produit, profil, maintenant = new Date()) {
     source: "déclaré par scripts/mobiliser.mjs --profil (diagnostic 20261026a, section d, A5)", signaux: profil }, null, 2) + "\n", "utf8");
 }
 
-/** L'identifiant de la session qui écrit ou qui restitue (`CLAUDE_CODE_SESSION_ID`), ou null quand rien ne l'identifie. */
-export const sessionDe = (env = process.env) => String(env.CLAUDE_CODE_SESSION_ID || "").trim() || null;
+/** L'identifiant de la session qui écrit ou qui restitue, ou null quand rien ne l'identifie. D-218 (b), items I1 et I4 (15/11/2026) : par la
+ *  source unique de `lib-session.mjs`, `FORGE_SESSION_ID` posée par le hook SessionStart de la session, sinon `CLAUDE_CODE_SESSION_ID`,
+ *  qu'une session enfant hérite de sa mère. L'identifiant reste entier : `derniereDemande` compare les lignes à lui (TF-2045). */
+export const sessionDe = (env = process.env) => sessionCourante({ env }).id;
 
 /** La ligne de trace d'une demande, prête à être ajoutée à forge/mobilisation.jsonl. */
 export function ligneDeTrace({ carte, types, profil, verdicts, demande = null, maintenant = new Date(), session = sessionDe() }) {
@@ -309,7 +312,7 @@ export function ligneDeTrace({ carte, types, profil, verdicts, demande = null, m
 /** Ce que dit chaque repli de `derniereDemande`, pour l'écran et pour le constat. */
 export const REPLI_DIT = Object.freeze({
   ancienne: "cette session n'a écrit aucune ligne ; la dernière ligne SANS identifiant de session (écrite avant le 02/11/2026) est jugée, faute de savoir qui l'a écrite",
-  "session-non-identifiee": "aucune session n'est identifiée (CLAUDE_CODE_SESSION_ID absent, pas de --session) ; la dernière ligne du fichier est jugée, quelle que soit sa session",
+  "session-non-identifiee": "aucune session n'est identifiée (FORGE_SESSION_ID et CLAUDE_CODE_SESSION_ID absents, pas de --session) ; la dernière ligne du fichier est jugée, quelle que soit sa session",
 });
 
 /**

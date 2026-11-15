@@ -32,6 +32,7 @@ import { existsSync, readFileSync, readdirSync, appendFileSync, openSync, closeS
 import { join, dirname, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { signature } from "./lib-session.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const PILOT = resolve(ICI, "..");
@@ -108,7 +109,11 @@ export function controlerQuestion(question) {
   return { ok: true, question: q };
 }
 
-const session = (s) => String(s || process.env.CLAUDE_CODE_SESSION_ID || "").slice(0, 8) || null;
+// D-218 (b), item I1 (15/11/2026, RP-25 du lot factory-digit-ai-fr 20261114u) : la signature vient de la source unique de
+// `lib-session.mjs` — l'identifiant passé, sinon la variable que le hook SessionStart de la session a posée, sinon
+// `CLAUDE_CODE_SESSION_ID`, marquée « heritee_possible ». Cette ligne lisait la seule variable héritée : D-218 a été signée du nom
+// de la session mère. Rend { session (8 caractères), session_source }.
+const session = (s) => signature({ explicite: s });
 const aujourdhui = () => new Date().toISOString().slice(0, 10);
 
 /** Réserve le prochain numéro libre au registre du pilot et l'inscrit : UN verrou, une lecture, une écriture. */
@@ -118,7 +123,7 @@ export function reserverAuPilot({ question, fichier = REGISTRE_PILOT, sessionId 
   return sousVerrou(fichier + ".lock", () => {
     const reg = lireRegistrePilot(fichier);
     const n = Math.max(reg.max, plancher) + 1;
-    const entree = { type: "decision", n, question: q.question, date: aujourdhui(), ts: new Date().toISOString(), session: session(sessionId), origine: "reservation", ...(source ? { source } : {}) };
+    const entree = { type: "decision", n, question: q.question, date: aujourdhui(), ts: new Date().toISOString(), ...session(sessionId), origine: "reservation", ...(source ? { source } : {}) };
     mkdirSync(dirname(fichier), { recursive: true });
     const contenu = existsSync(fichier) ? readFileSync(fichier, "utf8") : "";
     appendFileSync(fichier, (contenu && !contenu.endsWith("\n") ? "\n" : "") + JSON.stringify(entree) + "\n", "utf8");
@@ -134,7 +139,7 @@ export function reformulerAuPilot({ n, question, fichier = REGISTRE_PILOT, sessi
   return sousVerrou(fichier + ".lock", () => {
     const reg = lireRegistrePilot(fichier);
     if (!reg.numeros.has(String(num))) throw new Error(`D-${num} n'est pas inscrite au registre : une décision NOUVELLE se réserve (--question), seule une décision inscrite se reformule`);
-    const entree = { type: "decision", n: num, question: q.question, date: aujourdhui(), ts: new Date().toISOString(), session: session(sessionId), origine: "reformulation" };
+    const entree = { type: "decision", n: num, question: q.question, date: aujourdhui(), ts: new Date().toISOString(), ...session(sessionId), origine: "reformulation" };
     const contenu = readFileSync(fichier, "utf8");
     appendFileSync(fichier, (contenu && !contenu.endsWith("\n") ? "\n" : "") + JSON.stringify(entree) + "\n", "utf8");
     return { id: "D-" + num, n: num, question: q.question, registre: fichier, ecrit_par: "lib-decisions.mjs (registre du pilot)" };
@@ -327,7 +332,8 @@ function ecrireHorsRun(produit, entree) {
     let ts = new Date().toISOString().replace(/\.\d+Z$/, "Z");
     if (deja.length && ts < deja[deja.length - 1].ts) ts = deja[deja.length - 1].ts;
     const brut = existsSync(journal) ? readFileSync(journal, "utf8") : "";
-    writeFileSync(journal, brut + (brut && !brut.endsWith("\n") ? "\n" : "") + JSON.stringify({ seq, ts, type: entree.type, hors_run: true, ...entree.champs }) + "\n", "utf8");
+    // D-218 (b), item I1 : la ligne porte la session qui l'écrit, comme celles que `forge/ledger.py` écrit au même journal.
+    writeFileSync(journal, brut + (brut && !brut.endsWith("\n") ? "\n" : "") + JSON.stringify({ seq, ts, type: entree.type, hors_run: true, ...session(null), ...entree.champs }) + "\n", "utf8");
     return journal;
   });
 }
@@ -342,7 +348,7 @@ function reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun, h
     const decisions = { [id]: q.question };
     if (fichierCommun) {
       // Le registre commun d'abord : si l'écrivain du ledger refuse ensuite, le numéro reste pris (un trou n'est pas une erreur) ; l'inverse laisserait un numéro affiché et libre.
-      const entree = { type: "decision", n, question: q.question, date: aujourdhui(), ts: new Date().toISOString(), session: session(null), arbre: resolve(produit), origine: "reservation" };
+      const entree = { type: "decision", n, question: q.question, date: aujourdhui(), ts: new Date().toISOString(), ...session(null), arbre: resolve(produit), origine: "reservation" };
       const contenu = existsSync(fichierCommun) ? readFileSync(fichierCommun, "utf8") : "";
       appendFileSync(fichierCommun, (contenu && !contenu.endsWith("\n") ? "\n" : "") + JSON.stringify(entree) + "\n", "utf8");
     }

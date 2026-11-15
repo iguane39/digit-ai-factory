@@ -16,6 +16,7 @@ import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { decisionsSansReponse, DECISION_RETIREE } from "../oracles/lib-decisions.mjs";
+import { VARIABLE_SESSION } from "../oracles/lib-session.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // Fins de ligne normalisées : un poste qui extrait le gabarit en CRLF faisait manquer la chirurgie du
@@ -713,6 +714,51 @@ try {
     const { d, script } = unProduit(mutant);
     const r = ecrire(script, "decision_retiree", "--decision", "D-12");
     att(r.status === 0 && entrees(d).at(-1).type === "decision_retiree" && !entrees(d).at(-1).cause, `le mutant refuse : exit ${r.status} ${r.stderr}`);
+  });
+
+  // ---- D-218 (b), item I1 (15/11/2026, RP-25 du lot factory-digit-ai-fr 20261114u) : la session qui écrit chaque entrée -------------
+  // Le fait : une session lancée depuis une autre hérite de CLAUDE_CODE_SESSION_ID, et D-218 a été signée du nom de la session mère.
+  // L'écrivain lit d'abord FORGE_SESSION_ID, que le hook SessionStart de la session pose par CLAUDE_ENV_FILE (oracles/lib-session.mjs).
+  const envSession = (vars) => { const e = { ...CONSOLE }; delete e.FORGE_SESSION_ID; delete e.CLAUDE_CODE_SESSION_ID; return { ...e, ...vars }; };
+  const ecrireAvec = (script, vars, ...args) => spawnSync(PYTHON, [script, ...args], { encoding: "utf8", env: envSession(vars) });
+  const MERE = "74dc7ecb-d93f-4110-bebc-19bf7aa9011b", ENFANT = "0e40d4f5-1111-4222-8333-944445555666";
+  check("D-218 (b) vert — session enfant : la variable posée par son SessionStart signe l'entrée de son nom, 8 caractères, source session_start", () => {
+    const { d, script } = unProduit();
+    const r = ecrireAvec(script, { CLAUDE_CODE_SESSION_ID: MERE, [VARIABLE_SESSION]: ENFANT }, "retour", "--resume", "x");
+    const e = entrees(d).at(-1);
+    att(r.status === 0 && e.session === "0e40d4f5" && e.session_source === "session_start", `exit ${r.status} ${JSON.stringify(e)}`);
+  });
+  check("D-218 (b) rouge — la seule variable héritée signe l'entrée du nom de la mère, et la source le dit : heritee_possible", () => {
+    const { d, script } = unProduit();
+    const r = ecrireAvec(script, { CLAUDE_CODE_SESSION_ID: MERE }, "retour", "--resume", "x");
+    const e = entrees(d).at(-1);
+    att(r.status === 0 && e.session === "74dc7ecb" && e.session_source === "heritee_possible", `exit ${r.status} ${JSON.stringify(e)}`);
+  });
+  check("D-218 (b) vert — sans aucune variable : session null, source inconnue ; un --session explicite est gardé, source argument", () => {
+    const { d, script } = unProduit();
+    ecrireAvec(script, {}, "retour", "--resume", "x");
+    const sans = entrees(d).at(-1);
+    att(sans.session === null && sans.session_source === "inconnue", JSON.stringify(sans));
+    ecrireAvec(script, { [VARIABLE_SESSION]: ENFANT }, "retour", "--resume", "x", "--session", "manuel");
+    const expl = entrees(d).at(-1);
+    att(expl.session === "manuel" && expl.session_source === "argument", JSON.stringify(expl));
+  });
+  check("D-218 (b) rouge — sans le bloc de signature, l'entrée n'a plus de champ session (le témoin voit la chirurgie)", () => {
+    const mutant = GABARIT.replace(/        # D-218 \(b\), item I1 : la session qui écrit l'entrée[\s\S]*?e\["session_source"\] = "argument"\n/, "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = unProduit(mutant);
+    ecrireAvec(script, { [VARIABLE_SESSION]: ENFANT }, "retour", "--resume", "x");
+    att(!("session" in entrees(d).at(-1)), "le mutant signe encore l'entrée");
+  });
+  check("D-218 (b) vert — le nom de la variable est le même chez l'écrivain Python et dans oracles/lib-session.mjs", () => {
+    att(GABARIT.includes(`VARIABLE_SESSION = "${VARIABLE_SESSION}"`), `ledger.py ne déclare pas ${VARIABLE_SESSION}`);
+  });
+  check("D-218 (b) vert — hors run, la ligne du journal hors run porte aussi la session qui l'écrit", () => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-gabarit-")); dossiers.push(d); mkdirSync(join(d, "forge"));
+    const script = join(d, "forge", "ledger.py"); writeFileSync(script, GABARIT, "utf8");
+    const r = ecrireAvec(script, { [VARIABLE_SESSION]: ENFANT }, "retour", "--resume", "hors run");
+    const l = readFileSync(join(d, "forge", "hors-run.jsonl"), "utf8").trim().split("\n").map((x) => JSON.parse(x)).at(-1);
+    att(r.status === 0 && l.hors_run === true && l.session === "0e40d4f5" && l.session_source === "session_start", `exit ${r.status} ${JSON.stringify(l)}`);
   });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }

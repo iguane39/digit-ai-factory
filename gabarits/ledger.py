@@ -21,6 +21,11 @@ HORS RUN (TF-2223). Sans ledger de run, `retour`, `question_humain`, `reponse_hu
 REMPLACEMENT (TF-2206). `--remplace D-46` nomme la décision remplacée ; `--artefacts_remplaces '[{"artefact": "…", "sort":
 "retire|conserve|a_decider"}]'` liste ce qu'elle avait créé et ce que cela devient.
 
+SESSION (D-218 (b), item I1, 15/11/2026). Chaque entrée nouvelle porte `session` (les 8 premiers caractères de l'identifiant de la
+session qui l'écrit) et `session_source` : `session_start` quand la variable `FORGE_SESSION_ID` posée par le hook SessionStart de la
+session est là, `heritee_possible` quand seule `CLAUDE_CODE_SESSION_ID` répond (une session enfant l'hérite de sa mère), `inconnue`
+sinon. Un `--session` donné par l'appelant est gardé tel quel, avec `session_source: argument`.
+
 `--run <identifiant>` est un CHAMP comme un autre : il s'écrit dans l'entrée (run_open, run_close, rectification_*...). Il ne
 désigne plus l'archive d'un run clos, c'est `--archive` ; `--verifier --run <identifiant>` reste lu pour l'ancien usage (TF-2174).
 
@@ -100,6 +105,22 @@ JOURNAL_HORS_RUN = FORGE / "hors-run.jsonl"
 
 # TF-2206 (RP-26, 06/11/2026) : ce que devient ce qu'une décision remplacée avait créé.
 SORTS = ("retire", "conserve", "a_decider")
+
+# D-218 (b), item I1 (15/11/2026, RP-25 du lot factory-digit-ai-fr 20261114u) : l'identité de la session qui écrit, dans l'ordre de
+# `sessionCourante()` de `oracles/lib-session.mjs` du pilot. Le fait : D-218 a été signée du nom de la session mère, parce qu'une
+# session lancée depuis une autre hérite de `CLAUDE_CODE_SESSION_ID`. La variable que pose le hook SessionStart de la session
+# elle-même (par `CLAUDE_ENV_FILE`) passe d'abord ; la variable héritée vient ensuite, et sa source le dit.
+VARIABLE_SESSION = "FORGE_SESSION_ID"
+SOURCES_SESSION = ((VARIABLE_SESSION, "session_start"), ("CLAUDE_CODE_SESSION_ID", "heritee_possible"))
+
+
+def session_courante() -> tuple:
+    """(identifiant de 8 caractères, source) de la session qui écrit ; (None, "inconnue") quand rien ne l'identifie."""
+    for nom, source in SOURCES_SESSION:
+        valeur = os.environ.get(nom, "").strip()
+        if valeur:
+            return valeur[:8], source
+    return None, "inconnue"
 
 
 def controler_remplacement(type_: str, champs: dict) -> None:
@@ -213,6 +234,11 @@ def ajouter(archive: str, type_: str, essai: bool = False, /, **champs) -> dict:
         if dejà and ts < dejà[-1]["ts"]:
             ts = dejà[-1]["ts"]                  # `ts` non décroissant, jamais falsifié
         e = {"seq": seq, "ts": ts, "type": type_, **({"hors_run": True} if hors_run else {}), **champs}
+        # D-218 (b), item I1 : la session qui écrit l'entrée, et la source de cette identité.
+        if "session" not in champs:
+            e["session"], e["session_source"] = session_courante()
+        elif "session_source" not in champs:
+            e["session_source"] = "argument"
         if not essai:
             with p.open("a", encoding="utf-8", newline="\n") as fh:
                 fh.write(json.dumps(e, ensure_ascii=False) + "\n")

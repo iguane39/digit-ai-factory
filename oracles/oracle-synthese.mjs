@@ -7424,10 +7424,11 @@ Aucun écart : la demande a été suivie à la lettre.
     const rD2 = jouer85(pD, "t4-ops-ecartee-par-une-nouvelle-ligne.md", LIVRE_85);
     // (j) TF-2045 (02/11/2026) : deux sessions d'un produit écrivent le même fichier ; la dernière ligne est jugée PAR SESSION. La session A
     // mobilise un produit neuf dont les livrables manquent (09:00) ; la session B écrit APRÈS elle une ligne qui n'exige rien (10:00). Avant
-    // la correction, A était jugée sur la ligne de B et passait. Les cas sont hermétiques : --session explicite, CLAUDE_CODE_SESSION_ID retirée.
+    // la correction, A était jugée sur la ligne de B et passait. Les cas sont hermétiques : --session explicite, CLAUDE_CODE_SESSION_ID retirée,
+    // et FORGE_SESSION_ID aussi, que `sessionDe` lit d'abord depuis D-218 (b) (lib-session.mjs).
     const jouerSession85 = (p, nom, contenu, session) => {
       const f = join(dir, nom); writeFileSync(f, contenu, "utf8");
-      const env = { ...process.env }; delete env.CLAUDE_CODE_SESSION_ID;
+      const env = { ...process.env }; delete env.CLAUDE_CODE_SESSION_ID; delete env.FORGE_SESSION_ID;
       return spawnSync(process.execPath, [moi, f, "--racine", p, ...(session ? ["--session", session] : [])], { encoding: "utf8", env });
     };
     const pJ = produit85("produit85-deux-sessions");
