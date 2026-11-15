@@ -87,8 +87,8 @@ export function lireFiches(texte) {
   return { fiches, sansIdentifiant, verdicts, illisibles, autres };
 }
 
-/** Le fichier des fiches, dit sans le chemin d'un produit. */
-function lieuDe(chemin, env) {
+/** Le fichier des fiches, dit sans le chemin d'un produit (`echecs-a-analyser.mjs` le dit de même). */
+export function lieuDe(chemin, env) {
   const n = String(chemin).replace(/\\/g, "/");
   const designe = typeof env?.[VARIABLE_DESTINATION] === "string" ? env[VARIABLE_DESTINATION].trim() : "";
   if (designe && resolve(designe) === resolve(chemin)) return `le fichier désigné par ${VARIABLE_DESTINATION}`;
