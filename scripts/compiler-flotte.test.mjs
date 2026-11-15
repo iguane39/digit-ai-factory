@@ -9,6 +9,9 @@
  *           dans le dossier des agents ; une option inconnue rend 2 ; sans oracle, SKIP et rien d'installé ;
  *   RÉEL  : si forge-agents et forge-agents-security sont sur le poste, le même double sens est joué avec le VRAI compilateur et le
  *           VRAI oracle (CAP-1 : réseau + écriture + lecture) ; absents, la section se déclare NON JOUÉE.
+ *   ANALYSTE DES ÉCHECS (D-219 (e), lot L5), sur les vraies définitions : il lit (Read, Grep, Glob) sans Write, Edit ni shell, et sa
+ *           source nomme les cinq causes du jeu fermé de `noter-fiche.mjs` ; le témoin qui lui rend un outil d'écriture, ou retire une
+ *           cause de son mandat, est vu.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { spawnSync } from "node:child_process";
@@ -17,6 +20,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { MOTIF_MIN, compiler, compilateurParDefaut, jugerAgent, jugerFlotte, lireDeclarations, oracleParDefaut } from "./compiler-flotte.mjs";
+import { CAUSES_ANALYSEES } from "./noter-fiche.mjs";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => { try { fn(); console.log(`  [PASS] ${nom}`); pass++; } catch (e) { console.error(`  [FAIL] ${nom} — ${e.message}`); fail++; } };
@@ -238,6 +242,35 @@ if (!oracleReel || !compilateurReel) {
   check("TF-2549 rouge — sans la ligne de l'arbitre, le contrôle voit l'interdiction manquer", () => {
     const mutant = lire("gabarits", "flotte", "verificateur.yaml").replace(/^ {2}- "Aucun écrivain de ledger n'est exécuté[^\n]*\n/m, "");
     vrai(mutant !== lire("gabarits", "flotte", "verificateur.yaml") && !LIGNE_LEDGER.test(mutant), "la chirurgie n'a pas retiré la ligne");
+  });
+
+  // D-219 (e) du 15/11/2026, TF-2563, lot L5 : l'analyste des échecs lit une transcription et rend une cause ; la session l'inscrit sur la fiche.
+  // Sa lecture seule tient à l'absence d'outil, comme celle du relecteur, et sa cause au jeu fermé que noter-fiche.mjs accepte, ni plus ni moins.
+  const causesNommees = (t) => { const m = /^mandat:\s*"(.*)"\s*$/m.exec(t); return m ? CAUSES_ANALYSEES.filter((c) => new RegExp(`(?<![\\w])${c}(?![\\w])`).test(m[1])) : []; };
+  check("D-219 (e) vert — l'analyste des échecs lit (Read, Grep, Glob) sans Write, Edit ni shell, dans sa source ET dans l'agent installé", () => {
+    const src = outilsSource(lire("gabarits", "flotte", "analyste-echecs.yaml")), inst = outilsInstalles(lire(".claude", "agents", "analyste-echecs.md"));
+    vrai(ecrivains(src).length === 0 && ecrivains(inst).length === 0, `outils d'écriture ou de shell : source ${src}, installé ${inst}`);
+    vrai(src.join() === "Read,Grep,Glob" && src.join() === inst.join(), `l'analyste ne lit pas seulement, ou la source et l'agent installé divergent : ${src} / ${inst}`);
+  });
+  check("D-219 (e) rouge — un analyste qui regagne Write, Edit ou un shell est vu par le contrôle (le témoin voit la chirurgie)", () => {
+    const src = lire("gabarits", "flotte", "analyste-echecs.yaml");
+    for (const outil of ["Write", "Edit", "Bash", "PowerShell"]) {
+      const mutant = src.replace(/^outils:\s*\[(.*)\]\s*$/m, (_m, o) => `outils: [${o}, ${outil}]`);
+      vrai(mutant !== src && ecrivains(outilsSource(mutant).join()).includes(outil), `${outil} regagné sans que le contrôle le voie`);
+    }
+  });
+  check("D-219 (e) vert — le mandat de l'analyste nomme les cinq causes du jeu fermé de noter-fiche.mjs, dans sa source ET dans l'agent installé", () => {
+    const src = lire("gabarits", "flotte", "analyste-echecs.yaml");
+    vrai(causesNommees(src).join() === CAUSES_ANALYSEES.join(), `causes nommées : ${causesNommees(src)} / jeu fermé : ${CAUSES_ANALYSEES}`);
+    const description = (/^description:\s*(.*)$/m.exec(lire(".claude", "agents", "analyste-echecs.md")) || [, ""])[1];
+    vrai(CAUSES_ANALYSEES.every((c) => description.includes(c)), "l'agent installé ne nomme pas les cinq causes : recompiler (node scripts\\compiler-flotte.mjs)");
+  });
+  check("D-219 (e) rouge — un mandat amputé d'une cause du jeu fermé est vu, cause par cause", () => {
+    const src = lire("gabarits", "flotte", "analyste-echecs.yaml");
+    for (const c of CAUSES_ANALYSEES) {
+      const mutant = src.replace(/^(mandat:\s*".*)$/m, (l) => l.replace(new RegExp(`(?<![\\w])${c}(?![\\w])`), "cause_retiree"));
+      vrai(mutant !== src && !causesNommees(mutant).includes(c), `la cause ${c} retirée sans que le contrôle le voie`);
+    }
   });
 }
 

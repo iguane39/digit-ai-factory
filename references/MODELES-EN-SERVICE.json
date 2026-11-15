@@ -154,6 +154,13 @@
         "effort": "high",
         "classe": "étude, synthèse, document sous gabarit",
         "fondement": "high retenu par le rejeu pour les classes restitution et étude"
+      },
+      {
+        "id": "analyste-echecs",
+        "famille": "opus",
+        "effort": "high",
+        "classe": "analyse en lecture seule de la cause d'échec d'un agent (sa transcription), sans Write, Edit ni shell",
+        "fondement": "modèle et effort du relecteur, l'autre agent qui juge un texte en lecture seule et cite sa preuve (classe analyse-de-prompt de effort_par_classe, plancher mesuré medium) ; D-219 (e) du 15/11/2026, TF-2563, mandat 20261115b, lot L5 ; aucune analyse n'a couru : son coût se lit à la fiche de l'analyste (scripts/echecs-a-analyser.mjs), et un passage à Sonnet se teste sur la précision des causes que le porteur valide"
       }
     ]
   },

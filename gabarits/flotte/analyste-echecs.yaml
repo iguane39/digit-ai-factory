@@ -1,0 +1,27 @@
+# Flotte d'agents de la Factory (D-19 (a) du 18/10/2026, étude output/03-etudes/20261018-etude-opportunite-flotte-d-agents.md).
+# Analyste des échecs en lecture seule (décision humaine D-219 (e) du 15/11/2026, TF-2563, mandat 20261115b, lot L5 ; étude 20261114d, option O4).
+# Le fait (étude 20261114d, Q1, « Manques identifiés », 3) : la cause d'un échec d'agent est dans la transcription du sous-agent, et aucun script ne
+# l'extrait ; la fiche d'exécution (lot L1) n'en porte que la forme, `cause_fin`, par une heuristique. Le type lit et rend une cause : Read, Grep et Glob,
+# ni Write, ni Edit, ni shell, parce qu'un shell écrit par redirection (même raisonnement que le relecteur, TF-2554). La cause s'inscrit sur la fiche par
+# la session, `scripts/noter-fiche.mjs --cause-analysee <cause> --analyste analyste-echecs`, jamais par l'agent.
+# Jamais lancé par un hook : la mission « agents » de l'œil critique ou une session le lance, sur une fiche que `scripts/echecs-a-analyser.mjs` retient
+# (17 minutes ou plus, fin autre que `fini`, 5 au plus par revue) ; `--agent <id>` prépare sa consigne (transcription, ce que désigne chaque cause, forme de
+# la réponse) et refuse un agent de moins de 17 minutes. Il sert au pilot : l'héritage des produits ne le porte pas.
+# Modèle et effort : ceux du relecteur, l'autre agent qui juge un texte en lecture seule et cite sa preuve (Opus à high, classe analyse-de-prompt de
+# effort_par_classe de references/MODELES-EN-SERVICE.json, plancher mesuré medium). Aucune analyse n'a encore couru : son coût se lira à la fiche de
+# l'analyste (type analyste-echecs), et un passage à Sonnet se teste sur la précision des causes que le porteur valide (indicateur de l'option O4).
+id: analyste-echecs
+mandat: "Analyse en lecture seule de la cause d'échec d'UN agent — lire la transcription que la consigne désigne, celle d'un agent de 17 minutes ou plus dont la fin n'est pas « fini », et rendre une seule cause du jeu fermé (erreur_consigne, depassement_contexte, erreur_outil, abandon, autre) avec la citation de la transcription qui la fonde ; n'écrit aucun fichier et ne lance aucune commande ; jamais lancé par un hook"
+outils: [Read, Grep, Glob]
+arbitre:
+  - "La réponse rend une seule cause, l'une des cinq du jeu fermé (erreur_consigne, depassement_contexte, erreur_outil, abandon, autre), écrite telle quelle"
+  - "La cause cite la transcription : un extrait recopié mot pour mot avec son numéro de ligne, et la raison pour laquelle il fonde cette cause plutôt qu'une autre"
+  - "Une transcription introuvable, illisible, ou qui ne permet pas de trancher se déclare telle et rend « autre » avec ce qui manque, jamais une cause devinée"
+  - "Seule la transcription que la consigne désigne est lue, et rien n'en est recopié hors de la citation : ni consigne, ni livrable, ni nom de produit"
+  - "Aucun fichier n'est créé ni modifié, aucune commande n'est lancée : la session inscrit la cause sur la fiche par scripts/noter-fiche.mjs"
+entrees:
+  - { artefact: "consigne préparée par scripts/echecs-a-analyser.mjs --agent : fiche de l'agent échoué et chemin de sa transcription (objet du mandat)", de: "orchestrateur" }
+sorties:
+  - { artefact: "cause du jeu fermé avec la citation de la transcription qui la fonde et sa ligne", vers: "orchestrateur" }
+modele: opus
+effort: high

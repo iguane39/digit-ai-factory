@@ -46,7 +46,8 @@ Délégation aux agents — avant la première étape, écris au brief du run qu
 - `explorateur` lit, extrait et compte ; `relecteur` relit à l'aveugle, en lecture seule, sans shell ;
   `verificateur` rejoue une recette ou un oracle et dit si c'est fait ; `redacteur` écrit un document
   sous gabarit ; `campagne` écrit dans UN dépôt sous gabarits\AGENT-CAMPAGNE.md ; `constructeur`
-  prend la construction complexe (maquette, architecture, code neuf d'ampleur).
+  prend la construction complexe (maquette, architecture, code neuf d'ampleur). `analyste-echecs`
+  ne prend aucune activité du run : il lit au pilot la transcription d'un agent échoué (D-219 (e)).
 - Pour chacune des 5 étapes (conception, design, development, tests, MEP), le brief nomme l'agent
   de chaque activité, ou dit « session seule » avec son motif : un brief sans cette ligne est incomplet.
 - Des agents qui écrivent en parallèle travaillent sur des arbres disjoints (`git worktree add`, un
