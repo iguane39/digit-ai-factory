@@ -192,6 +192,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` | fichier | 9,3 Ko | Synthèse Mandat — 4 dépôts publiés, skills recopiés, campagne de consigne jouée sans gagna |
 | `Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` | fichier | 5,3 Ko | Synthèse Mandat — vos décisions D-61 (a), D-62 (a) et D-63 sont exécutées : 3 dépôts publi |
 | `Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` | fichier | 19,8 Ko | Synthèse Mandat — 4 lots de retours ingérés et première revue hebdomadaire rendue, 7 propo |
+| `Digit-AI - Synthese Mandat - Quatrieme campagne close et publiee - 20261115c.md` | fichier | 7,2 Ko | Synthèse Mandat — quatrième campagne close et publiée (15/11/2026) |
 | `Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` | fichier | 5,9 Ko | Synthèse Mandat — rangement des entrants dans input et output (16/10/2026) |
 | `Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md` | fichier | 7,4 Ko | Synthèse Mandat — rappel des leçons au geste et relevé des frictions du tour, sur D-172 (a |
 | `Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` | fichier | 6,1 Ko | Synthèse Mandat — recette complète du pilot jouée : 2 contrôles en défaut sur 221, aucun d |
@@ -252,4 +253,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_231 fichier(s), 4 sous-dossier(s)_
+_232 fichier(s), 4 sous-dossier(s)_

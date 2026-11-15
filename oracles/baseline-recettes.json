@@ -47,11 +47,11 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 61,
+  "cas": 64,
   "vu_le": "2026-11-15"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 67,
+  "cas": 75,
   "vu_le": "2026-11-15"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
@@ -148,7 +148,7 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 268,
+  "cas": 277,
   "vu_le": "2026-11-15"
  },
  "oracle-constantes-externes.mjs": {
@@ -510,6 +510,10 @@
   "cas": 29,
   "vu_le": "2026-11-13"
  },
+ "oracles/lib-calendrier.test.mjs": {
+  "cas": 17,
+  "vu_le": "2026-11-15"
+ },
  "oracles/lib-chiffres-releves.test.mjs": {
   "cas": 20,
   "vu_le": "2026-11-03"
@@ -541,6 +545,10 @@
  "oracles/lib-produits-hors-table.test.mjs": {
   "cas": 4,
   "vu_le": "2026-10-30"
+ },
+ "oracles/lib-recettes-dediees.test.mjs": {
+  "cas": 3,
+  "vu_le": "2026-11-15"
  },
  "oracles/lib-sens-rouge.test.mjs": {
   "cas": 23,
@@ -725,6 +733,10 @@
  "scripts/lecteur-isole.test.mjs": {
   "cas": 9,
   "vu_le": "2026-11-14"
+ },
+ "scripts/lib-config-installee.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-11-15"
  },
  "scripts/lib-extensions-jugees.test.mjs": {
   "cas": 12,

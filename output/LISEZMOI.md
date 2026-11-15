@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 713 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 714 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -697,6 +697,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md | 20261017e | 9.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et campagne de consigne - 20261017e.md` |
 | Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md | 20261012d | 5.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Publication et charte unique actee - 20261012d.md` |
 | Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md | 20261001l | 19.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatre lots ingeres et premiere revue hebdomadaire - 20261001l.md` |
+| Digit-AI - Synthese Mandat - Quatrieme campagne close et publiee - 20261115c.md | 20261115c | 7.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Quatrieme campagne close et publiee - 20261115c.md` |
 | Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md | 20261016d | 5.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Rangement des entrants dans input et output - 20261016d.md` |
 | Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md | 20261105b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Rappel des lecons et frictions du tour - 20261105b.md` |
 | Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md | 20261015m | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Recette complete apres six travaux - 20261015m.md` |
