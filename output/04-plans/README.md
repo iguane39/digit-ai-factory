@@ -212,6 +212,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Reprise multi-poste fusionnee - 20261015i.md` | fichier | 4,7 Ko | Synthèse Mandat — reprise multi-poste construite, fusionnée avec l'autre poste, publicatio |
 | `Digit-AI - Synthese Mandat - Reprise multi-poste prete a publier - 20261015j.md` | fichier | 9,5 Ko | Synthèse Mandat — vos réponses 1a, 2a et 3b exécutées, reprise multi-poste prête à publier |
 | `Digit-AI - Synthese Mandat - Reprise reseau publiee, installation close - 20261013j.md` | fichier | 3,5 Ko | Synthèse Mandat — reprise réseau de l'installateur publiée, chantier d'installation sans q |
+| `Digit-AI - Synthese Mandat - Reprise sur un autre poste - 20261115d.md` | fichier | 9,0 Ko | Synthèse Mandat — reprise sur un autre poste (15/11/2026) |
 | `Digit-AI - Synthese Mandat - Reste a faire au 19-10 soir - 20261019j.md` | fichier | 7,9 Ko | Synthèse Mandat — ce qui reste à faire au pilot, le 19/10/2026 au soir |
 | `Digit-AI - Synthese Mandat - Restes de campagne corriges et largeur des gabarits - 20261103b.md` | fichier | 10,4 Ko | Synthèse Mandat — 2 restes sur 3 corrigés et publiés, 1 décision pour la largeur des gabar |
 | `Digit-AI - Synthese Mandat - Retours et sujets du poste traites - 20261014b.md` | fichier | 12,2 Ko | Synthèse Mandat — retours et sujets qui attendaient ce poste (14/10/2026) |
@@ -253,4 +254,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_232 fichier(s), 4 sous-dossier(s)_
+_233 fichier(s), 4 sous-dossier(s)_
