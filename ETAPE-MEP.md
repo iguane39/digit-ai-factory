@@ -319,7 +319,7 @@ et elle grossit par les incidents, pas par la devinette.
 | M-21 | **Réglages de plateforme lus contre leur attendu** (AVERTISSEMENT, règle neuve du 06/11/2026) | Le dossier porte la section « Réglages de plateforme » : pour chaque réglage de `references\REGLAGES-SURS-PAR-DEFAUT.json` que le produit emploie, l'état lu le jour du dossier par la commande `cmd_lire` de l'entrée, l'attendu et un verdict ; un écart accepté nomme sa décision (`D-nn`) ; ou « Aucun réglage de plateforme : <motif> ». Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM15 — § 3 quaterdecies, R-66, D-178 (a), TF-2233 |
 | M-22 | **Version servie lue, inventaire confronté** (AVERTISSEMENT, FAIL pour un FAIL porté par le dossier) | Le dossier porte la section « Version servie et inventaire » : le commit lu par `version-servie.mjs lire`, le verdict d'O-26 de forge-ops et celui d'O-27 rejoué par la porte « prêt » ; ou « Sans objet : <motif> ». Un FAIL d'O-26 ou d'O-27 vaut refus. Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM16 — § 3 quaterdecies, TF-2201, TF-2209, TF-2243 |
 | M-23 | **Verdict websec du gate, lu avec son paramètre** (AVERTISSEMENT ; FAIL si le produit a armé `websec_bloquant`) | Le dossier porte le verdict de `oracle-exposition` et celui d'`oracle-sca`, ou « Websec : sans objet : <motif> ». Gate non armé (le défaut de l'écosystème : `[gates] websec_bloquant = false` dans `docs\projet\PARAMETRAGE.md`) : un verdict absent, FAIL ou SKIP est un manque déclaré, jamais un refus. Gate armé (`true`) : un verdict absent, FAIL ou SKIP bloque le GO. Contrôle exécutable : `node oracles\oracle-trace-mutation-mep.mjs <produit>`, règle TM17 — § 4, R-33 bis, TF-2506 |
-| M-24 | **Fiche de sécurité rejouée avec l'étiquette déployée** (AVERTISSEMENT, règle neuve du 14/11/2026) | Un dossier qui cite une fiche de sécurité porte le verdict de FS12, rejoué par `node <audit>\oracles\verifier-fiche-securite.mjs <fiche.html> --etiquette-deployee <x.y.z>`, l'étiquette étant celle du commit servi lu à M-22. Sans l'étiquette FS12 n'est pas jouée. Contrôle exécutable : règle TM18 — § 3 quaterdecies, TF-2419, TF-2536 |
+| M-24 | **Fiche de sécurité rejouée avec l'étiquette déployée** (AVERTISSEMENT, règle neuve du 14/11/2026) | Un dossier qui cite une fiche de sécurité porte le verdict de FS12, rejoué par `node <audit>\oracles\verifier-fiche-securite.mjs <fiche.html> --etiquette-deployee <x.y.z>`, l'étiquette étant celle du commit servi lu à M-22. Sans l'étiquette FS12 n'est pas jouée. Pas exécutable : `node scripts\rejouer-fiche-securite.mjs <fiche.html> --dossier <DOSSIER-MEP.md> --commit-servi <sha> --depot <produit>` joue FS12 et consigne son verdict au dossier. Contrôle exécutable : règle TM18 — § 3 quaterdecies, TF-2419, TF-2536, TF-2572 |
 
 ### § 3 sexies — Une porte qui ne distingue pas l'avant de l'après valide un déploiement qui n'a pas eu lieu (M-8, TF-0666)
 
@@ -961,6 +961,14 @@ corrige par la réémission de la fiche, puis un rejeu qui se lit au dernier ver
 Fiche CDC-SEC-HPR-20261110a remise au référent sécurité, version citée v1.13.0.
 FS12 : PASS (version citée 1.13.0, étiquette déployée 1.13.0), rejoué le 2026-11-10.
 ```
+
+**Le pas exécutable (TF-2572)** : `node scripts\rejouer-fiche-securite.mjs <fiche.html> --dossier <DOSSIER-MEP.md>
+--commit-servi <sha> --depot <produit>` lit l'étiquette déployée (`git describe --tags --abbrev=0 <commit servi>`, ou
+`--etiquette-deployee <x.y.z>` donnée telle quelle), joue `verifier-fiche-securite.mjs` de forge-audit avec elle, et écrit
+la ligne « FS12 : <verdict> … » à la section « Fiche de sécurité » du dossier, AJOUTÉE (un FAIL suivi d'un rejeu PASS se lit
+au dernier verdict) ; la section est créée si elle manque. Exit 0 pour PASS, 1 pour FAIL, 2 pour SKIP ou un pas non
+jouable (rien n'est alors écrit). La chaîne de qualification d'un produit le joue après la lecture de la version servie
+(M-22), sur la fiche qu'elle remet : le verdict que TM18 lit n'est plus recopié à la main.
 
 « Aucune fiche de sécurité » se passe de section : sans fiche citée au dossier, TM18 est sans objet. **Le contrôle
 exécutable** de cette forme est TM18, qui AVERTIT (règle neuve, précédent D-70 (b)) une fiche citée sans verdict de FS12,

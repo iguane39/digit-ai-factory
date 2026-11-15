@@ -477,6 +477,8 @@ const FICHE_SECURITE_MOTS = /fiche\s+(?:de\s+)?s[ée]curit[ée]/i;
 const FICHE_SECURITE_CODE = /\b[A-Z0-9]{2,}-SEC-(?:DEV|HPR|PRD)-\d{8}[a-z]?\b/;
 const FICHE_SECURITE = { test: (t) => FICHE_SECURITE_MOTS.test(t) || FICHE_SECURITE_CODE.test(t) };
 const COMMANDE_FS12 = "node <audit>/oracles/verifier-fiche-securite.mjs <fiche.html> --etiquette-deployee <x.y.z>";
+// TF-2572 (15/11/2026) : le pas exécutable de la chaîne, qui joue FS12 avec l'étiquette déployée ET écrit son verdict au dossier.
+const PAS_FS12 = "node scripts/rejouer-fiche-securite.mjs <fiche.html> --dossier <DOSSIER-MEP.md> --commit-servi <sha> --depot <produit>";
 function confronterFicheSecurite(texte) {
   if (!FICHE_SECURITE.test(texte)) return { statut: "SANS_OBJET", message: "aucune fiche de sécurité citée au dossier : FS12 sans objet" };
   const re = /\bFS12\b[^\n]*?\b(PASS|FAIL|SKIP)\b/g;
@@ -484,11 +486,11 @@ function confronterFicheSecurite(texte) {
   while ((m = re.exec(texte)) !== null) verdict = m[1];                        // le dernier verdict compte : un FAIL suivi d'un rejeu PASS se lit PASS
   if (verdict === "PASS") return { statut: "PASS", message: "fiche de sécurité citée et FS12 PASS : la version citée est la dernière étiquette déployée" };
   if (verdict === "FAIL") return avertirNeuve("le dossier porte un FAIL de FS12 : la fiche de sécurité cite une version qui n'est pas la dernière étiquette déployée. "
-    + `La réémettre depuis le canevas de forge-audit, rejouer \`${COMMANDE_FS12}\`, puis écrire le nouveau verdict (M-24, TF-2419)`);
+    + `La réémettre depuis le canevas de forge-audit, rejouer \`${COMMANDE_FS12}\`, puis écrire le nouveau verdict (M-24, TF-2419) ; le pas \`${PAS_FS12}\` fait les deux gestes (TF-2572)`);
   return avertirNeuve(verdict === "SKIP"
     ? "FS12 rend SKIP : la fiche de sécurité ne cite aucune version (ligne « Version déployée » absente), la fraîcheur n'est pas jugée"
     : `le dossier cite une fiche de sécurité et ne porte pas le verdict de FS12. Sans \`--etiquette-deployee\` FS12 n'est pas jouée : \`${COMMANDE_FS12}\`, `
-      + "l'étiquette étant celle du commit servi lu à M-22 (ETAPE-MEP.md § 3 quaterdecies, M-24)");
+      + `l'étiquette étant celle du commit servi lu à M-22 (ETAPE-MEP.md § 3 quaterdecies, M-24) ; le pas \`${PAS_FS12}\` joue FS12 et écrit son verdict au dossier (TF-2572)`);
 }
 
 export function juger(racine) {
@@ -1046,6 +1048,8 @@ function selfTest() {
     const msg = JSON.parse(spawnSync(process.execPath, [fileURLToPath(import.meta.url), join(dir, "tm18-muet")], { encoding: "utf8" }).stdout || "{}");
     const f = (msg.findings || []).find((x) => x.regle === "TM18");
     if (!f || !/--etiquette-deployee/.test(f.message)) casse.push("l'avertissement de TM18 ne donne pas la commande qui joue FS12 avec l'étiquette déployée : un remède prescrit doit se lire (TF-1013)");
+    // TF-2572 : le pas qui écrit le verdict est nommé par l'avertissement ET existe ; il se joue de bout en bout à `scripts/rejouer-fiche-securite.test.mjs`.
+    if (f && (!/scripts\/rejouer-fiche-securite\.mjs/.test(f.message) || !existsSync(join(dirname(fileURLToPath(import.meta.url)), "..", "scripts", "rejouer-fiche-securite.mjs")))) casse.push("l'avertissement de TM18 ne nomme pas le pas exécutable qui consigne le verdict de FS12, ou ce pas n'existe pas : un remède prescrit doit exister et se lire (TF-2572, TF-1013)");
   }
   // Le remède que la doctrine prescrit se joue : la forme écrite à ETAPE-MEP.md § 3 quaterdecies (M-24) passe son oracle.
   {
