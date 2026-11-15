@@ -107,6 +107,11 @@ try {
     att(page.includes('id="theme-toggle"') && /localStorage\.setItem\('digitai-theme'/.test(page), "bascule non câblée");
     att(!/<(textarea|form)\b/i.test(page), "surface de saisie dans une page en lecture seule");
   });
+  // TF-2578 (15/11/2026) : la ligne de métadonnées (227 caractères sur UNE ligne à 2560 et 3840 px) était un paragraphe nu, hors de tout conteneur de lecture ; la
+  // mesure se pose sur le CONTENEUR (.chap.lire, V18 et L2 du socle), jamais sur le paragraphe. Jugé à la source de la page, rendu ou non (le rendu ci-dessus le juge en vrai).
+  check("VERT TF-2578 — la ligne de métadonnées est posée dans un conteneur de lecture (.chap.lire), pas en paragraphe nu", () => {
+    att(/<div class="chap lire"><p class="meta">rôle :/.test(page), "la ligne de métadonnées n'est pas dans un conteneur de lecture : V18 la mesurerait sur toute la largeur");
+  });
   check("VERT TF-2212 — les quatre compteurs sont dits en texte, avec leur valeur", () => {
     att(/Décisions attendues : <strong>\d+<\/strong>/.test(page) && /Écarts assumés : <strong>\d+<\/strong>/.test(page), "compteurs absents");
   });

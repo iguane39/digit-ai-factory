@@ -320,7 +320,7 @@ export function pageDeVue({ gabarit, poseur, titre, description, front = {}, svg
   // TF-0359 / TF-0615 : le sceau porte la source normalisée LF, par la fonction partagée.
   const sceau = empreinteTexte(source, 12);
   const initiale = (lettre || (titre || "D").trim()[0] || "D").toUpperCase();
-  const meta = `<p class="meta">rôle : ${esc(front.role || "—")} · sources de vérité : <code>${esc(front.sources_de_verite || "—")}</code> · vérifié le ${esc(front.verifie_le || "—")}</p>`;
+  const meta = `<div class="chap lire"><p class="meta">rôle : ${esc(front.role || "—")} · sources de vérité : <code>${esc(front.sources_de_verite || "—")}</code> · vérifié le ${esc(front.verifie_le || "—")}</p></div>`;
   const figure = svg
     ? `<figure class="schema" role="img" aria-label="${esc(svg.label)}">\n${svg.corps}\n      <figcaption>${esc(svg.legende)}</figcaption>\n    </figure>\n`
     : "";
