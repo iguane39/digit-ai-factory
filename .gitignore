@@ -59,6 +59,10 @@ todo/TODO.html
 todo/TODO-ARCHIVE.html
 todo/RECIDIVES.md
 todo/AVANCEMENT.md
+# D-219 (e), TF-2563 (15/11/2026, mandat 20261115b, lot L4) : la page des indicateurs des agents est une vue generee, que
+# `scripts\indicateurs-agents.mjs` reecrit a chaque appel, ouverture du pilot comprise ; regle D-4 (a) ci-dessus, elle ne se versionne pas.
+# Sa source est versionnee : `references\INDICATEURS-AGENTS.json` (bases et seuils), et les fiches, frictions et transcriptions qu'elle lit.
+todo/observabilite/indicateurs-agents.md
 
 # TF-1273 (13/10/2026) — LES CAPTURES DU CONTROLE DES PAGES NE SE VERSIONNENT PAS.
 # `render_page.py` (hook d ecriture, controle des pages) depose un PNG par largeur sous

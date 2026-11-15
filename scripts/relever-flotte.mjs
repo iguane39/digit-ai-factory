@@ -283,8 +283,9 @@ export function dureeLisible(s) {
 
 /**
  * Le relevé des fiches depuis `depuisIso` : { indicateurs, agents }. `agents` : une ligne par agent (horodatage, projet, type, identifiant,
- * session, modèle, effort, durée, cause de fin, verdicts notés, fiche partielle), du plus ancien au plus récent ; une fiche sans
- * identifiant y figure aussi, une fois. Un projet que la fiche ne porte pas sous un pseudonyme admis se dit null.
+ * session, modèle, effort, durée, jetons d'entrée et de sortie, cause de fin, verdicts notés, fiche partielle), du plus ancien au plus
+ * récent ; une fiche sans identifiant y figure aussi, une fois. Un projet que la fiche ne porte pas sous un pseudonyme admis se dit null.
+ * Les jetons servent aux indicateurs de `scripts/indicateurs-agents.mjs` (D-219 (e), lot L4) ; le texte du relevé ne les affiche pas.
  */
 export function releverFiches(sources, depuisIso) {
   const parAgent = new Map(), verdicts = new Map(), sansId = new Map();
@@ -306,6 +307,7 @@ export function releverFiches(sources, depuisIso) {
       const v = fiche.agent_id ? verdicts.get(fiche.agent_id) : null;
       return { ts: fiche.ts ?? null, projet: projetDe(fiche.projet), type: fiche.type ?? null, agent_id: fiche.agent_id ?? null, session: fiche.session ?? null,
         modele: fiche.modele ?? null, effort: fiche.effort ?? null, duree_s: Number.isFinite(fiche.duree_s) ? fiche.duree_s : null,
+        jetons_entree: Number.isFinite(fiche.jetons_entree) ? fiche.jetons_entree : null, jetons_sortie: Number.isFinite(fiche.jetons_sortie) ? fiche.jetons_sortie : null,
         cause_fin: CAUSES_FIN.includes(fiche.cause_fin) ? fiche.cause_fin : null,
         verdict_livrable: v?.verdict_livrable ?? null, verdict_relecture: v?.verdict_relecture ?? null, partielle: fiche.partielle === true };
     })

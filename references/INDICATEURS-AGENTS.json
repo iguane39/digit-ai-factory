@@ -1,0 +1,116 @@
+{
+  "schema": "pilot/indicateurs-agents@1",
+  "version": "1.0.0",
+  "date": "2026-11-15",
+  "revue_prevue": "2026-12-14",
+  "pourquoi": "Étude 20261114d, section Q4 : « Chaque optimisation qui réduit un délai ou un coût doit être gardée par un indicateur de qualité, pour que le gain de vitesse ne se paie pas en défauts. » Loi transverse n° 4 : une base et un seuil sont des données datées ; ils vivent ici, jamais dans scripts/indicateurs-agents.mjs, qui les lit et ne les écrit jamais.",
+  "decision": "D-219 (e) du 15/11/2026 (réponse « 219e » du porteur : l'option O4, qui comprend la preuve de qualité automatisée de l'option O3), TF-2563, mandat de construction 20261115b, lot L4.",
+  "regle": "La base d'un indicateur est sa mesure du jour de la première mesure, sur la fenêtre de `fenetre_jours` jours. Une base ou un seuil ne se change que par un commit motivé, qui cite la mesure et la décision : jamais par la boucle, jamais par le script (étude, section Q5 : modifier le seuil d'un indicateur de qualité reste humain). Un indicateur non mesurable le jour de la première mesure garde une base nulle et sa raison ; quand il devient mesurable, le script le dit « base à poser » et n'évalue pas un seuil relatif à la base tant qu'un commit ne l'a pas posée. Un indicateur de délai n'a pas de seuil : l'étude n'en fixe pas, il se compare à sa base, et c'est son gardien qui alerte.",
+  "fenetre_jours": 14,
+  "sources": [
+    { "nom": "Étude d'opportunité « Amélioration continue des agents par leurs leçons », section Q4 (tableau des 4 paires) et section Q5 (frontière d'autonomie)", "chemin": "output/03-etudes/Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md", "lu_le": "2026-11-15" },
+    { "nom": "Première mesure : scripts/indicateurs-agents.mjs 1.0.0 --json, sur le poste DESKTOP-ULTRA7", "lu_le": "2026-11-15T12:45:18.648Z", "note": "fenêtre de 14 jours ouverte le 2026-11-01T12:45:18.648Z ; 1 fichier de fiches (7 agents, 1 session), 2 journaux de frictions (94 frictions, dont 19 des sessions avec sous-agents), 1 ledger de produit, relevé de suivi de 12 sessions sur 2 profils (61 agents jugés, dont 1 d'une session fermée). Contre-mesurée le même jour par une seconde voie (fiches et frictions relues sans le script, oracle-suivi-agents.mjs joué en ligne de commande) : mêmes valeurs." }
+  ],
+  "paires": [
+    {
+      "id": "P1",
+      "methode": "Comparaison appariée : mêmes types d'agent, même complexité de tâche, avant et après (étude, Q4). Les types se lisent sur la fiche : la valeur comparée à la base ne tient que les agents des types de la base. La complexité de la tâche n'est sur aucune fiche : elle n'est pas appariée.",
+      "delai": {
+        "id": "P1-delai",
+        "libelle": "Durée médiane d'un agent",
+        "mesure": "duree_mediane_agent",
+        "definition": "médiane (la valeur de rang n/2 arrondi par défaut, la règle de relever-flotte.mjs) des durées `duree_s` des fiches d'exécution de la fenêtre, la dernière fiche de chaque agent faisant foi (lot L1)",
+        "base_etude": "non publiée en dessous de 17 min ; 40,6 à 119,5 min pour les 16 agents publiés (relevé 1 bis de l'étude, oracle de suivi) : autre population, citée sans servir de base",
+        "base": { "valeur": 1588, "n": 7, "types": ["campagne", "verificateur"], "mesuree_le": "2026-11-15T12:45:18.648Z", "note": "26 min 28 s ; 7 agents d'une seule session, durées de 2 s à 4 059 s" },
+        "seuil": null,
+        "seuil_motif": "l'étude n'en fixe pas : un délai se compare à sa base, c'est son gardien qui alerte"
+      },
+      "qualite": {
+        "id": "P1-qualite",
+        "libelle": "Part des agents dont le verdict livrable est PASS",
+        "mesure": "part_livrables_pass",
+        "definition": "parmi les agents de la fenêtre dont la fiche porte un verdict de livrable noté (scripts/noter-fiche.mjs --verdict-livrable, lot L2), la part de PASS",
+        "base_etude": "non mesurée : le lien agent → verdict manquait",
+        "base": { "valeur": null, "n": 0, "mesuree_le": "2026-11-15T12:45:18.648Z", "non_mesurable": "aucun verdict de livrable n'est noté sur les 7 fiches de la fenêtre : scripts/noter-fiche.mjs --verdict-livrable existe, aucun appel ne l'écrit encore" },
+        "seuil": { "type": "plancher_base", "tolerance_points": 0, "texte_etude": "≥ valeur de la première mesure, sans descendre" }
+      }
+    },
+    {
+      "id": "P2",
+      "methode": "Même jeu de types d'agent (étude, Q4) : la valeur comparée à la base ne tient que les agents des types de la base ; une baisse de plus de 5 points de la part « sert » arrête l'optimisation.",
+      "delai": {
+        "id": "P2-delai",
+        "libelle": "Jetons médians par agent",
+        "mesure": "jetons_medians_agent",
+        "definition": "médiane de la somme `jetons_entree` + `jetons_sortie` des fiches de la fenêtre dont les deux comptes sont relevés (entrée, cache écrit et cache relu, puis sortie : la règle du lot L1)",
+        "base_etude": "458 333 jetons RELUS en médiane par sous-agent (relevé 1 de l'étude, transcriptions sur 30 jours) : la fiche ne sépare pas les jetons relus, autre grandeur, citée sans servir de base",
+        "base": { "valeur": 10820195, "n": 7, "types": ["campagne", "verificateur"], "mesuree_le": "2026-11-15T12:45:18.648Z" },
+        "seuil": null,
+        "seuil_motif": "l'étude n'en fixe pas : un coût se compare à sa base, c'est son gardien qui alerte"
+      },
+      "qualite": {
+        "id": "P2-qualite",
+        "libelle": "Part « sert » des relectures d'intention notées sur les fiches",
+        "mesure": "part_relectures_sert",
+        "definition": "parmi les agents de la fenêtre dont la fiche porte un verdict de relecture d'intention (point reception : scripts/relecture-intention.mjs --consigner --agent, lot L2), la part « sert »",
+        "base_etude": "67 relectures, détail par verdict non relevé (relevé 1 de l'étude)",
+        "base": { "valeur": null, "n": 0, "mesuree_le": "2026-11-15T12:45:18.648Z", "non_mesurable": "aucune relecture d'intention n'est notée sur les 7 fiches de la fenêtre : aucune relecture au point reception n'a encore été consignée avec --agent" },
+        "seuil": { "type": "plancher_base", "tolerance_points": 5, "texte_etude": "≥ part « sert » de la base, à 5 points près (bruit attendu)" }
+      }
+    },
+    {
+      "id": "P3",
+      "methode": "Décompte sur les frictions des sessions avec sous-agents (étude, Q4) : une session avec sous-agents est une session qui porte au moins une fiche d'exécution dans la fenêtre.",
+      "delai": {
+        "id": "P3-delai",
+        "libelle": "Nombre de frictions par session",
+        "mesure": "frictions_par_session",
+        "definition": "frictions des journaux (`.claude/frictions.jsonl` du pilot, `forge/frictions.jsonl` de chaque produit du parc) datées dans la fenêtre, des sessions qui portent au moins une fiche d'exécution dans la fenêtre (8 premiers caractères de l'identifiant de session), divisées par le nombre de ces sessions",
+        "base_etude": "22 frictions du pilot sur 32 sessions avec sous-agents, soit environ 0,69 par session (relevés 1 et 5 de l'étude)",
+        "base": { "valeur": 19, "n": 1, "mesuree_le": "2026-11-15T12:45:18.648Z", "note": "19 frictions (14 refus de hook, 5 échecs d'oracle) d'une seule session fichée : base fragile, à relire à la revue du 2026-12-14" },
+        "seuil": null,
+        "seuil_motif": "l'étude n'en fixe pas : un nombre de frictions se compare à sa base, c'est son gardien qui alerte"
+      },
+      "qualite": {
+        "id": "P3-qualite",
+        "libelle": "Part des frictions suivies d'un retour consigné",
+        "mesure": "part_frictions_suivies_retour",
+        "definition": "parmi ces frictions, celles d'un produit dont le ledger signait déjà ses entrées à l'heure de la friction (champ `session`, D-218 (b), gabarits/ledger.py) ; la part suivie d'une entrée `type: retour` du même ledger, signée de la même session, écrite à l'heure de la friction ou après",
+        "base_etude": "non mesurée : le croisement frictions → retours n'était pas fait",
+        "base": { "valeur": null, "n": 0, "mesuree_le": "2026-11-15T12:45:18.648Z", "non_mesurable": "aucune friction jugeable sur 19 : toutes au pilot, où aucun écrivain ne consigne un retour signé de sa session ; aucun produit du parc n'a encore de fiche d'exécution, et le ledger du seul produit qui journalise ses frictions ne signe encore aucune entrée" },
+        "seuil": { "type": "plancher", "valeur": 0.5, "texte_etude": "≥ 50 %" }
+      },
+      "non_juge": [
+        "les frictions du pilot : aucun écrivain n'y consigne un retour signé de sa session (les événements de `todo/TODO.jsonl` ne portent pas la session) ; elles comptent au délai, pas au gardien",
+        "un retour consigné par une autre session que celle de la friction, et la justesse du retour"
+      ]
+    },
+    {
+      "id": "P4",
+      "methode": "Décompte sur le relevé de suivi (étude, Q4) : celui d'oracles/oracle-suivi-agents.mjs, sur les transcriptions des profils du poste.",
+      "delai": {
+        "id": "P4-delai",
+        "libelle": "Temps entre le lancement et le premier point de suivi",
+        "mesure": "delai_premier_point_suivi",
+        "definition": "médiane, en minutes, de l'écart lancement → premier point de suivi des agents jugés par oracle-suivi-agents.mjs (plus de 17 minutes de course, SEUIL_MIN) qui ont au moins un point pendant leur course, hors agent d'une session fermée (S67) ; un agent dont le seul point suit sa fin compte au gardien, pas au délai",
+        "base_etude": "15 min par conception (SEUIL_POINT_MIN de lib-suivi-agents.mjs)",
+        "base": { "valeur": 14.6, "n": 60, "mesuree_le": "2026-11-15T12:45:18.648Z" },
+        "seuil": null,
+        "seuil_motif": "l'étude n'en fixe pas : un délai se compare à sa base, c'est son gardien qui alerte"
+      },
+      "qualite": {
+        "id": "P4-qualite",
+        "libelle": "Part des agents suivis (au moins un point) parmi les agents jugés par le relevé de suivi",
+        "mesure": "part_agents_suivis",
+        "definition": "parmi les agents jugés par oracle-suivi-agents.mjs, hors agent d'une session fermée (S67), la part qui porte au moins un point de suivi ; l'oracle juge les agents de plus de 17 minutes (SEUIL_MIN) quand l'étude écrit « plus de 15 min », et la base de l'étude (16 agents jugés sur 34 sessions, relevé 1 bis) a été mesurée par ce même oracle",
+        "base_etude": "16 agents jugés sur 34 sessions (relevé 1 bis de l'étude), les points eux-mêmes comptés",
+        "base": { "valeur": 1, "n": 60, "mesuree_le": "2026-11-15T12:45:18.648Z", "note": "60 agents suivis sur 60, relevé de suivi de 12 sessions sur les 2 profils du poste ; 1 agent d'une session fermée écarté" },
+        "seuil": { "type": "plancher", "valeur": 0.8, "texte_etude": "≥ 80 % des agents de plus de 15 min" }
+      },
+      "non_juge": [
+        "un agent dont la transcription n'a pas bougé depuis 48 heures : lib-suivi-agents.mjs ne le lit pas (agentsDeSession), la fenêtre effective du relevé de suivi est donc de 48 heures",
+        "un agent de 15 à 17 minutes de course : l'oracle de suivi ne le juge pas"
+      ]
+    }
+  ]
+}

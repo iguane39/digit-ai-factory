@@ -89,14 +89,15 @@ export function mesurerSession(transcript, maintenant = Date.now(), { depuis = 0
 /**
  * Les profils de configuration du poste, par la fonction partagée (TF-2483, TF-0995) : celui que la session charge (`CLAUDE_CONFIG_DIR`),
  * puis `~\.claude` et son frère `~\.claude-b`, sans doublon. Sans répertoire personnel, la fonction rend `racine: null` : la liste
- * est vide au lieu de lever, et l'appelant le dit.
+ * est vide au lieu de lever, et l'appelant le dit. Exportée, avec `transcriptsDepuis`, pour `scripts/indicateurs-agents.mjs` (D-219 (e), lot L4) :
+ * le relevé de suivi qui fonde la paire P4 est celui de cet oracle, jamais une seconde liste des transcriptions.
  */
-function profilsParDefaut() {
+export function profilsParDefaut() {
   const defaut = racineConfigInstallee({}).racine;
   return [...new Set([racineConfigInstallee().racine, defaut, defaut && join(dirname(defaut), ".claude-b")].filter(Boolean))];
 }
 
-function transcriptsDepuis(depuis, profils) {
+export function transcriptsDepuis(depuis, profils) {
   const res = [];
   for (const prof of profils) {
     const projets = join(prof, "projects");
