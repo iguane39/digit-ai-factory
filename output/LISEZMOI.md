@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 711 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 712 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -736,6 +736,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Skill make-it-better construit - 20261102m.md | 20261102m | 8.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill make-it-better construit - 20261102m.md` |
 | Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md | 20261021c | 6.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill oeil-critique installe - 20261021c.md` |
 | Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md | 20261030a | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Skill PDF construit - 20261030a.md` |
+| Digit-AI - Synthese Mandat - Skills propages, menage, tri et alertes expliquees - 20261115a.md | 20261115a | 8.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Skills propages, menage, tri et alertes expliquees - 20261115a.md` |
 | Digit-AI - Synthese Mandat - Suites du tri TikTok et revues de code - 20261103c.md | 20261103c | 14.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Suites du tri TikTok et revues de code - 20261103c.md` |
 | Digit-AI - Synthese Mandat - Suivi des agents A1 et A2 - 20261113d.md | 20261113d | 8.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Suivi des agents A1 et A2 - 20261113d.md` |
 | Digit-AI - Synthese Mandat - Suivi des agents toutes les 15 minutes - 20261112j.md | 20261112j | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Suivi des agents toutes les 15 minutes - 20261112j.md` |
