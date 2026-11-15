@@ -318,13 +318,13 @@
       "barriere_le": "2026-11-14",
       "motif_barriere": "décision du 10/11/2026 (TF-2416, R-58) : barrière dès la 3e occurrence de RT-58, et la remise se refuse dès qu'un contrôle la précède dans la commande, puisque le verdict ne se lit qu'après",
       "mesure": {
-        "le": "2026-11-14",
-        "periode": "2026-09-29 au 2026-11-14",
-        "gestes_juges": 23979,
-        "gestes_rappeles": 24,
-        "echantillon_relu": 24,
-        "faux_positifs_vus": 3,
-        "note": "relevé par `node scripts/lecons.mjs --mesurer L-007` sur 695 transcriptions des profils du poste (sous-agents compris, un geste compté une fois par identifiant de tool_use) : 23 979 gestes Bash ou PowerShell jugés, 24 refusés par le motif, soit 0,100 % (Bash 24 sur 23 490, PowerShell 0 sur 489), les 24 relus un à un. 21 sont la forme visée : un contrôle (`node <oracle>.mjs`, `*.test.mjs`, `--self-test`) puis `git commit` ou `git push` dans la même commande, dont un `cp` d'un lot au sas. 3 sont des faux positifs, aucun contrôle n'y est joué : un `git add … ledger.py … ledger.test.mjs && git commit` (deux fois) et un `git add … forge/ledger.py … forge/retours/oracle-lot.mjs … && git commit`, où le motif lit le `py` de fin de `ledger.py` comme l'interpréteur `py` (`\\b` s'arrête au point), puis le nom d'un test ou d'un oracle cité dans le `git add` comme un contrôle joué. Faux positifs : 3 sur 24 refus, 3 sur 23 979 gestes. Non mesuré : le verdict des 21 contrôles (PASS ou FAIL) ; la barrière les refuse tous, par décision du 10/11/2026, puisque le verdict ne se lit qu'après. Correction du motif non faite ici, hors de la décision de TF-2530 : elle est portée au rapport de la campagne."
+        "le": "2026-11-15",
+        "periode": "2026-09-29 au 2026-11-15",
+        "gestes_juges": 27334,
+        "gestes_rappeles": 29,
+        "echantillon_relu": 29,
+        "faux_positifs_vus": 0,
+        "note": "rejoué le 15/11/2026 par `node scripts/lecons.mjs --mesurer L-007`, après la correction du motif de ba842e1d (TF-2570), sur 904 transcriptions des profils du poste (sous-agents compris, un geste compté une fois par identifiant de tool_use) : 27 334 gestes Bash ou PowerShell jugés, 29 refusés par le motif, soit 0,106 % (Bash 29 sur 26 781, PowerShell 0 sur 553), les 29 relus un à un. Les 29 sont la forme visée : un contrôle (`node <oracle>.mjs`, `*.test.mjs`, `--self-test`, `check_markdown.py`) puis `git commit` ou `git push` dans la même commande, dont un `cp` d'un lot au sas ; aucun faux positif. Le motif d'avant ba842e1d rejoué sur les mêmes transcriptions en refusait 32, soit 3 de plus : les 3 faux positifs du 14/11/2026 (`git add … gabarits/ledger.py … ledger.test.mjs && git commit`, deux fois, et un `git add … forge/ledger.py … forge/retours/oracle-lot.mjs … && git commit`, où le motif lisait le `py` de fin de `ledger.py` comme l'interpréteur `py`) ; aucun des 3 n'est plus refusé. Non mesuré : le verdict des 29 contrôles (PASS ou FAIL) ; la barrière les refuse tous, par décision du 10/11/2026, puisque le verdict ne se lit qu'après."
       }
     }
   ]

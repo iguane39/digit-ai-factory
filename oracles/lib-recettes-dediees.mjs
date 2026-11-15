@@ -12,6 +12,10 @@
  * forme ordinaire — un `--self-test` embarqué, ou un `<controle>.test.mjs` voisin — ne convient
  * pas, et la raison s'écrit sur place.
  */
+import { existsSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 export const DEDIES = {
   "oracle-conformite-projet.mjs": "self-test.mjs",
   "oracle-ecosysteme.mjs": "self-test-ecosysteme.mjs",
@@ -56,3 +60,44 @@ export const DEDIES = {
   // formée nommée sans être jouée, commande étrangère muette). Entrée lue par le seul juge BD1 : `self-tests.mjs` joue ce fichier par I2, jamais par I1.
   "hook-controles-produit.mjs": "../gabarits/hooks-factory.test.mjs",
 };
+
+/**
+ * Les défauts d'une table de recettes dédiées : un contrôle déclaré qui n'existe pas, ou un banc déclaré qui n'existe pas
+ * dans `dossier`. Une entrée qui pointe dans le vide ferait croire un contrôle éprouvé par un fichier absent (TF-2589).
+ */
+export function jugerTable(table, dossier) {
+  const defauts = [];
+  for (const [controle, banc] of Object.entries(table)) {
+    if (!existsSync(join(dossier, controle))) defauts.push(`contrôle absent : ${controle}`);
+    if (!existsSync(join(dossier, banc))) defauts.push(`banc absent : ${banc} (déclaré pour ${controle})`);
+  }
+  return defauts;
+}
+
+// TF-2589 (15/11/2026) : `--self-test` rendait exit 0 sans une ligne — une recette muette ne prouve rien. Il rend désormais un
+// verdict chiffré : la table réelle jugée, puis des tables fautives qui doivent être refusées pour la bonne raison (double sens).
+function selfTest() {
+  const ICI = dirname(fileURLToPath(import.meta.url));
+  const cas = [];
+  const verifier = (nom, ok, detail = "") => cas.push({ nom, ok, detail });
+  const reel = jugerTable(DEDIES, ICI);
+  verifier("la table réelle ne pointe que sur des fichiers présents", reel.length === 0, reel.join(" | "));
+  verifier("la table réelle porte au moins une entrée", Object.keys(DEDIES).length > 0);
+  const vert = jugerTable({ "lib-recettes-dediees.mjs": "lib-recettes-dediees.mjs" }, ICI);
+  verifier("vert — une entrée dont le contrôle et le banc existent n'est pas accusée", vert.length === 0, vert.join(" | "));
+  const sansBanc = jugerTable({ "lib-recettes-dediees.mjs": "banc-inexistant.test.mjs" }, ICI);
+  verifier("rouge — un banc déclaré absent est nommé", sansBanc.length === 1 && /banc absent : banc-inexistant\.test\.mjs/.test(sansBanc[0]), sansBanc.join(" | "));
+  const sansControle = jugerTable({ "oracle-inexistant.mjs": "lib-recettes-dediees.mjs" }, ICI);
+  verifier("rouge — un contrôle déclaré absent est nommé", sansControle.length === 1 && /contrôle absent : oracle-inexistant\.mjs/.test(sansControle[0]), sansControle.join(" | "));
+  const tout = jugerTable({ "oracle-a.mjs": "a.test.mjs" }, ICI);
+  verifier("rouge — une entrée toute fausse rend ses deux défauts", tout.length === 2, tout.join(" | "));
+  const echecs = cas.filter((c) => !c.ok);
+  for (const c of cas) console.log(c.ok ? `  [PASS] ${c.nom}` : `  [FAIL] ${c.nom}${c.detail ? ` — ${c.detail}` : ""}`);
+  console.log(`Self-test lib-recettes-dediees : ${cas.length - echecs.length}/${cas.length} PASS — table réelle de ${Object.keys(DEDIES).length} entrées jugée sur disque, `
+    + "puis une entrée verte, un banc absent, un contrôle absent et une entrée toute fausse jugés pour la bonne raison");
+  return echecs.length ? 1 : 0;
+}
+
+const lanceEnDirect = process.argv[1]
+  && fileURLToPath(import.meta.url).toLowerCase().replace(/\\/g, "/") === resolve(process.argv[1]).toLowerCase().replace(/\\/g, "/");
+if (lanceEnDirect && process.argv.includes("--self-test")) process.exit(selfTest());
