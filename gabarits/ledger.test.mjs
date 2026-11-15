@@ -374,7 +374,7 @@ try {
   });
   check("TF-2494 vert — le remède prescrit (rectification_horodatage nommant le seq qui suit la lacune) couvre le saut : R-42 passe, [RECTIFIÉ] imprimé", () => {
     const { d, script } = produitAvecSaut();
-    const entrees = JSON.stringify([{ seq: 7, ts_consigne: "2026-08-03T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu" }]);
+    const entrees = JSON.stringify([{ seq: 7, ts_consigne: "2026-08-03T10:00:00Z", ts_reel_estime: "2026-08-03T10:00:00Z", cause: "trois entrées (4 à 6) écrites par une session dont le dépôt a été perdu" }]);
     const r = spawnSync(PYTHON, [script, "rectification_horodatage", "--entrees", entrees], { encoding: "utf8", env: CONSOLE });
     att(r.status === 0, `exit ${r.status} ${r.stderr}`);
     const f = r42(d);

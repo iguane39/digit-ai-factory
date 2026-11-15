@@ -2033,6 +2033,16 @@ else {
         rectificationsInvalides.push(`seq ${seq} : rectification sans ts_consigne ni ts_reel_estime — non opposable (TF-1466)`);
         continue;
       }
+      // TF-2573 (15/11/2026) — LES FORMES DE `ts_reel_estime` : `ledger.mjs verify` (forge-agents, TF-1425) exige les quatre champs de la
+      // déclaration (`CHAMPS_RECTIFICATION`) et la tient pour INCOMPLÈTE, donc sans effet, quand `ts_reel_estime` ou `ts_consigne` est absent,
+      // null, vide ou fait d'espaces ; R-42 couvrait avec l'un OU l'autre (`ts_consigne || ts_reel_estime`) — mesuré le 15/11/2026, 5 formes sur 13
+      // où R-42 rendait PASS et `verify` exit 1. Même prédicat qu'à `verify` ; une valeur présente mais illisible reste jugée par `verify` seul
+      // (il ne la lit pas non plus : accord PASS/PASS). La cause manquante garde son « cause non dite » (hors de ce sujet).
+      const manquantsTs = ["ts_consigne", "ts_reel_estime"].filter((c) => d[c] === undefined || d[c] === null || String(d[c]).trim() === "");
+      if (manquantsTs.length) {
+        rectificationsInvalides.push(`seq ${seq} : déclaration incomplète — champ(s) ${manquantsTs.map((c) => `\`${c}\``).join(", ")} manquant(s) : une déclaration incomplète ne couvre rien, comme chez \`ledger.mjs verify\` (TF-2573)`);
+        continue;
+      }
       const instantRectif = Date.parse(String(e.ts || ""));
       const instantCollision = Date.parse(tsCollision);
       if (Number.isFinite(instantRectif) && Number.isFinite(instantCollision) && instantRectif <= instantCollision) {
@@ -2050,7 +2060,8 @@ else {
   // entrée au seq visé rendait PASS ici et exit 1 chez `verify` (le défaut de TF-1425, deux juges, deux verdicts ; mesuré le 14/11/2026 par
   // l'agent du lot fa2, TF-2494, pour le saut comme pour la collision). `couverture` rend la déclaration qui couvre l'entrée de ce seq et de ce
   // ts, ou, à défaut, la première déclarée à ce seq (`divergente`), que le message nomme. Une déclaration qui ne cite que `ts_reel_estime`
-  // (sans `ts_consigne`) n'a rien à confronter : elle couvre comme avant (TF-1466), et ce contrôle-là reste à `verify`.
+  // (sans `ts_consigne`) n'a rien à confronter : elle couvrait comme avant (TF-1466) ; depuis TF-2573 (15/11/2026) elle est refusée plus haut
+  // comme incomplète, ce que fait `verify` — la branche `!d.tsConsigne` ci-dessous n'est plus atteinte, laissée telle quelle (diff minimal).
   const couverture = (seq, ts) => {
     const declarees = rectifies.get(seq) || [];
     const r = declarees.find((d) => !d.tsConsigne || d.tsConsigne === ts) || null;
