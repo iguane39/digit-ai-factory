@@ -266,6 +266,12 @@ réception, le pilot consigne la relecture de ton livrable avec ton identifiant 
 `scripts\noter-fiche.mjs` ajoute alors son verdict à ta fiche sans la réécrire, et `scripts\relever-flotte.mjs`
 le publie avec ta durée et ta cause de fin. Tu n'as rien de plus à écrire.
 
+**Ta fin peut être analysée, jamais par un hook** (D-219 (e), TF-2563, lot L5). Si ta fiche dit 17 minutes ou plus et une
+fin autre que `fini`, l'agent `analyste-echecs` (lecture seule) peut lire ta transcription et rendre sa cause parmi cinq. La
+mission « agents » de l'œil critique, ou la session qui le demande, le lance sur la liste de `scripts\echecs-a-analyser.mjs`,
+5 au plus par revue ; la session inscrit la cause sur ta fiche par `scripts\noter-fiche.mjs --cause-analysee`. À la
+réception, rien de plus n'est dû : ni toi ni la session n'avez à lancer l'analyste.
+
 **L'orchestrateur recompte à la source un chiffre qu'il restitue** (TF-1802, 15/10/2026). La règle
 « Remesurer plutôt que reprendre » vaut aussi pour celui qui reçoit le rapport. Un compte annoncé par
 un agent (lignes peuplées, fichiers traités, cas de recette) se recompte en base, dans le fichier ou

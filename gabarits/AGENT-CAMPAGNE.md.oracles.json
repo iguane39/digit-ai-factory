@@ -1,9 +1,9 @@
 {
-  "cible": "gabarits/AGENT-CAMPAGNE.md",
-  "date_iso": "2026-11-12T12:51:22.311Z",
-  "registre_version": "2.59.0",
+  "cible": "c:\\dev\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
+  "date_iso": "2026-11-15T14:16:48.420Z",
+  "registre_version": "2.64.0",
   "profil": "digit-ai",
-  "niveau": "diffuse",
+  "niveau": "note",
   "verdict": "PASS",
   "perimetre": "disque",
   "perimetre_motif": null,
@@ -15,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "gabarits\\AGENT-CAMPAGNE.md"
+      "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -26,43 +26,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "SKIP",
       "detail": "aucune table détectée, aucun effectif annoncé ancré, aucun pourcentage ni unité publiés"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "PASS",
       "detail": "6 constat(s) · 5 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (5 avertissement(s)) ; nombre « 1 024 » non sourcé"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "SKIP",
       "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "gabarits\\AGENT-CAMPAGNE.md",
+      "file": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
       "verdict": "SKIP",
       "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
@@ -70,10 +70,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "gabarits\\AGENT-CAMPAGNE.md",
-    "ts": "2026-11-12T12:51:22.310Z",
+    "release": "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md",
+    "ts": "2026-11-15T14:16:48.419Z",
     "fichiers": {
-      "gabarits\\AGENT-CAMPAGNE.md": "4c583f27121c65f4f9795ca6ac95c61065ca6b8fbbacf2903c82b8c88830bc68"
+      "..\\digit-ai-factory\\gabarits\\AGENT-CAMPAGNE.md": "84966f3c778a30fe59a13580a35c5acbe24ca82a2b90687421edf3544225184a"
     }
   },
   "empreinte_motif": null,
