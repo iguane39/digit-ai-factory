@@ -108,6 +108,8 @@ writeFileSync(join(verte, ".claude", "settings.json"),
     Stop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs restitution" }, { type: "command", command: "node forge/hooks/factory.mjs reprise --pousser" },
       { type: "command", command: "node forge/hooks/factory.mjs suivi-agents --veille", asyncRewake: true, timeout: 1200 },
       { type: "command", command: "node forge/hooks/factory.mjs sessions" }] }],
+    // D-219 (e) (HERITAGE 1.69.0, 15/11/2026) : la fiche d'exécution de chaque agent, écrite à sa fin, en tâche de fond.
+    SubagentStop: [{ hooks: [{ type: "command", command: "node forge/hooks/factory.mjs fiches", async: true }] }],
     PreToolUse: [{ matcher: "Artifact", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs publication-hebergee" }] },
       // D-106 (b) (HERITAGE 1.44.0, 29/10/2026) : les .env ne transitent jamais, le hook refuse leur lecture.
       { matcher: "Read|Grep|Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs fichiers-env" }] },

@@ -26,7 +26,8 @@
  *  23. Registre des sessions (D-218 (b), 15/11/2026) : la commande `sessions` câblée sur six événements, un cas par entrée de hook
  *      joué par le lanceur (open et identité posée, objet, revendication, avertissement, état à deux, preuve de vie, clôture).
  *  24. Fiche d'exécution des agents (D-219 (e), TF-2563, 15/11/2026) : la commande `fiches`, jouée par le lanceur comme le SubagentStop
- *      la joue, ajoute la fiche de l'agent à forge/fiches-agents.jsonl, projet en pseudonyme, sans décision ; une entrée sans agent n'écrit rien.
+ *      la joue, ajoute la fiche de l'agent à forge/fiches-agents.jsonl, projet en pseudonyme, sans décision ; une entrée sans agent n'écrit rien ;
+ *      le gabarit la câble une fois, au SubagentStop, sans matcher, en `async`.
  * Joué par oracles/self-tests.mjs (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, readFileSync, existsSync } from "node:fs";
@@ -560,6 +561,11 @@ try {
       && f24?.session === S24.slice(0, 8), `${r24.status} ${r24.stdout}${r24.stderr} ${JSON.stringify(f24)}`);
   const vide24 = fiches24({ hook_event_name: "SubagentStop", session_id: S24, cwd: P24 });
   check("24 bis fiches : une entrée sans agent n'écrit rien, exit 0, sans décision", vide24.status === 0 && !vide24.stdout.trim() && lignes24().length === 1, `${vide24.status} ${vide24.stdout}${vide24.stderr}`);
+  // 24 ter — le câblage du gabarit : la commande `fiches` une fois, au SubagentStop, sans matcher (tous les types d'agent), en `async`.
+  const cablage24 = Object.entries(gabarit.hooks).flatMap(([ev, gs]) => gs.flatMap((g) => (g.hooks || [])
+    .filter((h) => /factory\.mjs"?\s+fiches\b/.test(String(h.command))).map((h) => ({ ev, matcher: g.matcher ?? "(tous)", async: h.async === true }))));
+  check("24 ter fiches : la commande est câblée une fois au gabarit, au SubagentStop, sans matcher et en async",
+    JSON.stringify(cablage24) === JSON.stringify([{ ev: "SubagentStop", matcher: "(tous)", async: true }]), JSON.stringify(cablage24));
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
