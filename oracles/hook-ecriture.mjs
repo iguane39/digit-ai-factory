@@ -22,7 +22,7 @@
  *
  * Usage : node oracles\hook-ecriture.mjs [--fichier <note.md>] [--self-test]   (stdin : JSON du hook)
  */
-import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync, readdirSync, symlinkSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync, readdirSync, symlinkSync, lstatSync, unlinkSync, rmdirSync } from "node:fs";
 import { join, dirname, resolve, relative, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -415,6 +415,21 @@ Le lot est entre en recette le 2 septembre. Trois environnements ont ete mesures
 Les deux echecs portent sur le meme composant. La correction est datee du 3 septembre.
 `;
 
+/**
+ * Retire un fichier ou un dossier et VÉRIFIE qu'il a disparu (TF-2588, 15/11/2026). Le fait, mesuré avec Node 25.2.1
+ * sous Windows : `fs.rmSync` ne supprime RIEN, sans lever d'erreur, quand le chemin contient une lettre accentuée
+ * (`C:\Users\Sébastien\AppData\Local\Temp`) ; `unlinkSync` et `rmdirSync` suppriment, eux. Le banc retirait ainsi une
+ * fiche de fixture qui restait, et deux cas D8 rendaient FAUX sous ce dossier temporaire, justes sous l'alias court.
+ */
+export function retirer(chemin) {
+  rmSync(chemin, { recursive: true, force: true });
+  if (!existsSync(chemin)) return;
+  const parcourir = (c) => {
+    if (lstatSync(c).isDirectory()) { for (const e of readdirSync(c)) parcourir(join(c, e)); rmdirSync(c); } else unlinkSync(c);
+  };
+  parcourir(chemin);
+}
+
 function selfTest() {
   const dir = mkdtempSync(join(tmpdir(), "hook-ecriture-"));
   const casse = [];
@@ -512,7 +527,7 @@ function selfTest() {
   mkdirSync(join(projet, "forge", "etapes", "onboarding"), { recursive: true });
   writeFileSync(join(projet, "forge", "etapes", "onboarding", "fiche-conception-onboarding-revendeurs.md"), "famille: gd-kit-partenaire\n", "utf8");
   if (d8(livrableD8("md")).length) casse.push("D8 : la fiche qui nomme le livrable, sous forge\\, est ignorée — le hook avertit à tort");
-  rmSync(join(projet, "forge", "etapes"), { recursive: true, force: true });
+  retirer(join(projet, "forge", "etapes"));
   if (d8(livrableD8("md", "fiche_de_conception: exemption — note interne sans lecteur externe\n\nTexte.\n")).length)
     casse.push("D8 : une exemption MOTIVÉE du livrable avertit encore");
   if (!d8(livrableD8("md", "fiche_de_conception: exemption — oui\n\nTexte.\n")).some((l) => /SANS motif/.test(l)))
@@ -522,7 +537,7 @@ function selfTest() {
   writeFileSync(join(projet, "forge", "fiche-conception-kit.md"), "famille: gd-kit-partenaire\n", "utf8");
   if (d8(livrableD8("md", "fiche_de_conception: forge/fiche-conception-kit.md\n\nTexte.\n")).length)
     casse.push("D8 : une fiche déclarée ET présente avertit à tort");
-  rmSync(join(projet, "forge", "fiche-conception-kit.md"), { force: true });
+  retirer(join(projet, "forge", "fiche-conception-kit.md"));
   const synthese = join(projet, "output", "05-livrables", "Digit-AI - Synthese Mandat - Campagne close - 20261021a.md");
   writeFileSync(synthese, "Un texte.\n", "utf8");
   if (d8(synthese).length) casse.push("D8 : une famille qui n'engage pas D8 (restitution) est accusée — la donnée du catalogue décide, pas ce code");
@@ -650,11 +665,24 @@ function selfTest() {
     if (jouerCalendrier(note, prod, JOUR).length) casse.push("CALENDRIER : un autre fichier que le calendrier le fait juger");
   }
 
-  rmSync(dir, { recursive: true, force: true });
+  // TF-2588 : le retrait du banc retire VRAIMENT, sous un chemin accentué comme sous un chemin ASCII (Node 25.2.1 / Windows :
+  // `rmSync` ne supprimait rien, sans erreur, sous « Sébastien »). Le cas pose son propre dossier accentué : il ne dépend pas du poste.
+  for (const nomDossier of ["accentue-é", "ascii"]) {
+    const zone = join(dir, nomDossier, "sous");
+    mkdirSync(zone, { recursive: true });
+    writeFileSync(join(zone, "fiche-conception-x.md"), "famille: x\n", "utf8");
+    retirer(join(dir, nomDossier, "sous", "fiche-conception-x.md"));
+    if (existsSync(join(zone, "fiche-conception-x.md"))) casse.push(`TF-2588 : un fichier sous « ${nomDossier} » reste après son retrait — le banc croit retirée une fiche qui existe`);
+    retirer(join(dir, nomDossier));
+    if (existsSync(join(dir, nomDossier))) casse.push(`TF-2588 : un dossier « ${nomDossier} » reste après son retrait`);
+  }
+
+  retirer(dir);
   console.log(casse.length
     ? `Self-test hook-ecriture : ${casse.length} DÉFAUT(S)\n - ${casse.join("\n - ")}`
     : "Self-test hook-ecriture : 14 cas d'avant + À REJOUER (TF-1960) PASS — courriel à un tiers de 90 mots rappelé avec son passage et sa passe 2 sur 3, jamais FAIL, le même réécrit PASS, courriel anglais rappelé puis PASS avec `langue: en` ; + D8 (TF-1907) PASS — livrable d'une famille qui engage la fiche sans fiche NOMMÉ, gabarit vierge refusé comme fiche, fiche qui nomme le livrable PASS, exemption motivée PASS, exemption sans motif et fiche déclarée introuvable NOMMÉES, fiche déclarée présente PASS, famille sans D8 et fichier hors `output\\` silencieux, page HTML signalée par le hook de page, chemin PRODUIT par le lanceur de la factory " + (produitNonJoue ? `(NON JOUÉ : ${produitNonJoue}) ` : "(joué) ") + "; les 14 d'avant : (.md reconnu ; .html, README.md, node_modules et entrée illisible écartés ; texte fautif FAIL ; texte sobre PASS ; fichier absent silencieux ; oracle absent DIT ; G8 dans ses TROIS sens — pas de famille demandée hors `output\\`, famille résolue sur un « Synthese … », type absent du catalogue NOMMÉ à l'écriture (TF-1076) ; CM-1 dans ses DEUX sens — un contrôle de sécurité écrit à la main NOMMÉ, un fichier ordinaire silencieux (TF-1077)) ; + RANGEMENT (TF-2041) PASS — livrable à la racine d'un output\\ rangé en familles signalé sur la référence distante quand le clone est en retard et sur l'arbre local sinon, rangé dans sa famille, index régénérés, fichier hors output\\ et output\\ plat silencieux, hors dépôt git signalé sur l'arbre local"
-    + " ; + ENGAGEMENTS et CALENDRIER (D-193 (a), TF-2333 et TF-2330) PASS, à double sens — engagement au livrable absent nommé à l'écriture d'un livrable et du registre, et par la ligne de commande du hook, puis silencieux une fois le livrable produit ; livrable qui promet un outil hors registre nommé avec son extrait, silencieux une fois cité ; action échue nommée ; pilot sans registre et fichier hors livrable silencieux ; date de séance hors forme nommée à l'écriture du calendrier, corrigée puis séance à J-3 annoncée");
+    + " ; + ENGAGEMENTS et CALENDRIER (D-193 (a), TF-2333 et TF-2330) PASS, à double sens — engagement au livrable absent nommé à l'écriture d'un livrable et du registre, et par la ligne de commande du hook, puis silencieux une fois le livrable produit ; livrable qui promet un outil hors registre nommé avec son extrait, silencieux une fois cité ; action échue nommée ; pilot sans registre et fichier hors livrable silencieux ; date de séance hors forme nommée à l'écriture du calendrier, corrigée puis séance à J-3 annoncée"
+    + " ; + RETRAIT du banc (TF-2588) PASS — fichier et dossier retirés pour de bon sous un chemin accentué comme sous un chemin ASCII");
   return casse.length ? 1 : 0;
 }
 
