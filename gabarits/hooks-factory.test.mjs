@@ -23,6 +23,8 @@
  *      est dit par le juge du pilot atteint par le lanceur, parmi les avertissements non bloquants.
  *  17. Fichiers `.env` (D-106 (b), 29/10/2026) : `cat .env` et `Read` d'un `.env.local` refusés par le lanceur avec la voie
  *      permise du pilot ; `.env.example` et le script de masquage passent.
+ *  23. Registre des sessions (D-218 (b), 15/11/2026) : la commande `sessions` câblée sur six événements, un cas par entrée de hook
+ *      joué par le lanceur (open et identité posée, objet, revendication, avertissement, état à deux, preuve de vie, clôture).
  * Joué par oracles/self-tests.mjs (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readdirSync, rmSync, readFileSync, existsSync } from "node:fs";
@@ -491,8 +493,45 @@ try {
   check("22 ter journaux de hooks : sans le motif de forge/gestes-approuves.jsonl, git voit ce journal (le témoin sait échouer)", rouge22.some((l) => /gestes-approuves/.test(l)) && rouge22.length === 1, rouge22.join(" | "));
   const motifs22 = (heritage22.artefacts.find((a) => a.source === "gabarits/gitignore-produit") || {}).motifs_exiges || [];
   check("22 quater journaux de hooks : chaque journal déclaré est un motif EXIGÉ du .gitignore (l'ouverture l'ajoute à un produit qui l'a perdu)", journaux22.length > 0 && journaux22.every((c) => motifs22.includes(c)), journaux22.filter((c) => !motifs22.includes(c)).join(", "));
+
+  // 23 — D-218 (b) (15/11/2026, mandat 20261114n), le registre des sessions par le lanceur, un cas par entrée de hook du gabarit : la
+  // commande `sessions` est câblée une fois sur chacun des six événements ; jouée par le lanceur chez un produit jetable, chaque événement
+  // écrit au registre forge/sessions.jsonl ce qu'il doit, sort toujours en 0, et une session seule ne reçoit rien.
+  const cablage23 = Object.fromEntries(Object.entries(gabarit.hooks).map(([ev, gs]) => [ev, gs.filter((g) => (g.hooks || []).some((h) => /factory\.mjs"?\s+sessions\b/.test(String(h.command)))).map((g) => g.matcher ?? "(tous)")]).filter(([, m]) => m.length));
+  check("23 sessions : la commande est câblée une fois sur chacun des six événements, Write|Edit|MultiEdit pour PreToolUse et PostToolUse",
+    JSON.stringify(cablage23) === JSON.stringify({ SessionStart: ["(tous)"], Stop: ["(tous)"], PreToolUse: ["Write|Edit|MultiEdit"], PostToolUse: ["Write|Edit|MultiEdit"], UserPromptSubmit: ["(tous)"], SessionEnd: ["(tous)"] }), JSON.stringify(cablage23));
+  const P23 = produit("produit-sessions", false);
+  const envFile23 = join(base, "env-session-23.sh");
+  const env23 = { ...env, CLAUDE_PROJECT_DIR: P23, CLAUDE_ENV_FILE: envFile23 }; delete env23.FORGE_SESSION_ID;
+  const S23A = "a23a0000-0000-4000-8000-000000000001", S23B = "b23b0000-0000-4000-8000-000000000002", S23C = "c23c0000-0000-4000-8000-000000000003";
+  const sessions23 = (evenement, session, plus = {}) => spawnSync(process.execPath, [join(P23, "forge", "hooks", "factory.mjs"), "sessions"], { encoding: "utf8", cwd: P23, env: env23,
+    input: JSON.stringify({ hook_event_name: evenement, session_id: session, cwd: P23, transcript_path: join(base, `${session}.jsonl`), ...plus }) });
+  const reg23 = () => { try { return readFileSync(join(P23, "forge", "sessions.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l)); } catch { return []; } };
+  const contexte23 = (r) => { try { return JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { return ""; } };
+  const page23 = join(P23, "site", "index.html");
+  const ss23 = sessions23("SessionStart", S23A, { source: "startup" });
+  check("23 bis sessions, SessionStart : le lanceur inscrit la session (open) et pose son identité au fichier CLAUDE_ENV_FILE, sans rien montrer",
+    ss23.status === 0 && !ss23.stdout.trim() && reg23()[0]?.ev === "open" && reg23()[0]?.session === S23A && readFileSync(envFile23, "utf8").includes(`export FORGE_SESSION_ID=${S23A}`), `${ss23.status} ${ss23.stdout}${ss23.stderr}`);
+  const ups23 = sessions23("UserPromptSubmit", S23A, { prompt: "Refondre la page d'accueil" });
+  check("23 ter sessions, UserPromptSubmit : le premier tour écrit l'objet ; une session seule ne reçoit aucune ligne", ups23.status === 0 && !ups23.stdout.trim() && reg23().some((l) => l.ev === "objet" && l.objet === "Refondre la page d'accueil"), `${ups23.status} ${ups23.stdout}`);
+  const post23 = sessions23("PostToolUse", S23A, { tool_name: "Write", tool_input: { file_path: page23 }, tool_response: { type: "create" } });
+  check("23 quater sessions, PostToolUse : l'écriture revendique son chemin relatif au produit", post23.status === 0 && reg23().some((l) => l.ev === "revendique" && l.chemin === "site/index.html" && l.session === S23A), `${post23.status} ${post23.stderr}`);
+  sessions23("SessionStart", S23B, { source: "startup" });
+  const pre23 = sessions23("PreToolUse", S23B, { tool_name: "Edit", tool_input: { file_path: page23 } });
+  check("23 quinquies sessions, PreToolUse : la seconde session qui écrit le même fichier part avec un avertissement qui nomme la première et son objet, exit 0",
+    pre23.status === 0 && /CHEMIN REVENDIQUÉ/.test(contexte23(pre23)) && /a23a0000/.test(contexte23(pre23)) && /Refondre la page d'accueil/.test(contexte23(pre23)), `${pre23.status} ${pre23.stdout}${pre23.stderr}`);
+  const ups23b = sessions23("UserPromptSubmit", S23B, { prompt: "Corriger le formulaire" });
+  check("23 sexies sessions, UserPromptSubmit à deux : 3 lignes au plus, la coordinatrice nommée", ups23b.status === 0 && /coordinatrice : a23a0000/.test(contexte23(ups23b)) && contexte23(ups23b).split("\n").length <= 3, contexte23(ups23b));
+  writeFileSync(join(P23, "forge", "sessions.jsonl"), readFileSync(join(P23, "forge", "sessions.jsonl"), "utf8")
+    + JSON.stringify({ schema: "pilot/sessions@1", ev: "open", session: S23C, ts: new Date(Date.now() - 6 * 60_000).toISOString(), racine: P23 }) + "\n", "utf8");
+  const stop23 = sessions23("Stop", S23C), stop23b = sessions23("Stop", S23C);
+  check("23 septies sessions, Stop : la fin de tour écrit une preuve de vie après 5 minutes de silence, et une seule", stop23.status === 0 && !stop23.stdout.trim() && stop23b.status === 0
+    && reg23().filter((l) => l.ev === "vie" && l.session === S23C).length === 1, `${stop23.status} ${JSON.stringify(reg23().filter((l) => l.session === S23C))}`);
+  const fin23 = sessions23("SessionEnd", S23A, { reason: "prompt_input_exit" });
+  check("23 octies sessions, SessionEnd : la session libère ses chemins puis se clôt, exit 0", fin23.status === 0 && reg23().some((l) => l.ev === "libere" && l.session === S23A && l.chemin === "site/index.html")
+    && reg23().at(-1)?.ev === "close" && reg23().at(-1)?.session === S23A, `${fin23.status} ${JSON.stringify(reg23().slice(-2))}`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b))`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b)), registre des sessions joué par le lanceur sur ses six événements, avertissement d'un chemin tenu par une autre session et rien pour une session seule (D-218 (b))`);

@@ -86,7 +86,14 @@ const [nom, ...options] = process.argv.slice(2);
 // contenu (cat, type, Get-Content, head, tail, less, more, grep, sed, awk, Select-String, copie vers la sortie standard)
 // sont refusés ; `.env.example`, `.env.sample` et `.env.template` passent. Voie permise : `scripts/env-masque.mjs` du
 // pilot (valeurs masquées, ou clés seules). Bloque.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents", "fichiers-env"]);
+// `sessions` (15/11/2026, décision humaine D-218 (b), mandat 20261114n) : hook SessionStart, UserPromptSubmit, PreToolUse et
+// PostToolUse sur Write, Edit et MultiEdit, Stop et SessionEnd — le registre `forge/sessions.jsonl` des sessions du produit : la
+// session s'inscrit et pose son identité (`FORGE_SESSION_ID` par CLAUDE_ENV_FILE), déclare son objet, revendique les chemins
+// qu'elle écrit, prouve sa vie et se clôt ; une écriture sur un chemin tenu par une autre session vivante part avec un
+// avertissement qui la nomme, et chaque tour reçoit 3 lignes au plus sur la coordinatrice, les sessions vivantes et les conflits.
+// Une session seule ne voit rien. `--revendiquer <chemin> --pour <session>` (la coordinatrice) n'a pas l'usage de l'entrée
+// standard. Avertit, ne bloque jamais.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents", "fichiers-env", "sessions"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [
@@ -104,7 +111,7 @@ if (!pilot) {
 // la lire attendait sa fermeture, et un préjugement lancé avec une entrée ouverte n'a rien rendu en
 // 9 minutes le 14/10. Elle n'est donc pas lue en préjugement, ni quand elle est un terminal.
 let stdin = "";
-if (!["--prejuger", "--poser", "--ouvrir", "--clore", "--lister"].some((o) => options.includes(o)) && !process.stdin.isTTY) {
+if (!["--prejuger", "--poser", "--ouvrir", "--clore", "--lister", "--revendiquer"].some((o) => options.includes(o)) && !process.stdin.isTTY) {
   try { stdin = readFileSync(0, "utf8"); } catch { /* pas de stdin (SessionStart) */ }
 }
 const argv = [join(pilot, "oracles", `hook-${nom}.mjs`), ...options];

@@ -8,12 +8,15 @@
  *        commande, la signature de `lib-decisions.mjs` (rouge : le mutant qui relit la seule variable héritée signe du nom de la mère) ;
  *   I2 — le registre `forge/sessions.jsonl` (`lib-sessions.mjs`) : session seule, deux sessions sur le même fichier, coordinatrice
  *        expirée, passation, double revendication dans la même seconde, registre illisible, verrou tenu ou périmé, arbre de travail
- *        lié, pouvoir borné de la coordinatrice.
+ *        lié, pouvoir borné de la coordinatrice ;
+ *   I3 — les hooks (`hook-sessions.mjs`), un cas par événement, par la fonction et par le processus réel : jamais de code de sortie
+ *        2, une session seule ne voit rien, la panne se déclare une fois par session, l'identité d'un hook ne vient que de son
+ *        entrée, le budget de 300 ms sur un registre de 1 000 lignes mesuré par le lanceur.
  */
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { ID_POSABLE, SOURCES, VARIABLE_SESSION, court, ligneVariable, poserVariable, sessionCourante, signature } from "./lib-session.mjs";
 import {
@@ -255,6 +258,180 @@ try {
     att(/seule la coordinatrice/.test(revendicationPour(e, { session: B, chemin: "output/README.md", pour: C }, T0).refus || ""), "une session non coordinatrice revendique pour une autre");
     att(/tenu par la session vivante cccc3333/.test(revendicationPour(e, { session: A, chemin: "forge/ledger.jsonl", pour: B }, T0).refus || ""), "un chemin tenu par une autre session vivante est pris");
     att(/n'est pas une session vivante/.test(revendicationPour(e, { session: A, chemin: "x.md", pour: "inconnue" }, T0).refus || ""), "une session absente est servie");
+  });
+
+  // ---- I3 — les hooks ---------------------------------------------------------------------------------------------------------
+  const { traiter } = await import("./hook-sessions.mjs");
+  const lignesDe = (p) => (existsSync(join(p, ...FICHIER_SESSIONS.split("/"))) ? lireRegistre([p]).lignes : []);
+  const entreeDe = (evenement, session, p, plus = {}) => ({ hook_event_name: evenement, session_id: session, cwd: p, transcript_path: join(T, "transcriptions", `${session}.jsonl`), ...plus });
+  const jouer = (entree, m, env = {}) => traiter(entree, { env, maintenant: m, vieDe: sansTranscription });
+
+  check("I3 vert — session seule, les six événements : open, objet, revendique, vie après 5 minutes, libere et close ; rien n'est montré", () => {
+    const p = produitJetable("i3-seule");
+    const envFile = join(T, "i3-seule-env.sh");
+    const r = [
+      jouer(entreeDe("SessionStart", A, p, { source: "startup" }), T0, { CLAUDE_ENV_FILE: envFile }),
+      jouer(entreeDe("UserPromptSubmit", A, p, { prompt: "  Refondre   la page\nd'accueil du site  " }), T0 + 1000),
+      jouer(entreeDe("PreToolUse", A, p, { tool_name: "Write", tool_input: { file_path: join(p, "site", "index.html") } }), T0 + 2000),
+      jouer(entreeDe("PostToolUse", A, p, { tool_name: "Write", tool_input: { file_path: join(p, "site", "index.html") }, tool_response: { type: "create" } }), T0 + 3000),
+      jouer(entreeDe("PostToolUse", A, p, { tool_name: "Edit", tool_input: { file_path: join(p, "site", "index.html") } }), T0 + 4000),
+      jouer(entreeDe("Stop", A, p), T0 + 60_000),
+      jouer(entreeDe("Stop", A, p), T0 + 6 * MIN),
+      jouer(entreeDe("UserPromptSubmit", A, p, { prompt: "et le pied de page" }), T0 + 7 * MIN),
+      jouer(entreeDe("SessionEnd", A, p, { reason: "prompt_input_exit" }), T0 + 8 * MIN),
+    ];
+    const evs = lignesDe(p).map((l) => l.ev + (l.role ? `:${l.role}` : "") + (l.chemin ? `:${l.chemin}` : ""));
+    att(evs.join() === "open,revendique:coordinatrice,objet,revendique:site/index.html,vie,libere:site/index.html,close", evs.join());
+    att(r.every((x) => !x.contexte), `une session seule a vu : ${r.map((x) => x.contexte).filter(Boolean).join(" | ")}`);
+    att(lignesDe(p).find((l) => l.ev === "objet").objet === "Refondre la page d'accueil du site", JSON.stringify(lignesDe(p).find((l) => l.ev === "objet")));
+    att(readFileSync(envFile, "utf8") === `${ligneVariable(A)}\n` && r[0].variable?.pose, "SessionStart n'a pas posé l'identité");
+    att(lignesDe(p).find((l) => l.ev === "close").raison === "prompt_input_exit", "la raison de fin n'est pas écrite");
+  });
+
+  check("I3 vert → rouge — deux sessions sur le même fichier : PreToolUse de B nomme A et son objet ; un autre fichier, ou A sur le sien, ne dit rien", () => {
+    const p = produitJetable("i3-deux");
+    jouer(entreeDe("SessionStart", A, p), T0);
+    jouer(entreeDe("UserPromptSubmit", A, p, { prompt: "Refondre la page d'accueil" }), T0 + 1000);
+    jouer(entreeDe("PostToolUse", A, p, { tool_name: "Write", tool_input: { file_path: join(p, "site", "index.html") } }), T0 + 2000);
+    jouer(entreeDe("SessionStart", B, p), T0 + 60_000);
+    const premierTourB = jouer(entreeDe("UserPromptSubmit", B, p, { prompt: "Corriger le formulaire" }), T0 + 61_000);
+    att(/coordinatrice : aaaa1111/.test(premierTourB.contexte || "") && premierTourB.contexte.split("\n").length <= 3, premierTourB.contexte);
+    const pre = jouer(entreeDe("PreToolUse", B, p, { tool_name: "Edit", tool_input: { file_path: join(p, "site", "index.html") } }), T0 + 62_000);
+    att(/CHEMIN REVENDIQUÉ/.test(pre.contexte || "") && /session aaaa1111/.test(pre.contexte) && /Refondre la page d'accueil/.test(pre.contexte) && /sessions-actives\.mjs/.test(pre.contexte), pre.contexte);
+    att(!jouer(entreeDe("PreToolUse", B, p, { tool_name: "Edit", tool_input: { file_path: join(p, "app", "contact.py") } }), T0 + 63_000).contexte, "un autre fichier avertit");
+    att(!jouer(entreeDe("PreToolUse", A, p, { tool_name: "Edit", tool_input: { file_path: join(p, "site", "index.html") } }), T0 + 64_000).contexte, "A est averti sur son propre fichier");
+    jouer(entreeDe("PostToolUse", B, p, { tool_name: "Edit", tool_input: { file_path: join(p, "site", "index.html") } }), T0 + 65_000);
+    const tourA = jouer(entreeDe("UserPromptSubmit", A, p, { prompt: "suite" }), T0 + 66_000);
+    att(/Conflits : site\/index\.html tenu par aaaa1111 \(cette session\) et bbbb2222/.test(tourA.contexte || ""), tourA.contexte);
+  });
+
+  check("I3 rouge → vert — coordinatrice expirée : au tour de B, 20 minutes après, A est déclarée expirée et B revendique le rôle", () => {
+    const p = produitJetable("i3-expiree");
+    jouer(entreeDe("SessionStart", A, p), T0);
+    jouer(entreeDe("SessionStart", B, p), T0 + 60_000);
+    jouer(entreeDe("UserPromptSubmit", B, p, { prompt: "travail de B" }), T0 + 5 * MIN);
+    att(!lignesDe(p).some((l) => l.ev === "expire") && !lignesDe(p).some((l) => l.session === B && l.role), "rouge : A vivante, rien ne doit être déclaré");
+    const tour = jouer(entreeDe("UserPromptSubmit", B, p, { prompt: "suite" }), T0 + 20 * MIN);
+    const l = lignesDe(p);
+    att(l.some((x) => x.ev === "expire" && x.session === B && x.cible === A) && l.some((x) => x.session === B && x.role === ROLE_COORDINATRICE && !x.chemin), l.map((x) => x.ev).join());
+    att(!tour.contexte, "B, seule vivante, voit encore l'état");
+  });
+
+  check("I3 vert — double revendication dans la même seconde, par les hooks : la plus petite dans l'ordre lexical prime, l'autre se range", () => {
+    const p = produitJetable("i3-double");
+    const Z = "zzzz9999-0000-4000-8000-000000000009";
+    const s = T0 - (T0 % 1000);
+    jouer(entreeDe("SessionStart", Z, p), s + 100);
+    jouer(entreeDe("SessionStart", A, p), s + 600);
+    const roles = lignesDe(p).filter((x) => x.role === ROLE_COORDINATRICE).map((x) => x.session);
+    att(roles.join() === `${Z},${A}`, `revendications du rôle : ${roles.join()}`);
+    const tourZ = jouer(entreeDe("UserPromptSubmit", Z, p, { prompt: "travail de Z" }), s + 2000);
+    att(/coordinatrice : aaaa1111/.test(tourZ.contexte || "") && lignesDe(p).filter((x) => x.role === ROLE_COORDINATRICE).length === 2, tourZ.contexte);
+  });
+
+  check("I3 vert → rouge — l'identité d'un hook ne vient que de son entrée : une variable héritée de la mère n'inscrit rien et ne se pose pas", () => {
+    const p = produitJetable("i3-enfant");
+    const envFile = join(T, "i3-enfant-env.sh");
+    const env = { CLAUDE_ENV_FILE: envFile, [VARIABLE_SESSION]: MERE, CLAUDE_CODE_SESSION_ID: MERE };
+    const sansId = jouer({ hook_event_name: "SessionStart", cwd: p }, T0, env);
+    att(!sansId.session && !lignesDe(p).length && !existsSync(envFile), "une identité héritée a été inscrite ou posée");
+    jouer(entreeDe("SessionStart", ENFANT, p), T0 + 1000, env);
+    att(lignesDe(p).map((l) => l.session).every((s) => s === ENFANT) && readFileSync(envFile, "utf8").trim() === ligneVariable(ENFANT), readFileSync(envFile, "utf8"));
+    const m = join(T, "mutant-hook", "oracles"); mkdirSync(m, { recursive: true });
+    for (const f of ["hook-sessions.mjs", "lib-sessions.mjs", "lib-session.mjs", "lib-decisions.mjs"]) copyFileSync(join(ICI, f), join(m, f));
+    const src = readFileSync(join(m, "hook-sessions.mjs"), "utf8"), ligne = "const session = s.source === SOURCES.HOOK ? s.id : null;";
+    att(src.includes(ligne), "la ligne visée par la chirurgie est introuvable : le témoin est vide");
+    writeFileSync(join(m, "hook-sessions.mjs"), src.replace(ligne, "const session = s.id;"), "utf8");
+    const pm = produitJetable("i3-enfant-mutant");
+    const r = spawnSync(process.execPath, [join(m, "hook-sessions.mjs")], { input: JSON.stringify({ hook_event_name: "SessionStart", cwd: pm }), encoding: "utf8", env: envAvec({ [VARIABLE_SESSION]: MERE }) });
+    att(r.status === 0 && lignesDe(pm).some((l) => l.session === MERE), `rouge : le mutant devait inscrire la session mère, lu ${JSON.stringify(lignesDe(pm))} ${r.stderr}`);
+  });
+
+  // Le processus réel, comme le harnais le lance : entrée standard, sortie JSON, code de sortie.
+  const HOOK = join(ICI, "hook-sessions.mjs");
+  const TEMP = join(T, "temp-du-poste"); mkdirSync(TEMP, { recursive: true });
+  const processus = (entree, brut = null, plus = {}) => {
+    const r = spawnSync(process.execPath, [HOOK], { input: brut ?? JSON.stringify(entree), encoding: "utf8", env: envAvec({ TEMP, TMP: TEMP, ...plus }) });
+    let o = null; try { o = r.stdout.trim() ? JSON.parse(r.stdout) : null; } catch { /* le cas le dit */ }
+    return { code: r.status, sortie: o, contexte: o?.hookSpecificOutput?.additionalContext || "", err: r.stderr };
+  };
+  check("I3 vert → rouge — registre illisible : jamais de code 2, la panne se déclare une fois par session au contexte, jamais en fin de tour", () => {
+    const p = produitJetable("i3-panne");
+    writeFileSync(join(p, ...FICHIER_SESSIONS.split("/")), "{pas du json\n", "utf8");
+    const un = processus(entreeDe("UserPromptSubmit", C, p, { prompt: "x" }));
+    const deux = processus(entreeDe("UserPromptSubmit", C, p, { prompt: "y" }));
+    att(un.code === 0 && /REGISTRE DES SESSIONS EN PANNE/.test(un.contexte) && /1 ligne\(s\) illisible\(s\)/.test(un.contexte), `${un.code} ${un.contexte} ${un.err}`);
+    att(deux.code === 0 && !/EN PANNE/.test(deux.contexte), `la panne se redit : ${deux.contexte}`);
+    const autre = processus(entreeDe("PreToolUse", B, p, { tool_name: "Write", tool_input: { file_path: join(p, "a.md") } }));
+    att(autre.code === 0 && /EN PANNE/.test(autre.contexte), "une autre session doit recevoir sa propre déclaration");
+    const pd = produitJetable("i3-panne-dossier");
+    mkdirSync(join(pd, ...FICHIER_SESSIONS.split("/")));
+    const stop = processus(entreeDe("Stop", A, pd));
+    att(stop.code === 0 && !stop.sortie, `Stop ne porte jamais de contexte (il relancerait le tour) : ${JSON.stringify(stop.sortie)}`);
+    const dossier = processus(entreeDe("UserPromptSubmit", A, pd, { prompt: "x" }));
+    att(dossier.code === 0 && /EN PANNE/.test(dossier.contexte) && /illisible/.test(dossier.contexte), dossier.contexte);
+    const illisible = processus(null, "pas du json");
+    att(illisible.code === 0 && !illisible.sortie, `entrée illisible : exit ${illisible.code}`);
+  });
+
+  check("I3 vert — hors d'un produit (le pilot, sans forge/), le SessionStart pose l'identité et n'écrit aucun registre", () => {
+    const pilot = join(T, "pilot-sans-forge"); mkdirSync(join(pilot, ".claude"), { recursive: true });
+    const envFile = join(T, "pilot-env.sh");
+    const r = processus(entreeDe("SessionStart", A, pilot), null, { CLAUDE_ENV_FILE: envFile, CLAUDE_PROJECT_DIR: pilot });
+    att(r.code === 0 && !r.sortie && readFileSync(envFile, "utf8").trim() === ligneVariable(A) && !existsSync(join(pilot, "forge")), `${r.code} ${r.err}`);
+  });
+
+  check("I3 vert → rouge — --revendiquer : la coordinatrice revendique un fichier commun pour une session nommée ; une autre session est refusée", () => {
+    const p = produitJetable("i3-revendiquer");
+    jouer(entreeDe("SessionStart", A, p), Date.now() - 60_000);
+    jouer(entreeDe("SessionStart", B, p), Date.now() - 30_000);
+    const main = (session, ...args) => spawnSync(process.execPath, [HOOK, "--revendiquer", ...args], { cwd: p, encoding: "utf8", env: envAvec({ [VARIABLE_SESSION]: session }) });
+    const ok = main(A, "forge/ledger.jsonl", "--pour", court(B));
+    att(ok.status === 0 && /revendiqué pour la session bbbb2222 par la coordinatrice aaaa1111/.test(ok.stdout), `${ok.status} ${ok.stdout}${ok.stderr}`);
+    att(lignesDe(p).some((l) => l.role === ROLE_COORDINATRICE && l.pour === B && l.chemin === "forge/ledger.jsonl"), "la revendication n'est pas écrite");
+    const ko = main(B, "output/README.md", "--pour", court(A));
+    att(ko.status === 1 && /seule la coordinatrice/.test(ko.stderr), `${ko.status} ${ko.stderr}`);
+  });
+
+  // Le budget : chaque hook rend la main en moins de 300 ms sur un registre de 1 000 lignes, mesuré par le lanceur du produit
+  // (deux processus node, comme chez un produit), médiane de 5 passages par événement.
+  check("I3 — budget : par le lanceur, chaque événement rend la main en moins de 300 ms (médiane de 5) sur un registre de 1 000 lignes", () => {
+    const p = produitJetable("i3-banc");
+    mkdirSync(join(p, "forge", "hooks"), { recursive: true });
+    copyFileSync(join(ICI, "..", "gabarits", "hooks-factory.mjs"), join(p, "forge", "hooks", "factory.mjs"));
+    const reg = [];
+    const m = Date.now() - 2 * 3600_000;
+    for (let i = 0; reg.length < 980; i++) {
+      const s = `ancienne-${String(i).padStart(4, "0")}-0000-4000-8000-000000000000`;
+      reg.push(ligneOpen({ session: s, racine: p, transcription: join(T, "absente", `${s}.jsonl`) }, m + i * 1000), ligneObjet({ session: s, objet: `travail ${i}` }, m + i * 1000 + 1),
+        ligneRevendique({ session: s, chemin: `src/module-${i}.py` }, m + i * 1000 + 2), ligneVie({ session: s }, m + i * 1000 + 3), ligneClose({ session: s }, m + i * 1000 + 4));
+    }
+    for (const s of [A, B]) reg.push(ligneOpen({ session: s, racine: p }, Date.now() - 60_000), ligneObjet({ session: s, objet: `objet ${s.slice(0, 4)}` }, Date.now() - 59_000));
+    while (reg.length < 1000) reg.push(ligneVie({ session: A }, Date.now() - 30_000));
+    writeFileSync(join(p, ...FICHIER_SESSIONS.split("/")), reg.slice(0, 1000).map((l) => JSON.stringify(l)).join("\n") + "\n", "utf8");
+    const lanceur = join(p, "forge", "hooks", "factory.mjs");
+    const env = envAvec({ FORGE_ROOT: resolve(ICI, "..", ".."), TEMP, TMP: TEMP, CLAUDE_ENV_FILE: join(T, "banc-env.sh") });
+    const evenements = [
+      ["SessionStart", {}], ["UserPromptSubmit", { prompt: "mesure du banc" }],
+      ["PreToolUse", { tool_name: "Write", tool_input: { file_path: join(p, "src", "module-1.py") } }],
+      ["PostToolUse", { tool_name: "Write", tool_input: { file_path: join(p, "src", "banc.py") } }], ["Stop", {}], ["SessionEnd", { reason: "other" }],
+    ];
+    const mesures = [];
+    const auDepart = lireRegistre([p]).lignes.length;
+    for (const [ev, plus] of evenements) {
+      const durees = [];
+      for (let k = 0; k < 5; k++) {
+        const t0 = process.hrtime.bigint();
+        const r = spawnSync(process.execPath, [lanceur, "sessions"], { cwd: p, input: JSON.stringify(entreeDe(ev, B, p, plus)), encoding: "utf8", env });
+        durees.push(Number(process.hrtime.bigint() - t0) / 1e6);
+        att(r.status === 0 && !/pilot introuvable/.test(r.stderr), `${ev} : exit ${r.status} ${r.stderr}`);
+      }
+      durees.sort((x, y) => x - y);
+      mesures.push({ ev, mediane: Math.round(durees[2]), max: Math.round(durees[4]) });
+    }
+    console.log(`  [MESURE] budget, registre de ${auDepart} lignes au départ (${lireRegistre([p]).lignes.length} à la fin), par le lanceur : ${mesures.map((x) => `${x.ev} ${x.mediane} ms (max ${x.max})`).join(" ; ")}`);
+    const trop = mesures.filter((x) => x.mediane >= 300);
+    att(!trop.length, `au-dessus de 300 ms : ${trop.map((x) => `${x.ev} ${x.mediane} ms`).join(", ")}`);
   });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { try { rmSync(T, { recursive: true, force: true }); } catch { /* toléré */ } }
