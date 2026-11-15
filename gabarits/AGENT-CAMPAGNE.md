@@ -259,6 +259,13 @@ gains_constates, ou retour en non-clos), régénère la vue et la page, et journ
 campagne dans BOUCLE-AMELIORATION.md. Tu n'as donc PAS à écrire ces artefacts — ton
 rapport est ta seule interface de sortie.
 
+**Le verdict de ta remise s'inscrit sur ta fiche d'exécution** (D-219 (e) du 15/11/2026, TF-2563). À ta fin,
+le hook de fin d'agent écrit ta fiche (durée, cause de fin, jetons ; ni nom, ni chemin, ni contenu). À la
+réception, le pilot consigne la relecture de ton livrable avec ton identifiant d'agent :
+`node scripts\relecture-intention.mjs --consigner <verdict.json> --point reception --fichier <livrable> --agent <identifiant>`.
+`scripts\noter-fiche.mjs` ajoute alors son verdict à ta fiche sans la réécrire, et `scripts\relever-flotte.mjs`
+le publie avec ta durée et ta cause de fin. Tu n'as rien de plus à écrire.
+
 **L'orchestrateur recompte à la source un chiffre qu'il restitue** (TF-1802, 15/10/2026). La règle
 « Remesurer plutôt que reprendre » vaut aussi pour celui qui reçoit le rapport. Un compte annoncé par
 un agent (lignes peuplées, fichiers traités, cas de recette) se recompte en base, dans le fichier ou
