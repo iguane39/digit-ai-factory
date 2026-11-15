@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 712 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 713 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -755,6 +755,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md | 20261109a | 9.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri des favoris TikTok du 09-11 - 20261109a.md` |
 | Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md | 20261102i | 11.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Tri TikTok et skill de tri - 20261102i.md` |
 | Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md | 20261026o | 4.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` |
+| Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md | 20261115b | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md *(archivé)* | 20261016a | 4.5 Ko | `04-plans/old/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016a.md` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md *(archivé)* | 20261102e | 18.4 Ko | `04-plans/old/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102e.md` |
 | 00-audit-environnement.md | — | 20.2 Ko | `04-plans/plateforme-pentest-gate-a-20261102/00-audit-environnement.md` |
