@@ -108,6 +108,25 @@ check("vert — TF-1750 : un livrable sous output\\ reste versionnable", () => {
     if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
 });
 
+// TF-2629 (16/11/2026) : `!forge/**` rouvrait les caches Python écrits sous forge\ ; l'exclusion se répète après la négation.
+check("rouge → vert — TF-2629 : le gitignore socle ignore un cache Python écrit sous forge\\, et le motif est aux exigés de l'héritage", () => {
+  for (const rel of ["forge/x/__pycache__/a.cpython-312.pyc", "forge/etapes/p2/mod.pyc", "forge/oracles/__pycache__/o.pyc"])
+    if (!socle.ignore(rel)) throw new Error(`${rel} n'est pas ignoré par gabarits/gitignore-produit`);
+  const exiges = heritage.artefacts.find((a) => a.source === "gabarits/gitignore-produit").motifs_exiges;
+  for (const m of ["forge/**/__pycache__/", "forge/**/*.pyc"])
+    if (!exiges.includes(m)) throw new Error(`${m} n'est pas aux motifs exigés de gabarits/HERITAGE.json : un produit sans lui ne serait pas relevé`);
+});
+check("rouge — TF-2629 : le gabarit d'AVANT (sans la ré-exclusion après !forge/**) laisse le cache suivi : le défaut d'origine", () => {
+  const avant = depot(readFileSync(join(PILOT, "gabarits", "gitignore-produit"), "utf8").split(/\r?\n/).filter((l) => l !== "forge/**/__pycache__/" && l !== "forge/**/*.pyc").join("\n"));
+  const ignore = avant.ignore("forge/x/__pycache__/a.cpython-312.pyc") || avant.ignore("forge/etapes/p2/mod.pyc");
+  avant.fin();
+  if (ignore) throw new Error("la recette ne distingue pas avec et sans la ré-exclusion");
+});
+check("vert — TF-2629 : un fichier non compilé sous forge\\ reste versionnable", () => {
+  for (const rel of ["forge/oracles/oracle_x.py", "forge/etapes/p2/rapport.md"])
+    if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
+});
+
 reel.fin();
 vide.fin();
 socle.fin();
