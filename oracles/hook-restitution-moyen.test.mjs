@@ -21,7 +21,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { detecterEffets, effetsGit, jugerFormeMoyen } from "./hook-restitution.mjs";
+import { detecterEffets, ecrituresDuTour, effetsGit, jugerFormeMoyen } from "./hook-restitution.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const HOOK = join(ICI, "hook-restitution.mjs");
@@ -106,6 +106,17 @@ try {
     outil("Bash", { command: "git tag -l" }),
     outil("Bash", { command: "git tag --list 'v*'" }),
     outil("Bash", { command: "git -C /c/dev/x stash list && git -C /c/dev/x tag -l" }),
+    // TF-2648 (16/11/2026) : lister les étiquettes avec un tri, un filtre ou un format lit aussi (le cas du 13/11 : `git tag --sort=-creatordate | head -10`),
+    // et une récupération vers le dossier temporaire de la session n'écrit rien dans le dépôt.
+    outil("Bash", { command: "git tag --sort=-creatordate | head -10" }),
+    outil("Bash", { command: "git tag --sort=-v:refname --list 'v*'" }),
+    outil("Bash", { command: "git tag --contains HEAD" }),
+    outil("Bash", { command: "git tag | tail -3" }),   // sans argument, `git tag` liste
+    outil("Bash", { command: "git tag --points-at HEAD" }),
+    outil("Bash", { command: "git tag -n5" }),
+    outil("Bash", { command: "git tag --merged main --format='%(refname:short)'" }),
+    outil("Bash", { command: `curl -sL -o ${join(tmpdir(), "page.html").replace(/\\/g, "/")} https://example.com/qualification` }),
+    outil("Bash", { command: `curl -s -o "$TEMP/x.json" -w '%{http_code}' https://example.com/api` }),
   ];
   const e0 = detecterEffets(epargnes);
   check("4 détecteur : temporaire, néant, flèche, Explore, lecture connectée → aucun effet", e0.length === 0, e0.join(" ; "));
@@ -126,7 +137,22 @@ try {
     [outil("Bash", { command: "git stash pop" }), /git stash/],
     [outil("Bash", { command: "git tag v1.0" }), /git tag/],
     [outil("Bash", { command: "git tag -d v1.0" }), /git tag/],
+    // TF-2648 : le remède ne rend pas muet le côté qui écrit — créer, forcer, supprimer ou signer reste un effet, même derrière une option de liste.
+    [outil("Bash", { command: "git tag -a v1.1 -m 'x'" }), /git tag/],
+    [outil("Bash", { command: "git tag -f v1.0" }), /git tag/],
+    [outil("Bash", { command: "git tag --delete v1.0" }), /git tag/],
+    [outil("Bash", { command: "git tag -D v1.0" }), /git tag/],
+    [outil("Bash", { command: "git tag --sort=-creatordate -d v1.0" }), /git tag/],
+    [outil("Bash", { command: "git tag --list 'v*' -d v1.0" }), /git tag/],
+    // Un `curl -X POST` reste une écriture distante, même quand sa sortie va au dossier temporaire.
+    [outil("Bash", { command: "curl -X POST -o $TEMP/r.json https://example.com/api" }), /curl -X POST/],
   ];
+  // TF-2648 : le MÊME jeu par le relevé que le hook de fin de tour joue, `git -C <dossier>` compris (`GIT_A_OPTIONS`).
+  const parRelevé = (cmd) => ecrituresDuTour([outil("Bash", { command: cmd })]);
+  for (const cmd of ["git -C /c/dev/x tag --sort=-creatordate", "git -C /c/dev/x tag --contains HEAD | head -3", `curl -sL -o "$TEMP/p.html" https://example.com/q`, "git tag --sort=-creatordate | head -10"])
+    check(`4 relevé (TF-2648) : « ${cmd} » est une lecture`, parRelevé(cmd).length === 0, parRelevé(cmd).join(" ; "));
+  for (const cmd of ["git -C /c/dev/x tag -d v1", "git -C /c/dev/x tag v2", "git -C /c/dev/x tag --sort=-creatordate -D v1"])
+    check(`4 relevé (TF-2648) : « ${cmd} » reste un effet`, parRelevé(cmd).length === 1 && /git tag/.test(parRelevé(cmd)[0]), parRelevé(cmd).join(" ; ") || "aucun effet");
   for (const [o, re] of releves) {
     const e = detecterEffets([o]);
     check(`4 détecteur : ${o.message.content[0].name} relevé`, e.length === 1 && re.test(e[0]), e.join(" ; "));
