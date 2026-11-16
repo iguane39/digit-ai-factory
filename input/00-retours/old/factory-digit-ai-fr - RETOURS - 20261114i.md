@@ -56,3 +56,12 @@ Aucun document mûr.
 ## Garde-fou de plateforme relevé
 
 Aucun garde-fou de plateforme relevé.
+
+## Note de réception du pilot (16/11/2026)
+
+Le lot a été refusé tel quel à l'ingestion : la famille de ses classes proposées n'existe pas au référentiel `todo/CLASSES.json`. Le pilot l'a ramenée, avant ingestion, à la famille connue la plus proche :
+
+- classe proposée « releve-affiche-une-regle-comme-un-verdict » : famille « oracles », inconnue du référentiel, ramenée à « contrat-interface-forge »
+- classe proposée « restitution-non-prejugee-hors-run » : famille « restitution », inconnue du référentiel, ramenée à « restitution-forme »
+
+Lot déjà ingéré sous un autre nom (doublon strict à la ré-ingestion du 16/11/2026) : rangé dans old/ sans ingestion.
