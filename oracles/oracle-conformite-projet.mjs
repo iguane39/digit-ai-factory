@@ -2935,6 +2935,65 @@ else {
       }
     });
     if (ok23) ok("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête démo-locale présent, aucun motif de secret, comptes de démo nommés par variables");
+
+    // R-23 (suite) · CHAQUE ENVIRONNEMENT DÉPLOYÉ A SA LIGNE DANS ACCES-TEST (TF-2601, 16/11/2026). LE FAIT : le 12/11/2026 le porteur demande
+    // pourquoi aucun fichier ne liste les comptes de test de tous les environnements pour qu'il s'y connecte ; R-20 et R-23 bornaient
+    // `ACCES-TEST.md` à la démonstration locale et réduisaient tout environnement réel à une référence. La fiche indexe désormais, sous
+    // « Environnements déployés », adresse, variable d'identifiant et variable de secret de chaque environnement déployé de COMPOSANTS-OPS
+    // (frontmatter `environnements:` et colonne « Environnement » de l'inventaire, hors locale). ANTÉRIORITÉ : jugée dès un `verifie_le`
+    // du 16/11/2026 ; avant, c'est la règle qui a bougé (le manque se déclare au `non_juge`). Ce qui est jugé : la PRÉSENCE de la ligne de
+    // chaque environnement, une adresse non vide, et des NOMS de variable (jamais des valeurs, R-23). NON JUGÉ : que l'adresse réponde, que
+    // les variables existent au `.env`, que le compte fonctionne.
+    const copAcces = join(dp, "COMPOSANTS-OPS.md");
+    if (existsSync(copAcces)) {
+      const texteCop = readFileSync(copAcces, "utf8");
+      const nomEnv = (s) => s.replace(/[`*]/g, "").trim().toLowerCase();
+      const estGabaritEnv = (s) => /^[{<]/.test(s.trim()) || s.trim() === "";
+      const deployes = new Set();
+      const mEnv = /^environnements\s*:\s*\[([^\]]*)\]\s*$/m.exec(frontmatter(texteCop) || "");
+      if (mEnv) for (const e of mEnv[1].split(",")) if (!estGabaritEnv(e)) deployes.add(nomEnv(e));
+      let colEnv = -1;
+      for (const l of texteCop.split(/\r?\n/)) {
+        if (!l.trim().startsWith("|")) { colEnv = -1; continue; }
+        const cs = l.split("|").slice(1, -1).map((c) => c.trim());
+        const h = cs.findIndex((c) => /^environnement$/i.test(c));
+        if (h >= 0) { colEnv = h; continue; }
+        if (colEnv >= 0 && cs[colEnv] !== undefined && !/^:?-+:?$/.test(cs[colEnv]) && !estGabaritEnv(cs[colEnv])) deployes.add(nomEnv(cs[colEnv]));
+      }
+      for (const e of [...deployes]) if (/^(locale|local|localhost)$/.test(e)) deployes.delete(e);
+      if (deployes.size) {
+        const verifieAcces = (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+        const lignes = t.split(/\r?\n/);
+        const debut = lignes.findIndex((l) => /^#{2,}\s.*environnements?\s+d[ée]ploy[ée]s/i.test(l));
+        const listes = new Map();
+        const ecarts = [];
+        if (debut >= 0) {
+          let entete = false;
+          for (let i = debut + 1; i < lignes.length && !/^#{1,6}\s/.test(lignes[i]); i++) {
+            if (!lignes[i].trim().startsWith("|")) { entete = false; continue; }
+            const cs = lignes[i].split("|").slice(1, -1).map((c) => c.trim());
+            if (!entete) { entete = true; continue; }                       // la ligne d'en-tête
+            if (cs.every((c) => /^:?-+:?$/.test(c))) continue;              // le filet
+            listes.set(nomEnv(cs[0] || ""), { i: i + 1, cs });
+          }
+        }
+        const manquants = [...deployes].filter((e) => !listes.has(e));
+        if (debut < 0) ecarts.push(`section « Environnements déployés » absente : ${deployes.size} environnement(s) déployé(s) sans ligne (${[...deployes].join(", ")})`);
+        else if (manquants.length) ecarts.push(`${manquants.length} environnement(s) déployé(s) de COMPOSANTS-OPS.md sans ligne dans « Environnements déployés » : ${manquants.join(", ")}`);
+        for (const [env, { i, cs }] of listes) {
+          if (!deployes.has(env)) continue;
+          if (!cs[1] || !cs[1].replace(/[`*]/g, "").trim()) ecarts.push(`${env} (ligne ${i}) : adresse vide`);
+          for (const [rang, intitule] of [[2, "identifiant"], [3, "secret"]])
+            if (cs[rang] === undefined || !estNomDeVariable(cs[rang]) || cs[rang].replace(/[`{}<>*]/g, "").trim() === "")
+              ecarts.push(`${env} (ligne ${i}) : le ${intitule} n'est pas un NOM de variable (« ${String(cs[rang] ?? "").slice(0, 40)} ») — une fiche versionnée nomme des variables, jamais des valeurs (R-23)`);
+        }
+        if (!ecarts.length) ok("R-23", "docs\\projet\\ACCES-TEST.md", `${deployes.size} environnement(s) déployé(s) de COMPOSANTS-OPS.md indexé(s) avec adresse et variables d'accès (TF-2601)`);
+        else if (verifieAcces && verifieAcces >= "2026-11-16")
+          ko("R-23", "docs\\projet\\ACCES-TEST.md", `${ecarts.join(" ; ")} — sans cette ligne le porteur ne sait ni où se connecter ni avec quel compte (TF-2601). Remède : une ligne par environnement sous « Environnements déployés » (adresse, variable d'identifiant, variable de secret, date), gabarit gabarits\\docs-projet\\ACCES-TEST.md`);
+        else
+          antecedences.push(`R-23 (environnements déployés) non jugé sur docs\\projet\\ACCES-TEST.md : la règle naît le 16/11/2026 (TF-2601) et la fiche porte verifie_le=${verifieAcces || "non daté"} — antériorité déclarée, jamais un défaut de produit (${ecarts.slice(0, 2).join(" ; ")})`);
+      }
+    }
   }
 
   // ---- R-23, SECOND VOLET (TF-1088, 17/09/2026) — LA FICHE EST LUE, LA PAGE SERVIE NE L'EST PAS

@@ -322,6 +322,56 @@ check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui 
   } finally { writeFileSync(f, avant); }
 });
 
+// TF-2601 (16/11/2026) — CHAQUE ENVIRONNEMENT DÉPLOYÉ DE COMPOSANTS-OPS A SA LIGNE DANS ACCES-TEST. Le 12/11/2026 le porteur demande
+// pourquoi aucun fichier ne liste les comptes de test de tous les environnements : R-20 et R-23 bornaient la fiche à la démo locale.
+// Trois états : un environnement déployé SANS ligne (FAIL qui le nomme), la même fiche complète (PASS, le remède joué), la fiche revue AVANT
+// le 16/11 (antériorité déclarée, jamais un FAIL). Fixtures minimales : le contrôle ne lit que les deux fiches.
+{
+  const COP = ["---", "role: composants", 'sources_de_verite: ["ops.mjs etat"]', "verifie_le: 2026-11-16", "environnements: [locale, staging, production]", "---", "", "# Composants Ops", "",
+    "## Inventaire par environnement", "", "| Composant | Environnement | URL |", "|---|---|---|", "| api | staging | https://x-staging.exemple.test |", "| api | production | https://x.exemple.test |", ""].join("\n");
+  const ACCES = (verifie, lignes) => ["---", "role: acces", 'sources_de_verite: ["seed"]', `verifie_le: ${verifie}`, "---", "# Accès", "",
+    "> comptes de démonstration locale — jamais valides hors MODE_DEMO", "", "## Environnements déployés — comptes de test", "",
+    "| Environnement | Adresse | Identifiant | Mot de passe ou clé | Mis à jour le |", "|---|---|---|---|---|", ...lignes, ""].join("\n");
+  const STAGING = "| staging | https://x-staging.exemple.test | `STAGING_ADMIN_IDENTIFIANT` | `STAGING_ADMIN_MOTDEPASSE` | 2026-11-16 |";
+  const PROD = "| production | https://x.exemple.test | `PROD_ADMIN_IDENTIFIANT` | `PROD_CLE_API` | 2026-11-16 |";
+  const projet2601 = (acces) => {
+    const d = mkdtempSync(join(tmpdir(), "conf-r23-env-"));
+    mkdirSync(join(d, "docs", "projet"), { recursive: true });
+    writeFileSync(join(d, "docs", "projet", "COMPOSANTS-OPS.md"), COP, "utf8");
+    writeFileSync(join(d, "docs", "projet", "ACCES-TEST.md"), acces, "utf8");
+    return d;
+  };
+  const r23env = (d) => { const { rapport } = lance(d); rmSync(d, { recursive: true, force: true }); return rapport; };
+  check("TF-2601 rouge — un environnement déployé de COMPOSANTS-OPS sans ligne dans ACCES-TEST : R-23 FAIL qui nomme `production`", () => {
+    const f = r23env(projet2601(ACCES("2026-11-16", [STAGING]))).findings.filter((x) => x.regle === "R-23" && x.statut === "FAIL" && /Environnements déployés/.test(x.message));
+    if (f.length !== 1 || !/production/.test(f[0].message) || /staging/.test(f[0].message.split("—")[0]) || !/TF-2601/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2601 rouge — la section « Environnements déployés » absente : FAIL qui nomme les deux environnements", () => {
+    const sans = ACCES("2026-11-16", [STAGING, PROD]).replace("## Environnements déployés — comptes de test", "## Autre section");
+    const f = r23env(projet2601(sans)).findings.filter((x) => x.regle === "R-23" && x.statut === "FAIL");
+    if (f.length !== 1 || !/section « Environnements déployés » absente/.test(f[0].message) || !/staging/.test(f[0].message) || !/production/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2601 rouge — une VALEUR à la place du nom de variable, ou une adresse vide : FAIL qui nomme la ligne", () => {
+    const valeur = r23env(projet2601(ACCES("2026-11-16", [STAGING, "| production | https://x.exemple.test | admin@exemple.test | `PROD_CLE_API` | 2026-11-16 |"]))).findings
+      .filter((x) => x.regle === "R-23" && x.statut === "FAIL");
+    if (valeur.length !== 1 || !/production \(ligne \d+\) : le identifiant n'est pas un NOM de variable/.test(valeur[0].message)) throw new Error(JSON.stringify(valeur));
+    const vide = r23env(projet2601(ACCES("2026-11-16", [STAGING, "| production |  | `PROD_ADMIN_IDENTIFIANT` | `PROD_CLE_API` | 2026-11-16 |"]))).findings
+      .filter((x) => x.regle === "R-23" && x.statut === "FAIL");
+    if (vide.length !== 1 || !/adresse vide/.test(vide[0].message)) throw new Error(JSON.stringify(vide));
+  });
+  check("TF-2601 vert — chaque environnement déployé a sa ligne (adresse, noms de variable) : R-23 PASS qui compte les deux, la locale n'en exige aucune", () => {
+    const r = r23env(projet2601(ACCES("2026-11-16", [STAGING, PROD])));
+    const f = r.findings.filter((x) => x.regle === "R-23" && /environnement\(s\) déployé\(s\)/.test(x.message));
+    if (f.length !== 1 || f[0].statut !== "PASS" || !/^2 environnement/.test(f[0].message)) throw new Error(JSON.stringify(f));
+    if (r.findings.some((x) => x.regle === "R-23" && x.statut === "FAIL")) throw new Error("un FAIL R-23 sur la fiche complète");
+  });
+  check("TF-2601 ANTÉRIEUR — la même fiche incomplète revue avant le 16/11 : antériorité déclarée au non_juge, jamais un FAIL", () => {
+    const r = r23env(projet2601(ACCES("2026-11-15", [STAGING])));
+    if (r.findings.some((x) => x.regle === "R-23" && x.statut === "FAIL")) throw new Error("une fiche d'avant la règle est accusée");
+    if (!JSON.stringify(r.non_juge || []).includes("R-23 (environnements déployés)")) throw new Error("l'antériorité n'est pas déclarée au non_juge");
+  });
+}
+
 // TF-2668 (16/11/2026) — LA COPIE DU BOILERPLATE QU'UN PRODUIT FAIT DE SON CHEF DÉRIVE SANS SIGNAL. Le 16/11, la copie
 // `scripts/apdlb/gabarit.html` d'un produit datait d'avant `color-scheme` (TF-2384) : SC4 a échoué sur une page jugée PASS le 10/11, et R-47
 // ne comparait cette copie à rien. Double sens, sur le VRAI boilerplate du socle : la copie périmée est NOMMÉE par R-47 (constat déclaré,
