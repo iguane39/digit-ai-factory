@@ -132,6 +132,9 @@
  *       alors que le ledger ne porte aucun run ouvert est signalée ; numéro pris au suivant libre (S125) plus 10 ; SANS_OBJET hors produit ; avertissante ;
  *   S145 UNE RESTITUTION NOMME UN RÔLE, PAS UNE PERSONNE (14/11, TF-2410, RT de Produit-81, préférence du porteur du 09/11) : une forme que `todo/noms-de-personnes.mjs` relève à l'accueil des lots (« Prénom NOM », « Prénom Nom »
  *       à prénom de la liste fermée, civilité suivie d'un nom, adresse électronique nominative) est signalée hors des blocs de code, le rôle étant le remède ; numéro pris au suivant libre (S135) plus 10 ; avertissante ;
+ *   S155 UNE ACTION `auto_ia` QUI ATTEND UN AUTRE AGENT PORTE SON MOYEN DE REPRISE (16/11, TF-2642, RP-220 de digit-ai-marketing, gabarit 2.70.0) : le motif ou l'événement de départ d'une action `auto_ia` qui attend la fin d'un agent
+ *       (sous-agent, session Codex, constructeur) dit comment la session reprendra la main (surveillance du fichier de sortie, ticket, notification de fin), sinon l'action est `manuelle_utilisateur` ; numéro pris au suivant libre (S145) plus 10 ; avertissante ;
+ *   S11 étendue (16/11, TF-2610, TF-2614) : « programmée, départ : <événement> » est un motif ; `hors_mandat` seul est refusé sous un mandat cité « jusqu'à épuisement » quand aucune dépendance n'est dite ;
  *   S115 UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (09/11, TF-2304, loi n° 5, gabarit 2.65.0) : une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage
  *       (decision, depense, irreversible) porte une commande d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, cmdlets Az et Graph ; pas git, node ni npm, souvent demandés pour un autre poste), la même figure ailleurs dans le texte, et aucune ligne qui la porte ne montre un code de retour d'échec ;
  *       numéro pris au suivant libre (S105) plus 10, comme S103, pour ne pas heurter une règle qu'une autre session ajoute le même jour ; avertissante ;
@@ -3349,6 +3352,26 @@ function juger(texte, cheminJuge = null) {
     else ko("S145", `${formes145.length} forme(s) nomment une personne ou donnent son adresse (${formes145.slice(0, 4).map((f) => `« ${f} »`).join(" ; ")}${formes145.length > 4 ? ` ; +${formes145.length - 4}` : ""}) : une restitution nomme un RÔLE, `
       + "jamais une personne par son nom ou son adresse (préférence du porteur du 09/11/2026). Remplace chaque forme par son rôle (« la personne qui administre l'abonnement », « le titulaire du compte »). "
       + "Si la forme ne désigne aucune personne (nom de produit, personnage d'exemple), motive-le à l'appel de `--prejuger` : `--motif S145=\"<raison>\"` (TF-2410)");
+  }
+
+  // ---- S155 (16/11/2026, TF-2642, RP-220 de digit-ai-marketing) — UNE ACTION `auto_ia` QUI ATTEND UN AUTRE AGENT PORTE SON MOYEN DE REPRISE ---------------------------------
+  //
+  // LE FAIT. Le 12/11/2026, un briefing écrit à 17:12 pour une session Codex ouverte par le dirigeant annonçait l'action `auto_ia` « appliquer la proposition ». Codex a fini à 17:53 ; la session
+  // n'a pas repris, faute de surveillance, et le dirigeant a dû demander pourquoi. La file de tickets porte ce relais avec reçu, mais son routage ne prévoit pas l'échange de fond.
+  // LA RÈGLE (décision R-58 du 16/11/2026). Une action `auto_ia` dont le motif ou l'événement de départ attend la fin, le retour ou la réponse d'un autre agent (sous-agent, session Codex, constructeur)
+  // dit comment la session reprendra la main : une surveillance du fichier de sortie de cet agent, un ticket de la file, ou la notification de fin de sa tâche d'arrière-plan. Sans moyen de reprise,
+  // l'action est `manuelle_utilisateur` : personne ne la reprendra. AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook de restitution).
+  // NON JUGÉ : que la surveillance annoncée tourne réellement ; une attente que le motif dit autrement qu'avec les mots « agent », « Codex », « constructeur », « autre session ».
+  {
+    const ATTEND_UN_AGENT = /(?:attend\w*|en attente|d[ée]part\s*:|apr[èe]s|d[èe]s|quand|lorsque|une fois)[^.\n|]{0,70}\b(?:agents?|sous-agents?|Codex|constructeur|autre session|session\s+Codex)\b/i;
+    const MOYEN_DE_REPRISE = /\breprise\s*:[^\n]*\S|\bsurveill\w+[^.\n|]{0,60}(?:fichier|sortie|avancement)|\bticket\b|notification de fin|hook[- ]suivi[- ]agents|asyncRewake|\bguetteur\b/i;
+    const concernes155 = groupes8.filter((g) => /\bauto_ia\b/.test(g) && ATTEND_UN_AGENT.test(zoneMotif(g)));
+    const sans155 = concernes155.filter((g) => !MOYEN_DE_REPRISE.test(g));
+    if (!concernes155.length) ok("S155", "aucune action `auto_ia` n'attend un autre agent");
+    else if (!sans155.length) ok("S155", `${concernes155.length} action(s) \`auto_ia\` attendent un autre agent, chacune porte son moyen de reprise`);
+    else ko("S155", `${sans155.length} action(s) \`auto_ia\` sur ${concernes155.length} attendent un autre agent sans dire comment la session reprendra la main. Ex. : ${sans155[0].replace(/\s+/g, " ").trim().slice(0, 110)}. `
+      + "Écris le moyen de reprise dans l'action : « reprise : surveillance du fichier de sortie `<chemin>` », « reprise : ticket <identifiant> » ou la notification de fin de la tâche d'arrière-plan. "
+      + "Sans moyen de reprise, personne ne reprendra l'action : elle est `manuelle_utilisateur`, avec sa raison (TF-2642).");
   }
 
   // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
@@ -7754,6 +7777,36 @@ Aucun écart : la demande a été suivie à la lettre.
         casse.push(`S11 (TF-2610) : le constat sur ${nom} doit dire que \`hors_mandat\` ne couvre pas un mandat « jusqu'à épuisement » : ` + String(constatDe(r, "S11").message || "").slice(0, 200));
     if (!/programmée, départ/.test(constatDe(m11g, "S11").message || ""))
       casse.push("S11 (TF-2614) : le constat sur « programmée » sans départ doit nommer la forme attendue « programmée, départ : <événement> » : " + String(constatDe(m11g, "S11").message || "").slice(0, 200));
+  }
+  }
+  // 16/11 — S155, UNE ACTION `auto_ia` QUI ATTEND UN AUTRE AGENT PORTE SON MOYEN DE REPRISE (TF-2642), DANS SES SENS. (a) Rouge : « attend la fin de l'agent Codex » sous `dependance_externe`, sans
+  // moyen de reprise — le cas du 12/11. (b) Rouge : « programmée, départ : fin de l'agent Codex », sans moyen. (c) Vert : la même, « reprise : surveillance du fichier de sortie » — la restitution
+  // passe en entier, S11 compris. (d) Vert : « reprise : ticket ». (e) Vert : une attente qui n'est pas celle d'un agent (`dependance_bloc_3`). (f) Vert : `hors_mandat` sans attente d'agent.
+  if (veut(2642)) {
+  {
+    const ACTION_MOTIF = (motif) => "- **A-3** — enfin TF-0222 (auto_ia) — appliquer la proposition rendue par l'agent.\n"
+      + `  - motif de non-exécution : ${motif}\n  - si rien n'est fait : la proposition reste lettre morte.\n`;
+    const avec = (motif) => verte.replace(/- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/, ACTION_MOTIF(motif));
+    const r155a = jouerPe("s155-attend-agent-sans-reprise.md", avec("dependance_externe — attend la fin de l'agent Codex ouvert par le dirigeant."));
+    const r155b = jouerPe("s155-programmee-sans-reprise.md", avec("programmée, départ : fin de l'agent Codex."));
+    const r155c = jouerPe("s155-programmee-surveillance.md", avec("programmée, départ : fin de l'agent Codex ; reprise : surveillance du fichier de sortie `C:\\dev\\x\\sortie.md`."));
+    const r155d = jouerPe("s155-programmee-ticket.md", avec("programmée, départ : fin de l'agent Codex ; reprise : ticket digit-ai-queue TKT-12."));
+    const r155e = jouerPe("s155-attend-decision-bloc-3.md", avec("dependance_bloc_3 — attend la décision de publication ci-dessus."));
+    const r155f = jouerPe("s155-hors-mandat-sans-attente.md", avec("hors_mandat — le lot restant relève d'un autre mandat."));
+    if (avec("hors_mandat — x.") === verte) casse.push("S155 (TF-2642) : la fixture n'a pas été modifiée — le cas ne prouve plus rien");
+    for (const [r, statut, quoi] of [
+      [r155a, "FAIL", "une action `auto_ia` qui attend la fin d'un agent, sans moyen de reprise, passe — le cas du 12/11"],
+      [r155b, "FAIL", "« programmée, départ : fin de l'agent Codex » sans moyen de reprise passe"],
+      [r155c, "PASS", "la même action avec « reprise : surveillance du fichier de sortie » est accusée"],
+      [r155d, "PASS", "la même action avec « reprise : ticket » est accusée"],
+      [r155e, "PASS", "une attente de décision (`dependance_bloc_3`) est prise pour l'attente d'un agent"],
+      [r155f, "PASS", "`hors_mandat` sans attente d'agent est accusé"],
+    ]) if (constatDe(r, "S155").statut !== statut)
+      casse.push(`S155 (reprise d'une action qui attend un agent, TF-2642, 16/11) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S155").message || "sortie illisible").slice(0, 200));
+    if (r155c.status !== 0 || constatDe(r155c, "S11").statut !== "PASS")
+      casse.push("S155 (TF-2642) : l'action programmée avec son moyen de reprise doit faire passer la restitution en entier (exit 0, S11 compris), le remède du constat : exit " + r155c.status);
+    if (!/TF-2642/.test(constatDe(r155a, "S155").message || "") || !/manuelle_utilisateur/.test(constatDe(r155a, "S155").message || ""))
+      casse.push("S155 (TF-2642) : le constat doit nommer le moyen de reprise attendu et dire que sans lui l'action est `manuelle_utilisateur` : " + String(constatDe(r155a, "S155").message || "").slice(0, 200));
   }
   }
   // 29/10 — S88, « DE QUOI S'AGIT-IL » DIT CE QU'EST L'OBJET AVANT SON NOM INTERNE (TF-1979), DANS SES SENS. Le champ de FORMAT_B est la forme de référence : S88 PASS. (a) Rouge :
