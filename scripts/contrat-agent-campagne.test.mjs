@@ -10,7 +10,7 @@
  * Un contrat sans sa phrase redevient muet sur le défaut : la phrase est la seule preuve que l'agent sait.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -39,6 +39,27 @@ check("rouge (TF-2619) — le contrat privé de la règle ne la porte plus : le 
   const mutant = sansBloc(CONTRAT, /Toute copie de dossier exclut/);
   vrai(mutant !== CONTRAT, "la chirurgie n'a rien retiré");
   vrai(!COPIE.exclusion.test(mutant), "la règle d'exclusion subsiste dans le mutant");
+});
+
+// ---- TF-2621 : le marqueur d'occupation d'une copie de travail ---------------------------------------------------------
+const OCCUPATION = {
+  section: /^## Une copie de travail occupée porte son marqueur \(TF-2621/m,
+  pose: /La session qui crée une copie y pose son marqueur/,
+  commande: /node scripts\\occuper-copie\.mjs --poser <copie> --session <identifiant>/,
+  hook: /`oracles\\hook-flotte\.mjs` le lit avant tout lancement d'agent/,
+  refus: /refuse \(exit 2\) quand une autre session vivante occupe la copie/,
+  agent: /L'agent ne pose ni ne retire le marqueur/,
+};
+check("vert (TF-2621) — le contrat prescrit la pose du marqueur à la création d'une copie et sa lecture par hook-flotte avant tout lancement d'agent", () => {
+  for (const [nom, motif] of Object.entries(OCCUPATION)) vrai(motif.test(CONTRAT), `le contrat ne porte plus « ${nom} » (${motif})`);
+});
+check("vert (TF-2621) — les fichiers que le contrat nomme existent : le script de pose et le hook", () => {
+  for (const f of ["scripts/occuper-copie.mjs", "oracles/hook-flotte.mjs"]) vrai(existsSync(join(RACINE, f)), `${f} est prescrit par le contrat et absent`);
+  vrai(/export function jugerOccupation/.test(readFileSync(join(RACINE, "oracles", "hook-flotte.mjs"), "utf8")), "hook-flotte ne porte plus jugerOccupation");
+});
+check("rouge (TF-2621) — le contrat privé de la section ne prescrit plus le marqueur : le contrôle voit la différence", () => {
+  const mutant = sansBloc(CONTRAT, /Une copie de travail occupée porte son marqueur|La session qui crée une copie|oracles\\hook-flotte\.mjs` le lit|L'agent ne pose ni ne retire/);
+  vrai(mutant !== CONTRAT && !OCCUPATION.pose.test(mutant) && !OCCUPATION.hook.test(mutant), "la chirurgie n'a pas retiré la section");
 });
 
 console.log(`\ncontrat-agent-campagne.test : ${pass} PASS, ${fail} FAIL`);

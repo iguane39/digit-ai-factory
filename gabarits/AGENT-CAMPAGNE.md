@@ -468,3 +468,11 @@ ni Docker.
 
 - **Toute copie de dossier exclut les fichiers d'environnement** : `.env` et `.env.*`, à toute profondeur. Les copies récursives sont visées (`cp -r`, `Copy-Item -Recurse`, `robocopy`, `xcopy`, `rsync`) ; le plus sûr est de copier des fichiers nommés, pas un dossier.
 - **L'absence se vérifie après la copie**, avant tout autre geste : `Get-ChildItem -Recurse -Force -Filter ".env*" <destination>` (ou `find <destination> -name ".env*"`) ne rend rien. Un fichier trouvé se supprime sans être ouvert ni affiché, et son chemin seul, jamais son contenu, entre aux `restes` du rapport.
+
+## Une copie de travail occupée porte son marqueur (TF-2621, 16/11/2026)
+
+**Le fait, le 12/11/2026.** Deux sessions du même produit ont fait travailler chacune un constructeur dans la même copie de travail, créée hors de l'isolation automatique : 10 fichiers d'un agent écrits au milieu du travail commité de l'autre. Rien ne disait que la copie était prise ; la collision n'a été vue que par un message entre sessions.
+
+- **La session qui crée une copie y pose son marqueur** : `node scripts\occuper-copie.mjs --poser <copie> --session <identifiant> --run <run> --agent <agent>`. Le marqueur (session, run, agent, date) vit dans le répertoire git de la copie, hors de l'arbre : il n'est jamais suivi ni commité, et disparaît avec la copie.
+- **`oracles\hook-flotte.mjs` le lit avant tout lancement d'agent**, pour le dossier courant et pour les chemins que la consigne nomme, et refuse (exit 2) quand une autre session vivante occupe la copie. Une session est vivante quand sa transcription a été écrite depuis moins de 15 minutes. Le refus nomme l'occupante et le remède : créer sa propre copie, ou attendre la fin de l'autre session.
+- **L'agent ne pose ni ne retire le marqueur.** La session le retire (`--liberer <copie>`) à la fusion ou au retrait de la copie ; `--lire <copie>` dit qui l'occupe.

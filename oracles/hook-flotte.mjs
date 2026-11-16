@@ -38,7 +38,7 @@
  * Exit : 0 ; l'avertissement sort sur stdout en JSON `hookSpecificOutput.additionalContext`. 2 pour un refus d'isolation (TF-2426), motif sur stderr.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -121,10 +121,112 @@ export function jugerIsolation(entree, env = process.env) {
   return null;
 }
 
-/** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message }, { decision: "rappelle", message } ou { decision: "refuse", message } (TF-2426). */
+/**
+ * TF-2621 (16/11/2026) — UNE COPIE DE TRAVAIL OCCUPÉE PAR UNE SESSION PORTE SON MARQUEUR, ET UNE AUTRE SESSION N'Y LANCE PAS SON AGENT.
+ * Le fait (Produit-86, RP-67, ledger seq 962) : le 12/11/2026, deux sessions du même produit ont fait travailler chacune un constructeur dans la même copie de travail
+ * (créée hors de l'isolation automatique) : 10 fichiers d'un agent écrits au milieu du travail commité de l'autre, collision vue seulement par un message entre sessions.
+ * LA RÈGLE (décision R-58 du 16/11/2026) : à la création d'une copie, la session pose un marqueur d'occupation (session, run, agent, date) dans le RÉPERTOIRE GIT de la
+ * copie (`<git-dir>/occupation-copie.json` : hors de l'arbre, jamais suivi, jamais commité, supprimé avec la copie) ; ce hook le lit avant tout lancement d'agent, pour le
+ * dossier courant ET pour les chemins que la consigne nomme, et REFUSE (exit 2) quand l'occupante est une AUTRE session encore vivante. Une session est vivante quand sa
+ * transcription (`<profil>/projects/*\/<session>.jsonl`) a été écrite depuis moins de 15 minutes, la même fenêtre que le suivi des agents ; sans transcription retrouvée, quand
+ * le marqueur a moins de 15 minutes. Un marqueur dont l'occupante n'écrit plus ne retient personne.
+ * NON JUGÉ, dit : une copie sans marqueur (rien à lire : la pose est le geste de la session qui crée la copie, `scripts/occuper-copie.mjs --poser`), une entrée sans `session_id`,
+ * une occupante vivante dans une transcription que ce poste ne voit pas (un autre poste), et un agent lancé par un script ou une CLI hors de l'outil.
+ */
+export const OCCUPATION_FICHIER = "occupation-copie.json";
+export const SEUIL_OCCUPATION_MS = 15 * 60 * 1000;
+const MAX_COPIES_VISEES = 8;
+export function repertoireGit(dossier) {
+  if (typeof dossier !== "string" || !dossier || !existsSync(dossier)) return null;
+  const r = spawnSync("git", ["-C", dossier, "rev-parse", "--path-format=absolute", "--show-toplevel", "--git-dir"], { encoding: "utf8", timeout: 10000 });
+  if (r.status !== 0) return null;
+  const [racine, git] = String(r.stdout).split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return racine && git ? { racine, git } : null;
+}
+export function lireOccupation(dossier) {
+  const d = repertoireGit(dossier);
+  if (!d) return null;
+  try { return { ...JSON.parse(readFileSync(join(d.git, OCCUPATION_FICHIER), "utf8")), copie: d.racine }; } catch { return null; }
+}
+/** Pose le marqueur ; rend { ok, chemin } ou { ok: false, raison }. */
+export function poserOccupation(dossier, { session, run = "", agent = "" }, maintenant = new Date()) {
+  const d = repertoireGit(dossier);
+  if (!d) return { ok: false, raison: `« ${dossier} » n'est pas une copie de travail git` };
+  if (!session) return { ok: false, raison: "aucune session à inscrire" };
+  const chemin = join(d.git, OCCUPATION_FICHIER);
+  writeFileSync(chemin, JSON.stringify({ session, run, agent, date: maintenant.toISOString() }, null, 1) + "\n");
+  return { ok: true, chemin, copie: d.racine };
+}
+export function libererOccupation(dossier) {
+  const d = repertoireGit(dossier);
+  if (!d) return { ok: false, raison: `« ${dossier} » n'est pas une copie de travail git` };
+  const chemin = join(d.git, OCCUPATION_FICHIER);
+  if (!existsSync(chemin)) return { ok: true, libere: false, copie: d.racine };
+  rmSync(chemin);
+  return { ok: true, libere: true, copie: d.racine };
+}
+/** Âge en ms de la dernière écriture de la transcription de la session, ou null si aucune n'est retrouvée sous les profils `.claude*` du poste. */
+export function ageTranscription(session, { maison = homedir(), env = process.env, maintenant = Date.now() } = {}) {
+  if (!/^[\w-]+$/.test(String(session))) return null;
+  const profils = new Set([env?.CLAUDE_CONFIG_DIR].filter(Boolean));
+  try { for (const e of readdirSync(maison, { withFileTypes: true })) if (e.isDirectory() && /^\.claude/.test(e.name)) profils.add(join(maison, e.name)); } catch { /* poste sans profil */ }
+  let meilleur = null;
+  for (const p of profils) {
+    const projets = join(p, "projects");
+    let dossiers = []; try { dossiers = readdirSync(projets, { withFileTypes: true }).filter((e) => e.isDirectory()); } catch { continue; }
+    for (const d of dossiers) {
+      try { const age = maintenant - statSync(join(projets, d.name, `${session}.jsonl`)).mtimeMs; if (meilleur === null || age < meilleur) meilleur = age; } catch { /* pas dans ce projet */ }
+    }
+  }
+  return meilleur;
+}
+/** Les dossiers que l'appel vise : le dossier courant, puis les chemins absolus de la consigne (au plus 8, dédoublonnés). */
+export function copiesVisees(entree) {
+  const ti = entree?.tool_input || {};
+  const candidats = [entree?.cwd];
+  for (const m of `${ti.prompt || ""}\n${ti.description || ""}`.matchAll(/[A-Za-z]:[\\/][^\s"'`<>|*?()\[\]]+/g)) candidats.push(m[0].replace(/[.,;:]+$/, ""));
+  const vus = new Set(), sortie = [];
+  for (const c of candidats) {
+    if (typeof c !== "string" || !c || !existsSync(c)) continue;
+    let dossier = c; try { if (!statSync(c).isDirectory()) dossier = dirname(c); } catch { continue; }
+    const cle = norme(dossier);
+    if (vus.has(cle)) continue;
+    vus.add(cle); sortie.push(dossier);
+    if (sortie.length >= MAX_COPIES_VISEES) break;
+  }
+  return sortie;
+}
+/** Le refus d'un lancement dans une copie occupée par une autre session vivante, ou null. */
+export function jugerOccupation(entree, { maison, env = process.env, maintenant = Date.now() } = {}) {
+  if (!OUTILS.has(entree?.tool_name)) return null;
+  const session = typeof entree?.session_id === "string" ? entree.session_id : "";
+  if (!session) return null;
+  const vues = new Set();
+  for (const dossier of copiesVisees(entree)) {
+    const d = repertoireGit(dossier);
+    if (!d || vues.has(norme(d.git))) continue;
+    vues.add(norme(d.git));
+    const m = lireOccupation(dossier);
+    if (!m || !m.session || m.session === session) continue;
+    const age = ageTranscription(m.session, { maison, env, maintenant });
+    const ageMarqueur = maintenant - Date.parse(m.date);
+    const vivante = age !== null ? age < SEUIL_OCCUPATION_MS : Number.isFinite(ageMarqueur) && ageMarqueur < SEUIL_OCCUPATION_MS;
+    if (!vivante) continue;
+    const preuve = age !== null ? `sa transcription a été écrite il y a ${Math.round(age / 60000)} min` : `son marqueur date de ${Math.round(ageMarqueur / 60000)} min et sa transcription est introuvable sur ce poste`;
+    return `COPIE DE TRAVAIL OCCUPÉE (TF-2621, 16/11/2026) — « ${d.racine} » porte le marqueur de la session ${m.session}${m.run ? ` (run ${m.run}` : " ("}${m.agent ? `, agent ${m.agent}` : ""}, posé le ${m.date}), `
+      + `encore vivante : ${preuve}. Lancer un agent ici ferait écrire deux sessions dans la même copie ; le 12/11/2026, 10 fichiers d'un agent ont ainsi été écrits au milieu du travail commité de l'autre (Produit-86, RP-67). `
+      + `Remède : créer sa propre copie (\`git worktree add\`), y poser son marqueur (\`node scripts/occuper-copie.mjs --poser <copie> --session <identifiant>\`), puis lancer l'agent dedans ; `
+      + `ou attendre la fin de l'autre session ; si elle est finie, \`node scripts/occuper-copie.mjs --liberer ${d.racine}\`.`;
+  }
+  return null;
+}
+
+/** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message }, { decision: "rappelle", message } ou { decision: "refuse", message } (TF-2426, TF-2621). */
 export function juger(entree, options = {}) {
   const refus = jugerIsolation(entree, options.env);
   if (refus) return { decision: "refuse", message: refus };
+  const occupee = jugerOccupation(entree, options);
+  if (occupee) return { decision: "refuse", message: occupee };
   const v = jugerFlotte(entree, options);
   const racine = OUTILS.has(entree?.tool_name) ? racineEnMinuscule(entree) : null;
   if (!racine) return v;
