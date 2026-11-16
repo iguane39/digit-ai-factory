@@ -30,5 +30,29 @@
         { "paquet": "bibliotheque-a", "langage": "Python", "depot": "https://exemple.invalid/depot-a", "version": "1.0.0", "publiee_le": "2026-10-01", "etat": "courante" }
       ]
     }
+  },
+  "voies_generation": {
+    "regle": "Fixture : table des voies de génération par média, identifiants fictifs.",
+    "date": "2026-11-03",
+    "medias": {
+      "video": {
+        "courantes": [
+          { "fournisseur": "fournisseur-a", "id": "modele-a-nouveau", "acces": "API fictive /v1/video", "etat_poste": "non mesuré", "cout": "non relevé" }
+        ],
+        "arretees": [
+          { "fournisseur": "fournisseur-a", "id": "modele-a-arrete" }
+        ]
+      },
+      "image": {
+        "courantes": [
+          { "fournisseur": "fournisseur-a", "id": "alpha-4o-mini", "acces": "API fictive /v1/image", "etat_poste": "non mesuré", "cout": "non relevé" }
+        ],
+        "arretees": []
+      }
+    },
+    "medias_non_tables": [
+      { "media": "voix", "motif": "fixture : non recopié" },
+      { "media": "musique", "motif": "fixture : non recopié" }
+    ]
   }
 }
