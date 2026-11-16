@@ -394,6 +394,27 @@ function lireNommageDeclare() {
 
 // R-4 — nommage daté des livrables (output/ et docs/ ; input/ non jugé : entrants humains)
 let r4 = true;
+// TF-2638 (16/11/2026) — UN DOSSIER DE SEMAINE D'UN RUN DE RÉSEAU SE RECONNAÎT À SON CONTENU. `RUN-RESEAU.md` (N2)
+// prescrit des fichiers à nom fixe (`calendrier.md`, `publication*.md`) que `oracle-run-reseau` lit dans un dossier de
+// semaine : sous `output\` sans ancêtre daté, chacun prenait un FAIL R-4 « livrable sans nommage » (RP-218 : 15 semaines
+// du 12/11, deux relecteurs aveugles). Un dossier qui porte `calendrier.md` ET au moins un `publication*.md` est un dossier
+// de semaine : ses parties ne sont pas des livrables remis, comme celles d'un livrable-dossier daté (TF-1177). La dispense
+// tient au CONTENU du dossier, jamais à l'extension ni à l'emplacement : un `publication.md` sans calendrier à côté reste
+// jugé. Le plafond de chemin (plus bas) vaut toujours pour chaque fichier.
+const cacheSemaine = new Map();
+const estDossierDeSemaine = (dossierRel) => {
+  if (!cacheSemaine.has(dossierRel)) {
+    let noms = [];
+    try { noms = readdirSync(p(...dossierRel.split("/"))); } catch { /* dossier illisible : pas une semaine */ }
+    cacheSemaine.set(dossierRel, noms.includes("calendrier.md") && noms.some((n) => /^publication.*\.md$/i.test(n)));
+  }
+  return cacheSemaine.get(dossierRel);
+};
+const dansUnDossierDeSemaine = (fichierRel) => {
+  const segs = fichierRel.split("/").slice(0, -1);
+  for (let n = segs.length; n >= 1; n--) if (estDossierDeSemaine(segs.slice(0, n).join("/"))) return true;
+  return false;
+};
 const lotsDeclares = lireLotsDeclares();
 for (const x of lotsDeclares.refus) {
   r4 = false;
@@ -448,6 +469,7 @@ for (const d of ["output", "docs"]) {
       continue;
     }
     if (EXCLUS_NOMMAGE.has(nom) || !EXT_LIVRABLE.has(ext)) continue;
+    if (dansUnDossierDeSemaine(rel(f))) continue; // TF-2638 : partie d'un dossier de semaine de run de réseau
     if (/^docs[\/]projet[\/]/.test(rel(f))) continue; // socle documentaire R-20 : documents vivants à noms fixes, pas des livrables datés
     // TF-0197 (14/08) : le gabarit d'étude du pilot PRESCRIT lui-même « output\03-etudes\
     // <AAAAMMJJ>-etude-<objet>.md » (gabarits\ETUDE-OPPORTUNITE.md l.6) — date en tête, pour

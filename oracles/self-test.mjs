@@ -1164,6 +1164,58 @@ check("TF-1177 — R-4 juge le DOSSIER-livrable daté et non ses parties interne
     throw new Error("le `.png` livré À PLAT dans output\\ n'est plus jugé — la dispense du dossier daté s'est étendue en échappatoire générale");
 });
 
+// ---- fixture DOSSIERS DE SEMAINE (TF-2638, 16/11/2026) : `RUN-RESEAU.md` N2 prescrit des fichiers à nom fixe
+// (`calendrier.md`, `publication*.md`) ; sous `output\` sans ancêtre daté, chacun prenait un FAIL R-4 (RP-218, 15 semaines
+// du 12/11). Les DEUX SENS : un dossier qui porte calendrier ET publication est une semaine, sous un dossier-livrable daté
+// comme sans ancêtre daté ; un `publication.md` sans calendrier, un `.md` voisin de la semaine et un chemin trop long restent jugés. ----
+const FICHIERS_SEMAINE = ["calendrier.md", "publication-linkedin.md", "avis-2026-09-20.md"];
+const projetSemaines = (racineRel, semaines, { sansCalendrier = false } = {}) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-semaines-"));
+  for (const s of semaines) {
+    const dossier = join(d, "output", ...racineRel.split("/"), s);
+    mkdirSync(dossier, { recursive: true });
+    for (const f of FICHIERS_SEMAINE) if (!(sansCalendrier && f === "calendrier.md")) writeFileSync(join(dossier, f), "x" + NL_TEST);
+    writeFileSync(join(dossier, "accord.json"), "{}" + NL_TEST);
+    writeFileSync(join(dossier, "README.md"), "x" + NL_TEST);
+  }
+  sh("git", ["init", "-q", "-b", "main"], d);
+  return d;
+};
+const r4Fails = (d) => lance(d).rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
+const SEMAINES_15 = Array.from({ length: 15 }, (_, i) => `2027-02-${String(i + 1).padStart(2, "0")}`);
+check("TF-2638 vert — 15 semaines rangées sous un dossier-livrable daté ne rendent aucun FAIL R-4", () => {
+  const d = projetSemaines("Digit-AI - Serie reseau - 20261112d", SEMAINES_15);
+  try { const f = r4Fails(d); if (f.length) throw new Error(`${f.length} FAIL R-4 : ${f.slice(0, 3).map((x) => x.ou).join(", ")}`); } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-2638 vert — 15 semaines sous un dossier de run SANS ancêtre daté : reconnues à leur contenu, aucun FAIL R-4", () => {
+  const d = projetSemaines("run-reseau", SEMAINES_15);
+  try { const f = r4Fails(d); if (f.length) throw new Error(`${f.length} FAIL R-4 : ${f.slice(0, 3).map((x) => x.message).join(" | ")}`); } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-2638 rouge — un dossier sans calendrier.md n'est pas une semaine : ses publication*.md restent jugés, nommés", () => {
+  const d = projetSemaines("run-reseau", ["2027-02-01"], { sansCalendrier: true });
+  try {
+    const f = r4Fails(d);
+    if (!f.some((x) => /publication-linkedin\.md$/.test(x.ou) && /nommage/.test(x.message))) throw new Error(`publication-linkedin.md n'est plus jugé : ${JSON.stringify(f.map((x) => x.ou))}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-2638 rouge — un .md voisin de la semaine, dans le dossier du run, reste jugé : la dispense tient au contenu du dossier, pas à son emplacement", () => {
+  const d = projetSemaines("run-reseau", ["2027-02-01"]);
+  try {
+    writeFileSync(join(d, "output", "run-reseau", "notes.md"), "x" + NL_TEST);
+    const f = r4Fails(d);
+    if (!f.some((x) => /run-reseau\/notes\.md$/.test(x.ou))) throw new Error(`notes.md voisin n'est plus jugé : ${JSON.stringify(f.map((x) => x.ou))}`);
+    if (f.some((x) => /2027-02-01/.test(x.ou))) throw new Error(`une partie de la semaine est jugée : ${JSON.stringify(f.map((x) => x.ou))}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-2638 rouge — le plafond de chemin vaut toujours dans une semaine : un nom trop long y est refusé", () => {
+  const d = projetSemaines("run-reseau", ["2027-02-01"]);
+  try {
+    writeFileSync(join(d, "output", "run-reseau", "2027-02-01", "publication-" + "x".repeat(110) + ".md"), "x" + NL_TEST);
+    const f = r4Fails(d);
+    if (!f.some((x) => /chemin de \d+ caractères/.test(x.message))) throw new Error(`plafond de chemin muet dans une semaine : ${JSON.stringify(f.map((x) => x.message.slice(0, 60)))}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 // ---- fixture ROUGE-ENV (TF-0869) : le `.env.example` est PRÉSENT, RENSEIGNÉ et SUIVI — donc
 // vert pour les trois sous-contrôles historiques de R-13 — et il porte pourtant deux valeurs
 // qui n'auraient jamais dû entrer dans un fichier versionné : une variable déléguée à l'humain

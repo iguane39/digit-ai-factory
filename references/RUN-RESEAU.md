@@ -91,8 +91,22 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
    `oracle-claims` ; transparence par `oracle-transparence` (une publication générée sans mention
    fait FAIL) ; voix par les règles de l'émetteur (`voix.json`, RR8). Une légende d'image joint son
    visuel ; une réponse à un avis joint l'avis, tel que collé par l'humain, avec sa date.
+
+   **Où vit le dossier de semaine (TF-2638).** Chez le produit, sous `output\` : un dossier par
+   semaine, qui porte `calendrier.md` et au moins un `publication*.md`, avec ses `avis-*.md`, ses
+   visuels, son `accord.json` et son `mesures.json`. Deux rangements tiennent R-4. Sous un
+   dossier-livrable daté, un par lot : `output\<Marque> - <Objet> - AAAAMMJJ<i>\<AAAA-MM-JJ>\`.
+   Ou sous un dossier de run sans date : `output\run-reseau\<AAAA-MM-JJ>\`. Dans les deux cas
+   `oracle-conformite-projet` reconnaît la semaine à son contenu (calendrier et publication
+   ensemble) et ne juge pas le nommage daté de ses parties, dont les noms fixes sont ceux que lit
+   `oracle-run-reseau`. Le plafond de chemin de 150 caractères, sidecar d'oracle compris, vaut
+   toujours pour chaque fichier : on raccourcit l'`<Objet>` du dossier-livrable, jamais le nom
+   d'un fichier fixe. `emetteur.json` et `voix.json` se posent dans le dossier de semaine ou dans
+   son parent.
 3. **Accorder et programmer (N3).** Accord humain consigné au ledger (R-38), **un par lot**, qui
-   nomme chaque fichier couvert. Puis programmation ou publication **par l'humain**, dans l'outil
+   nomme chaque fichier couvert. `accord.json` se pose dans le dossier de la semaine accordée, à
+   côté des publications qu'il couvre, une fois l'accord donné et jamais avant ; son `lot` les
+   nomme toutes. Puis programmation ou publication **par l'humain**, dans l'outil
    de la plateforme. Chaque publication est archivée chez le produit, avec sa date réelle.
 4. **Animer (N4).** Réponses, modération et **réponses aux avis** **par l'humain**. L'IA propose
    une réponse sur un texte collé ; elle ne lit aucun compte. Sur la fiche d'établissement, la
