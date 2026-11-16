@@ -13,6 +13,8 @@
  *                     %VARIABLE% développés) ; la variable d'environnement REPRISE_CANAL prime ;
  *   elements        — chemins relatifs au produit (fichier ou dossier), au même chemin dans le canal ;
  *   exclusions      — motifs ajoutés aux exclusions dures ;
+ *   regenerer       — [{ commande, produit }] : à la restauration, après la copie, la commande se joue depuis la
+ *                     racine du produit quand `produit` (chemin relatif d'une base ignorée par git) manque ou est vide ;
  *   envoi           — { actif, go_publication: { decision, date, par } } : l'envoi vers le canal fait
  *                     partir des fichiers vers un service hébergé, il exige le feu vert R-38 consigné.
  *
@@ -22,7 +24,8 @@
  *   --verifier   le juge (défaut) : RP1 manifeste valide · RP2 aucun secret déclaré · RP3 canal joignable
  *                sur ce poste · RP4 aucun écart non restauré · RP5 envoi actif sous feu vert consigné ·
  *                RP6 rien de ce que le canal poserait n'est commitable (TF-2441) · RP7 un feu vert de
- *                publication consigné au ledger qui vise un dossier synchronisé a son manifeste (TF-2623).
+ *                publication consigné au ledger qui vise un dossier synchronisé a son manifeste (TF-2623) ·
+ *                RP8 une base dérivée ignorée par git est copiée, régénérée ou écartée à dessein (TF-2680).
  *   Options : --racine <produit> (défaut : dossier courant), --budget <secondes>, --etat <dossier>.
  *
  * DÉCISION FICHIER PAR FICHIER. Un état par poste et par produit, HORS du dépôt
@@ -55,7 +58,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 
-export const VERSION = "1.2.0";
+export const VERSION = "1.3.0";
 export const MANIFESTE = join("forge", "REPRISE.json");
 
 // Un motif par ligne : `*` vaut n'importe quel nom sans séparateur, et un motif sans « / » juge le
@@ -98,7 +101,49 @@ export function defautsManifeste(m) {
   else for (const e of m.elements)
     if (typeof e !== "string" || !e.trim() || /^([a-z]:|[\\/])/i.test(e) || e.split(/[\\/]/).includes("..")) d.push(`élément « ${e} » : un chemin RELATIF au produit, sans « .. »`);
   if (m.exclusions !== undefined && !Array.isArray(m.exclusions)) d.push("« exclusions » est une liste de motifs");
+  if (m.regenerer !== undefined) {
+    if (!Array.isArray(m.regenerer)) d.push("« regenerer » est une liste de { commande, produit }");
+    else for (const r of m.regenerer) {
+      if (!r || typeof r !== "object" || typeof r.commande !== "string" || !r.commande.trim()) d.push(`« regenerer » : ${JSON.stringify(r)} n'est pas un objet { commande, produit } à commande non vide`);
+      else if (typeof r.produit !== "string" || !r.produit.trim() || /^([a-z]:|[\\/])/i.test(r.produit) || r.produit.split(/[\\/]/).includes("..")) d.push(`« regenerer » : le produit de « ${r.commande} » est un chemin RELATIF au produit, sans « .. »`);
+    }
+  }
   return d;
+}
+
+// TF-2680 (factory-digit-ai-fr 20261115zb) : une base dérivée, ignorée par git, ne voyage ni par git ni par le canal. Le 15/11/2026,
+// sur un poste neuf restauré par le canal, data/site-v2.db était créée vide au démarrage local : 13 pages de forge rendaient 404 sans
+// erreur, et seule l'image Docker savait la régénérer. Le manifeste porte donc `regenerer` : { commande, produit }, la commande étant
+// rejouée à la restauration, depuis la racine du produit, quand `produit` manque ou est vide.
+export const MOTIFS_BASES = ["*.db", "*.sqlite", "*.sqlite3", "*.duckdb"];
+const etatBase = (racine, rel) => { try { const st = statSync(join(racine, rel)); return st.isFile() ? (st.size > 0 ? "présente" : "vide") : "absente"; } catch { return "absente"; } };
+
+/** Rejoue la commande de chaque base absente ou vide ; rend [{ commande, produit, ok, detail }]. Jamais de sortie de la commande, hors la fin de son erreur. */
+export function regenererBases(racine, m, restantMs = 200000) {
+  const debut = Date.now(), rendu = [];
+  for (const r of m.regenerer || []) {
+    if (etatBase(racine, r.produit) === "présente") continue;
+    const reste = restantMs - (Date.now() - debut);
+    if (reste <= 0) { rendu.push({ commande: r.commande, produit: r.produit, ok: false, detail: "budget de temps atteint, reporté au prochain passage" }); continue; }
+    const p = spawnSync(r.commande, { cwd: racine, shell: true, encoding: "utf8", timeout: Math.max(5000, reste), maxBuffer: 16 * 1024 * 1024 });
+    const apres = etatBase(racine, r.produit);
+    if (p.status === 0 && apres === "présente") { rendu.push({ commande: r.commande, produit: r.produit, ok: true }); continue; }
+    const cause = p.error ? String(p.error.code || p.error.message) : p.status !== 0 ? `exit ${p.status}` : `${r.produit} reste ${apres}`;
+    rendu.push({ commande: r.commande, produit: r.produit, ok: false, detail: `${cause}${p.stderr ? " : " + String(p.stderr).trim().slice(-160) : ""}` });
+  }
+  return rendu;
+}
+
+/** Les bases (.db, .sqlite…) que git ignore sur ce poste : { toutes, orphelines }, les orphelines étant celles que le manifeste ne couvre pas (ni élément, ni exclusion, ni régénération). */
+export function basesIgnoreesDeGit(racine, m) {
+  const env = { ...process.env };
+  for (const k of ["GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"]) delete env[k];
+  const r = spawnSync("git", ["-C", racine, "ls-files", "-z", "--others", "--ignored", "--exclude-standard", "--", ...MOTIFS_BASES], { encoding: "utf8", env, maxBuffer: 256 * 1024 * 1024 });
+  if (r.status !== 0) return { toutes: [], orphelines: [] };
+  const elements = (m.elements || []).map((e) => e.replaceAll("\\", "/").replace(/\/+$/, ""));
+  const produits = new Set((m.regenerer || []).map((x) => String(x.produit).replaceAll("\\", "/")));
+  const toutes = r.stdout.split("\0").filter(Boolean).filter((rel) => !estExclu(rel, []));
+  return { toutes, orphelines: toutes.filter((rel) => !estExclu(rel, m.exclusions || []) && !produits.has(rel) && !elements.some((e) => rel === e || rel.startsWith(e + "/"))) };
 }
 
 export const goComplet = (m) => {
@@ -258,7 +303,9 @@ export function synchroniser(racine, sens, opt = {}) {
     if (p.conflit) conflits.push({ rel: p.rel, motif: p.motif, sauvegarde });
   }
   ecrireEtat(racine, opt, etat);
-  return { canal, sens, fait, conflits, refuses, reste, egaux: plan.filter((p) => p.sens === "egal").length, a_faire_autre_sens: plan.filter((p) => p.sens !== "egal" && p.sens !== sens).length };
+  // TF-2680 : après la copie, les bases dérivées que le canal ne porte pas se régénèrent (restauration seulement).
+  const regenere = sens === "restaurer" ? regenererBases(racine, m, budget - (Date.now() - debut)) : [];
+  return { canal, sens, fait, conflits, refuses, regenere, reste, egaux: plan.filter((p) => p.sens === "egal").length, a_faire_autre_sens: plan.filter((p) => p.sens !== "egal" && p.sens !== sens).length };
 }
 
 /** Le juge. */
@@ -302,6 +349,16 @@ export function verifier(racine, opt = {}) {
       ko("RP6", `${refuses.length} fichier(s) du canal seraient posés sur ce poste sans que git les ignore ni les suive, donc commitables : ${refuses.slice(0, 3).map((p) => p.rel).join(", ")} — rien n'a été posé. Un dossier ignoré a-t-il été renommé ? Garder l'ancien chemin dans le .gitignore du produit (ligne par dossier, ex. « ${motifs.join(" », « ")} »), ou retirer ces fichiers du canal`);
     } else ok("RP6", git ? "rien de ce que le canal poserait n'est commitable : tout est ignoré ou déjà suivi par git" : "produit hors dépôt git : le périmètre ignoré n'est pas jugé");
   }
+  // RP8 (TF-2680) : une base dérivée ignorée par git se copie, se régénère ou s'écarte à dessein ; sinon elle manque sur le poste suivant.
+  const regen = Array.isArray(m.regenerer) ? m.regenerer : [];
+  const manque = regen.map((r) => ({ ...r, etat: etatBase(racine, r.produit) })).filter((r) => r.etat !== "présente");
+  const { toutes: bases, orphelines } = basesIgnoreesDeGit(racine, m);
+  if (manque.length)
+    ko("RP8", `${manque.length} base(s) dérivée(s) à régénérer, absente(s) ou vide(s) sur ce poste : ${manque.slice(0, 3).map((r) => `${r.produit} (${r.etat}, « ${r.commande} »)`).join(", ")} — \`node oracles/oracle-reprise.mjs --restaurer\` joue la commande, et le hook d'ouverture le fait seul`
+      + (orphelines.length ? ` ; ${orphelines.length} autre(s) base(s) ignorée(s) par git que rien ne couvre : ${orphelines.slice(0, 3).join(", ")}` : ""));
+  else if (orphelines.length)
+    findings.push({ regle: "RP8", statut: "AVERT", message: `${orphelines.length} base(s) ignorée(s) par git que le manifeste ne couvre pas, ni copiée(s) ni régénérée(s) : ${orphelines.slice(0, 3).join(", ")} — sur un autre poste elles manqueront, ou seront créées vides au démarrage. Les nommer dans « elements » (copie par le canal), dans « regenerer » ({ commande, produit }), ou dans « exclusions » si elles sont locales à dessein` });
+  else if (regen.length || bases.length) ok("RP8", `${regen.length} base(s) dérivée(s) régénérable(s) par la commande déclarée, ${bases.length} base(s) ignorée(s) par git sur ce poste, toutes couvertes (copiées, régénérées ou écartées à dessein)`);
   if (m.envoi?.actif && !goComplet(m)) ko("RP5", "envoi actif sans feu vert de publication complet — « envoi.go_publication » porte decision, date (AAAA-MM-JJ) et par : envoyer vers le canal publie sur un service hébergé (R-38)");
   else if (m.envoi?.actif) ok("RP5", `envoi actif sous le feu vert « ${m.envoi.go_publication.decision} » du ${m.envoi.go_publication.date}`);
   else findings.push({ regle: "RP5", statut: "AVERT", message: "envoi non actif : ce qui change hors de git sur ce poste ne part pas vers le canal, et l'autre poste ne le verra pas" });
@@ -313,6 +370,7 @@ export const NON_JUGE = [
   "deux postes qui écrivent le même fichier entre deux synchronisations : le plus récent gagne, l'autre reste en sauvegarde, sans fusion de contenu",
   "le périmètre ignoré d'un produit qui n'est pas un dépôt git : sans git, rien ne dit ce qui serait commitable, et la restauration ne refuse rien",
   "ce que le fournisseur du canal fait du fichier une fois déposé (versions, partage, rétention)",
+  "que la commande de `regenerer` produise une base CORRECTE : le juge lit seulement que `produit` existe et n'est pas vide après son passage ; RP8 ne cherche que les extensions .db, .sqlite, .sqlite3 et .duckdb, une autre base dérivée ignorée par git n'est pas vue",
   "que le feu vert qui nomme un dossier synchronisé (RP7) soit bien pour une reprise : seul le texte de l'entrée `go_publication` du ledger sert d'indice (noms de fournisseurs), un partage de livrable sur Drive se lit aussi comme une reprise, et un feu vert consigné ailleurs que `forge/ledger.jsonl` n'est pas vu",
   "que le canal soit à jour du côté du fournisseur : le juge lit le miroir local, tel que le client de synchronisation l'a laissé",
 ];

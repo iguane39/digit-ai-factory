@@ -242,5 +242,79 @@ check("TF-2623 — un feu vert qui ne vise aucun dossier synchronisé, ou pas de
   }
 });
 
-console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 8 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7 et l'envoi refusé), chacun avec son remède vert`);
+// ---- TF-2680 (factory-digit-ai-fr 20261115zb) : une base dérivée, ignorée par git, ne voyage ni par git ni par le canal.
+// Le 15/11/2026, sur un poste neuf restauré par le canal, data/site-v2.db était créée vide au démarrage local : 13 pages de
+// forge rendaient 404 sans erreur. REPRISE.json porte une liste « regenerer » ({ commande, produit }) que la restauration joue
+// quand le produit manque ou est vide ; RP8 juge cette base, et signale toute base ignorée par git que rien ne couvre.
+const GENERATEUR = 'import { mkdirSync, writeFileSync } from "node:fs";\nmkdirSync("data", { recursive: true });\nwriteFileSync("data/site-v2.db", "catalogue fictif de la v2");\n';
+const REGEN = { commande: "node scripts/generer-base.mjs", produit: "data/site-v2.db" };
+const manifeste = (b, extra) => {
+  const f = join(b.produit, "forge", "REPRISE.json");
+  writeFileSync(f, JSON.stringify({ ...JSON.parse(readFileSync(f, "utf8")), ...extra }));
+};
+const bancBase = (extra) => {
+  const b = bancGit("data/\n", { "scripts/generer-base.mjs": GENERATEUR });
+  manifeste(b, extra);
+  return b;
+};
+const message = (r, regle) => r.findings.find((f) => f.regle === regle)?.message || "";
+
+check("TF-2680 rouge — base ignorée absente du poste : RP8 FAIL la nomme ; la restauration joue la commande, RP8 PASS, git ne voit rien", () => {
+  const b = bancBase({ regenerer: [REGEN] });
+  const v = verifier(b.produit, b.opt);
+  egal(statut(v, "RP8"), "FAIL", "RP8 base absente");
+  if (!/data\/site-v2\.db/.test(message(v, "RP8")) || !/--restaurer/.test(message(v, "RP8"))) throw new Error("le constat ne nomme pas la base ni la restauration : " + message(v, "RP8"));
+  const h = jouerHook(b);
+  egal(h.status, 0, "hook");
+  if (!/1 base\(s\) régénérée\(s\)/.test(h.stdout)) throw new Error("le hook ne dit pas la régénération : " + h.stdout);
+  egal(readFileSync(join(b.produit, "data", "site-v2.db"), "utf8"), "catalogue fictif de la v2", "base régénérée");
+  egal(statut(verifier(b.produit, b.opt), "RP8"), "PASS", "RP8 après restauration");
+  egal(b.visibles().length, 0, "fichiers non suivis visibles à git status");
+  // idempotence : une base présente et non vide ne se régénère pas
+  writeFileSync(join(b.produit, "data", "site-v2.db"), "base enrichie sur ce poste");
+  egal(synchroniser(b.produit, "restaurer", b.opt).regenere.length, 0, "régénération d'une base présente");
+  egal(readFileSync(join(b.produit, "data", "site-v2.db"), "utf8"), "base enrichie sur ce poste", "base du poste intacte");
+});
+
+check("TF-2680 — la base créée VIDE au démarrage local (le cas du 15/11) est régénérée comme une base absente", () => {
+  const b = bancBase({ regenerer: [REGEN] });
+  mkdirSync(join(b.produit, "data"), { recursive: true }); writeFileSync(join(b.produit, "data", "site-v2.db"), "");
+  const v = verifier(b.produit, b.opt);
+  egal(statut(v, "RP8"), "FAIL", "RP8 base vide");
+  if (!/vide/.test(message(v, "RP8"))) throw new Error("le constat ne dit pas que la base est vide : " + message(v, "RP8"));
+  const s = synchroniser(b.produit, "restaurer", b.opt);
+  egal(s.regenere.length, 1, "bases régénérées"); egal(s.regenere[0].ok, true, "régénération réussie");
+  egal(statut(verifier(b.produit, b.opt), "RP8"), "PASS", "RP8 après restauration");
+});
+
+check("TF-2680 — une commande de régénération qui échoue se dit (ok faux, RP8 FAIL, ligne du hook) ; une liste mal formée rend RP1 FAIL", () => {
+  const b = bancBase({ regenerer: [{ commande: "node scripts/nulle-part.mjs", produit: "data/site-v2.db" }] });
+  const s = synchroniser(b.produit, "restaurer", b.opt);
+  egal(s.regenere[0].ok, false, "régénération échouée");
+  egal(statut(verifier(b.produit, b.opt), "RP8"), "FAIL", "RP8 base toujours absente");
+  const h = jouerHook(b);
+  if (!/régénération en échec/.test(h.stdout) || !/nulle-part/.test(h.stdout)) throw new Error("le hook ne nomme pas la commande en échec : " + h.stdout);
+  manifeste(b, { regenerer: ["node scripts/generer-base.mjs"] });
+  egal(statut(verifier(b.produit, b.opt), "RP1"), "FAIL", "RP1 liste mal formée");
+  manifeste(b, { regenerer: [{ commande: "node x.mjs", produit: "../hors.db" }] });
+  egal(statut(verifier(b.produit, b.opt), "RP1"), "FAIL", "RP1 produit hors du dépôt");
+});
+
+check("TF-2680 — une base ignorée par git que rien ne couvre (ni élément, ni régénération) : RP8 AVERT la nomme ; chaque remède la couvre", () => {
+  const b = bancBase({});
+  mkdirSync(join(b.produit, "data"), { recursive: true }); writeFileSync(join(b.produit, "data", "site-v2.db"), "catalogue");
+  const v = verifier(b.produit, b.opt);
+  egal(statut(v, "RP8"), "AVERT", "RP8 base non couverte"); egal(v.verdict, "PASS", "un avertissement ne bloque pas");
+  if (!/data\/site-v2\.db/.test(message(v, "RP8"))) throw new Error("le constat ne nomme pas la base : " + message(v, "RP8"));
+  manifeste(b, { regenerer: [REGEN] });
+  egal(statut(verifier(b.produit, b.opt), "RP8"), "PASS", "RP8 avec régénération");
+  manifeste(b, { regenerer: undefined, elements: ["input", "data"] });
+  egal(statut(verifier(b.produit, b.opt), "RP8"), "PASS", "RP8 avec la base comme élément");
+  manifeste(b, { elements: ["input"], exclusions: ["data/site-v2.db"] });
+  egal(statut(verifier(b.produit, b.opt), "RP8"), "PASS", "RP8 avec la base écartée à dessein");
+  const sans = bancGit("", { "input/a.txt": "suivi" }); // aucun fichier ignoré, aucune régénération : rien à dire
+  egal(statut(verifier(sans.produit, sans.opt), "RP8"), undefined, "RP8 sans objet");
+});
+
+console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 9 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7, RP8 et l'envoi refusé), chacun avec son remède vert`);
 process.exit(fail ? 1 : 0);
