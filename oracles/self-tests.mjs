@@ -412,6 +412,15 @@ const ETAT_DU_PARC = [
     motif: "les trois porteurs de la version de RESTITUTION.md (en-tête du gabarit, étiquette du rappel de hook-restitution.mjs, ligne des gates de hook-ouverture.mjs) divergent (RC1)",
     remede: "mettre les deux porteurs en retard à la version du gabarit, qui fait foi (le message du verdict les nomme)",
   },
+  {
+    // TF-2521 (16/11/2026) : 46 des 887 sidecars d'oracle suivis (`ETAPE-MEP.md.oracles.json` à la racine, `.oracles/…`) nommaient un arbre lié
+    // (`..\_wt-pilot-ph\…`, `.claude\worktrees\agent-…\…`) : le contrôle de lisibilité y inscrit le chemin de l'arbre où l'édition a eu lieu, et la fusion
+    // l'emporte. C'est un état du PARC : le défaut naît d'un commit, jamais d'un artefact qu'on passerait à un oracle.
+    nom: "oracle-sidecars-arbre-lie.mjs",
+    args: ["--json"],
+    motif: "sidecar d'oracle suivi dont un champ de chemin nomme un arbre lié (SL1) : le chemin cite un dossier qui n'existera plus, et la clé d'empreinte ne se résout plus depuis la racine",
+    remede: "node oracles\\oracle-sidecars-arbre-lie.mjs --corriger (le chemin redevient celui du dépôt principal), puis commiter les sidecars réécrits",
+  },
 ];
 for (const { nom, remede, args: argsParc } of ETAT_DU_PARC) {
   // Certains oracles d'etat jugent des ARTEFACTS nommes plutot qu'un parc entier : ils portent
