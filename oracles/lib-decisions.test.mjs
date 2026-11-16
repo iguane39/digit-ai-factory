@@ -9,10 +9,10 @@
  * une décision sans réponse reste rappelée ; une retraite ne sort QUE la décision qu'elle nomme ; une retraite antérieure à la décision ne la sort pas ;
  * une décision hors de la fenêtre de 14 jours n'est pas rappelée. Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { decisionsSansReponse, decisionsRetirees, DECISION_RETIREE } from "./lib-decisions.mjs";
+import { decisionsSansReponse, decisionsRetirees, DECISION_RETIREE, decisionsPiloteSansReponse, consignerReponse, lettresDeReponse, reponsesDuRegistre, lireRegistrePilot } from "./lib-decisions.mjs";
 
 const casse = [];
 let n = 0;
@@ -58,7 +58,39 @@ veut(ouvertes([pose({ "D-12": "Faut-il garder le lot de la semaine passée ?" })
 veut(decisionsRetirees({ decision: "D-12", decisions: ["D-13", "d 14"], decisions_retirees: "D-15" }).join(",") === "D-12,D-13,D-14,D-15", "C2 : decisionsRetirees ne lit pas les trois champs, chaîne ou liste");
 veut(decisionsRetirees({ decision: "la décision du 12 octobre" }).length === 0, "C3 vert : un texte qui n'est pas un numéro de décision est lu comme tel");
 
+// ── D. Le registre du PILOT porte la réponse humaine (TF-2214, 16/11/2026) ──────────────────────
+// Le cas fondateur : D-48 posée le 03/11, sans réponse ni rappel. Au pilot, `decisions\REGISTRE.jsonl` ne portait que des lignes `registre` et `decision` :
+// rien ne disait qu'une décision attendait. `hook-lexique` consigne la lettre ; `decisionsPiloteSansReponse` rappelle ce qui n'a pas de réponse.
+const MAINT_PILOT = Date.parse("2026-11-20T12:00:00Z");
+const registre = (...decisions) => {
+  const f = join(T, `registre-${++k}.jsonl`);
+  writeFileSync(f, [{ type: "registre", version: 1 }, ...decisions.map(([n, ts, question]) => ({ type: "decision", n, question: question || `Question de la décision ${n} ?`, date: ts.slice(0, 10), ts, origine: "reservation" }))].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+  return f;
+};
+const sansReponse = (f, options = {}) => decisionsPiloteSansReponse({ fichier: f, maintenant: MAINT_PILOT, ...options }).map((d) => d.n).join(",");
+veut(lettresDeReponse("223a", 223).join() === "a" && lettresDeReponse("D-76 (c)", 76).join() === "c" && lettresDeReponse("68a + b", 68).join() === "a,b" && lettresDeReponse("219e, 220a", 220).join() === "a",
+  "D1 vert : les lettres se lisent pour le seul numéro demandé (« 223a », « D-76 (c) », « 68a + b », « 219e, 220a »)");
+veut(lettresDeReponse("oui, fais-le", 48).length === 0 && lettresDeReponse("il y a 3 jours", 3).length === 0 && lettresDeReponse("48a " + "x".repeat(300), 48).length === 0 && lettresDeReponse("A1 & A2", 1).length === 0,
+  "D2 rouge : un message sans lettre, une date, un sélecteur d'action ou un long texte ne donne aucune lettre");
+{
+  const f = registre([47, "2026-11-10T09:00:00Z"], [48, "2026-11-18T09:00:00Z"], [49, "2026-11-19T09:00:00Z"], [51, "2026-11-02T09:00:00Z"], [51, "2026-11-19T10:00:00Z", "Question de la décision 51, reformulée ?"]);
+  veut(sansReponse(f) === "D-48,D-49", `D3 rouge : D-48 et D-49, réservées sans réponse, doivent être rappelées ; D-47 (avant l'écrivain) et D-51 (réservée hors fenêtre, puis reformulée) non — lu « ${sansReponse(f)} »`);
+  veut(sansReponse(f, { depuis: "2026-11-01T00:00:00Z" }) === "D-47,D-48,D-49", "D4 vert : sans la borne de l'écrivain, D-47 (réservée il y a 10 jours) est rappelée ; D-51 reste hors fenêtre malgré sa reformulation");
+  const brut = readFileSync(f, "utf8");
+  const r = consignerReponse({ n: 48, lettres: ["B"], fichier: f });
+  veut(r.consignee === true && sansReponse(f) === "D-49", `D5 vert : la réponse à D-48 sort D-48 du rappel, D-49 reste ; lu « ${sansReponse(f)} »`);
+  const ajout = readFileSync(f, "utf8").slice(brut.length).trim();
+  const e5 = ajout ? JSON.parse(ajout) : {};
+  veut(ajout.split("\n").length === 1 && e5.type === "reponse" && e5.n === 48 && e5.lettres?.join() === "b" && /^\d{4}-\d{2}-\d{2}$/.test(e5.date) && !("texte" in e5) && !("message" in e5) && !("question" in e5),
+    `D6 : l'entrée ne porte que le numéro, les lettres, la date et la session, jamais un texte du message : ${ajout}`);
+  veut(consignerReponse({ n: 48, lettres: ["c"], fichier: f }).consignee === false && readFileSync(f, "utf8").split("\n").filter((l) => /"type":"reponse"/.test(l)).length === 1, "D7 rouge : une seconde réponse à D-48 n'ajoute rien (une entrée par décision)");
+  veut(consignerReponse({ n: 99, lettres: ["a"], fichier: f }).consignee === false && consignerReponse({ n: 49, lettres: [], fichier: f }).consignee === false && consignerReponse({ n: 49, lettres: ["1"], fichier: f }).consignee === false,
+    "D8 rouge : un numéro absent du registre, une réponse sans lettre ou une lettre qui n'en est pas une ne s'écrivent pas");
+  veut(consignerReponse({ n: 48, lettres: ["a"], fichier: join(T, "nulle-part.jsonl") }).consignee === false && !existsSync(join(T, "nulle-part.jsonl")), "D9 rouge : sans registre, rien n'est créé");
+  veut(reponsesDuRegistre(f).length === 1 && lireRegistrePilot(f).entrees.length === 5, "D10 : la ligne `reponse` n'est pas une décision — lireRegistrePilot l'ignore, le prochain numéro réservé ne bouge pas");
+}
+
 rmSync(T, { recursive: true, force: true });
 if (casse.length) { console.error(`lib-decisions : ${casse.length} défaut(s)\n - ${casse.join("\n - ")}`); process.exit(1); }
-console.log(`lib-decisions (S93, TF-2415) : ${n}/${n} PASS (cas rouges : une décision retirée par un type decision_retiree, en champ simple ou en liste, et le rattachement « D-N remplacée par D-M » sortent la décision du rappel ; `
+console.log(`lib-decisions (S93, TF-2415, TF-2214) : ${n}/${n} PASS (cas rouges du pilot : D-N réservée sans réponse rappelée, la réponse consignée la sort, une seule entrée par décision, jamais le texte du message ; cas rouges : une décision retirée par un type decision_retiree, en champ simple ou en liste, et le rattachement « D-N remplacée par D-M » sortent la décision du rappel ; `
   + "cas verts : une décision sans sortie reste rappelée, une retraite ne sort que la décision qu'elle nomme, une retraite antérieure ou d'un autre type ne sort rien, la fenêtre de 14 jours tient)");

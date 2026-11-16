@@ -5,7 +5,7 @@
  * contexte nommant le skill ; un message ordinaire ne produit RIEN (stdout vide, exit 0).
  */
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -252,6 +252,32 @@ check("cas rouge — hook — transcript absent, illisible ou sans champ → rie
   writeFileSync(illisible, "ceci n'est pas du JSON\n{ casse\n");
   const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify({ prompt: "exécute le prompt", transcript_path: illisible }) });
   if (r.status !== 0 || r.stdout.trim() !== "") throw new Error(`transcript illisible : exit ${r.status}, ${JSON.stringify(r.stdout)}`);
+});
+// TF-2214 (16/11/2026) — la lettre du porteur s'écrit au registre des décisions du PILOT : une entrée `reponse` par décision, ses lettres seules, jamais le
+// texte du message ; hors du pilot (un produit a ses propres D-N), sans lettre, ou pour un numéro absent du registre, rien ne s'écrit. Joué au point d'entrée réel.
+check("hook — « 48b » dans une session du pilot consigne la réponse de D-48 au registre (lettre seule) ; sans lettre, hors pilot, numéro inconnu ou texte long : rien", () => {
+  const dir = mkdtempSync(join(tmpdir(), "lexique-reponse-"));
+  const registre = join(dir, "REGISTRE.jsonl");
+  const maintenant = new Date().toISOString();
+  const decision = (n) => JSON.stringify({ type: "decision", n, question: `Question de la décision ${n} ?`, date: maintenant.slice(0, 10), ts: maintenant, origine: "reservation" });
+  writeFileSync(registre, [JSON.stringify({ type: "registre", version: 1 }), decision(48), decision(49)].join("\n") + "\n", "utf8");
+  const PILOT = join(dirname(HOOK), "..");
+  const lancer = (prompt, cwd = PILOT) => spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd, input: JSON.stringify({ prompt, cwd }),
+    env: { ...process.env, FORGE_REGISTRE_DECISIONS_PILOT: registre, CLAUDE_PROJECT_DIR: cwd } });
+  const reponses = () => readFileSync(registre, "utf8").split("\n").filter((l) => /"type":"reponse"/.test(l)).map((l) => JSON.parse(l));
+  for (const [prompt, cwd] of [["oui, fais-le", PILOT], ["49", PILOT], ["99a", PILOT], ["48b", dir], ["48b " + "mot ".repeat(100), PILOT]]) {
+    const r = lancer(prompt, cwd);
+    if (r.status !== 0) throw new Error(`exit ${r.status} sur « ${prompt.slice(0, 20)} »`);
+    if (reponses().length) throw new Error(`« ${prompt.slice(0, 20)}… » (cwd ${cwd === PILOT ? "pilot" : "produit"}) a écrit une réponse : ${JSON.stringify(reponses())}`);
+  }
+  const r = lancer("48b");
+  if (r.status !== 0) throw new Error(`exit ${r.status}`);
+  const e = reponses();
+  if (e.length !== 1 || e[0].n !== 48 || e[0].lettres.join() !== "b" || e[0].origine !== "hook-lexique" || "texte" in e[0] || "message" in e[0]) throw new Error(`entrée attendue pour D-48 : ${JSON.stringify(e)}`);
+  lancer("48a"); lancer("48b");
+  if (reponses().length !== 1) throw new Error("une seconde réponse a été ajoutée pour D-48");
+  lancer("49a + b");
+  if (reponses().map((x) => `${x.n}${x.lettres.join("+")}`).join() !== "48b,49a+b") throw new Error(`D-49 non consignée : ${JSON.stringify(reponses())}`);
 });
 console.log(`\nhook-lexique.test : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

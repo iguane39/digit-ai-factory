@@ -839,6 +839,31 @@ if (veut(2214)) {
   });
 }
 
+// ---- TF-2214 (16/11/2026), suite : AU PILOT, la décision réservée au registre sans réponse consignée se signale à l'ouverture. Le registre est un fichier d'essai
+// (FORGE_REGISTRE_DECISIONS_PILOT) : celui du pilot n'est jamais lu ni écrit. Vert : D-90 réservée il y a un quart d'heure, sans entrée `reponse`, est nommée avec sa date ;
+// le remède se joue (l'entrée `reponse` fait disparaître la section) ; une décision réservée avant l'entrée en service de l'écrivain (16/11/2026) n'est pas nommée.
+if (veut(2214)) {
+  const dossierReg = mkdtempSync(join(tmpdir(), "ouverture-registre-pilot-"));
+  const reg = join(dossierReg, "REGISTRE.jsonl");
+  const il = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
+  const decision = (n, jours) => JSON.stringify({ type: "decision", n, question: "Supprime-t-on le réseau vide créé en Europe du Nord ?", date: il(jours).slice(0, 10), ts: il(jours), origine: "reservation" });
+  const joueRegistre = (...lignes) => {
+    writeFileSync(reg, [JSON.stringify({ type: "registre", version: 1 }), ...lignes].join("\n") + "\n", "utf8");
+    return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"], { cwd: PILOT, encoding: "utf8", timeout: delaiSousCharge(120000),
+      env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, FORGE_REGISTRE_DECISIONS_PILOT: reg } });
+  };
+  const sectionPilote = (s) => (s.split("## Décisions posées sans réponse consignée (TF-2214, pilot)")[1] || "").split("\n## ")[0];
+  check("TF-2214 (pilot) — la décision réservée au registre sans réponse consignée est nommée à l'ouverture (date, question), et elle seule", () => {
+    const l = sectionPilote(joueRegistre(decision(90, 0.01), decision(12, 5)));
+    if (!/1 décision\(s\)/.test(l) || !/D-90 \(posée le \d{4}-\d{2}-\d{2} — Supprime-t-on le réseau vide/.test(l)) throw new Error(`section : ${l.slice(0, 300) || "(absente)"}`);
+    if (/D-12/.test(l)) throw new Error("une décision réservée avant l'entrée en service de l'écrivain est nommée");
+  });
+  check("TF-2214 (pilot) — le remède se joue : l'entrée `reponse` au registre fait disparaître la section", () => {
+    const sortie = joueRegistre(decision(90, 0.01), JSON.stringify({ type: "reponse", n: 90, lettres: ["a"], date: il(0).slice(0, 10), ts: il(0), origine: "hook-lexique" }));
+    if (/Décisions posées sans réponse consignée/.test(sortie)) throw new Error("la section persiste alors que la réponse est consignée");
+  });
+}
+
 // ---- D-193 (a) du 10/11/2026, TF-2330 et TF-2333 (RP-07 et RP-10 du produit marketing) : LA SÉANCE DATÉE NOMME SA REVUE À 5 JOURS, ET UN
 // ENGAGEMENT NON TENU SE REDIT. La séance du 13/11/2026 n'était dans aucun calendrier et sa revue n'a eu lieu que sur demande humaine ; des
 // documents ont promis des pièces que personne n'a produites. Vert : le calendrier et le registre NAISSENT de leur modèle chez un produit qui

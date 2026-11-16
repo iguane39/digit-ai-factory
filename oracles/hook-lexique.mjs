@@ -425,6 +425,37 @@ export async function contexteLettre(message, transcriptPath) {
 }
 
 /**
+ * LA RÉPONSE DU PORTEUR SE CONSIGNE AU REGISTRE DES DÉCISIONS DU PILOT (TF-2214, 16/11/2026).
+ *
+ * LE FAIT. D-48 (ressources Azure facturées en Europe du Nord) a été posée le 03/11/2026 sans réponse ni rappel, et les ressources ont été
+ * facturées deux jours. S93 rappelait au bloc 3 les décisions du ledger d'un PRODUIT ; au pilot, `decisions\REGISTRE.jsonl` ne consignait
+ * jamais une réponse (sur 119 décisions posées depuis le 26/10, 83 avaient une réponse lisible au registre des tâches, 92 dans les
+ * transcriptions). Ce hook lit déjà la lettre du porteur contre les décisions ouvertes (TF-1958) : il l'ÉCRIT maintenant au registre, une entrée
+ * `reponse` par décision, avec ses lettres seules (le registre est versionné dans un dépôt public : jamais le texte du message).
+ *
+ * BORNES. Seule une session du pilot écrit (un produit a ses propres D-N dans son ledger : un « 23a » y désigne une autre décision) ; un message
+ * de plus de 300 caractères ou sans lettre collée au numéro n'écrit rien ; un numéro absent du registre, ou déjà répondu, n'écrit rien ; tout
+ * échec rend le silence, jamais un blocage. Rend les numéros consignés.
+ */
+export async function consignerReponsesPilot(message, dossier, { fichier = process.env.FORGE_REGISTRE_DECISIONS_PILOT || null } = {}) {
+  try {
+    const m = String(message || "");
+    if (m.length > 300 || !/\d/.test(m)) return [];
+    const lib = await import("./lib-decisions.mjs");
+    if (!lib.estAuPilot(dossier)) return [];
+    const registre = fichier || lib.REGISTRE_PILOT;
+    if (!existsSync(registre)) return [];
+    const { numerosDeDecision } = await import("../scripts/relecture-intention.mjs");
+    const consignees = [];
+    for (const n of numerosDeDecision(m)) {
+      const lettres = lib.lettresDeReponse(m, n);
+      if (lettres.length && lib.consignerReponse({ n, lettres, fichier: registre }).consignee) consignees.push(`D-${Number(n)}`);
+    }
+    return consignees;
+  } catch { return []; }
+}
+
+/**
  * LA GARDE DE RECETTE EST ANCRÉE SUR LE POINT D'ENTRÉE (TF-1291, décision humaine A-14 du
  * 22/09/2026).
  *
@@ -728,6 +759,11 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
       return humain ? contexteLettre(message, transcript) : "";
     })
     .catch(() => "")
+    .then(async (lettre) => {
+      // TF-2214 : la lettre du porteur s'écrit au registre des décisions du pilot, avant que le tour ne l'oublie.
+      if (humain) await consignerReponsesPilot(message, dossier);
+      return lettre;
+    })
     .then((lettre) => {
       if (lettre) lignes.push(lettre);
       if (lignes.length) process.stdout.write(lignes.join("\n") + "\n");

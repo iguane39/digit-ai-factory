@@ -146,6 +146,80 @@ export function reformulerAuPilot({ n, question, fichier = REGISTRE_PILOT, sessi
   });
 }
 
+// ---- LA RÉPONSE HUMAINE AU REGISTRE DU PILOT (TF-2214, 16/11/2026) -----------------------------------------------------
+// LE FAIT. Le 03/11/2026, D-48 (« Supprime-t-on le réseau vide créé en Europe du Nord ? ») a été posée sans réponse ni rappel ; les ressources
+// sont restées facturées deux jours. S93 rappelait les décisions du ledger d'un PRODUIT ; au pilot, `decisions\REGISTRE.jsonl` ne portait que des
+// lignes `registre` et `decision`, jamais une réponse : sur 119 décisions posées depuis le 26/10, 83 avaient une réponse lisible au champ decideur
+// du registre des tâches, 92 dans les transcriptions, 106 par l'une ou l'autre ; lue au seul registre des tâches, S93 se serait trompée 23 fois sur 36.
+// Le chaînon manquant est l'ÉCRIVAIN de la réponse : `hook-lexique.mjs` lit déjà la lettre du porteur contre les décisions ouvertes (TF-1958) ; il
+// consigne maintenant, au registre, une entrée `reponse` par décision tranchée, avec ses LETTRES et jamais le texte du message (le registre est
+// versionné dans un dépôt public). S93 et le relevé d'ouverture lisent ensuite ce registre.
+export const REPONSE_AU_REGISTRE = "reponse";
+/** Avant cette date, aucun écrivain ne consignait les réponses : une décision plus ancienne n'est pas jugée sans réponse, elle n'a pas pu en recevoir. */
+export const REPONSES_DEPUIS = "2026-11-16T00:00:00Z";
+
+/** Les lettres que `message` donne à la décision `n` (« 223a », « D-76 (c) », « 68a + b » → ["a"], ["c"], ["a", "b"]) ; [] sans lettre. Jamais le texte du message. */
+export function lettresDeReponse(message, n) {
+  const t = String(message ?? "");
+  if (t.length > 300) return [];
+  const m = new RegExp(`(?<![\\w-])(?:D-?)?0*${Number(n)}\\s*\\(?([a-z])\\)?((?:\\s*[+&]\\s*[a-z](?![\\p{L}\\d]))*)(?![\\p{L}\\d])`, "iu").exec(t);
+  if (!m) return [];
+  return [m[1], ...[...m[2].matchAll(/[a-z]/gi)].map((x) => x[0])].map((x) => x.toLowerCase());
+}
+
+/** Les entrées `reponse` du registre : [{ n, lettres, ts }]. */
+export function reponsesDuRegistre(fichier = REGISTRE_PILOT) {
+  if (!existsSync(fichier)) return [];
+  const sortie = [];
+  for (const l of readFileSync(fichier, "utf8").split(/\r?\n/)) {
+    if (!l.trim()) continue;
+    let e; try { e = JSON.parse(l); } catch { continue; }
+    if (e?.type === REPONSE_AU_REGISTRE && Number.isInteger(e.n)) sortie.push({ n: e.n, lettres: Array.isArray(e.lettres) ? e.lettres : [], ts: e.ts || null });
+  }
+  return sortie;
+}
+
+/** Consigne la réponse du porteur à D-`n` au registre du pilot : une seule entrée par décision, sous le verrou du registre. Rend { consignee, motif? }. */
+export function consignerReponse({ n, lettres, fichier = REGISTRE_PILOT, sessionId = null }) {
+  const num = Number(String(n).replace(/\D/g, ""));
+  const lettresPropres = (lettres || []).map((x) => String(x).toLowerCase()).filter((x) => /^[a-z]$/.test(x));
+  if (!Number.isInteger(num) || num < 1 || !lettresPropres.length) return { consignee: false, motif: "numéro ou lettre absent : rien n'est consigné" };
+  if (!existsSync(fichier)) return { consignee: false, motif: "registre du pilot introuvable" };
+  return sousVerrou(fichier + ".lock", () => {
+    if (!lireRegistrePilot(fichier).numeros.has(String(num))) return { consignee: false, motif: `D-${num} n'est pas inscrite au registre : une réponse ne se consigne que pour une décision réservée` };
+    if (reponsesDuRegistre(fichier).some((r) => r.n === num)) return { consignee: false, motif: `D-${num} a déjà sa réponse au registre` };
+    const entree = { type: REPONSE_AU_REGISTRE, n: num, lettres: lettresPropres, date: aujourdhui(), ts: new Date().toISOString(), ...session(sessionId), origine: "hook-lexique" };
+    const contenu = readFileSync(fichier, "utf8");
+    appendFileSync(fichier, (contenu && !contenu.endsWith("\n") ? "\n" : "") + JSON.stringify(entree) + "\n", "utf8");
+    return { consignee: true, id: "D-" + num, lettres: lettresPropres, registre: fichier };
+  });
+}
+
+/**
+ * Les décisions du PILOT posées (réservées) sans réponse consignée, depuis `fenetreJours` jours au plus et depuis l'entrée en service de l'écrivain
+ * (`REPONSES_DEPUIS`), de la plus ancienne à la plus récente : [{ n: "D-48", question, ts }]. Même rendu que `decisionsSansReponse` du ledger d'un produit.
+ * Limite dite : une réponse donnée sans lettre (« oui », « fais-le »), ou hors d'une session du pilot, n'est pas consignée ; la décision reste rappelée
+ * jusqu'à la fin de sa fenêtre, ce qui avertit sans bloquer.
+ */
+export function decisionsPiloteSansReponse({ fichier = REGISTRE_PILOT, maintenant = Date.now(), fenetreJours = 14, depuis = REPONSES_DEPUIS } = {}) {
+  if (!existsSync(fichier)) return [];
+  const reps = new Set(reponsesDuRegistre(fichier).map((r) => r.n));
+  const parNumero = new Map();
+  // La date de pose est la PLUS ANCIENNE du numéro : une reformulation (format B du 17/10) ne rouvre pas la fenêtre.
+  for (const e of lireRegistrePilot(fichier).entrees) {
+    const t = e.ts ? Date.parse(e.ts) : NaN;
+    const vu = parNumero.get(e.n);
+    if (!vu) { parNumero.set(e.n, { n: e.n, question: e.question || "", ts: e.ts || null, t }); continue; }
+    if (Number.isFinite(t) && (!Number.isFinite(vu.t) || t < vu.t)) { vu.ts = e.ts; vu.t = t; }
+    if (e.question) vu.question = e.question;
+  }
+  const plancher = Math.max(maintenant - fenetreJours * 86400000, Date.parse(depuis));
+  return [...parNumero.values()]
+    .filter((d) => Number.isFinite(d.t) && d.t >= plancher && !reps.has(d.n))
+    .map((d) => ({ n: `D-${d.n}`, question: d.question, ts: d.ts, seq: null }))
+    .sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
+}
+
 // ---- CHEZ UN PRODUIT : l'inscription reste celle de `forge\ledger.jsonl` ----------------------------------------------
 /** Tous les numéros D-N que le ledger d'un produit nomme, toutes entrées confondues (une décision posée ou répondue occupe son numéro). */
 export function numerosDuLedger(produit) {

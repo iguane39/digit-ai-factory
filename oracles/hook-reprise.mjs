@@ -23,16 +23,26 @@ let r;
 try { r = synchroniser(racine, sens, { budget: sens === "pousser" ? 45 : 200 }); }
 catch (e) { r = { erreur: String(e?.message || e).slice(0, 300) }; }
 
-if (r.sans_objet) process.exit(0);
+if (r.sans_objet) {
+  // TF-2623 : un feu vert de publication vise un dossier synchronisé et le manifeste manque. L'ouverture le dit à la session,
+  // qui écrit forge/REPRISE.json dans le tour ; ce n'est pas un geste laissé à l'humain (R-64 §5).
+  if (sens === "restaurer" && r.go_sans_manifeste?.length)
+    process.stdout.write(`[reprise — R-64] ${r.go_sans_manifeste.length} feu(x) vert(s) de publication au ledger vise(nt) un dossier synchronisé (seq ${r.go_sans_manifeste.map((g) => g.seq).join(", ")}) et forge/REPRISE.json est absent : rien n'a été restauré. `
+      + "Écrire forge/REPRISE.json dans CE tour depuis gabarits/REPRISE.json du pilot (emplacements du dossier sur chaque poste, éléments hors git à reprendre), puis rejouer `node forge/hooks/factory.mjs reprise --restaurer` : "
+      + "`node <PILOT_ROOT>/oracles/oracle-reprise.mjs` doit rendre RP4 PASS au premier passage\n");
+  process.exit(0);
+}
 const tete = `[reprise — R-64] ${sens === "restaurer" ? "restauration depuis le canal" : "envoi vers le canal"}`;
 let ligne;
 if (r.erreur) ligne = `${tete} : ${r.erreur}`;
 else if (r.refuse) ligne = sens === "pousser" && /non actif/.test(r.message) ? null : `${tete} : ${r.message}`;
-else if (r.fait.length || r.conflits.length || r.reste || r.refuses.length)
+else if (r.fait.length || r.conflits.length || r.reste || r.refuses.length || r.regenere?.length)
   ligne = `${tete} : ${r.fait.length} fichier(s) ${sens === "restaurer" ? "restauré(s)" : "envoyé(s)"}`
     + (r.conflits.length ? `, dont ${r.conflits.length} écrasé(s) par plus récent, version précédente sauvegardée (${r.conflits[0].sauvegarde})` : "")
     + (r.reste ? `, ${r.reste} reporté(s) au prochain passage (budget de temps atteint)` : "")
     + (r.refuses.length ? `, ${r.refuses.length} refusé(s) car ni ignoré(s) ni suivi(s) par git (ex. ${r.refuses[0].rel}) : garder le chemin dans .gitignore, ou retirer le fichier du canal` : "")
+    + (r.regenere?.some((x) => x.ok) ? `, ${r.regenere.filter((x) => x.ok).length} base(s) régénérée(s) (${r.regenere.filter((x) => x.ok).map((x) => x.produit).join(", ")})` : "")
+    + (r.regenere?.some((x) => !x.ok) ? `, régénération en échec : ${r.regenere.filter((x) => !x.ok).map((x) => `« ${x.commande} » (${x.detail})`).join(" ; ")}` : "")
     + ` — canal ${r.canal}`;
 if (ligne) (sens === "restaurer" ? process.stdout : process.stderr).write(ligne + "\n");
 process.exit(0);

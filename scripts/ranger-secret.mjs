@@ -19,7 +19,10 @@
  *   2. le fichier visé (`.env` par défaut, à la racine du produit) est IGNORÉ par git (`git check-ignore`), sinon refus : un secret
  *      rangé dans un fichier qu'un `git add .` embarque est à un commit de l'histoire, où seule une rotation le retire ;
  *   3. le ledger du produit (`forge\ledger.jsonl`) existe et son écrivain est trouvé — `forge\ledger.py` d'un produit Python, sinon
- *      `ledger.mjs` de forge-agents, comme `reserver-decision.mjs` ; le secret n'est jamais rangé sans pouvoir être consigné ;
+ *      `ledger.mjs` de forge-agents, comme `reserver-decision.mjs` ; le secret n'est jamais rangé sans pouvoir être consigné.
+ *      HORS RUN (TF-2676, 16/11/2026) : sans `forge\ledger.jsonl` (aucun run ouvert), l'entrée s'écrit à `forge\hors-run.jsonl`, comme
+ *      `reserver-decision.mjs` (TF-2223), sans écrivain de ledger ; le 13/11/2026 le geste refusait de ranger le mot de passe d'un compte
+ *      SQL faute de ledger, et le secret s'écrivait à la main au .env, sans entrée `secret_range` ;
  *   4. la ligne `NOM=valeur` s'écrit au fichier, ou REMPLACE celle du même nom (les doublons du même nom sont retirés ; un
  *      commentaire, une autre variable, les fins de ligne du fichier restent tels quels) ;
  *   5. le ledger reçoit une entrée `secret_range` : `variable`, `fichier`, `empreinte_sha256` (sha256 de la valeur, 64 hex),
@@ -40,7 +43,7 @@
  *   · le secret transmis à un AUTRE poste : `forge\REPRISE.json` ne porte jamais les secrets (R-64), chaque poste range le sien.
  * Recette : scripts\ranger-secret.test.mjs. Site de hachage déclaré : references\EMPREINTES.md.
  */
-import { existsSync, readFileSync, writeFileSync, renameSync, unlinkSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, appendFileSync, renameSync, unlinkSync, openSync, closeSync, statSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { dirname, join, resolve, relative, basename, isAbsolute, sep } from "node:path";
@@ -100,9 +103,10 @@ if (ign.error) refus(`git est introuvable ou illisible (${ign.error.code || ign.
 if (ign.status === 1) refus(`${relPosix} n'est PAS ignoré par git : un secret rangé là serait à un commit de l'histoire. Ajouter le motif au .gitignore du produit (gabarits/gitignore-produit du pilot porte .env et .env.*), ou le retirer de l'index s'il est suivi, puis rejouer`);
 if (ign.status !== 0) refus(`git check-ignore a échoué (exit ${ign.status}) : ${String(ign.stderr || "").trim().slice(0, 200) || "le dossier n'est pas un dépôt git ?"} — l'ignorance de ${relPosix} n'est pas prouvée, rien n'est rangé`);
 
-// ---- 3. le ledger du produit et son écrivain
+// ---- 3. le ledger du produit et son écrivain ; HORS RUN (TF-2676), sans ledger de run, la trace va au journal hors run
 const ledger = join(produit, "forge", "ledger.jsonl");
-if (!existsSync(ledger)) refus(`ledger du produit introuvable (${ledger}) : un produit ouvre son run avant de ranger un secret, rien n'est rangé`);
+const horsRun = !existsSync(ledger);
+const journalHorsRun = join(produit, "forge", "hors-run.jsonl");
 function ecrivainDeLedger() {
   const py = join(produit, "forge", "ledger.py");
   if (existsSync(py)) return { sorte: "python", chemin: py };
@@ -111,8 +115,8 @@ function ecrivainDeLedger() {
   const mjs = racines.map(sousRacine).find((c) => existsSync(c));
   return mjs ? { sorte: "node", chemin: mjs } : null;
 }
-const ecrivain = ecrivainDeLedger();
-if (!ecrivain) refus("écrivain du ledger introuvable : ni forge/ledger.py chez le produit, ni ledger.mjs de forge-agents (FORGE_ROOT, voisin du produit, c:\\dev) — rien n'est rangé");
+const ecrivain = horsRun ? null : ecrivainDeLedger();
+if (!horsRun && !ecrivain) refus("écrivain du ledger introuvable : ni forge/ledger.py chez le produit, ni ledger.mjs de forge-agents (FORGE_ROOT, voisin du produit, c:\\dev) — rien n'est rangé");
 
 // ---- 4. la ligne NOM=valeur, écrite ou remplacée
 function citer(v) {
@@ -149,7 +153,44 @@ try {
 // ---- 5. le ledger : le nom, l'empreinte, la date — jamais la valeur
 const empreinte = createHash("sha256").update(valeur, "utf8").digest("hex");
 const date = new Date().toISOString().slice(0, 10);
+// Hors run : l'entrée s'écrit au journal hors run, comme `reserver-decision.mjs` (TF-2223) — même discipline de `seq` et de `ts`, même verrou
+// `<journal>.lock` que `forge/ledger.py`, champ `hors_run: true`, session qui écrit (D-218 (b)). `ledger.mjs` ne sait pas ouvrir un journal
+// autrement que par `run_open`, et le run n'est pas ouvert : aucun écrivain de ledger n'est nécessaire, et le run n'est pas ouvert pour autant.
+function ecrireHorsRun(champs) {
+  const verrou = `${journalHorsRun}.lock`;
+  let pris = false;
+  for (let i = 0; i < 100 && !pris; i++) {
+    try { closeSync(openSync(verrou, "wx")); pris = true; }
+    catch {
+      try { if (Date.now() - statSync(verrou).mtimeMs > 60000) unlinkSync(verrou); } catch { /* disparu entre-temps */ }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+    }
+  }
+  if (!pris) return { erreur: `verrou non obtenu après 5 s : un autre processus détient ${verrou} (s'il est mort, supprimer ce fichier)` };
+  try {
+    const brut = existsSync(journalHorsRun) ? readFileSync(journalHorsRun, "utf8") : "";
+    const deja = brut.split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l));
+    const seq = deja.reduce((m, x) => Math.max(m, x.seq || 0), 0) + 1;
+    let ts = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+    if (deja.length && ts < deja[deja.length - 1].ts) ts = deja[deja.length - 1].ts;
+    const id = ["FORGE_SESSION_ID", "CLAUDE_CODE_SESSION_ID"].map((v) => [String(process.env[v] || "").trim(), v]).find(([valeur]) => valeur);
+    const session = id ? { session: id[0].slice(0, 8), session_source: id[1] === "FORGE_SESSION_ID" ? "session_start" : "heritee_possible" } : { session: null, session_source: "inconnue" };
+    const entree = { seq, ts, type: "secret_range", hors_run: true, ...champs, ...session };
+    appendFileSync(journalHorsRun, (brut && !brut.endsWith("\n") ? "\n" : "") + JSON.stringify(entree) + "\n", "utf8");
+    return { seq };
+  } catch (e) { return { erreur: `journal hors run illisible ou non écrit (${e.code || e.message})` }; }
+  finally { try { unlinkSync(verrou); } catch { /* déjà absent */ } }
+}
+const rangeSansTrace = (raison) => sortie({ verdict: "FAIL", variable: nom, fichier: relPosix, remplace, empreinte_sha256: empreinte,
+  message: `la valeur est RANGÉE dans ${relPosix} mais sa trace n'est pas au ledger (${raison}) : rejouer le même geste, il remplace la ligne et consigne` }, 1);
 let r;
+if (horsRun) {
+  const h = ecrireHorsRun({ variable: nom, fichier: relPosix, empreinte_sha256: empreinte, date, remplace, range_par: "ranger-secret.mjs" });
+  if (h.erreur) rangeSansTrace(h.erreur);
+  sortie({ verdict: "PASS", variable: nom, fichier: relPosix, remplace, empreinte_sha256: empreinte, ledger_seq: h.seq, hors_run: true, journal: "forge/hors-run.jsonl",
+    ecrit_par: "ranger-secret.mjs (journal hors run : aucun run ouvert)",
+    note: "la valeur n'est ni affichée ni consignée ; seule son empreinte l'est ; le prochain lot de retours compile l'entrée" }, 0);
+}
 if (ecrivain.sorte === "python") {
   r = spawnSync("python", [ecrivain.chemin, "secret_range", "--variable", nom, "--fichier", relPosix, "--empreinte_sha256", empreinte, "--date", date, "--remplace", String(remplace), "--range_par", "ranger-secret.mjs"],
     { encoding: "utf8", env: { ...process.env, PYTHONUTF8: "1" }, cwd: produit });
@@ -157,8 +198,6 @@ if (ecrivain.sorte === "python") {
   const payload = { type: "secret_range", variable: nom, fichier: relPosix, empreinte_sha256: empreinte, date, remplace, range_par: "ranger-secret.mjs" };
   r = spawnSync(process.execPath, [ecrivain.chemin, "append", ledger, JSON.stringify(payload)], { encoding: "utf8", cwd: produit });
 }
-const rangeSansTrace = (raison) => sortie({ verdict: "FAIL", variable: nom, fichier: relPosix, remplace, empreinte_sha256: empreinte,
-  message: `la valeur est RANGÉE dans ${relPosix} mais sa trace n'est pas au ledger (${raison}) : rejouer le même geste, il remplace la ligne et consigne` }, 1);
 if (r.status !== 0) rangeSansTrace(`l'écrivain du ledger (${ecrivain.sorte}) a refusé, exit ${r.status} : ${String(r.stderr || r.stdout || "").trim().slice(0, 240)}`);
 const derniere = readFileSync(ledger, "utf8").split("\n").filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean).at(-1);
 if (!derniere || derniere.type !== "secret_range" || derniere.variable !== nom || derniere.empreinte_sha256 !== empreinte)

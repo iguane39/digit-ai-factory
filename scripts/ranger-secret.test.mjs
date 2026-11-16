@@ -12,12 +12,15 @@
  *   4. une seconde écriture du même nom REMPLACE la ligne (doublons retirés, commentaire, autres variables et fins de ligne CRLF conservés) et
  *      le ledger consigne `remplace: true` avec la nouvelle empreinte ;
  *   5. refus avant écriture : valeur absente, valeur multi-ligne, nom invalide (non répété à l'écran), valeur en argument (usage, exit 2),
- *      ledger absent, `--fichier` hors du produit ou modèle `.env.example`, cible = le pilot ;
+ *      `--fichier` hors du produit ou modèle `.env.example`, cible = le pilot ;
  *   6. une valeur avec espace est citée entre apostrophes ; apostrophe + espace est refusée plutôt que mal citée ;
  *   7. écrivain `ledger.mjs` de forge-agents (produit sans `forge/ledger.py`) : même entrée, `verify` du ledger PASS (sauté, dit, si le dépôt frère est absent) ;
  *   8. le remède du message est JOUÉ : un écrivain qui refuse le type (vocabulaire ancien) laisse la valeur rangée et le DIT (exit 1), le même
  *      geste rejoué avec l'écrivain à jour remplace la ligne et consigne (exit 0) ;
- *   9. `secret_range` est au vocabulaire de `gabarits/ledger.py` (rouge : sans lui, l'écrivain Python refuse le type).
+ *   9. `secret_range` est au vocabulaire de `gabarits/ledger.py` (rouge : sans lui, l'écrivain Python refuse le type) ;
+ *  10. HORS RUN (TF-2676) : sans `forge/ledger.jsonl`, l'entrée `secret_range` s'écrit à `forge/hors-run.jsonl` (seq, ts, session, jamais la
+ *      valeur), le ledger du run n'est pas créé, `--verifier --hors-run` reste INTÈGRE, un second rangement remplace la ligne ; sans écrivain
+ *      de ledger le geste passe ; les refus d'avant écriture (fichier non ignoré, valeur absente, aucun produit) tiennent hors run.
  * Joué par oracles/self-tests.mjs (I2).
  */
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync, readdirSync, statSync } from "node:fs";
@@ -127,7 +130,6 @@ try {
   refus("valeur vide (saut de ligne seul)", produit(), ["ESSAI_CLE"], "\n", /aucune valeur/);
   refus("valeur multi-ligne", produit(), ["ESSAI_CLE"], "FAUX-ligne-1\nFAUX-ligne-2\n", /plusieurs lignes/);
   refus("nom invalide", produit(), ["FAUX-cle-collee-en-nom=0003"], V1, /premier argument/);
-  refus("ledger absent", produit({ ledger: false }), ["ESSAI_CLE"], V1, /ledger du produit introuvable/);
   refus("fichier hors du produit", produit(), ["ESSAI_CLE", "--fichier", "../hors.env"], V1, /pas dans le produit/);
   refus("modèle .env.example", produit(), ["ESSAI_CLE", "--fichier", ".env.example"], V1, /pas un fichier d'environnement local/);
   refus("fichier quelconque", produit(), ["ESSAI_CLE", "--fichier", "README.md"], V1, /pas un fichier d'environnement local/);
@@ -197,10 +199,57 @@ try {
   const vocabulaire = (t) => new Set([...(t.match(/TYPES = \{([\s\S]*?)\}/) || ["", ""])[1].matchAll(/"([a-z_]+)"/g)].map((m) => m[1]));
   att(vocabulaire(readFileSync(LEDGER_PY, "utf8")).has("secret_range"), "9 : secret_range n'est pas au vocabulaire de gabarits/ledger.py");
 
+  // ---- 10. hors run (TF-2676, RP-81 du 13/11/2026) : sans `forge/ledger.jsonl`, le geste range le secret et consigne `secret_range`
+  //          au journal hors run, comme `reserver-decision.mjs` (TF-2223). Avant : refus « ledger du produit introuvable », secret
+  //          ressaisi à la main au .env, sans trace.
+  const lignesHorsRun = (d) => readFileSync(join(d, "forge", "hors-run.jsonl"), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const p10 = produit({ ledger: false });
+  const r10 = lancer(p10, ["ESSAI_CLE"], V1 + "\n", { FORGE_SESSION_ID: "abcdef0123456789" });
+  toutLu += r10.sortie;
+  att(r10.code === 0 && r10.o?.verdict === "PASS" && r10.o?.hors_run === true && r10.o?.ledger_seq === 1, `10 : hors run, le rangement doit réussir et le dire, obtenu ${r10.code} ${r10.sortie.slice(0, 300)}`);
+  att(env(p10) === `ESSAI_CLE=${V1}\n`, `10 : le fichier .env doit porter la ligne, obtenu ${JSON.stringify(env(p10))}`);
+  att(!existsSync(join(p10, "forge", "ledger.jsonl")), "10 : le ledger du run ne doit pas être créé (R-42 exige qu'il s'ouvre par run_open)");
+  const e10 = existsSync(join(p10, "forge", "hors-run.jsonl")) ? lignesHorsRun(p10).at(-1) : null;
+  att(e10 && e10.type === "secret_range" && e10.hors_run === true && e10.seq === 1 && e10.variable === "ESSAI_CLE" && e10.fichier === ".env" && e10.empreinte_sha256 === H1
+    && e10.remplace === false && /^\d{4}-\d{2}-\d{2}$/.test(e10.date) && e10.session === "abcdef01" && e10.session_source === "session_start", `10 : l'entrée du journal hors run est fausse : ${JSON.stringify(e10)}`);
+  att(!readFileSync(join(p10, "forge", "hors-run.jsonl"), "utf8").includes(V1), "10 : la valeur est écrite au journal hors run");
+  const v10 = spawnSync("python", [join(p10, "forge", "ledger.py"), "--verifier", "--hors-run"], { encoding: "utf8", env: { ...process.env, PYTHONUTF8: "1" } });
+  att(v10.status === 0 && /INTÈGRE/.test(v10.stdout), `10 : le journal hors run doit rester intègre (--verifier --hors-run de ledger.py) : exit ${v10.status} ${v10.stdout.slice(0, 200)}`);
+  att(!existsSync(join(p10, "forge", "hors-run.jsonl.lock")) && !readdirSync(p10).some((f) => f.endsWith(".tmp")), "10 : un verrou ou un fichier temporaire est resté");
+  // le second rangement du même nom remplace la ligne et prend le seq suivant du journal
+  const r10b = lancer(p10, ["ESSAI_CLE"], V2);
+  toutLu += r10b.sortie;
+  const l10 = lignesHorsRun(p10);
+  att(r10b.code === 0 && r10b.o?.remplace === true && l10.length === 2 && l10[1].seq === 2 && l10[1].remplace === true && l10[1].empreinte_sha256 === H2 && env(p10) === `ESSAI_CLE=${V2}\n`, `10 : le second rangement hors run doit remplacer et prendre le seq 2, obtenu ${r10b.code} ${JSON.stringify(l10)}`);
+  // sans écrivain de ledger (ni ledger.py ni ledger.mjs) : le journal hors run n'en a pas besoin
+  const p10c = produit({ ledger: false, py: false });
+  const r10c = lancer(p10c, ["ESSAI_CLE"], V1, { FORGE_ROOT: join(base, "parc-vide"), FORGE_SESSION_ID: "", CLAUDE_CODE_SESSION_ID: "" });
+  toutLu += r10c.sortie;
+  const e10c = existsSync(join(p10c, "forge", "hors-run.jsonl")) ? lignesHorsRun(p10c).at(-1) : null;
+  att(r10c.code === 0 && env(p10c) === `ESSAI_CLE=${V1}\n` && e10c?.type === "secret_range" && e10c.session === null && e10c.session_source === "inconnue", `10 : hors run sans écrivain, le rangement doit réussir ; obtenu ${r10c.code} ${r10c.sortie.slice(0, 200)} ${JSON.stringify(e10c)}`);
+  // un journal hors run qui porte déjà des entrées : le seq suit, le ts ne décroît pas
+  const p10d = produit({ ledger: false });
+  writeFileSync(join(p10d, "forge", "hors-run.jsonl"), JSON.stringify({ seq: 4, ts: "2099-01-01T00:00:00Z", type: "retour", hors_run: true }) + "\n", "utf8");
+  const r10d = lancer(p10d, ["ESSAI_CLE"], V1);
+  toutLu += r10d.sortie;
+  const l10d = lignesHorsRun(p10d);
+  att(r10d.code === 0 && l10d.length === 2 && l10d[1].seq === 5 && l10d[1].ts >= l10d[0].ts, `10 : le seq suit le plus grand déjà pris et le ts ne décroît pas, obtenu ${JSON.stringify(l10d)}`);
+  // rouge hors run : les refus d'avant écriture tiennent encore — fichier non ignoré, valeur absente : rien n'est écrit, ni .env ni journal
+  for (const [nomCas, d, entree, motif] of [["fichier non ignoré", produit({ ledger: false, ignore: false }), V1, /PAS ignoré/], ["valeur absente", produit({ ledger: false }), "", /aucune valeur/]]) {
+    const r = lancer(d, ["ESSAI_CLE"], entree);
+    toutLu += r.sortie;
+    att(r.code === 1 && motif.test(r.o?.message || "") && env(d) === null && !existsSync(join(d, "forge", "hors-run.jsonl")), `10 refus hors run (${nomCas}) : rien ne doit être écrit, obtenu ${r.code} ${r.sortie.slice(0, 200)}`);
+  }
+  // un dossier sans forge/ n'est pas un produit : refus, même hors run
+  const sansForge = join(base, "sans-forge"); mkdirSync(sansForge, { recursive: true });
+  const r10e = lancer(sansForge, ["ESSAI_CLE", "--produit", sansForge], V1);
+  toutLu += r10e.sortie;
+  att(r10e.code === 1 && /aucun produit/.test(r10e.o?.message || "") && !existsSync(join(sansForge, ".env")), `10 : sans forge/, refus attendu, obtenu ${r10e.code} ${r10e.sortie.slice(0, 200)}`);
+
   // ---- aucune valeur d'essai n'a été rendue par un geste
   for (const v of TOUTES) att(!toutLu.includes(v), `fin : la valeur d'essai « ${v.slice(0, 12)}… » a été rendue sur une sortie`);
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 300)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error("ranger-secret : FAIL\n  - " + echecs.join("\n  - ")); process.exit(1); }
-console.log(`ranger-secret : ${verifs}/${verifs} — cas rouges joués et refusés (fichier non ignoré, fichier suivi, valeur absente ou multi-ligne, nom invalide, valeur en argument, ledger absent, fichier hors du produit, cible = pilot, apostrophe + espace, écrivain qui refuse), seconde écriture qui remplace, valeur jamais rendue ni consignée`);
+console.log(`ranger-secret : ${verifs}/${verifs} — cas rouges joués et refusés (fichier non ignoré, fichier suivi, valeur absente ou multi-ligne, nom invalide, valeur en argument, fichier hors du produit, cible = pilot, apostrophe + espace, écrivain qui refuse), seconde écriture qui remplace, hors run consigné au journal hors run (sans ledger de run ouvert), valeur jamais rendue ni consignée`);
