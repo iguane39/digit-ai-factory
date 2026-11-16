@@ -981,6 +981,9 @@ export function analyserTranscript(texte) {
     gainsLitteraux: gainsLitterauxDuTour(entrees, debut), evenementsJournalises: evenementsJournalisesDuTour(entrees, debut),
     // TF-1913 — les fichiers servis écrits dans le tour et les critiques jouées, pour le contrôle CRITIQUE.
     critique: critiqueDuTour(entrees.slice(debut + 1)),
+    // TF-2672 — les décisions posées plus tôt dans la session et restées ouvertes : le message final les repose en entier (RÉAFFICHAGE).
+    decisionsOuvertes: decisionsOuvertesDeLaSession(entrees), decisionsOuvertesAvantBrouillon: decisionsOuvertesDeLaSession(entrees, { dernierEstJuge: false }),
+    posesSession: numerosPosesAvant(entrees), posesAvantBrouillon: numerosPosesAvant(entrees, { dernierEstJuge: false }),
     // TF-1973 et TF-2016 — les livrables écrits sous output/ dans le tour, pour le contrôle S87 (la ligne « Livré : » du bloc 0).
     livrables: livrablesEcrits(entrees.slice(debut + 1)),
     // TF-2078 — les skills touchés, les livrables écrits à la main et le retour consigné par commande, pour l'avertissement REMONTÉE.
@@ -1702,6 +1705,70 @@ const RAPPEL_DETAIL = "Un détail demandé reçoit la décision EN ENTIER, au bl
   + "ses options (a), (b), (c) avec ce qui se passe, le coût et le retour arrière de chacune, sa recommandation sourcée et la ligne « Sans réponse » ; "
   + "ou, si le détail se découpe, des décisions détaillées, une par point, qui citent D-N. Jamais une ligne de rappel (S4, TF-1851).";
 
+// ---- TF-2672 (16/11/2026) — LE MESSAGE FINAL D'UNE DEMANDE RÉAFFICHE EN ENTIER CHAQUE DÉCISION OUVERTE POSÉE PENDANT LA SESSION -----
+//
+// LE FAIT. Retour du porteur du 16/11/2026, mot pour mot : « Elles sont affichées une première fois, puis l'IA recommence à travailler, réaffiche des prompts de sortie, et lors du prompt final, les
+// décisions ne sont jamais affichées complètement, je suis obligé de redemander à chaque fois le détail des décisions. » La règle TF-1429 (S4) prescrit le rappel d'une ligne d'une décision déjà posée,
+// et seule une demande explicite (TF-1851, DÉTAIL) rouvre le détail : D-229 et D-230 rappelées en une ligne, 34 occurrences dans le journal d'une session, sans affichage complet retrouvable.
+//
+// LA RÈGLE (décision R-58 du 16/11/2026). Au message final d'une demande, chaque décision POSÉE pendant la session et restée OUVERTE se repose au format B complet : sa tête avec son point d'interrogation, au
+// moins deux options étiquetées, sa recommandation. Une décision est ouverte quand un message de l'assistant la pose (tête « D-N … ? », `decisionsPosees`) et qu'aucun message humain ultérieur ne la nomme (sélecteur
+// « 1a », « décision D-1 », demande de détail). Le rappel d'une ligne reste admis dans un point d'étape (mention au bloc 1) et pour une décision d'une session antérieure, que ce contrôle ne voit pas.
+// S4 et RÉSERVATION n'en sont pas touchées : une décision reposée en entier a ses options, donc S4 la juge sur elles, et RÉSERVATION l'accepte dès qu'elle est inscrite au registre ou déjà à l'écran.
+//
+// AVERTISSANT à son entrée : aucune échéance de blocage n'est armée (pour en poser une, `BLOQUANTES_DATEES`). NON JUGÉ, dit plutôt que promis : une décision que le porteur a tranchée par un message qui ne la
+// nomme pas (« oui pour tout ») reste lue ouverte ; une décision d'une autre session ; que la décision reposée soit identique à la première.
+const POINT_ETAPE_BLOC_1 = /\bpoint\s+d\s*['’]\s*[ée]tape\b/i;
+/** Le message se déclare-t-il point d'étape ? La mention se cherche avant le bloc 2 (verdict) ou 3 (décisions), jamais dans la prose qui en parle plus loin. */
+export function estPointDEtape(texte) {
+  const tete = String(texte || "").split(/\n#{1,4}\s*(?:\d{1,2}\s*[.)\-–—:·]?\s*)?(?:verdict|d[ée]cisions?|ce qui reste)/i)[0];
+  return POINT_ETAPE_BLOC_1.test(tete);
+}
+
+/** Les décisions posées par un message de l'assistant avant le message jugé et qu'aucun message humain ultérieur ne nomme : [{ n, tete }]. */
+export function decisionsOuvertesDeLaSession(entrees, { dernierEstJuge = true } = {}) {
+  // Au hook de fin de tour, le dernier texte de l'assistant est le message jugé : ce n'est pas une pose antérieure. Au préjugement, le brouillon n'est pas encore au transcript : tout y est antérieur.
+  let dernier = dernierEstJuge ? -1 : entrees.length;
+  if (dernierEstJuge) for (let i = entrees.length - 1; i >= 0; i--) if (entrees[i].type === "assistant" && texteDe(entrees[i])) { dernier = i; break; }
+  const ouvertes = new Map();
+  for (let i = 0; i < dernier; i++) {
+    const e = entrees[i];
+    if (e.type === "assistant") {
+      for (const d of decisionsPosees(texteDe(e))) ouvertes.set(d.n, { n: d.n, tete: (d.segment.split("\n").find((l) => /\?/.test(l)) || "").replace(/^[\s>*•-]+/, "").trim().slice(0, 160) });
+    } else if (estHumain(e)) {
+      const t = texteDe(e);
+      const nommees = new Set([...selecteursDecision(t).map((s) => s.n), ...demandesDetail(t)]);
+      for (const n of [...ouvertes.keys()]) if (nommees.has(n) || citeD(n, t)) ouvertes.delete(n);
+    }
+  }
+  return [...ouvertes.values()];
+}
+
+/** Les numéros de toutes les décisions posées par un message de l'assistant avant le message jugé, répondues ou non : déjà à l'écran, donc jamais « nouvelles » pour RÉSERVATION (TF-2672). */
+export function numerosPosesAvant(entrees, { dernierEstJuge = true } = {}) {
+  let dernier = dernierEstJuge ? -1 : entrees.length;
+  if (dernierEstJuge) for (let i = entrees.length - 1; i >= 0; i--) if (entrees[i].type === "assistant" && texteDe(entrees[i])) { dernier = i; break; }
+  const numeros = new Set();
+  for (let i = 0; i < dernier; i++) if (entrees[i].type === "assistant") for (const d of decisionsPosees(texteDe(entrees[i]))) numeros.add(d.n);
+  return [...numeros];
+}
+
+export function controlerReaffichage({ decisionsOuvertes = [], dernierTexte = "", pointEtape = estPointDEtape(dernierTexte) }) {
+  if (!decisionsOuvertes.length || pointEtape) return { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
+  const entieres = new Set(decisionsPosees(dernierTexte).filter((d) => d.options >= 2 && d.recommandee).map((d) => d.n));
+  const manquantes = decisionsOuvertes.filter((d) => !entieres.has(String(d.n)));
+  if (!manquantes.length) return { applicable: true, verdict: "PASS", ecarts: [], ouvertes: decisionsOuvertes.map((d) => d.n) };
+  const etat = (n) => (new RegExp("(?<![\\p{L}\\p{N}_])D\\s*-?\\s*" + n + "(?![\\p{N}])[^\\n]*inchang", "iu").test(dernierTexte) ? "rappelée en une ligne"
+    : citeD(n, dernierTexte) ? "citée sans ses options ni sa recommandation" : "absente");
+  const liste = manquantes.slice(0, 5).map((d) => `D-${d.n} ${etat(d.n)}`).join(" ; ") + (manquantes.length > 5 ? ` (+${manquantes.length - 5})` : "");
+  return { applicable: true, verdict: "FAIL", ouvertes: decisionsOuvertes.map((d) => d.n), manquantes: manquantes.map((d) => d.n),
+    ecarts: [`le message final d'une demande repose en entier chaque décision restée ouverte et posée pendant la session : ${liste} (TF-2672, retour du porteur du 16/11/2026 : « je suis obligé de redemander à chaque fois le détail des décisions »)`] };
+}
+
+const RAPPEL_REAFFICHAGE = "Au message final d'une demande, chaque décision restée ouverte se repose EN ENTIER au bloc 3 : sa tête « > **D-N — <la question exacte, avec son point d'interrogation>** », "
+  + "ses options (a), (b), (c) avec ce qui se passe, le coût et le retour arrière de chacune, sa recommandation sourcée et la ligne « Sans réponse ». "
+  + "Le rappel d'une ligne reste admis dans un point d'étape (mention « point d'étape » au bloc 1) et pour une décision d'une session antérieure.";
+
 // ---- TF-1849 (18/10/2026) — UNE D-N AFFICHÉE EST INSCRITE AU REGISTRE DU PRODUIT AVANT L'AFFICHAGE -----
 //
 // LE FAIT, retour Produit-79 RP-12 (lot 20261017b), le 15/10/2026 : une synthèse affichait D-37 à D-40
@@ -1778,16 +1845,18 @@ export function registreDesDecisions(produit) {
 // `FORGE_RESERVATION_BLOQUANTE_DES` (AAAA-MM-JJ) avance ou recule l'échéance sans toucher au hook ; la recette s'en sert pour jouer les deux états.
 export const RESERVATION_BLOQUANTE_DES = process.env.FORGE_RESERVATION_BLOQUANTE_DES || "2026-11-01";
 
-export function controlerReservation({ dernierTexte = "", dernierHumain = "", textePrecedent = "", racine = null, maintenant = new Date() }) {
+// TF-2672 : `posesSession` — les numéros que la session a déjà posés à l'écran (messages de l'assistant antérieurs au message jugé). Une décision reposée en entier au message final, parce que
+// le porteur l'a demandé, n'est pas une décision NOUVELLE : elle est déjà à l'écran, et le registre n'a pas à la porter de nouveau.
+export function controlerReservation({ dernierTexte = "", dernierHumain = "", textePrecedent = "", racine = null, maintenant = new Date(), posesSession = [] }) {
   const produit = produitDe(racine);
   if (!produit) {
     // TF-1872 (D-32 (a), 18/10/2026) : le pilot a désormais son registre des D-N, et la MÊME règle s'y applique.
-    if (estAuPilot(racine)) return controlerReservationPilot({ dernierTexte, dernierHumain, textePrecedent, maintenant });
+    if (estAuPilot(racine)) return controlerReservationPilot({ dernierTexte, dernierHumain, textePrecedent, maintenant, posesSession });
     return { applicable: false, verdict: "SANS_OBJET", bloquant: false, ecarts: [], motif: "ni un produit (aucun forge\\retours\\ en remontant depuis le dossier de la session) ni le pilot : une forge n'a pas de registre des D-N" };
   }
   const deja = [dernierHumain, textePrecedent].join("\n");
   // Une D-N que l'humain NOMME (« D-51 », « 51a », « 51 détaille ») ou que le message précédent affichait n'est pas nouvelle.
-  const nommees = new Set([...selecteursDecision(dernierHumain).map((s) => s.n), ...demandesDetail(dernierHumain)]);
+  const nommees = new Set([...selecteursDecision(dernierHumain).map((s) => s.n), ...demandesDetail(dernierHumain), ...posesSession.map(String)]);
   const nouvelles = decisionsPosees(dernierTexte).filter((d) => !nommees.has(d.n) && !citeD(d.n, deja));
   if (!nouvelles.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit, nouvelles: [] };
   const registre = registreDesDecisions(produit);
@@ -1829,9 +1898,9 @@ export function controlerReservation({ dernierTexte = "", dernierHumain = "", te
 export const RESERVATION_PILOT_BLOQUANTE_DES = process.env.FORGE_RESERVATION_PILOT_BLOQUANTE_DES || "2026-10-25";
 const questionDeTete = (segment) => { const m = /D\s*-?\s*\d{1,3}\s*\*{0,2}\s*[—–:-]?\s*([^\n]*\?)/.exec(String(segment || "")); return m ? m[1].replace(/\*+/g, "").replace(/\s+/g, " ").trim() : ""; };
 
-export function controlerReservationPilot({ dernierTexte = "", dernierHumain = "", textePrecedent = "", maintenant = new Date(), fichier = process.env.FORGE_REGISTRE_DECISIONS_PILOT || REGISTRE_PILOT }) {
+export function controlerReservationPilot({ dernierTexte = "", dernierHumain = "", textePrecedent = "", maintenant = new Date(), fichier = process.env.FORGE_REGISTRE_DECISIONS_PILOT || REGISTRE_PILOT, posesSession = [] }) {
   const deja = [dernierHumain, textePrecedent].join("\n");
-  const nommees = new Set([...selecteursDecision(dernierHumain).map((s) => s.n), ...demandesDetail(dernierHumain)]);
+  const nommees = new Set([...selecteursDecision(dernierHumain).map((s) => s.n), ...demandesDetail(dernierHumain), ...posesSession.map(String)]);
   const nouvelles = decisionsPosees(dernierTexte).filter((d) => !nommees.has(d.n) && !citeD(d.n, deja));
   if (!nouvelles.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit: null, cible: "pilot", nouvelles: [], absentes: [], prises: [] };
   const registre = lireRegistrePilot(fichier);
@@ -2241,13 +2310,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const bloquants = fails.filter((x) => estBloquante(x.regle));
   const avertissements = [...fails.filter((x) => !estBloquante(x.regle)), ...avertsOracle];
   // TF-1849 — la RÉSERVATION : chaque D-N nouvelle de ce brouillon est-elle inscrite au registre du produit ?
-  const reservation = controlerReservation({ dernierTexte: brouillon, dernierHumain: dernierHumainP, textePrecedent: textePrecedentP, racine: RACINE_P });
+  const reservation = controlerReservation({ dernierTexte: brouillon, dernierHumain: dernierHumainP, textePrecedent: textePrecedentP, racine: RACINE_P, posesSession: tourP ? tourP.posesAvantBrouillon || [] : [] });
   const reservationBloque = reservation.verdict === "FAIL" && reservation.bloquant;
   // TF-1866 — le « oui » à une question de complétude, joué sur ce brouillon dès que le transcript donne le dernier message humain.
   const completude = controlerOuiDeCompletude({ dernierHumain: dernierHumainP, dernierTexte: brouillon });
   // TF-1913 — la CRITIQUE : les fichiers servis écrits dans le tour portent-ils un verdict de critique daté après leur dernière écriture ?
   const critiqueJ = controlerCritique({ critique: critiqueP });
   const critiqueBloque = critiqueJ.verdict === "FAIL" && estBloquante("CRITIQUE");
+  // TF-2672 — le RÉAFFICHAGE, joué sur ce brouillon : les décisions posées plus tôt dans la session (le brouillon n'est pas encore au transcript) et restées ouvertes.
+  const reaffichageJ = tourP ? controlerReaffichage({ decisionsOuvertes: tourP.decisionsOuvertesAvantBrouillon || [], dernierTexte: brouillon }) : { verdict: "SANS_OBJET", ecarts: [] };
   // TF-1973 et TF-2016 (S87) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est-il lié au bloc 0 de ce brouillon ? Avertissante.
   const livreJ = controlerLivre({ livrables: livrablesP || [], synthese: syntheseDeposee, texte: brouillon, racine: RACINE_P });
   // TF-2078 (RT-33) — la REMONTÉE : un skill de la Factory a servi, un livrable a été écrit à la main, aucun retour au ledger. Avertissante.
@@ -2275,6 +2346,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const avertObjets = [
     ...avertissements.map((x) => ({ code: x.regle, texte: `${avecEcheance(x)} — ${x.message}` })),
     ...detail.ecarts.map((e) => ({ code: "DÉTAIL", texte: `DÉTAIL — ${e}` })),
+    ...reaffichageJ.ecarts.map((e) => ({ code: "RÉAFFICHAGE", texte: `RÉAFFICHAGE — ${e}. ${RAPPEL_REAFFICHAGE}` })),
     ...(reservation.verdict === "FAIL" && !reservationBloque ? [{ code: "RÉSERVATION", texte: `RÉSERVATION (bloquante dès le ${echeanceReservation(reservation)}) — ${reservation.ecarts[0]}. ${rappelReservation(reservation)}` }] : []),
     ...(critiqueJ.verdict === "FAIL" && !critiqueBloque ? [{ code: "CRITIQUE", texte: `CRITIQUE (bloquante dès le ${BLOQUANTES_DATEES.CRITIQUE}) — ${critiqueJ.ecarts[0]}. ${RAPPEL_CRITIQUE}` }] : []),
     ...(livreJ.verdict === "FAIL" ? livreJ.ecarts.map((e) => ({ code: "S87", texte: `S87 — ${e}. ${RAPPEL_LIVRE}` })) : []),
@@ -2373,7 +2445,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const RACINE_HOOK = racineDuProjet(entree.cwd);
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
     depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, nonInteractif, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables, remontee: remonteeTour,
-    frictions: frictionsTour, depuisFrictions, retourFrictions } = analyserTranscript(readFileSync(chemin, "utf8"));
+    frictions: frictionsTour, depuisFrictions, retourFrictions, decisionsOuvertes, posesSession } = analyserTranscript(readFileSync(chemin, "utf8"));
   // TF-2257 (06/11/2026) : `FORGE_HOOKS_JOURNAL` dérive le journal ailleurs que sous `.claude\` du dépôt — la recette du hook s'en sert pour que ses
   // sessions fictives (« test-66-borne-… ») n'entrent jamais au journal réel. Absente, le chemin est celui d'avant.
   const journal = process.env.FORGE_HOOKS_JOURNAL || join(ICI, "..", ".claude", "hooks-journal.jsonl");
@@ -2462,7 +2534,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const detail = controlerDetail({ dernierHumain, dernierTexte, textePrecedent, texteSynthese });
   // TF-1849 — la RÉSERVATION : une D-N nouvelle du bloc 3 est inscrite au registre du produit avant l'affichage.
   // Avertissante jusqu'à RESERVATION_BLOQUANTE_DES, bloquante ensuite (mesure d'entrée : gabarit RESTITUTION.md 2.45.0).
-  const reservation = controlerReservation({ dernierTexte, dernierHumain, textePrecedent, racine: RACINE_HOOK });
+  const reservation = controlerReservation({ dernierTexte, dernierHumain, textePrecedent, racine: RACINE_HOOK, posesSession });
   const reservationBloque = reservation.verdict === "FAIL" && reservation.bloquant;
   // TF-1866 — le « oui » à une question de complétude porte sa ligne « Mesuré sur » (S82 juge le texte, ce contrôle lit le message humain). Bloquant.
   const completude = controlerOuiDeCompletude({ dernierHumain, dernierTexte });
@@ -2475,6 +2547,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // écriture. Avertissante jusqu'au 02/11/2026 inclus, bloquante dès le 03/11/2026 (`BLOQUANTES_DATEES.CRITIQUE`).
   const critique = controlerCritique({ critique: critiqueTour });
   const critiqueBloque = critique.verdict === "FAIL" && estBloquante("CRITIQUE");
+  // TF-2672 — le RÉAFFICHAGE : une décision posée plus tôt dans la session et restée ouverte se repose en entier au message final. Avertissant.
+  const reaffichage = controlerReaffichage({ decisionsOuvertes, dernierTexte });
   // TF-1973 et TF-2016 (S87, gabarit 2.53.0) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est la cible d'un lien du bloc 0.
   // Avertissante à son entrée (règle neuve) ; aucune échéance armée : pour en poser une, la mettre à `BLOQUANTES_DATEES` (clé S87) et reprendre la forme de `critiqueBloque`.
   const livre = controlerLivre({ livrables, synthese: fichierSynthese, texte: dernierTexte, racine: RACINE_HOOK });
@@ -2492,6 +2566,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...geste.ecarts.map((e) => ({ regle: "GESTE", statut: "FAIL", message: `${e}. ${RAPPEL_GESTE}` })),
     ...procedure.ecarts.map((e) => ({ regle: "PROCÉDURE", statut: "FAIL", message: `${e} ${RAPPEL_PROCEDURE}` })),
     ...detail.ecarts.map((e) => ({ regle: "DÉTAIL", statut: "FAIL", message: `${e}. ${RAPPEL_DETAIL}` })),
+    ...reaffichage.ecarts.map((e) => ({ regle: "RÉAFFICHAGE", statut: "FAIL", message: `${e}. ${RAPPEL_REAFFICHAGE}` })),
     ...possession.ecarts.map((e) => ({ regle: "POSSESSION", statut: "FAIL", message: e })),
     ...explication.ecarts.map((e) => ({ regle: "EXPLICATION", statut: "FAIL", message: e })),
     ...(reservation.verdict === "FAIL" && !reservationBloque
@@ -2502,7 +2577,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...(frictionsC.verdict === "FAIL" && !frictionsBloque ? frictionsC.ecarts.map((e) => ({ regle: "FRICTIONS", statut: "FAIL", message: `${e}. ${RAPPEL_FRICTIONS}` })) : [])];
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
   const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
-    && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
+    && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reaffichage.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
     && critique.verdict !== "FAIL" && livre.verdict !== "FAIL" && remontee.verdict !== "FAIL" && frictionsC.verdict !== "FAIL" && !lotBloque;
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   // TF-2191 — au PASS, les livrables écrits dans le tour et liés au bloc 0 reçoivent leur sceau ; le journal en garde la liste.
@@ -2523,6 +2598,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(geste.applicable ? { geste: { decision: geste.decision, verdict: geste.verdict, ecarts: geste.ecarts } } : {}),
       ...(procedure.applicable ? { procedure: { verdict: procedure.verdict, ecarts: procedure.ecarts } } : {}),
       ...(detail.applicable ? { detail: { decision: detail.decision, verdict: detail.verdict, ecarts: detail.ecarts } } : {}),
+      ...(reaffichage.applicable ? { reaffichage: { verdict: reaffichage.verdict, ouvertes: reaffichage.ouvertes, manquantes: reaffichage.manquantes || [] } } : {}),
       ...(reservation.applicable ? { reservation: { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [] } } : {}),
       ...(completude.applicable ? { completude: { verdict: completude.verdict, ecarts: completude.ecarts } } : {}),
       ...(possession.applicable ? { possession: { verdict: possession.verdict } } : {}),
