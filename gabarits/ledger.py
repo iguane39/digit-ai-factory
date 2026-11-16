@@ -3,11 +3,17 @@
 JSON Lines append-only, `seq` strictement croissant depuis 1 (numéroté après le plus grand déjà pris), `ts` ISO non décroissant,
 première entrée `run_open`. Écrivain unique : l'orchestrateur de session.
 
-  python forge/ledger.py <type> --champ valeur ...
+  python forge/ledger.py <type> --<nom du champ> <valeur> [--<autre champ> <valeur>] ...
   python forge/ledger.py --verifier
-  python forge/ledger.py <type> --archive <run clos> --champ valeur ...   (écrit dans runs/<run clos>/ledger.jsonl)
+  python forge/ledger.py <type> --archive <run clos> --<nom du champ> <valeur> ...   (écrit dans runs/<run clos>/ledger.jsonl)
   python forge/ledger.py --hors-run                  (liste forge/hors-run.jsonl) ; --verifier --hors-run en juge l'intégrité
-  python forge/ledger.py <type> --essai --champ valeur ...   (mode d'essai : rien n'est écrit)
+  python forge/ledger.py <type> --essai --<nom du champ> <valeur> ...   (mode d'essai : rien n'est écrit)
+
+EXEMPLE RÉEL (TF-2630). Le nom du champ s'écrit dans l'option elle-même, une option par champ, jamais `--champ clé=valeur` :
+  python forge/ledger.py oracles_verdict --oracle oracle-conformite-projet --verdict PASS --cible forge
+Un verdict d'oracle porte `oracle` et `verdict` (CONTRAT-INTERFACE §3) ; l'écrivain refuse l'entrée qui n'a pas l'un des deux,
+et tout champ nommé « champ », AVANT d'écrire : le 12/11/2026, `--champ clé=valeur` répété a écrit une entrée au seul champ
+« champ », sans oracle ni verdict, code 0 (seq 976 de Produit-86), et un ledger ne se réécrit pas.
 
 MODE D'ESSAI (TF-2549). `--essai` joue tous les contrôles d'une écriture (type, forme, première entrée, numérotation) et AFFICHE
 l'entrée qui serait écrite, sans l'écrire : ni ledger, ni journal hors run, ni verrou. Un agent en lecture seule qui veut
@@ -145,6 +151,27 @@ def controler_remplacement(type_: str, champs: dict) -> None:
             raise SystemExit(f"`artefacts_remplaces` : liste non vide de {{artefact, sort}}, sort parmi {', '.join(SORTS)}")
 
 
+# TF-2630 (retour RP-69 de Produit-86, 12/11/2026) : l'usage affiché disait `<type> --champ valeur` ; un appel `--champ clé=valeur` répété a écrit une
+# entrée `oracles_verdict` au seul champ « champ » (la dernière valeur), sans `oracle` ni `verdict`, code 0. Un ledger est en ajout seul : le refus
+# vient AVANT l'écriture. Le nom du champ est celui de l'option (`--oracle x`), et un verdict d'oracle porte les deux champs que le contrat exige.
+EXEMPLE_VERDICT = "python forge/ledger.py oracles_verdict --oracle oracle-conformite-projet --verdict PASS --cible forge"
+CHAMPS_VERDICT = ("oracle", "verdict")
+
+
+def controler_forme(type_: str, champs: dict) -> None:
+    """Refuse AVANT d'écrire un champ nommé « champ » (la lettre de l'ancien usage, jamais un nom de champ) et une entrée `oracles_verdict` à qui il
+    manque `oracle` ou `verdict` (absent, vide, fait d'espaces, ou option donnée sans valeur). Le refus nomme le champ et donne un exemple réel."""
+    if "champ" in champs:
+        raise SystemExit("`--champ` n'est pas un nom de champ : le nom du champ s'écrit dans l'option elle-même (`--oracle oracle-x`, une option par champ), "
+                         f"jamais `--champ clé=valeur` ; exemple : `{EXEMPLE_VERDICT}` — rien n'est écrit")
+    if type_ != "oracles_verdict":
+        return
+    manquants = [c for c in CHAMPS_VERDICT if not isinstance(champs.get(c), str) or not champs[c].strip()]
+    if manquants:
+        raise SystemExit(f"`oracles_verdict` sans {' ni '.join(f'`{c}`' for c in manquants)} : une entrée sans oracle ou sans verdict ne dit pas ce qui a tourné "
+                         f"(CONTRAT-INTERFACE §3) ; exemple : `{EXEMPLE_VERDICT}` — rien n'est écrit")
+
+
 # TF-2527 : les champs où `oracles/lib-decisions.mjs` (`decisionsRetirees`) lit la décision qu'une entrée `decision_retiree` retire.
 CHAMPS_DECISION_RETIREE = ("decision", "decisions", "decisions_retirees")
 CAUSE_MIN = 20
@@ -261,6 +288,7 @@ def ajouter(archive: str, type_: str, essai: bool = False, /, **champs) -> dict:
     # `essai` (TF-2549) : tous les contrôles sont joués et l'entrée est rendue, mais ni le journal ni le verrou ne sont touchés.
     if type_ not in TYPES:
         raise SystemExit(f"type inconnu : {type_} — attendus {sorted(TYPES)}")
+    controler_forme(type_, champs)
     controler_remplacement(type_, champs)
     controler_retrait(type_, champs)
     controler_rectification(type_, champs)
