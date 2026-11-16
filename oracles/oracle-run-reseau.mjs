@@ -32,7 +32,10 @@
  *   RR2 chaque publication du lot tient le contrat de sortie du modèle qu'elle DÉCLARE : longueur,
  *       accroche, clôture, hashtags, pièce requise ; le modèle déclaré sert le réseau déclaré ;
  *   RR3 faits chiffrés sourcés — `oracle-claims` de forge-agents, verdict repris tel quel ;
- *   RR4 transparence — `oracle-transparence` de forge-agents (TF-1030), verdict repris tel quel ;
+ *   RR4 transparence — `oracle-transparence` de forge-agents (TF-1030), verdict repris tel quel. Un texte qu'une
+ *       personne nommée relit, modifie et publie sous sa responsabilité éditoriale se passe de la mention d'IA : la
+ *       publication déclare `responsable_editorial` et `decision_editoriale: D-<n>` (D-187 (c), TF-2644 ; TR4 de
+ *       l'oracle, TF-2645), et RR4 cite ce responsable au verdict ;
  *   RR5 accord de publication consigné AVANT toute publication : `accord: true`, daté, nommé ;
  *       dès que le lot compte plus d'une publication, `lot` les nomme TOUTES — un accord donné
  *       sur 2 textes ne couvre pas le 3e ;
@@ -94,6 +97,26 @@ function frontmatter(texte) {
   const sortie = {};
   if (m) for (const l of m[1].split(/\r?\n/)) { const k = /^([A-Za-z_]+)\s*:\s*(.*)$/.exec(l); if (k) sortie[k[1]] = k[2].trim(); }
   return sortie;
+}
+
+/**
+ * RR4 lit le verdict d'oracle-transparence TEL QUEL, et NOMME la voie par laquelle il passe ou échoue (TF-2644, D-187 (c) du
+ * 12/11/2026). Un texte qu'une personne nommée relit, modifie et publie sous sa responsabilité éditoriale ne porte pas la
+ * mention d'IA : la publication déclare `responsable_editorial` et `decision_editoriale: D-<n>` au frontmatter, et l'oracle de
+ * forge-agents (TR4, TF-2645) rend un PASS motivé ; le champ sans décision est bloquant. Ici, le responsable et la décision
+ * sont CITÉS au verdict, jamais déduits, et un refus de TR4 est cité avec sa raison au lieu du seul nom du fichier.
+ */
+export function lireTransparence(fichier, tr) {
+  const tr4 = (tr.findings || []).filter((x) => /^TR4\b/.test(String(x.msg || "")));
+  const dit = (x) => String(x.msg).replace(/^TR4\s*—\s*/, "").replace(/\s+/g, " ").slice(0, 300);
+  if (tr.verdict === "FAIL") {
+    const refus = tr4.find((x) => x.sev === "bloquant");
+    return refus ? `${fichier} (${dit(refus)})` : fichier;
+  }
+  const motive = tr4.find((x) => x.sev === "info");
+  const qui = motive && /de «\s*(.+?)\s*»,? appuyée sur la décision (D-\d+)/.exec(String(motive.msg));
+  const motif = motive ? ` motivé — ${qui ? `responsabilité éditoriale de « ${qui[1]} » appuyée sur ${qui[2]}, à la place de la mention (l'existence de la décision n'est pas vérifiée)` : dit(motive)}` : tr.motif ? ` (${tr.motif})` : "";
+  return `${fichier} ${tr.verdict}${motif}`;
 }
 
 /** Les contrats de sortie publiés par forge-agents ; absents ou illisibles → null, et RR2 le dit. */
@@ -295,10 +318,11 @@ export function juger(dossier, { mentions, contrats = chargerContrats() } = {}) 
       const claims = jouer("oracle-claims.mjs", [chemin]);
       claims.verdict === "FAIL" ? rouges3.push(f) : vus3.push(`${f} ${claims.verdict}${claims.motif ? ` (${claims.motif})` : ""}`);
       const tr = jouer("oracle-transparence.mjs", mentions ? [chemin, "--mentions", mentions] : [chemin]);
-      tr.verdict === "FAIL" ? rouges4.push(f) : vus4.push(`${f} ${tr.verdict}${tr.motif ? ` (${tr.motif})` : ""}`);
+      const lu = lireTransparence(f, tr);
+      tr.verdict === "FAIL" ? rouges4.push(lu) : vus4.push(lu);
     }
     rouges3.length ? ko("RR3", `oracle-claims FAIL — un chiffre sans source : ${rouges3.join(", ")}`) : ok("RR3", `oracle-claims — ${vus3.join(" | ")}`);
-    rouges4.length ? ko("RR4", `oracle-transparence FAIL — contenu généré sans mention lisible : ${rouges4.join(", ")}`) : ok("RR4", `oracle-transparence — ${vus4.join(" | ")}`);
+    rouges4.length ? ko("RR4", `oracle-transparence FAIL — contenu généré sans mention lisible, ni responsable éditorial déclaré et appuyé : ${rouges4.join(", ")}`) : ok("RR4", `oracle-transparence — ${vus4.join(" | ")}`);
   }
 
   // RR5 — accord humain de publication, par LOT
@@ -462,6 +486,7 @@ const arg = process.argv[2];
 if (arg === "--self-test") {
   const base = mkdtempSync(join(tmpdir(), "run-reseau-"));
   const casse = [];
+  const en_attente = [];
   const enEchec = (f) => f.filter((x) => x.statut === "FAIL").map((x) => x.regle);
   let cas = 0;
   try {
@@ -643,9 +668,49 @@ if (arg === "--self-test") {
       const nu = (juger(join(base, "verte")).find((x) => x.regle === "RR9") || {}).message || "";
       if (!/planificateur\.json absent.*non jugé/.test(nu)) casse.push(`RR9 sans planificateur : le verdict ne dit pas qu'il n'a rien jugé — ${nu}`);
     }
+
+    // 48 à 56 — RR4 et la responsabilité éditoriale (TF-2644, D-187 (c) du 12/11/2026). Les formes du verdict sont celles
+    // que rend `oracle-transparence` avec TR4 (TF-2645, commit 38681c9 de forge-agents) : RR4 les LIT et nomme la voie.
+    {
+      const MSG_TR4_OK = "TR4 — publié sous la responsabilité éditoriale de « Le dirigeant de l'émetteur », appuyée sur la décision D-187 : la mention TR1 n'est pas exigée (PASS MOTIVÉ par ce champ, pas par une mention). L'existence de la décision et la réalité de la relecture ne sont pas vérifiées ici";
+      const MSG_TR4_KO = "TR4 — `responsable_editorial` (« Le dirigeant de l'émetteur ») n'est pas APPUYÉ sur une décision consignée : le champ `decision_editoriale` est absent. Correction : ajouter `decision_editoriale: D-<nombre>`, ou écrire la mention TR1 dans le corps visible";
+      const lectures = [
+        ["PASS motivé par TR4 : RR4 cite le responsable et la décision", lireTransparence("publication-linkedin.md", { verdict: "PASS", findings: [{ sev: "info", msg: MSG_TR4_OK }] }),
+          /^publication-linkedin\.md PASS motivé — responsabilité éditoriale de « Le dirigeant de l'émetteur » appuyée sur D-187, à la place de la mention/],
+        ["PASS par la mention TR1 : le verdict n'a pas changé", lireTransparence("publication-linkedin.md", { verdict: "PASS", findings: [{ sev: "info", msg: "TR1 — mention d'assistance par IA présente dans le texte lisible" }] }), /^publication-linkedin\.md PASS$/],
+        ["FAIL de TR4 (champ sans décision) : RR4 cite la raison, pas le seul fichier", lireTransparence("publication-linkedin.md", { verdict: "FAIL", findings: [{ sev: "bloquant", msg: MSG_TR4_KO }] }), /^publication-linkedin\.md \(.*n'est pas APPUYÉ sur une décision consignée/],
+        ["FAIL de TR1 (ni mention, ni champ) : le nom du fichier, sans motif inventé", lireTransparence("publication-linkedin.md", { verdict: "FAIL", findings: [{ sev: "bloquant", msg: "TR1 — AUCUNE MENTION d'assistance par IA" }] }), /^publication-linkedin\.md$/],
+      ];
+      for (const [nom, obtenu, attendu] of lectures) { cas++; if (!attendu.test(obtenu)) casse.push(`RR4 lit le verdict — ${nom} : obtenu « ${obtenu} »`); }
+
+      // De bout en bout, contre l'oracle RÉEL de forge-agents : il n'existe qu'une fois TF-2645 fusionné chez lui. Tant qu'il
+      // ne lit pas `responsable_editorial`, ces 3 cas sont DITS en attente (jamais comptés verts), et ils se jouent seuls
+      // le jour où l'oracle livré les rend jouables.
+      const sourceOracle = existsSync(join(QO, "oracle-transparence.mjs")) ? readFileSync(join(QO, "oracle-transparence.mjs"), "utf8") : "";
+      if (/responsable_editorial/.test(sourceOracle)) {
+        const sansMention = (d, champs) => {
+          remplacer(d, "publication-linkedin.md", MENTION + "\n\n", "");
+          if (champs) remplacer(d, "publication-linkedin.md", "genere: true", `genere: true\n${champs}`);
+        };
+        const rr4 = (nom, champs, attendu, motif) => {
+          const d = join(base, nom);
+          semaine(d, { rouge: false });
+          sansMention(d, champs);
+          const f = juger(d);
+          cas++;
+          const rouges = enEchec(f), m = (f.find((x) => x.regle === "RR4") || {}).message || "";
+          if (attendu === "PASS" ? (rouges.length || !m.includes(motif)) : (rouges.length !== 1 || rouges[0] !== "RR4" || !m.includes(motif)))
+            casse.push(`${nom} : attendu RR4 ${attendu} nommant « ${motif} », obtenu ${rouges.join(", ") || "PASS"} — ${m}`);
+        };
+        rr4("responsable-editorial", "responsable_editorial: Le dirigeant de l'émetteur, qui relit et publie\ndecision_editoriale: D-187 (c)", "PASS", "responsabilité éditoriale de « Le dirigeant de l'émetteur, qui relit et publie » appuyée sur D-187");
+        rr4("responsable-sans-decision", "responsable_editorial: Le dirigeant de l'émetteur", "FAIL", "n'est pas APPUYÉ sur une décision consignée");
+        rr4("sans-mention-ni-responsable", null, "FAIL", "publication-linkedin.md");
+      } else en_attente.push("RR4 de bout en bout : responsable éditorial déclaré (PASS), sans décision (FAIL), sans mention ni responsable (FAIL) — attend l'oracle-transparence de forge-agents qui lit `responsable_editorial` (TF-2645, commit 38681c9)");
+    }
   } finally { rmSync(base, { recursive: true, force: true }); }
-  console.log(JSON.stringify({ outil: "oracle-run-reseau --self-test", verdict: casse.length ? "FAIL" : "PASS", cas, regles: 9, casse }, null, 1));
-  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR8 ; 19 altérations à une règle ; contrats absents ; voix sans règle mécanisable mais motivée PASS ; mot entier PASS ; gabarit brut refusé et instancié lu ; remède RR8 joué ; forme élidée « j'attends » vue sous « je » et « j' », imposée comme écartée ; RR9 : échéance ajoutée entre deux tours sans tour avant son heure, remèdes joués)`);
+  if (en_attente.length) console.log(`EN ATTENTE (non comptés, non verts) : ${en_attente.join(" | ")}`);
+  console.log(JSON.stringify({ outil: "oracle-run-reseau --self-test", verdict: casse.length ? "FAIL" : "PASS", cas, regles: 9, casse, en_attente }, null, 1));
+  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR8 ; 19 altérations à une règle ; contrats absents ; voix sans règle mécanisable mais motivée PASS ; mot entier PASS ; gabarit brut refusé et instancié lu ; remède RR8 joué ; forme élidée « j'attends » vue sous « je » et « j' », imposée comme écartée ; RR9 : échéance ajoutée entre deux tours sans tour avant son heure, remèdes joués ; RR4 cite le responsable éditorial qui tient lieu de mention)`);
   process.exit(casse.length ? 1 : 0);
 }
 if (!arg || !existsSync(arg)) { console.log(JSON.stringify({ oracle: "oracle-run-reseau", verdict: "SKIP", motif: "dossier de semaine absent" })); process.exit(2); }

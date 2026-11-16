@@ -46,6 +46,15 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
   `planificateur.json` (schéma `pilot/planificateur@1`, fuseau écrit sur chaque instant), dans le
   dossier de semaine ou son parent ; RR9 refuse l'échéance qui n'a aucun tour entre son ajout et son
   heure. Sans ce fichier, RR9 le dit et ne juge rien : la programmation est alors humaine (N3).
+- **Un texte qu'une personne nommée relit, modifie et publie elle-même ne porte pas la mention
+  d'IA** (TF-2644, D-187 (c) du 12/11/2026). Le cas : le dirigeant relit, modifie et publie chaque
+  texte de son compte à la main, et répond de la ligne éditoriale. La publication le déclare au
+  frontmatter, par deux champs : `responsable_editorial: <nom ou rôle>` et `decision_editoriale: D-<n>`,
+  la décision consignée qui établit cette responsabilité. `oracle-transparence` (règle TR4, forge-agents,
+  TF-2645) rend alors un PASS motivé à la place de la mention, et RR4 cite le responsable et la décision
+  à son verdict. Le champ sans décision reste refusé ; sans le champ, la mention reste due (TR1, depuis
+  le 02/08/2026). Le contrôle ne vérifie pas que la décision existe ni que la relecture a eu lieu : le
+  numéro se lit au registre des décisions du produit.
 - **Les règles d'une plateforme se lisent dans le référentiel daté, nulle part ailleurs.** Si
   `perime_le` est dépassé, le run relit le référentiel avant toute autre chose. Aucune « règle
   d'algorithme » sans source primaire datée n'entre dans un contenu ni dans un skill.
@@ -175,7 +184,8 @@ format `gabarits\RESTITUTION.md`.
 [--mentions <formules de la marque>]`. Il lit `emetteur.json` et `voix.json` (dans la semaine ou
 dans son parent), `calendrier.md`, chaque `publication*.md`, `accord.json` et `mesures.json`, et
 juge 9 règles : calendrier à 4 semaines ; contrat de sortie du modèle que chaque publication
-déclare ; faits sourcés (`oracle-claims`) ; transparence (`oracle-transparence`) ; accord humain
+déclare ; faits sourcés (`oracle-claims`) ; transparence (`oracle-transparence`, mention d'IA ou
+responsable éditorial déclaré et appuyé) ; accord humain
 couvrant tout le lot ; mesure avec temps humain ; fiche de l'émetteur complète et sans secret ;
 voix de l'émetteur tenue par chaque publication de sa portée ; et, quand un `planificateur.json`
 est déposé, un tour du planificateur entre l'ajout et l'heure de chaque échéance (RR9, TF-2609).
@@ -202,7 +212,11 @@ une valeur « j' » n'exige rien après son apostrophe, et « jeu » ni « jeton
 à 7 h 07 et 8 h 07 UTC et une échéance ajoutée à 12 h 32, rend FAIL ; les deux remèdes du message (replanification
 à l'ajout, exécutant d'intervalle) et un tour dans la fenêtre rendent PASS ; un intervalle plus long que
 la fenêtre, un instant sans fuseau, une échéance ajoutée après son heure et un relevé sans tour rendent FAIL ;
-sans `planificateur.json`, RR9 dit qu'elle n'a rien jugé (47 cas en tout). Aucun accord ni
+sans `planificateur.json`, RR9 dit qu'elle n'a rien jugé (47 cas en tout). Enfin 4 cas pour RR4 (TF-2644) :
+le verdict d'`oracle-transparence` cite le responsable éditorial et sa décision quand il passe par eux,
+la raison du refus quand le champ n'a pas de décision, et reste inchangé pour une mention ou une absence ;
+51 cas. Trois cas de bout en bout s'y ajoutent (54 en tout) dès que l'oracle de forge-agents lit
+`responsable_editorial` : tant qu'il ne le lit pas, la recette les dit EN ATTENTE, jamais verts. Aucun accord ni
 publication réels. La séquence est donc prouvée **à blanc**. Elle
 ne l'est pas encore **en vrai** : tant que le premier cas réel de 4 semaines n'est pas mesuré
 (TF-1160), rien ne dit que le rendez-vous tient dans un agenda.

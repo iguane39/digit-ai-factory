@@ -1,6 +1,6 @@
 {
   "cible": "references/RUN-RESEAU.md",
-  "date_iso": "2026-11-16T17:51:47.050Z",
+  "date_iso": "2026-11-16T18:15:38.612Z",
   "registre_version": "2.64.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\RUN-RESEAU.md",
-    "ts": "2026-11-16T17:51:47.049Z",
+    "ts": "2026-11-16T18:15:38.611Z",
     "fichiers": {
-      "references\\RUN-RESEAU.md": "47133f1af99d060a411e97b019ad7d8342c3ee98530a441280b684906ed9619e"
+      "references\\RUN-RESEAU.md": "40213e6bfb6ecf65f6258e52126fcfb6019eb346b6f7522be1da5d4b492ba27e"
     }
   },
   "empreinte_motif": null,
