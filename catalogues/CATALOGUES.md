@@ -1,6 +1,6 @@
 # Catalogues de services des forges — vue générée
 
-> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.8.0, 2026-08-19) — ne jamais éditer ce fichier.
+> **Vue générée** par `catalogues/generer-vues.mjs` depuis `catalogue.jsonl` (source unique, v1.9.0, 2026-11-16) — ne jamais éditer ce fichier.
 > 111 services · 93 prouvés · 18 déclarés. Un service **prouvé** a une preuve exécutée (oracle, CLI, run réel) ; un service **déclaré** n'a que sa méthode documentée — il est affiché comme tel, jamais promis.
 
 ## forge-conception (pipeline) — 9 services
@@ -181,4 +181,4 @@
 
 ---
 
-Règles : source unique `catalogue.jsonl` (écrivain unique : pilot) · ids stables, évolution sous table de correspondance (CONTRAT-INTERFACE §3 bis) · toute correction ou ajout passe par candidature TODO-FORGE, jamais par édition directe · barre de niveau : Backstage Software Catalog (registre la-barre).
+Règles : source unique `catalogue.jsonl` (écrivain unique : pilot) · ids stables, évolution sous table de correspondance (CONTRAT-INTERFACE §3 bis) · toute correction ou ajout passe par candidature TODO-FORGE, jamais par édition directe · version et date changent avec le contenu, scellées par `generer-vues.mjs --sceller` dans `versions.jsonl` (TF-2667) · barre de niveau : Backstage Software Catalog (registre la-barre).

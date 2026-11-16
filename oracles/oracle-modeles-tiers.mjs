@@ -35,6 +35,14 @@
  *         de configuration. Rien n'est daté, mais le fournisseur a nommé un remplaçant.
  *   MT4 · AVERTISSANT : le référentiel, ou la lecture de la page d'un fournisseur, date de plus de
  *         30 jours. Un calendrier périmé rend un vert qui ne vaut plus.
+ *   MT5 · BLOQUANT : la table des voies de génération par média (`voies_generation`, TF-2643) est bien
+ *         formée. Le fait : une session a déclaré absente une voie image vers vidéo qui existait, parce
+ *         qu'elle cherchait des noms de modèles arrêtés (RP-221, 12/11/2026). Chaque média attendu
+ *         (image, video, voix, musique) est tabulé ou déclaré non tabulé avec son motif ; chaque voie
+ *         courante vise un modèle COURANT du référentiel et porte son accès, son état au poste et son
+ *         coût (« non mesuré » ou « non relevé » se disent, ils ne se taisent pas) ; chaque prédécesseur
+ *         arrêté vise un modèle ARRÊTÉ du référentiel et nomme une voie courante du même média comme
+ *         remplaçant. Une table de plus de 30 jours se signale (AVERT).
  *
  * Les fichiers de fixtures et de tests sont comptés à part, jamais en MT1 : ils écrivent un défaut à
  * dessein. Les fichiers documentaires (Markdown, texte, registres .jsonl, HTML) sont comptés à part
@@ -78,7 +86,7 @@ import { spawnSync } from "node:child_process";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const NOM = "oracle-modeles-tiers";
-export const VERSION = "1.0.0";
+export const VERSION = "1.1.0";
 export const SCHEMA = "pilot/modeles-tiers@1";
 export const REF_DEFAUT = join(ICI, "..", "references", "MODELES-TIERS.json");
 export const FENETRE_MT2_JOURS = 90;
@@ -97,6 +105,7 @@ export const NON_JUGE = [
   "l'effet d'un arrêt : certains identifiants déprécient sans s'arrêter (redirection automatique vers le remplaçant, mentionnée en note du référentiel) ; l'oracle date, il ne mesure pas le comportement du fournisseur",
   "l'exactitude de la page du fournisseur et la complétude du référentiel : il reflète la page relue à sa date, pas la liste réelle des modèles servis",
   "les bibliothèques officielles et leurs versions : données du référentiel, non confrontées aux manifestes (package.json, requirements) du parc",
+  "l'état au poste et le coût de chaque voie de génération (MT5) : valeurs recopiées avec leur source et leur date, jamais rejouées. L'oracle ne rappelle aucun fournisseur ; il juge la forme de la table et ses liens avec les modèles du référentiel, pas la vérité d'un coût ni d'une génération",
 ];
 
 // ---- classement des fichiers ---------------------------------------------------------------------
@@ -188,6 +197,62 @@ export function lireReferentiel(ref, date) {
     }
   }
   return { defauts, avertissements, entrees };
+}
+
+// ---- MT5 : les voies de génération par média ----------------------------------------------------
+export const MEDIAS_ATTENDUS = ["image", "video", "voix", "musique"];
+const texteNonVide = (v) => typeof v === "string" && v.trim().length > 0;
+
+/**
+ * MT5 : forme de `voies_generation` et liens avec les modèles du référentiel. Rend { defauts, tabules,
+ * non_tabules }. Aucun appel réseau : l'état au poste et le coût sont recopiés, leur présence est jugée,
+ * pas leur vérité.
+ */
+export function lireVoies(ref, date) {
+  const defauts = [];
+  const v = ref && ref.voies_generation;
+  if (!v || typeof v !== "object" || Array.isArray(v)) return { defauts: ["table voies_generation absente"], tabules: [], non_tabules: [] };
+  if (!estIso(v.date)) defauts.push("date absente ou hors de la forme AAAA-MM-JJ");
+  else if (v.date > date) defauts.push(`date (${v.date}) postérieure au jour du contrôle (${date})`);
+  const modeles = new Map();
+  for (const [nom, f] of Object.entries((ref && ref.fournisseurs) || {})) {
+    for (const m of f && Array.isArray(f.modeles) ? f.modeles : []) if (m && typeof m.id === "string") modeles.set(`${nom}/${m.id}`, m);
+  }
+  const medias = v.medias && typeof v.medias === "object" && !Array.isArray(v.medias) ? Object.entries(v.medias) : [];
+  const nonTables = Array.isArray(v.medias_non_tables) ? v.medias_non_tables : [];
+  if (v.medias_non_tables !== undefined && !Array.isArray(v.medias_non_tables)) defauts.push("medias_non_tables n'est pas une liste");
+  const declares = new Set(nonTables.filter((x) => x && texteNonVide(x.media) && texteNonVide(x.motif)).map((x) => x.media));
+  nonTables.forEach((x, i) => { if (!x || !texteNonVide(x.media) || !texteNonVide(x.motif)) defauts.push(`medias_non_tables[${i}] : média ou motif absent`); });
+  for (const m of MEDIAS_ATTENDUS) {
+    const tabule = medias.some(([nom]) => nom === m);
+    if (!tabule && !declares.has(m)) defauts.push(`média « ${m} » ni tabulé ni déclaré non tabulé avec son motif`);
+    if (tabule && declares.has(m)) defauts.push(`média « ${m} » à la fois tabulé et déclaré non tabulé`);
+  }
+  for (const [nom] of medias) if (!MEDIAS_ATTENDUS.includes(nom)) defauts.push(`média « ${nom} » hors de ${MEDIAS_ATTENDUS.join(", ")}`);
+  for (const [nom, m] of medias) {
+    if (!m || typeof m !== "object") { defauts.push(`${nom} : média illisible`); continue; }
+    const courantes = Array.isArray(m.courantes) ? m.courantes : [];
+    if (!courantes.length) defauts.push(`${nom} : aucune voie courante`);
+    courantes.forEach((c, i) => {
+      const ou = `${nom}.courantes[${i}]${c && c.id ? ` « ${c.id} »` : ""}`;
+      if (!c || !texteNonVide(c.fournisseur) || !texteNonVide(c.id)) { defauts.push(`${ou} : fournisseur ou identifiant absent`); return; }
+      const mod = modeles.get(`${c.fournisseur}/${c.id}`);
+      if (!mod) defauts.push(`${ou} : modèle absent du référentiel de ${c.fournisseur}`);
+      else if (mod.etat !== "courant") defauts.push(`${ou} : le référentiel le range « ${mod.etat} », une voie courante vise un modèle courant`);
+      for (const champ of ["acces", "etat_poste", "cout"]) if (!texteNonVide(c[champ])) defauts.push(`${ou} : ${champ} absent (écrire « non mesuré » ou « non relevé » plutôt que se taire)`);
+    });
+    if (m.arretees !== undefined && !Array.isArray(m.arretees)) defauts.push(`${nom} : arretees n'est pas une liste`);
+    (Array.isArray(m.arretees) ? m.arretees : []).forEach((a, i) => {
+      const ou = `${nom}.arretees[${i}]${a && a.id ? ` « ${a.id} »` : ""}`;
+      if (!a || !texteNonVide(a.fournisseur) || !texteNonVide(a.id)) { defauts.push(`${ou} : fournisseur ou identifiant absent`); return; }
+      const mod = modeles.get(`${a.fournisseur}/${a.id}`);
+      if (!mod) { defauts.push(`${ou} : modèle absent du référentiel de ${a.fournisseur}`); return; }
+      if (mod.etat !== "arrete") { defauts.push(`${ou} : le référentiel le range « ${mod.etat} », un prédécesseur arrêté vise un modèle arrêté`); return; }
+      const nomme = courantes.some((c) => c && texteNonVide(c.id) && motifIdentifiant(c.id).test(mod.remplacant || ""));
+      if (!nomme) defauts.push(`${ou} : son remplaçant « ${mod.remplacant || "aucun"} » ne nomme aucune voie courante du média ${nom}`);
+    });
+  }
+  return { defauts, tabules: medias.map(([nom]) => nom), non_tabules: [...declares] };
 }
 
 // ---- les dépôts ------------------------------------------------------------------------------------
@@ -360,6 +425,17 @@ export function juger({ ref, occurrences = [], date, depotsLus = 0, depotsIllisi
       }
     }
     if (!findings.some((f) => f.regle === "MT4")) findings.push({ regle: "MT4", statut: "PASS", message: `référentiel et lectures des pages de moins de ${AGE_MT4_JOURS} jours (daté du ${ref.date})` });
+  }
+
+  // MT5 — la table des voies de génération par média (TF-2643)
+  if (ref && typeof ref === "object") {
+    const voies = lireVoies(ref, date);
+    if (voies.defauts.length) findings.push({ regle: "MT5", statut: "FAIL", message: `table des voies de génération mal formée : ${voies.defauts.join(" ; ")}` });
+    else {
+      findings.push({ regle: "MT5", statut: "PASS", message: `voies de génération du ${ref.voies_generation.date} : ${voies.tabules.length} média(s) tabulé(s) (${voies.tabules.join(", ")}), ${voies.non_tabules.length} déclaré(s) non tabulé(s) (${voies.non_tabules.join(", ") || "aucun"})` });
+      const ageV = joursEntre(ref.voies_generation.date, date);
+      if (ageV > AGE_MT4_JOURS) findings.push({ regle: "MT5", statut: "AVERT", message: `table des voies de génération datée du ${ref.voies_generation.date}, soit ${ageV} jours : au-delà de ${AGE_MT4_JOURS} jours, les noms courants des modèles sont à relire` });
+    }
   }
 
   const verdict = findings.some((f) => f.statut === "FAIL") ? "FAIL" : "PASS";

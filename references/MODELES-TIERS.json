@@ -1,14 +1,14 @@
 {
   "schema": "pilot/modeles-tiers@1",
-  "version": "1.0.0",
-  "date": "2026-11-03",
+  "version": "1.1.0",
+  "date": "2026-11-16",
   "regle": "Loi n° 4 de la Factory : un identifiant de modèle tiers et sa date d'arrêt sont une donnée volatile, pas du code. Ce fichier est daté, sourcé, et se relit à la main (page citée, mots de la page) ; il ne se complète jamais de mémoire. Juge : oracles/oracle-modeles-tiers.mjs. Une recherche ne vaut que pour l'identifiant exact écrit ici : un alias, un identifiant absent du calendrier du fournisseur, ou une valeur construite à l'exécution échappent au contrôle.",
   "etats": {
     "courant": "listé par la page sans déprécation ou nommé remplaçant ; seuls ceux qu'un appelant du parc emploie sont recopiés",
     "deprecie": "déprécié, avec ou sans date d'arrêt annoncée",
     "arrete": "date d'arrêt atteinte ou page qui le range parmi les modèles arrêtés"
   },
-  "decision": "TF-2109, décision humaine « A2 » du 03/11/2026 (synthèse 20261103n)",
+  "decision": "TF-2109, décision humaine « A2 » du 03/11/2026 (synthèse 20261103n) ; TF-2643, voies de génération par média, décision du 16/11/2026 (« Traite les retours et les TODOs »)",
   "fournisseurs": {
     "openai": {
       "documentation": "https://developers.openai.com/api/docs/llms.txt",
@@ -1987,7 +1987,7 @@
       "calendrier": "https://ai.google.dev/gemini-api/docs/deprecations.md.txt",
       "lu_le": "2026-11-03",
       "lu_a": "17:05",
-      "portee": "toutes les tables de la page, relues le 03/11/2026 à 17:05. La page a changé depuis la copie du catalogue (15:31) : elle range maintenant les modèles arrêtés sous « Deprecated models » et date au 2026-12-01 l'arrêt de gemini-2.5-pro et de gemini-2.5-flash ; ce fichier suit la page relue à 17:05. La colonne de date de la page est la date de SORTIE du modèle (champ sortie), jamais une date de déprécation (champ depreciation, nul ici)",
+      "portee": "toutes les tables de la page, relues le 03/11/2026 à 17:05. La page a changé depuis la copie du catalogue (15:31) : elle range maintenant les modèles arrêtés sous « Deprecated models » et date au 2026-12-01 l'arrêt de gemini-2.5-pro et de gemini-2.5-flash ; ce fichier suit la page relue à 17:05. La colonne de date de la page est la date de SORTIE du modèle (champ sortie), jamais une date de déprécation (champ depreciation, nul ici) RELECTURE PARTIELLE du 16/11/2026 (TF-2643) : seules les sections « Veo models » et « Gemini Omni Flash models » de la page ont été relues ce jour-là, d'où gemini-omni-1.2-flash, la date d'arrêt de gemini-omni-1.1-flash et les remplaçants des lignes Veo ; lu_le reste au 03/11/2026 pour le reste de la page, qui a changé depuis (dates d'arrêt des modèles audio, nouveaux modèles) et reste à relire.",
       "modeles": [
         {
           "id": "gemini-3.8-flash",
@@ -2627,9 +2627,9 @@
           "depreciation": null,
           "sortie": "March 31, 2026",
           "arret": "2026-10-22",
-          "remplacant": "gemini-omni-1.1-flash",
+          "remplacant": "gemini-omni-1.2-flash",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-3.1-lite-generate-preview` * March 31, 2026 * October 22, 2026 * `gemini-omni-1.1-flash`"
+          "citation": "`veo-3.1-lite-generate-preview` * March 31, 2026 * October 22, 2026 * `gemini-omni-1.2-flash`"
         },
         {
           "id": "veo-3.1-generate-preview",
@@ -2638,9 +2638,9 @@
           "depreciation": null,
           "sortie": "October 15, 2025",
           "arret": "2026-10-22",
-          "remplacant": "gemini-omni-1.1-flash",
+          "remplacant": "gemini-omni-1.2-flash",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-3.1-generate-preview` * October 15, 2025 * October 22, 2026 * `gemini-omni-1.1-flash`"
+          "citation": "`veo-3.1-generate-preview` * October 15, 2025 * October 22, 2026 * `gemini-omni-1.2-flash`"
         },
         {
           "id": "veo-3.1-fast-generate-preview",
@@ -2649,9 +2649,9 @@
           "depreciation": null,
           "sortie": "October 15, 2025",
           "arret": "2026-10-22",
-          "remplacant": "gemini-omni-1.1-flash",
+          "remplacant": "gemini-omni-1.2-flash",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-3.1-fast-generate-preview` * October 15, 2025 * October 22, 2026 * `gemini-omni-1.1-flash`"
+          "citation": "`veo-3.1-fast-generate-preview` * October 15, 2025 * October 22, 2026 * `gemini-omni-1.2-flash`"
         },
         {
           "id": "veo-3.0-generate-001",
@@ -2660,10 +2660,10 @@
           "depreciation": null,
           "sortie": "September 9, 2025",
           "arret": "2026-06-30",
-          "remplacant": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform",
+          "remplacant": "gemini-omni-1.2-flash or the GA models on the Gemini Enterprise Agent Platform",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-3.0-generate-001` * September 9, 2025 * June 30, 2026 * `gemini-omni-1.1-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
-          "note": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform"
+          "citation": "`veo-3.0-generate-001` * September 9, 2025 * June 30, 2026 * `gemini-omni-1.2-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
+          "note": "gemini-omni-1.2-flash or the GA models on the Gemini Enterprise Agent Platform"
         },
         {
           "id": "veo-3.0-fast-generate-001",
@@ -2672,10 +2672,10 @@
           "depreciation": null,
           "sortie": "September 9, 2025",
           "arret": "2026-06-30",
-          "remplacant": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform",
+          "remplacant": "gemini-omni-1.2-flash or the GA models on the Gemini Enterprise Agent Platform",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-3.0-fast-generate-001` * September 9, 2025 * June 30, 2026 * `gemini-omni-1.1-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
-          "note": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform"
+          "citation": "`veo-3.0-fast-generate-001` * September 9, 2025 * June 30, 2026 * `gemini-omni-1.2-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
+          "note": "gemini-omni-1.2-flash or the GA models on the Gemini Enterprise Agent Platform"
         },
         {
           "id": "veo-2.0-generate-001",
@@ -2684,10 +2684,10 @@
           "depreciation": null,
           "sortie": "April 9, 2025",
           "arret": "2026-06-30",
-          "remplacant": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform",
+          "remplacant": "gemini-omni-1.2-flash or the GA models on the Gemini Enterprise Agent Platform",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-2.0-generate-001` * April 9, 2025 * June 30, 2026 * `gemini-omni-1.1-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
-          "note": "gemini-omni-1.1-flash or the GA models on the Gemini Enterprise Agent Platform"
+          "citation": "`veo-2.0-generate-001` * April 9, 2025 * June 30, 2026 * `gemini-omni-1.2-flash` or the GA models on the [Gemini Enterprise Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate)",
+          "note": "gemini-omni-1.2-flash or the GA models on the Gemini Enterprise Agent Platform"
         },
         {
           "id": "veo-3.0-generate-preview",
@@ -2696,9 +2696,9 @@
           "depreciation": null,
           "sortie": "July 31, 2025",
           "arret": "2025-11-12",
-          "remplacant": "gemini-omni-1.1-flash",
+          "remplacant": "gemini-omni-1.2-flash",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-3.0-generate-preview` * July 31, 2025 * November 12, 2025 * `gemini-omni-1.1-flash`"
+          "citation": "`veo-3.0-generate-preview` * July 31, 2025 * November 12, 2025 * `gemini-omni-1.2-flash`"
         },
         {
           "id": "veo-3.0-fast-generate-preview",
@@ -2707,20 +2707,32 @@
           "depreciation": null,
           "sortie": "July 31, 2025",
           "arret": "2025-11-12",
-          "remplacant": "gemini-omni-1.1-flash",
+          "remplacant": "gemini-omni-1.2-flash",
           "section": "Veo models / Deprecated models",
-          "citation": "`veo-3.0-fast-generate-preview` * July 31, 2025 * November 12, 2025 * `gemini-omni-1.1-flash`"
+          "citation": "`veo-3.0-fast-generate-preview` * July 31, 2025 * November 12, 2025 * `gemini-omni-1.2-flash`"
+        },
+        {
+          "id": "gemini-omni-1.2-flash",
+          "famille": "multimodal",
+          "etat": "courant",
+          "depreciation": null,
+          "sortie": "November 5, 2026",
+          "arret": null,
+          "remplacant": null,
+          "section": "Gemini Omni Flash models",
+          "citation": "`gemini-omni-1.2-flash` * November 5, 2026 * No shutdown date announced *"
         },
         {
           "id": "gemini-omni-1.1-flash",
           "famille": "multimodal",
-          "etat": "courant",
+          "etat": "deprecie",
           "depreciation": null,
           "sortie": "August 27, 2026",
-          "arret": null,
-          "remplacant": null,
+          "arret": "2026-12-03",
+          "remplacant": "gemini-omni-1.2-flash",
           "section": "Gemini Omni Flash models",
-          "citation": "`gemini-omni-1.1-flash` * August 27, 2026 * No shutdown date announced *"
+          "citation": "`gemini-omni-1.1-flash` * August 27, 2026 * December 3, 2026 * `gemini-omni-1.2-flash` (Effective December 3, 2026, the endpoint is automatically routing API requests to `gemini-omni-1.2-flash`)",
+          "note": "Effective December 3, 2026, the endpoint is automatically routing API requests to gemini-omni-1.2-flash"
         },
         {
           "id": "gemini-omni-flash-preview",
@@ -2729,9 +2741,9 @@
           "depreciation": null,
           "sortie": "June 30, 2026",
           "arret": "2026-10-22",
-          "remplacant": "gemini-omni-1.1-flash",
+          "remplacant": "gemini-omni-1.2-flash",
           "section": "Gemini Omni Flash models / Deprecated models",
-          "citation": "`gemini-omni-flash-preview` * June 30, 2026 * October 22, 2026 * `gemini-omni-1.1-flash`"
+          "citation": "`gemini-omni-flash-preview` * June 30, 2026 * October 22, 2026 * `gemini-omni-1.2-flash`"
         },
         {
           "id": "lyria-3-pro-preview",
@@ -2929,5 +2941,95 @@
         }
       ]
     }
+  },
+  "voies_generation": {
+    "regle": "À lire AVANT de déclarer qu'une voie de génération (image, vidéo, voix, musique) n'existe pas au poste (TF-2643, RP-221 du lot digit-ai-marketing 20261112l : une session a conclu à l'absence d'une voie image vers vidéo parce qu'elle filtrait la liste des modèles de la clé sur « veo, video, imagen, predict », noms de modèles arrêtés). Un nom de modèle se prend dans cette table, jamais de mémoire ; une voie d'un média absent de la table (medias_non_tables) n'est pas déclarée absente, elle est à chercher. Chaque voie courante et chaque prédécesseur arrêté vise un modèle du référentiel (courant, arrêté) ; un prédécesseur arrêté nomme sa voie courante comme remplaçant. etat_poste et cout se renseignent toujours : « non mesuré » ou « non relevé » se disent, ils ne se taisent pas. Juge : oracles/oracle-modeles-tiers.mjs, règle MT5.",
+    "date": "2026-11-16",
+    "sources": {
+      "calendrier": "https://ai.google.dev/gemini-api/docs/deprecations.md.txt, sections « Veo models » et « Gemini Omni Flash models », lues le 16/11/2026",
+      "tarifs": "https://ai.google.dev/gemini-api/docs/pricing.md.txt, sections « Gemini Omni 1.2 Flash » et « Gemini Nano Banana 2.1 », lues le 16/11/2026",
+      "poste": "digit-ai-marketing - RETOURS - 20261112l, RP-221 (ledger seq 778) : rapporté par le retour, non rejoué ici"
+    },
+    "medias": {
+      "video": {
+        "courantes": [
+          {
+            "fournisseur": "gemini",
+            "id": "gemini-omni-1.2-flash",
+            "acces": "Interactions API, POST /v1beta/interactions, response_format de type video (lu au retour 20261112l, non rejoué ici)",
+            "etat_poste": "listé parmi les 64 modèles de la clé Gemini du pilot le 12/11/2026 ; 1 vidéo de 8 s en 720×1280 rendue en 39 s, avec des gestes (rapporté par le retour 20261112l, non rejoué ici)",
+            "cout": "Paid Tier, par million de jetons : entrée 1,50 USD (texte, image, vidéo) ; sortie 9,00 USD (texte) et 12,00 USD (vidéo), soit environ 0,07 USD la seconde de vidéo en 720p (page de tarification, lue le 16/11/2026) ; niveau gratuit : non disponible"
+          }
+        ],
+        "arretees": [
+          {
+            "fournisseur": "gemini",
+            "id": "veo-3.1-generate-preview"
+          },
+          {
+            "fournisseur": "gemini",
+            "id": "veo-3.1-fast-generate-preview"
+          },
+          {
+            "fournisseur": "gemini",
+            "id": "veo-3.1-lite-generate-preview"
+          },
+          {
+            "fournisseur": "gemini",
+            "id": "veo-3.0-generate-001"
+          },
+          {
+            "fournisseur": "gemini",
+            "id": "veo-3.0-fast-generate-001"
+          },
+          {
+            "fournisseur": "gemini",
+            "id": "veo-2.0-generate-001"
+          },
+          {
+            "fournisseur": "gemini",
+            "id": "gemini-omni-flash-preview"
+          }
+        ]
+      },
+      "image": {
+        "courantes": [
+          {
+            "fournisseur": "gemini",
+            "id": "gemini-nano-banana-2.1",
+            "acces": "API Gemini (nom lu au calendrier du fournisseur ; appel non rejoué ici)",
+            "etat_poste": "non mesuré : aucune génération d'image rejouée sur la clé du pilot lors de TF-2643",
+            "cout": "Paid Tier, par million de jetons : sortie 30,00 USD (images), soit 0,0336 USD l'image en 1K, 0,0504 USD en 2K, 0,113 USD en 4K (page de tarification, lue le 16/11/2026) ; niveau gratuit : non disponible"
+          },
+          {
+            "fournisseur": "openai",
+            "id": "gpt-image-2.5-sunburst",
+            "acces": "API OpenAI (nom lu au calendrier du fournisseur ; appel non rejoué ici)",
+            "etat_poste": "non mesuré : aucune génération d'image rejouée sur la clé du pilot lors de TF-2643",
+            "cout": "non relevé : la page de tarification d'OpenAI n'a pas été lue lors de TF-2643"
+          }
+        ],
+        "arretees": [
+          {
+            "fournisseur": "gemini",
+            "id": "imagen-4.0-generate-001"
+          },
+          {
+            "fournisseur": "openai",
+            "id": "gpt-image-1"
+          }
+        ]
+      }
+    },
+    "medias_non_tables": [
+      {
+        "media": "voix",
+        "motif": "les successeurs des modèles de voix (gemini-3.8-flash-tts, gpt-realtime-2.1-mini) ne sont pas tous recopiés au référentiel, et la page Gemini a changé depuis le 03/11 : la table se complète après relecture entière de la page"
+      },
+      {
+        "media": "musique",
+        "motif": "lyria-3.5 figure à la page Gemini du 16/11/2026 mais pas au référentiel : à recopier après relecture entière de la page"
+      }
+    ]
   }
 }

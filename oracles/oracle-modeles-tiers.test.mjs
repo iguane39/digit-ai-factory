@@ -29,6 +29,8 @@ const lire = (nom) => JSON.parse(readFileSync(join(FIX, nom), "utf8"));
 const REF_VERT = join(FIX, "referentiel-vert.json");
 const REF_ROUGE = join(FIX, "referentiel-rouge.json");
 const JOUR = "2026-11-03";
+// Jour de contrôle du référentiel RÉEL : il est daté du 16/11/2026 (TF-2643), donc postérieur à JOUR.
+const JOUR_REEL = "2026-11-16";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -170,7 +172,7 @@ check("AVERT — un déprécié dont la date d'arrêt est atteinte est lu comme 
 
 check("VERT — le référentiel RÉEL est bien formé, daté, sourcé, et porte les deux constats attendus", () => {
   const ref = JSON.parse(readFileSync(REF_DEFAUT, "utf8"));
-  const lu = lireReferentiel(ref, JOUR);
+  const lu = lireReferentiel(ref, JOUR_REEL);
   ok(lu.defauts.length === 0, `défauts : ${lu.defauts.slice(0, 3)}`);
   for (const [nom, f] of Object.entries(ref.fournisseurs)) ok(f.modeles.length > 10 && f.modeles.every((m) => m.citation), `${nom} : modèles ou citations manquants`);
   const e = (id) => lu.entrees.find((x) => x.id === id);
@@ -195,6 +197,72 @@ check("REMÈDE — relire la page et redater le référentiel fait passer MT4", 
   writeFileSync(f, JSON.stringify(r), "utf8");
   const apres = lancer(PARC_VERT, f, ["--date", "2026-12-04"]);
   ok(apres.rapport.findings.filter((x) => x.regle === "MT4").every((x) => x.statut === "PASS"), apres.sortie);
+});
+
+// -- MT5 : les voies de génération par média (TF-2643) --------------------------------------------
+const mt5 = (ref, date = JOUR) => juger({ ref, date }).findings.filter((f) => f.regle === "MT5");
+const muter = (fn) => { const r = structuredClone(lire("referentiel-vert.json")); fn(r); return r; };
+const FAIL_MT5 = (r, motif) => { const f = mt5(r); ok(f.length === 1 && f[0].statut === "FAIL" && motif.test(f[0].message), `MT5 : ${JSON.stringify(f)}`); };
+
+check("VERT — la table des voies du référentiel de fixture est jugée PASS, médias tabulés et non tabulés comptés", () => {
+  const f = mt5(lire("referentiel-vert.json"));
+  ok(f.length === 1 && f[0].statut === "PASS" && /2 média\(s\) tabulé\(s\) \(video, image\), 2 déclaré\(s\) non tabulé\(s\) \(voix, musique\)/.test(f[0].message), JSON.stringify(f));
+  ok(vert.rapport.findings.some((x) => x.regle === "MT5" && x.statut === "PASS"), "le parc vert ne rend pas MT5 PASS");
+});
+
+check("ROUGE — pas de table des voies de génération : FAIL MT5, jamais un vert silencieux", () => {
+  FAIL_MT5(muter((r) => { delete r.voies_generation; }), /table voies_generation absente/);
+  ok(juger({ ref: muter((r) => { delete r.voies_generation; }), date: JOUR }).verdict === "FAIL", "le verdict n'est pas FAIL");
+});
+
+check("ROUGE — un média ni tabulé ni déclaré non tabulé est un FAIL (un média n'est pas omis en silence)", () => {
+  FAIL_MT5(muter((r) => { delete r.voies_generation.medias.video; }), /média « video » ni tabulé ni déclaré non tabulé/);
+  FAIL_MT5(muter((r) => { r.voies_generation.medias_non_tables.pop(); }), /média « musique » ni tabulé/);
+  FAIL_MT5(muter((r) => { r.voies_generation.medias_non_tables.push({ media: "video", motif: "x" }); }), /à la fois tabulé et déclaré non tabulé/);
+});
+
+check("ROUGE — une voie courante qui vise un modèle arrêté, absent ou sans accès, état au poste ou coût est un FAIL", () => {
+  FAIL_MT5(muter((r) => { r.voies_generation.medias.video.courantes[0].id = "modele-a-arrete"; }), /le référentiel le range « arrete »/);
+  FAIL_MT5(muter((r) => { r.voies_generation.medias.video.courantes[0].id = "modele-inconnu"; }), /modèle absent du référentiel de fournisseur-a/);
+  FAIL_MT5(muter((r) => { delete r.voies_generation.medias.video.courantes[0].cout; }), /cout absent \(écrire « non mesuré » ou « non relevé »/);
+  FAIL_MT5(muter((r) => { r.voies_generation.medias.video.courantes[0].etat_poste = " "; }), /etat_poste absent/);
+  FAIL_MT5(muter((r) => { r.voies_generation.medias.video.courantes = []; }), /video : aucune voie courante/);
+});
+
+check("ROUGE — un prédécesseur arrêté dont le remplaçant ne nomme pas la voie courante du média est un FAIL (le cas du 12/11 : Veo → un Omni périmé)", () => {
+  FAIL_MT5(muter((r) => { r.voies_generation.medias.video.arretees.push({ fournisseur: "fournisseur-a", id: "orbe3" }); }), /orbe3 ».*« alpha-6 » ne nomme aucune voie courante du média video/);
+  FAIL_MT5(muter((r) => { r.voies_generation.medias.video.arretees[0].id = "modele-a-nouveau"; }), /un prédécesseur arrêté vise un modèle arrêté/);
+});
+
+check("REMÈDE — nommer la voie courante en remplaçant du prédécesseur (ou le retirer de la table) fait passer MT5", () => {
+  const f = muter((r) => {
+    r.voies_generation.medias.video.arretees.push({ fournisseur: "fournisseur-a", id: "orbe3" });
+    r.fournisseurs["fournisseur-a"].modeles.find((m) => m.id === "orbe3").remplacant = "modele-a-nouveau";
+  });
+  const x = mt5(f);
+  ok(x.length === 1 && x[0].statut === "PASS", JSON.stringify(x));
+});
+
+check("AVERT — une table des voies de plus de 30 jours est un AVERT MT5 (jamais un échec) ; 30 jours pile passe", () => {
+  const vieux = mt5(lire("referentiel-vert.json"), "2026-12-04");
+  ok(vieux.some((f) => f.statut === "AVERT" && /31 jours/.test(f.message)) && !vieux.some((f) => f.statut === "FAIL"), JSON.stringify(vieux));
+  ok(mt5(lire("referentiel-vert.json"), "2026-12-03").every((f) => f.statut === "PASS"), "30 jours pile est signalé");
+  FAIL_MT5(muter((r) => { r.voies_generation.date = "2026-11-04"; }), /postérieure au jour du contrôle/);
+});
+
+check("VERT — le référentiel RÉEL : MT5 PASS, gemini-omni-1.2-flash est la voie vidéo courante, successeur de Veo 3.1 (RP-221)", () => {
+  const ref = JSON.parse(readFileSync(REF_DEFAUT, "utf8"));
+  const f = mt5(ref, JOUR_REEL);
+  ok(f.length === 1 && f[0].statut === "PASS", JSON.stringify(f));
+  const video = ref.voies_generation.medias.video;
+  ok(video.courantes.some((c) => c.id === "gemini-omni-1.2-flash" && c.fournisseur === "gemini"), "gemini-omni-1.2-flash n'est pas la voie vidéo courante");
+  for (const id of ["veo-3.1-generate-preview", "veo-3.1-fast-generate-preview", "veo-3.1-lite-generate-preview"]) {
+    ok(video.arretees.some((a) => a.id === id), `${id} absent des prédécesseurs arrêtés`);
+    ok(ref.fournisseurs.gemini.modeles.find((m) => m.id === id).remplacant === "gemini-omni-1.2-flash", `${id} : remplaçant`);
+  }
+  const lu = lireReferentiel(ref, JOUR_REEL);
+  ok(lu.entrees.find((e) => e.id === "gemini-omni-1.1-flash")?.arret === "2026-12-03", "gemini-omni-1.1-flash : arrêt du 03/12/2026 absent");
+  ok(!lu.entrees.some((e) => e.id === "gemini-omni-1.2-flash"), "gemini-omni-1.2-flash est courant : il ne se cherche pas");
 });
 
 // -- contrat --------------------------------------------------------------------------------------
