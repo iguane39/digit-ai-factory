@@ -322,6 +322,39 @@ check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui 
   } finally { writeFileSync(f, avant); }
 });
 
+// TF-2668 (16/11/2026) — LA COPIE DU BOILERPLATE QU'UN PRODUIT FAIT DE SON CHEF DÉRIVE SANS SIGNAL. Le 16/11, la copie
+// `scripts/apdlb/gabarit.html` d'un produit datait d'avant `color-scheme` (TF-2384) : SC4 a échoué sur une page jugée PASS le 10/11, et R-47
+// ne comparait cette copie à rien. Double sens, sur le VRAI boilerplate du socle : la copie périmée est NOMMÉE par R-47 (constat déclaré,
+// jamais un FAIL), la copie à l'identique ne dit rien et la fixture verte reste PASS.
+{
+  const socle2668 = socleDePage();
+  const fichier2668 = socle2668.assets ? join(socle2668.assets, "boilerplate.html") : null;
+  const copie2668 = join(verte, "scripts", "apdlb", "gabarit.html");
+  const lancer2668 = (texte) => {
+    mkdirSync(dirname(copie2668), { recursive: true });
+    writeFileSync(copie2668, texte);
+    try { return lance(verte); } finally { rmSync(join(verte, "scripts", "apdlb"), { recursive: true, force: true }); }
+  };
+  const perimee = (rapport) => rapport.findings.filter((x) => x.regle === "R-47" && /copie\(s\) PÉRIMÉE\(S\) du socle/.test(x.message));
+  if (!fichier2668 || !existsSync(fichier2668)) {
+    console.log("  [SAUTÉ] TF-2668 — le socle digit-ai-page-html est introuvable sur ce poste : copie périmée non jouable");
+  } else {
+    const socleTexte = readFileSync(fichier2668, "utf8");
+    check("TF-2668 rouge — une copie du boilerplate d'avant color-scheme : R-47 la NOMME périmée, SANS_OBJET et jamais un FAIL", () => {
+      const ancienne = socleTexte.split(/\r?\n/).filter((l) => !/color-scheme\s*:/.test(l)).join("\n");
+      if (ancienne === socleTexte.split(/\r?\n/).join("\n")) throw new Error("témoin rouge mal construit : la copie est identique au socle");
+      const { exit, rapport } = lancer2668(ancienne);
+      const f = perimee(rapport);
+      if (exit !== 0 || f.length !== 1 || f[0].statut !== "SANS_OBJET" || !/scripts\/apdlb\/gabarit\.html/.test(f[0].message) || !/color-scheme/.test(f[0].message))
+        throw new Error(`exit ${exit}, constats : ${JSON.stringify(f)}`);
+    });
+    check("TF-2668 vert — la copie à l'identique du boilerplate (CRLF compris) ne dit rien, et la fixture reste PASS", () => {
+      const { exit, rapport } = lancer2668(socleTexte.split(/\r?\n/).join("\r\n"));
+      if (exit !== 0 || perimee(rapport).length) throw new Error(`exit ${exit}, constats : ${JSON.stringify(perimee(rapport))}`);
+    });
+  }
+}
+
 // TF-0330 — `forge\QUESTIONS.md` était prescrit par le contrat et jugé par RIEN. Double sens :
 // absent, il est DÉCLARÉ et jamais mis en échec (une dette antérieure aux produits ne doit pas
 // suspendre leur ouverture) ; présent, il est constaté PASS. Sans la seconde moitié, le

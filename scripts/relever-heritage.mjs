@@ -39,12 +39,12 @@
  *
  * Usage : node scripts\relever-heritage.mjs [--md <fichier>] [--json]
  */
-import { existsSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, writeFileSync, statSync } from "node:fs";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { empreinteFichier } from "./lib-empreinte.mjs";
+import { empreinteFichier, empreinteTexte, normaliserLignes } from "./lib-empreinte.mjs";
 import { estDepotEcosysteme } from "./lib-parc.mjs";
 import { PROFONDEUR_MAX, SAUTES } from "../todo/localiser-produit.mjs";
 // TF-1471 (28/09/2026, campagne D-32 (a)) — mêmes helpers que R-13/R-27 d'oracle-conformite-projet.mjs
@@ -100,6 +100,52 @@ export function trouverAilleurs(dossierProduit, cible, profondeur = 2) {
     return null;
   };
   return descendre(dossierProduit, 1);
+}
+
+// ── TF-2668 (16/11/2026) : LES COPIES DU SOCLE QU'UN PRODUIT FAIT DE SON CHEF ────────────────────────────────────────────────
+// LE FAIT. Le 16/11/2026, `oracle-surcouche` SC4 rend FAIL sur une page d'un produit jugée PASS le 10/11 : le boilerplate de
+// `digit-ai-page-html` porte `color-scheme` depuis TF-2384, et la copie `scripts/apdlb/gabarit.html` du produit datait d'avant
+// (3 déclarations et 1 commentaire d'écart). R-47 ne jugeait que les artefacts à CIBLE FIXE ; un produit qui copie un fichier du
+// socle à l'endroit de son choix n'avait aucun contrôle, ni à l'ouverture ni ailleurs, et sa copie dérivait sans signal.
+// CE QUE FAIT LA FONCTION. `copies_du_socle` de HERITAGE.json déclare le fichier du socle, comment reconnaître sa copie (un nom
+// de gabarit ET des marqueurs que seule une copie porte) et où le chercher ; elle rend, par copie trouvée, son état : à jour
+// (même empreinte, fins de ligne normalisées), PÉRIMÉE (le socle porte des lignes que la copie n'a pas) ou personnalisée (elle
+// n'ajoute que des lignes : ce que le produit en fait lui appartient). NON JUGÉ : une page INSTANCIÉE depuis le gabarit (son nom
+// n'est pas celui d'un gabarit), et une copie dont le nom ne dit pas gabarit — un contrôle par contenu seul accuserait chaque
+// page rendue du produit.
+const SAUTES_COPIES = new Set([...JAMAIS_FOUILLES].filter((n) => n !== "forge"));
+export function copiesDuSocle(dossierProduit, declaration, texteSource, profondeur = 6) {
+  const nom = new RegExp(declaration.noms_de_copie || "^$", "i");
+  const extensions = declaration.extensions || [".html"];
+  const marqueurs = declaration.reconnaissance || [];
+  const source = normaliserLignes(texteSource);
+  const lignes = (t) => t.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lignesSource = [...new Set(lignes(source))];
+  const copies = [];
+  const descendre = (d, niveau) => {
+    if (niveau > profondeur) return;
+    let entrees;
+    try { entrees = readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const e of entrees) {
+      if (e.isDirectory()) {
+        if (!SAUTES_COPIES.has(e.name) && !e.name.startsWith(".")) descendre(join(d, e.name), niveau + 1);
+        continue;
+      }
+      if (!e.isFile() || !nom.test(e.name) || !extensions.some((x) => e.name.toLowerCase().endsWith(x))) continue;
+      const chemin = join(d, e.name);
+      let contenu;
+      try { if (statSync(chemin).size > 1024 * 1024) continue; contenu = normaliserLignes(readFileSync(chemin, "utf8")); } catch { continue; }
+      if (!marqueurs.every((m) => contenu.includes(m))) continue;
+      const rel = relative(dossierProduit, chemin).replaceAll("\\", "/");
+      if (empreinteTexte(contenu) === empreinteTexte(source)) { copies.push({ chemin: rel, etat: "a_jour", manquantes: [], en_plus: 0 }); continue; }
+      const dansCopie = new Set(lignes(contenu));
+      const manquantes = lignesSource.filter((l) => !dansCopie.has(l));
+      const enPlus = [...dansCopie].filter((l) => !lignesSource.includes(l)).length;
+      copies.push({ chemin: rel, etat: manquantes.length ? "perimee" : "personnalisee", manquantes, en_plus: enPlus });
+    }
+  };
+  descendre(dossierProduit, 1);
+  return copies;
 }
 
 /**

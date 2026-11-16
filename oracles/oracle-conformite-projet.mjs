@@ -47,7 +47,8 @@ import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { COMMANDE_RELATIVE_FACTORY } from "./lib-ouverture-async.mjs";
 import { cadencesSansPorteur } from "./lib-cadence-promise.mjs";
-import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs } from "../scripts/relever-heritage.mjs";
+import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs, copiesDuSocle } from "../scripts/relever-heritage.mjs";
+import { socleDePage } from "../scripts/lib-socle-page.mjs";
 // TF-0923 volet (a) : les rôles qui portent une page homonyme et la date d'entrée de la doctrine
 // sont DÉCLARÉS chez le générateur qui les applique, et LUS ici. Une copie se périmerait au
 // premier rôle ajouté là-bas, en silence.
@@ -1488,6 +1489,29 @@ else {
     if (aliasPerimes.length) {
       so("R-47", `${aliasPerimes.length} alias de transition PÉRIMÉ(S) : l'ancien fichier survit à côté de la cible canonique et continue d'être lu et cité. `
         + `Constat DÉCLARÉ, jamais un défaut — le retrait est un geste du produit (TF-0881) : ${aliasPerimes.join(" · ")}`);
+    }
+    // R-47 (suite) · LES COPIES DU SOCLE QU'UN PRODUIT FAIT À L'ENDROIT DE SON CHOIX (TF-2668, 16/11/2026). Les artefacts ci-dessus ont
+    // une cible FIXE ; `copies_du_socle` de HERITAGE.json déclare ceux qu'un produit copie ailleurs (le boilerplate de page, copié en
+    // `scripts/<produit>/gabarit.html`). Le 16/11, une copie d'avant TF-2384 (3 déclarations `color-scheme` et 1 commentaire d'écart) a
+    // fait échouer SC4 sur une page jugée PASS le 10/11 : ni R-47 ni l'ouverture ne comparaient cette copie au socle. Une copie PÉRIMÉE
+    // (le socle porte des lignes qu'elle n'a pas) est SIGNALÉE, jamais un défaut : une règle neuve se durcit sur un corpus lu, et
+    // un produit peut avoir une raison de s'écarter (TF-2668). Une copie qui n'AJOUTE que des lignes est une personnalisation, non jugée.
+    for (const c of (heritage.copies_du_socle || [])) {
+      if (c.resolution !== "socle-de-page") { so("R-47", `copies_du_socle : résolution « ${c.resolution} » inconnue pour ${c.source} — non jugé (TF-2668)`); continue; }
+      const assets = socleDePage().assets;
+      const fichierSocle = assets ? join(assets, basename(c.source)) : null;
+      if (!fichierSocle || !existsSync(fichierSocle)) {
+        so("R-47", `copies_du_socle : source ${c.source} introuvable sur ce poste (socle digit-ai-page-html non installé) — les copies du produit ne sont PAS comparées (TF-2668)`);
+        continue;
+      }
+      const copies = copiesDuSocle(p("."), c, readFileSync(fichierSocle, "utf8"));
+      const perimees = copies.filter((x) => x.etat === "perimee");
+      if (perimees.length) {
+        so("R-47", `${perimees.length} copie(s) PÉRIMÉE(S) du socle ${c.source} : `
+          + perimees.map((x) => `${x.chemin} — le socle porte ${x.manquantes.length} ligne(s) que la copie n'a pas (ex. « ${x.manquantes[0].slice(0, 90)} »)`).join(" · ")
+          + ". Constat DÉCLARÉ, jamais un défaut de produit (TF-2668) : une page dérivée d'une copie périmée échoue au contrôle de surcouche (SC4) alors que le socle l'accepte ; "
+          + "remède : recopier le fichier du socle puis reporter les lignes propres au produit");
+      }
     }
     if (horsHistoire.length) {
       so("R-47", `${horsHistoire.length} artefact(s) hérité(s) tenu(s) sur le DISQUE mais pas dans l'HISTOIRE du dépôt — `
@@ -3244,6 +3268,7 @@ const nonJuge = [
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
   "R-11 ter (TF-2125) : les types d écrans sont reconnus à des SIGNAUX de fichier (balise <table> ; boutons, formulaires ou champs ; dossier locales ou i18n) dans les .html, .vue, .jsx, .tsx et .svelte hors output, input, docs, forge, old et tests — un écran construit par programme sans ces balises, ou servi par un gabarit hors du dépôt, n est pas vu. La ligne est reconnue à son LIBELLÉ (première colonne de la table), jamais à la pertinence de ses règles ; deux types seulement sont relevés (TYPES_D_ECRAN), les autres lignes du détail restent à la déclaration de la session",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
+  "R-47, copies du socle (TF-2668) : seule une copie dont le NOM est celui d'un gabarit et qui porte les marqueurs déclarés est comparée au fichier du socle ; une page instanciée depuis le gabarit, ou une copie renommée, n'est pas vue. Une copie périmée est signalée (SANS_OBJET), jamais un échec, et le socle introuvable sur le poste se déclare au lieu de passer pour un vert",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
   "R-23, volet « page servie » (TF-1088) : la reconnaissance passe par le NOM du fichier (connexion, login, sign-in, authentification, aide, help) — un identifiant de démonstration affiché depuis un composant dont le nom ne dit rien reste invisible. Le vocabulaire est étroit et fermé par choix : l'élargir à tout le code d'un produit rendrait la règle bavarde là où elle doit être opposable",
   "R-23, volet « page servie » : ni que la page soit réellement SERVIE, ni que le mode démo soit actif hors du poste local. L'oracle lit un gabarit sur le disque ; c'est la conjonction des deux — page publique et mode démo — qui a fait l'incident E-01, et seule la moitié lisible est jugée",

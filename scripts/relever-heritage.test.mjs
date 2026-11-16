@@ -13,7 +13,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence, racineWebDeclaree, texteDesMotifs } from "./relever-heritage.mjs";
+import { produitsDuParc, etatArtefact, relever, rendreMarkdown, attribuerDivergence, racineWebDeclaree, texteDesMotifs, copiesDuSocle } from "./relever-heritage.mjs";
 import { CARNET, CONDITION_SITE } from "./adopter-projet-existant.mjs";
 
 // TF-0957 — LES TABLES DE CE BANC SONT JETABLES, ET C'EST LUI QUI LES POSE.
@@ -772,6 +772,52 @@ try {
       att(readFileSync(join(perime, "forge", "ledger.py"), "utf8").replace(/\r\n/g, "\n") === LEDGER_GABARIT.replace(/\r\n/g, "\n"), "copie différente du gabarit");
       att(etatArtefact(ajour, LEDGER_CONTRAT, PILOT_REEL).etat === "conforme", "une copie à jour est relevée autrement que conforme");
     } finally { rmSync(perime, { recursive: true, force: true }); rmSync(ajour, { recursive: true, force: true }); }
+  });
+
+  // ── TF-2668 (16/11/2026) : LES COPIES DU SOCLE FAITES À L'ENDROIT DU CHOIX DU PRODUIT ─────────────────────────────────────────
+  // Le 16/11, la copie `scripts/apdlb/gabarit.html` d'un produit datait d'avant `color-scheme` (TF-2384) et rien ne la comparait au socle.
+  const DECL = { noms_de_copie: "^(gabarit|boilerplate|squelette)([-_.].*)?\\.html$", extensions: [".html"], reconnaissance: ["digitai-theme", "S-G1 (1/4"] };
+  const SOCLE_HTML = "<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n<!-- S-G1 (1/4) -->\n<script>var k = 'digitai-theme';</script>\n<style>\n:root { color-scheme: light; }\n[data-theme=dark] { color-scheme: dark; }\n</style>\n</head>\n<body></body>\n</html>\n";
+  const PERIME_HTML = SOCLE_HTML.replace(":root { color-scheme: light; }\n", "").replace("[data-theme=dark] { color-scheme: dark; }\n", "");
+  const produitCopies = (fichiers) => {
+    const d = mkdtempSync(join(tmpdir(), "copies-socle-"));
+    for (const [rel, texte] of Object.entries(fichiers)) { mkdirSync(join(d, ...rel.split("/").slice(0, -1)), { recursive: true }); writeFileSync(join(d, ...rel.split("/")), texte, "utf8"); }
+    return d;
+  };
+  check("rouge — TF-2668 : une copie du boilerplate datée d'avant le socle est trouvée et dite PÉRIMÉE, avec les lignes que le socle porte et qu'elle n'a pas", () => {
+    const d = produitCopies({ "scripts/apdlb/gabarit.html": PERIME_HTML });
+    try {
+      const r = copiesDuSocle(d, DECL, SOCLE_HTML);
+      att(r.length === 1 && r[0].chemin === "scripts/apdlb/gabarit.html" && r[0].etat === "perimee", `copie non signalée : ${JSON.stringify(r)}`);
+      att(r[0].manquantes.length === 2 && r[0].manquantes.every((l) => /color-scheme/.test(l)), `lignes manquantes : ${JSON.stringify(r[0].manquantes)}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  });
+  check("vert — TF-2668 : une copie à l'identique (CRLF compris) est à jour, une copie qui n'ajoute que des lignes est personnalisée, aucune n'est signalée", () => {
+    const d = produitCopies({
+      "scripts/a/gabarit.html": SOCLE_HTML.replaceAll("\n", "\r\n"),
+      "scripts/b/boilerplate-produit.html": SOCLE_HTML.replace("</style>", "body { margin: 0; }\n</style>"),
+    });
+    try {
+      const r = copiesDuSocle(d, DECL, SOCLE_HTML);
+      const etat = Object.fromEntries(r.map((c) => [c.chemin, c.etat]));
+      att(etat["scripts/a/gabarit.html"] === "a_jour" && etat["scripts/b/boilerplate-produit.html"] === "personnalisee" && r.length === 2, `états : ${JSON.stringify(etat)}`);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  });
+  check("vert — TF-2668 : une page INSTANCIÉE (nom sans gabarit), un fichier sans les marqueurs et un dossier d'entrée ou de sortie ne sont pas pris pour des copies", () => {
+    const d = produitCopies({
+      "site/accueil.html": PERIME_HTML,
+      "scripts/gabarit-mail.html": "<html><body>gabarit de courriel sans rapport</body></html>",
+      "output/gabarit.html": PERIME_HTML,
+      "node_modules/x/gabarit.html": PERIME_HTML,
+    });
+    try { att(copiesDuSocle(d, DECL, SOCLE_HTML).length === 0, "une page non copie du socle a été relevée"); }
+    finally { rmSync(d, { recursive: true, force: true }); }
+  });
+  check("TF-2668 — le référentiel déclare la copie du boilerplate, et la déclaration retrouve le nom de copie du produit du retour", () => {
+    const contrat = JSON.parse(readFileSync(join(ICI, "..", "gabarits", "HERITAGE.json"), "utf8"));
+    const c = (contrat.copies_du_socle || []).find((x) => /boilerplate\.html$/.test(x.source));
+    att(c && c.resolution === "socle-de-page" && c.reconnaissance.length >= 2, `déclaration absente ou incomplète : ${JSON.stringify(c)}`);
+    att(new RegExp(c.noms_de_copie, "i").test("gabarit.html"), "le nom de la copie du retour (scripts/apdlb/gabarit.html) n'est pas reconnu");
   });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
