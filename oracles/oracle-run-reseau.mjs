@@ -45,6 +45,8 @@
  *       `gabarits\VOIX-EMETTEUR.json` — daté, sourcé, sans marqueur de gabarit ; chaque publication
  *       tient les règles de sa portée : mots écartés, formules imposées, plafonds d'émojis et de
  *       hashtags, motifs interdits par position. Une règle `lecture_humaine` est nommée, jamais jugée.
+ *   RR9 échéances (TF-2609) : un `planificateur.json` — dans la semaine ou son parent — relève les tours d'un planificateur
+ *       hébergé ; chaque échéance du jour a un tour entre son ajout et son heure, sinon FAIL. Sans ce fichier : non jugé, dit.
  *
  * Ce qu'il ne juge PAS, et ne jugera jamais : la qualité du texte contre sa barre externe (lecture
  * humaine, `la-barre`), la sincérité d'un accord, la véracité d'un export, le fait que la
@@ -61,6 +63,7 @@ import { join, dirname, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { chargerPlanificateur, echeancesSansTour, SCHEMA_PLANIFICATEUR } from "./lib-echeances-planificateur.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = process.env.FORGE_ROOT || resolve(ICI, "..", "..");
@@ -362,10 +365,25 @@ export function juger(dossier, { mentions, contrats = chargerContrats() } = {}) 
     }
   }
 
+  // RR9 — échéances confiées à un planificateur hébergé : un tour entre l'ajout et l'heure (TF-2609)
+  const brutPlanif = lire("planificateur.json") ?? lire("planificateur.json", dirname(resolve(dossier)));
+  if (brutPlanif === null) ok("RR9", "planificateur.json absent : aucune échéance confiée à un planificateur hébergé, la programmation est humaine, dans l'outil de la plateforme (N3) — non jugé");
+  else {
+    const { releve, erreurs } = chargerPlanificateur(brutPlanif);
+    if (!releve) ko("RR9", `planificateur.json refusé — ${erreurs.join(" | ")}`);
+    else {
+      const sans = echeancesSansTour(releve);
+      sans.length
+        ? ko("RR9", `échéance sans tour avant son heure — ${sans.join(" | ")} — une échéance ajoutée entre deux tours attend le tour suivant : déclencher une replanification après chaque programmation (\`replanification_a_l_ajout\`), ou poser un exécutant d'intervalle (\`intervalle_minutes\`) plus court que la fenêtre`)
+        : ok("RR9", `${releve.echeances.length} échéance(s) du jour, chacune avec un tour entre son ajout et son heure — relevé du ${releve.releve_le}, ${releve.source}`);
+    }
+  }
+
   return findings;
 }
 
 const NON_JUGE = [
+  "RR9 : que le tour relevé fasse EFFECTIVEMENT partir le geste, la fiabilité du planificateur, et la phase d'un exécutant d'intervalle (une fenêtre plus courte que l'intervalle n'est pas tenue pour couverte) ; le relevé, lu à l'API par l'agent, n'est pas rejoué ici",
   "la qualité du texte contre sa barre externe (lecture humaine, registre la-barre)",
   "la part non mécanisable de chaque contrat de sortie : fait repris de l'avis, absence de justification, offre datée — prose de digit-ai-communication, lecture humaine",
   "la sincérité de l'accord et la véracité de l'export",
@@ -588,9 +606,46 @@ if (arg === "--self-test") {
       cas++;
       if (!enEchec(g).includes("RR8") || !/« je »/.test((g.find((x) => x.regle === "RR8") || {}).message || "")) casse.push(`« je » écarté ne voit pas « j'attends » — ${enEchec(g).join(", ") || "aucune règle rouge"}`);
     }
+
+    // 37 à 47 — RR9 (TF-2609) : une échéance ajoutée entre deux tours a un tour avant son heure. Le cas du 12/11 :
+    // tours à 7h07 et 8h07 UTC, semaine programmée à 12h32, publication à 19h00 : aucun tour avant le lendemain.
+    {
+      const planif = (d, sur) => writeFileSync(join(d, "planificateur.json"), JSON.stringify({
+        schema: SCHEMA_PLANIFICATEUR, releve_le: "2026-11-12T12:40:00+01:00", source: "relevé lu à l'API du planificateur fictif, le 12/11 à 12h40",
+        heures_utc: ["07:07", "08:07"],
+        echeances: [{ id: "publication-linkedin.md", a: "2026-11-12T19:00:00+01:00", ajoutee_le: "2026-11-12T12:32:00+01:00" }], ...sur,
+      }, null, 1));
+      const rr9 = (nom, sur, attendu, motif) => {
+        const d = join(base, nom);
+        semaine(d, { rouge: false });
+        planif(d, sur);
+        const f = juger(d);
+        cas++;
+        const rouges = enEchec(f), m = (f.find((x) => x.regle === "RR9") || {}).message || "";
+        if (attendu === "FAIL") {
+          if (rouges.length !== 1 || rouges[0] !== "RR9") casse.push(`${nom} : attendu RR9 seule, obtenu ${rouges.join(", ") || "aucune"}`);
+          else if (!m.includes(motif)) casse.push(`${nom} : RR9 rougit sans nommer « ${motif} » — ${m}`);
+        } else if (rouges.length || !m.includes(motif)) casse.push(`${nom} : attendu PASS nommant « ${motif} », obtenu ${rouges.join(", ") || "PASS"} — ${m}`);
+      };
+      rr9("echeance-sans-tour", {}, "FAIL", "aucun tour entre les deux");
+      rr9("echeance-sans-tour-nomme-la-suite", { tours: ["2026-11-13T07:07:00Z"] }, "FAIL", "premier tour relevé ensuite : 2026-11-13 07:07 UTC");
+      // Les remèdes que le message prescrit, joués (TF-1013) : une replanification à l'ajout, un exécutant d'intervalle.
+      rr9("remede-replanification", { replanification_a_l_ajout: true }, "PASS", "1 échéance(s) du jour, chacune avec un tour");
+      rr9("remede-intervalle", { heures_utc: [], intervalle_minutes: 30 }, "PASS", "1 échéance(s) du jour, chacune avec un tour");
+      rr9("tour-dans-la-fenetre", { heures_utc: [], tours: ["2026-11-12T17:30:00+01:00"] }, "PASS", "1 échéance(s) du jour, chacune avec un tour");
+      rr9("filet-du-soir", { heures_utc: ["17:15"] }, "PASS", "1 échéance(s) du jour, chacune avec un tour");
+      rr9("intervalle-plus-long-que-la-fenetre", { heures_utc: [], intervalle_minutes: 600 }, "FAIL", "aucun tour entre les deux");
+      rr9("instant-sans-fuseau", { echeances: [{ id: "publication-linkedin.md", a: "2026-11-12T19:00:00", ajoutee_le: "2026-11-12T12:32:00+01:00" }] }, "FAIL", "sans fuseau");
+      rr9("ajout-apres-l-heure", { echeances: [{ id: "publication-linkedin.md", a: "2026-11-12T19:00:00+01:00", ajoutee_le: "2026-11-12T19:05:00+01:00" }] }, "FAIL", "après son heure");
+      rr9("releve-sans-tour", { heures_utc: undefined }, "FAIL", "aucun tour relevé");
+      // Sans planificateur déclaré, la porte est muette et le dit : la semaine verte à programmation humaine reste verte.
+      cas++;
+      const nu = (juger(join(base, "verte")).find((x) => x.regle === "RR9") || {}).message || "";
+      if (!/planificateur\.json absent.*non jugé/.test(nu)) casse.push(`RR9 sans planificateur : le verdict ne dit pas qu'il n'a rien jugé — ${nu}`);
+    }
   } finally { rmSync(base, { recursive: true, force: true }); }
-  console.log(JSON.stringify({ outil: "oracle-run-reseau --self-test", verdict: casse.length ? "FAIL" : "PASS", cas, regles: 8, casse }, null, 1));
-  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR8 ; 19 altérations à une règle ; contrats absents ; voix sans règle mécanisable mais motivée PASS ; mot entier PASS ; gabarit brut refusé et instancié lu ; remède RR8 joué ; forme élidée « j'attends » vue sous « je » et « j' », imposée comme écartée)`);
+  console.log(JSON.stringify({ outil: "oracle-run-reseau --self-test", verdict: casse.length ? "FAIL" : "PASS", cas, regles: 9, casse }, null, 1));
+  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR8 ; 19 altérations à une règle ; contrats absents ; voix sans règle mécanisable mais motivée PASS ; mot entier PASS ; gabarit brut refusé et instancié lu ; remède RR8 joué ; forme élidée « j'attends » vue sous « je » et « j' », imposée comme écartée ; RR9 : échéance ajoutée entre deux tours sans tour avant son heure, remèdes joués)`);
   process.exit(casse.length ? 1 : 0);
 }
 if (!arg || !existsSync(arg)) { console.log(JSON.stringify({ oracle: "oracle-run-reseau", verdict: "SKIP", motif: "dossier de semaine absent" })); process.exit(2); }

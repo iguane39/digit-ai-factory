@@ -34,6 +34,15 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
   7 réseaux sur 9 offrent une programmation gratuite, relevée sur source officielle le 21/09/2026 :
   elle remplace « publier à l'heure ». Aucun script, robot ni extension, jamais. Un outil de
   diffusion par interface officielle ne se rouvre qu'à une revue, sur un temps humain mesuré.
+- **Une échéance ajoutée entre deux tours n'attend pas le lendemain** (TF-2609, 12/11/2026). Quand une
+  chaîne programme une publication auprès d'un planificateur hébergé, la tâche ne replanifie qu'à ses
+  tours : une semaine programmée à 12 h 32 n'avait aucun tour avant le lendemain (tours à 7 h 07 et
+  8 h 07 UTC). Toute chaîne qui ajoute une échéance déclenche une replanification, ou s'appuie sur un
+  exécutant d'intervalle plus court que la fenêtre entre l'ajout et l'heure. L'agent relève les tours
+  à l'API du planificateur, jamais de mémoire, et les dépose avec les échéances du jour dans
+  `planificateur.json` (schéma `pilot/planificateur@1`, fuseau écrit sur chaque instant), dans le
+  dossier de semaine ou son parent ; RR9 refuse l'échéance qui n'a aucun tour entre son ajout et son
+  heure. Sans ce fichier, RR9 le dit et ne juge rien : la programmation est alors humaine (N3).
 - **Les règles d'une plateforme se lisent dans le référentiel daté, nulle part ailleurs.** Si
   `perime_le` est dépassé, le run relit le référentiel avant toute autre chose. Aucune « règle
   d'algorithme » sans source primaire datée n'entre dans un contenu ni dans un skill.
@@ -162,10 +171,12 @@ format `gabarits\RESTITUTION.md`.
 **Le contrôle de chaque semaine** : `node oracles\oracle-run-reseau.mjs <dossier-semaine>
 [--mentions <formules de la marque>]`. Il lit `emetteur.json` et `voix.json` (dans la semaine ou
 dans son parent), `calendrier.md`, chaque `publication*.md`, `accord.json` et `mesures.json`, et
-juge 8 règles : calendrier à 4 semaines ; contrat de sortie du modèle que chaque publication
+juge 9 règles : calendrier à 4 semaines ; contrat de sortie du modèle que chaque publication
 déclare ; faits sourcés (`oracle-claims`) ; transparence (`oracle-transparence`) ; accord humain
 couvrant tout le lot ; mesure avec temps humain ; fiche de l'émetteur complète et sans secret ;
-voix de l'émetteur tenue par chaque publication de sa portée. Un `voix.json` absent, non daté, non
+voix de l'émetteur tenue par chaque publication de sa portée ; et, quand un `planificateur.json`
+est déposé, un tour du planificateur entre l'ajout et l'heure de chaque échéance (RR9, TF-2609).
+Un `voix.json` absent, non daté, non
 sourcé ou qui porte encore un trou du gabarit rend FAIL ; une règle `lecture_humaine` est nommée à
 chaque verdict, jamais jugée. Les contrats
 de sortie sont une donnée publiée par forge-agents
@@ -184,7 +195,11 @@ contrats absents qui rougissent RR2. Pour la voix, 5 cas de plus : un mot qui en
 est refusé, puis lu une fois instancié ; le remède d'un taux en accroche est joué. Depuis le
 16/11/2026 (TF-2646), 9 cas de plus sur la forme élidée : une valeur « je » se lit aussi dans « j'attends »,
 une valeur « j' » n'exige rien après son apostrophe, et « jeu » ni « jeton » ne les portent
-(36 cas en tout). Aucun accord ni
+(36 cas en tout). Le 16/11/2026 aussi (TF-2609), 11 cas pour RR9 : le cas du 12/11, tours
+à 7 h 07 et 8 h 07 UTC et une échéance ajoutée à 12 h 32, rend FAIL ; les deux remèdes du message (replanification
+à l'ajout, exécutant d'intervalle) et un tour dans la fenêtre rendent PASS ; un intervalle plus long que
+la fenêtre, un instant sans fuseau, une échéance ajoutée après son heure et un relevé sans tour rendent FAIL ;
+sans `planificateur.json`, RR9 dit qu'elle n'a rien jugé (47 cas en tout). Aucun accord ni
 publication réels. La séquence est donc prouvée **à blanc**. Elle
 ne l'est pas encore **en vrai** : tant que le premier cas réel de 4 semaines n'est pas mesuré
 (TF-1160), rien ne dit que le rendez-vous tient dans un agenda.

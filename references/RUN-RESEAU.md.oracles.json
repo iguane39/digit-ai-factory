@@ -1,6 +1,6 @@
 {
   "cible": "references/RUN-RESEAU.md",
-  "date_iso": "2026-11-16T15:38:51.120Z",
+  "date_iso": "2026-11-16T17:50:46.676Z",
   "registre_version": "2.64.0",
   "profil": "digit-ai",
   "niveau": "diffuse",
@@ -52,7 +52,7 @@
       "domaine": "Traçabilité des affirmations chiffrées",
       "file": "references\\RUN-RESEAU.md",
       "verdict": "PASS",
-      "detail": "1 constat(s) · 1 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes"
+      "detail": "2 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (1 avertissement(s)) ; date d'engagement non sourcée : « - **Une échéance ajoutée entre deux tours n'attend pas le lendemain** (TF-2609,  »"
     },
     {
       "domaine": "Nommage / convention de livraison",
@@ -71,9 +71,9 @@
   "empreinte": {
     "format": "forge-ops/empreinte@1",
     "release": "references\\RUN-RESEAU.md",
-    "ts": "2026-11-16T15:38:51.119Z",
+    "ts": "2026-11-16T17:50:46.675Z",
     "fichiers": {
-      "references\\RUN-RESEAU.md": "d1c66087884fd59e0d06bf20ed17ffc9f9fea615d65d49af570c38d1753f903d"
+      "references\\RUN-RESEAU.md": "d119a13fc6a0d533859abd584c4d5152ee5a66842a46aaa81eb84819d3bf9134"
     }
   },
   "empreinte_motif": null,
