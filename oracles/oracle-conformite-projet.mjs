@@ -46,7 +46,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { COMMANDE_RELATIVE_FACTORY } from "./lib-ouverture-async.mjs";
-import { cadencesSansPorteur } from "./lib-cadence-promise.mjs";
+import { cadencesSansPorteur, gestesAHeureSurGithub } from "./lib-cadence-promise.mjs";
 import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs } from "../scripts/relever-heritage.mjs";
 // TF-0923 volet (a) : les rôles qui portent une page homonyme et la date d'entrée de la doctrine
 // sont DÉCLARÉS chez le générateur qui les applique, et LUS ici. Une copie se périmerait au
@@ -3076,6 +3076,28 @@ else {
   }
 }
 
+// ---- R-35 ter · TF-2617 (RP-29, 16/11/2026) — UN GESTE À L'HEURE NE SE CONFIE PAS À GITHUB ACTIONS ----------------
+//
+// LE FAIT : le 20/10/2026, la planification `schedule` de GitHub n'a tourné qu'une fois sur 18 pour les publications
+// Instagram d'un produit ; le 12/11, un workflow GitHub qui attend l'heure dans un runner (`sleep`) a reçu la garde et
+// l'Instagram du soir, malgré la décision qui réservait à un planificateur hébergé tout ce qui part à l'heure. C'est la
+// moitié « porteur » de R-35 bis retournée : là, une cadence promise sans porteur ; ici, un porteur qui ne tient pas la
+// promesse d'une heure. REFUS (FAIL), parce que la décision le dit : un workflow GitHub de produit qui porte une
+// publication par `schedule` ou par une attente est refusé ; l'exception se décide (R-66) et se déclare, la décision
+// citée. Le vocabulaire et ses bornes vivent dans `oracles/lib-cadence-promise.mjs` (`gestesAHeureSurGithub`).
+{
+  const g = gestesAHeureSurGithub(cible);
+  if (!g.length) so("R-35 ter", "aucun workflow GitHub ne porte une publication par `schedule` ni par une attente (`sleep`)");
+  else {
+    for (const x of g.filter((y) => y.decision)) ok("R-35 ter", x.fichier, `publication (« ${x.marque} ») par ${x.par} dans un workflow GitHub, ACCEPTÉE par ${x.decision} (\`geste-a-l-heure-github:\`) — l'exception est décidée et nommée`);
+    for (const x of g.filter((y) => !y.decision))
+      ko("R-35 ter", `${x.fichier}:${x.ligne}`, `workflow GitHub qui porte une publication (« ${x.marque} ») par ${x.par} — la planification de GitHub saute des passages ` +
+        "(1 sur 18 le 20/10/2026) et un runner qui attend coûte des minutes sans alerte de plus. Un geste à l'heure passe par un planificateur hébergé dédié, " +
+        "qui se replanifie, avec un filet à heures décalées ; GitHub garde le code, la préparation, la relecture et la fusion. " +
+        "L'exception se décide (R-66) : `geste-a-l-heure-github: D-<n> <motif>` dans le workflow, la décision citée (TF-2617)");
+  }
+}
+
 // ---- R-60 (TF-1678, 14/10/2026) — LA CASCADE ISTO D'UN PRODUIT TIENT SA CHAÎNE, AVANT TOUTE CLÔTURE --
 //
 // LE FAIT, mesuré chez Produit-12 le 02/10/2026 : 99 exigences, 8 besoins, 0 stratégie et 0 tactique
@@ -3286,6 +3308,7 @@ const nonJuge = [
   "R-14 profils d'authentification et R-28 (TF-1284) : le profil se reconnaît à une liste NOMMÉE de noms de fichiers (azureProfile.json, msal_token_cache*, az.sess, .databrickscfg, accessTokens.json, credentials.json, application_default_credentials.json) — l'outil d'un autre éditeur, sous un autre nom, passera ; l'historique n'est pas fouillé, seul l'index courant est lu. R-28 ne voit que les noms d'artefact de shell (lettre seule, null, NUL, con, prn, aux, ~) : la liste FERMÉE des entrées attendues à la racine n'est pas jouée, parce que sur 13 dépôts de produits mesurés le 12/10/2026 elle accuserait des dizaines d'entrées légitimes (code, données, manifestes)",
   "R-60 (TF-1678) : la moitié STRUCTURELLE du test rétro est jugée, par oracle-cascade-isto rejoué sur la source avec le référentiel d'exigences ; la VÉRITÉ de l'intention et la pertinence d'un rattachement restent humaines (I2 exige la trace de la ratification, jamais sa justesse). La vue CASCADE.md n'est pas confrontée à sa source ici : son générateur le fait (`--verifier`). La date d'entrée se lit au PREMIER run_open du ledger : un produit sans run_open daté est tenu pour antérieur, et c'est un faux négatif déclaré",
   "R-35 bis (TF-1915) : une promesse de cadence se reconnaît à un VOCABULAIRE fermé — un mot de cadence (chaque semaine, quotidien, every week, daily…) à moins de 60 caractères d'un participe de mise à jour non daté (mis à jour, relevé, actualisé, updated…) — dans les textes servis et les seuls COMMENTAIRES des scripts ; une promesse dite autrement n'est pas vue, une description du monde dite ainsi est signalée. Le rapprochement est TEXTUEL : un script est porté si un porteur planifié le nomme ; une page l'est si l'un de ses producteurs (scripts qui nomment son fichier) l'est, ou, sans producteur repérable, dès qu'un porteur existe. Une planification hors dépôt (serveur, interface d'une CI) n'est vue que DÉCLARÉE (`porteur-cadence:`) ; que le porteur tourne vraiment, et à la cadence promise, n'est pas jugé (M-7 de l'étape MEP)",
+  "R-35 ter (TF-2617) : un geste à l'heure se reconnaît à un VOCABULAIRE fermé — un réseau nommé (instagram, linkedin, facebook, tiktok, threads, pinterest, youtube, bluesky, mastodon, twitter), « publier », « publication », « publish to/on » — dans un workflow de `.github/workflows/` qui se déclenche par `schedule` avec un `cron:` ou attend dans un runner (`sleep`, `Start-Sleep`, `time.sleep`, `setTimeout`) ; les lignes de commentaire ne comptent pas. Une publication dite autrement n'est pas vue, un workflow planifié qui « publie » un paquet ou des pages l'est s'il emploie ces mots, et une publication lancée par un autre outil que GitHub (GitLab, Azure) n'est pas jugée. Le planificateur hébergé que la règle prescrit n'est pas vérifié : elle refuse le mauvais porteur, elle ne prouve pas le bon. L'exception se lit à un numéro de décision (`D-<n>`) : son existence au registre n'est pas jugée",
   "R-61 bis (TF-2124) : la PRÉSENCE et le verdict des deux contrôles au ledger du dernier run sont jugés, pas leur justesse — un `parcours-personas` PASS dit qu'un parcours de bout en bout CITE chaque persona déclaré (pan statique, il ne joue aucun parcours), un `oracle-exploitabilite` PASS dit qu'une cible a été jugée, ni qu'elle était l'instance servie et alimentée ni que la revue humaine des captures a eu lieu ; l'ORDRE des entrées par rapport au `run_close` n'est pas jugé (un verdict consigné après coup lève le refus) ; un produit sans persona ni écran (pan NA, cible SKIP) n'a pas d'exemption : la décision D-166 (a) dit « verts »",
   "R-61 bis (TF-2207) : un verdict PARTIEL de la campagne forge-tests est tenu pour MOTIVÉ dès qu'un champ `motif_partiel` (ou `motif`) de 20 caractères au moins l'accompagne — la JUSTESSE du motif et le fait qu'il nomme réellement les pans non couverts ne sont pas jugés (relecture humaine) ; l'oracle ne voit que le dernier verdict de la campagne nommée `forge-tests` ou `forge_tests` (ses pans `forge-tests:<pan>` sont d'autres contrôles), et une campagne absente du ledger n'est pas accusée ; le refus vaut dès le 06/11/2026, sans période d'avertissement, parce que la décision dit « refusé »",
   "R-19 forme des clés (TF-0320) : seule la FORME des clés `versions_forges` est jugée, pas leur COMPLÉTUDE — un run_open qui ne relève que 5 forges sur 14 en noms complets reste PASS (Produit-01 en portait 5) ; un run_open sans `ts` n'est pas jugé sur la forme (pas de date, pas d'entrée en vigueur opposable) ; les run_open antérieurs au 2026-08-17 sont des antériorités déclarées, jamais réécrites",
@@ -3299,7 +3322,7 @@ if (REGLES_DEMANDEES) {
   for (const r of REGLES_DEMANDEES) {
     if (!rendus.some((f) => f.regle === r)) {
       rendus.push({ regle: r, statut: "SANS_OBJET", ou: "-",
-        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, « R-35 bis », R-42, « R-42 bis », « R-42 ter », R-43, R-47, R-60, « R-61 bis »)" });
+        message: "règle demandée par --regles, mais cet oracle n'a rendu aucun constat sous cet identifiant — vérifier l'orthographe (R-1..R-28, R-32, « R-32 bis », « R-32 ter », R-35, « R-35 bis », « R-35 ter », R-42, « R-42 bis », « R-42 ter », R-43, R-47, R-60, « R-61 bis »)" });
     }
   }
 }

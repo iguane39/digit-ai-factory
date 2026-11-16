@@ -310,6 +310,56 @@ check("TF-1915 sans objet — la verte ne promet aucune cadence : R-35 bis SANS_
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 
+// TF-2617 (RP-29, 16/11/2026) — R-35 ter : un geste à l'heure ne se confie pas à GitHub Actions. Rouge : le workflow du
+// 12/11, reconstitué (la garde et l'Instagram du soir, `schedule` et une attente `sleep` dans un runner, l'erreur d'une
+// échéance avalée par `|| true`), puis chacune de ses deux moitiés seule. Vert : un workflow planifié qui ne publie pas,
+// un workflow qui cite Instagram sans `schedule` ni attente, un commentaire, et l'exception DÉCIDÉE. Le remède que le
+// message prescrit est joué : la déclaration avec sa décision rend PASS, la même sans numéro de décision reste refusée.
+const WORKFLOW_12_11 = "name: Echeances reseaux du jour\non:\n  workflow_dispatch:\n  schedule:\n    - cron: '56 14 * * *'\njobs:\n  garde-et-instagram:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n"
+  + "      - name: Attendre l'heure puis publier sur Instagram\n        run: |\n          while [ \"$(date +%H%M)\" -lt 1800 ]; do sleep 60; done\n          node scripts/publier-instagram.mjs || true\n";
+const projetWorkflow = (fichiers) => {
+  const d = mkdtempSync(join(tmpdir(), "conf-2617-"));
+  mkdirSync(join(d, ".github", "workflows"), { recursive: true });
+  for (const [nom, texte] of Object.entries(fichiers)) writeFileSync(join(d, ".github", "workflows", nom), texte, "utf8");
+  sh("git", ["init", "-q", "-b", "main"], d);
+  return d;
+};
+const r35ter = (d) => (lance(d).rapport.findings || []).filter((x) => x.regle === "R-35 ter");
+const refus35ter = (nom, fichiers, attendu) => check(nom, () => {
+  const d = projetWorkflow(fichiers);
+  try {
+    const f = r35ter(d);
+    const ko = f.filter((x) => x.statut === "FAIL");
+    if (ko.length !== 1 || !ko[0].ou.startsWith(".github/workflows/") || !attendu.every((m) => ko[0].message.toLowerCase().includes(m.toLowerCase()))) throw new Error(`attendu 1 FAIL nommant ${JSON.stringify(attendu)}, obtenu ${JSON.stringify(f.map((x) => [x.statut, x.ou, x.message.slice(0, 90)]))}`);
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+refus35ter("TF-2617 rouge — le workflow du 12/11 (schedule ET attente sleep portant l'Instagram du soir) : R-35 ter FAIL, qui nomme le fichier, les deux déclencheurs et le remède",
+  { "reseaux-echeances-du-jour.yml": WORKFLOW_12_11 }, ["Instagram", "schedule et attente (sleep)", "planificateur hébergé", "geste-a-l-heure-github"]);
+refus35ter("TF-2617 rouge — un `schedule` seul qui publie sur Instagram (le cas du 20/10, 1 passage sur 18) : R-35 ter FAIL",
+  { "reseaux-echeances.yml": "name: Echeances reseaux\non:\n  schedule:\n    - cron: '*/15 * * * *'\njobs:\n  j:\n    runs-on: ubuntu-latest\n    steps:\n      - run: node scripts/publier-instagram.mjs\n" }, ["Instagram", "schedule"]);
+refus35ter("TF-2617 rouge — une attente `sleep` seule dans un workflow lancé à la main qui publie sur LinkedIn : R-35 ter FAIL",
+  { "publier-linkedin.yml": "name: Publier\non: workflow_dispatch\njobs:\n  j:\n    runs-on: ubuntu-latest\n    steps:\n      - run: sleep 3600 && node scripts/publier-post.mjs --reseau linkedin\n" }, ["linkedin", "attente (sleep)"]);
+refus35ter("TF-2617 rouge — l'exception sans numéro de décision n'est pas reçue : « parce que c'est pratique » reste refusée",
+  { "reseaux-echeances-du-jour.yml": "# geste-a-l-heure-github: parce que c'est pratique pour le moment\n" + WORKFLOW_12_11 }, ["Instagram"]);
+check("TF-2617 vert — l'exception DÉCIDÉE (`geste-a-l-heure-github: D-<n> <motif>`) est reçue, nommée, et ne rend aucun FAIL", () => {
+  const d = projetWorkflow({ "reseaux-echeances-du-jour.yml": "# geste-a-l-heure-github: D-993 passerelle du soir en attendant l'accès au planificateur hébergé\n" + WORKFLOW_12_11 });
+  try {
+    const f = r35ter(d);
+    if (f.some((x) => x.statut === "FAIL") || f.length !== 1 || !/ACCEPTÉE par D-993/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+check("TF-2617 sans objet — un workflow planifié qui ne publie pas, un workflow qui cite Instagram sans schedule ni attente, un commentaire : aucun refus", () => {
+  const d = projetWorkflow({
+    "mesure.yml": "name: Mesure\non:\n  schedule:\n    - cron: '0 4 * * *'\njobs:\n  m:\n    runs-on: ubuntu-latest\n    steps:\n      - run: python scripts/mesure.py\n",
+    "ci.yml": "name: CI\non: push\njobs:\n  t:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Tester le module Instagram\n        run: npm test -- instagram\n",
+    "pages.yml": "# Ce workflow ne publie plus sur Instagram à l'heure : voir le planificateur hébergé.\nname: Pages\non:\n  schedule:\n    - cron: '0 3 * * 1'\njobs:\n  p:\n    runs-on: ubuntu-latest\n    steps:\n      - run: node build.mjs\n",
+  });
+  try {
+    const f = r35ter(d);
+    if (f.length !== 1 || f[0].statut !== "SANS_OBJET") throw new Error(JSON.stringify(f.map((x) => [x.statut, x.ou, x.message.slice(0, 100)])));
+  } finally { rmSync(d, { recursive: true, force: true }); }
+});
+
 check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui nomme le motif asynchrone", () => {
   const f = join(verte, ".claude", "settings.json");
   const avant = readFileSync(f, "utf8");

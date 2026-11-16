@@ -33,7 +33,10 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
 - **L'humain programme dans l'outil gratuit de la plateforme ; aucun outil maison de diffusion.**
   7 réseaux sur 9 offrent une programmation gratuite, relevée sur source officielle le 21/09/2026 :
   elle remplace « publier à l'heure ». Aucun script, robot ni extension, jamais. Un outil de
-  diffusion par interface officielle ne se rouvre qu'à une revue, sur un temps humain mesuré.
+  diffusion par interface officielle ne se rouvre qu'à une revue, sur un temps humain mesuré. Si une
+  revue l'a rouvert, le geste à l'heure passe par un planificateur hébergé dédié, qui se replanifie,
+  avec un filet à heures décalées, jamais par un workflow GitHub : sa planification a tourné 1 fois
+  sur 18 le 20/10/2026, et une attente dans un runner coûte sans alerte (`R-35 ter`, TF-2617).
 - **Une échéance ajoutée entre deux tours n'attend pas le lendemain** (TF-2609, 12/11/2026). Quand une
   chaîne programme une publication auprès d'un planificateur hébergé, la tâche ne replanifie qu'à ses
   tours : une semaine programmée à 12 h 32 n'avait aucun tour avant le lendemain (tours à 7 h 07 et

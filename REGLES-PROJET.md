@@ -634,6 +634,16 @@ Deux corollaires opposables :
    porteur survit à la session (workflow `on: schedule`, tâche planifiée, CI planifiée) et appelle
    le script, ou se déclare `porteur-cadence: <où>` s'il vit hors du dépôt. Juge : R-35 bis
    d'`oracles\oracle-conformite-projet.mjs`, en avertissement (`ETAPE-MEP.md`, § 3 quinquies).
+4. **R-35 ter — un geste à l'heure ne se confie pas à GitHub Actions** (TF-2617, 16/11/2026). Le 20/10/2026,
+   la planification `schedule` de GitHub n'a tourné qu'une fois sur 18 pour des publications Instagram ;
+   le 12/11, un workflow GitHub qui attend l'heure dans un runner a reçu la garde et l'Instagram du soir,
+   contre la décision qui réservait à un planificateur hébergé tout ce qui part à l'heure. Un workflow de
+   produit qui porte une publication (un réseau nommé, « publier », « publication ») par `schedule` ou par
+   une attente (`sleep`) est refusé. Le geste à l'heure passe par un planificateur hébergé dédié, qui se
+   replanifie, avec un filet à heures décalées ; GitHub garde le code, la préparation, la relecture et la
+   fusion. L'exception se décide (R-66) et se déclare dans le workflow : `geste-a-l-heure-github: D-<n> <motif>`,
+   la décision citée. Juge : R-35 ter d'`oracles\oracle-conformite-projet.mjs`, en refus (FAIL) ; mesuré le
+   16/11/2026, 0 signalement sur les 7 dépôts du poste qui portent des workflows.
 
 ## P. La restitution se conçoit pour ses lecteurs (règle 36 — 15/08, TF-0235)
 

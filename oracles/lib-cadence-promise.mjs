@@ -185,6 +185,56 @@ export function porteursDuTexte(rel, texte) {
   return null;
 }
 
+// ---- TF-2617 (RP-29, 16/11/2026) — UN GESTE À L'HEURE NE SE CONFIE PAS À GITHUB ACTIONS -------------------------------
+//
+// LE FAIT. Le 20/10/2026, la planification `schedule` de GitHub n'a tourné qu'une fois sur 18 pour les publications
+// Instagram d'un produit ; l'exploitant a réservé à un planificateur hébergé tout ce qui part à une heure précise
+// (D-128 (a) de ce produit). Le 12/11, une session l'a oublié : la garde et l'Instagram du soir confiés à un workflow
+// GitHub qui attend l'heure dans un runner (`sleep`), sans alerte de plus ; l'exploitant l'a relevé à 16h28.
+//
+// CE QUI EST REFUSÉ. Un workflow de `.github/workflows/` qui porte une PUBLICATION (le nom d'un réseau, « publier »,
+// « publication », « publish to ») ET se déclenche par `schedule` avec un `cron:` OU attend l'heure dans un runner
+// (`sleep`, `Start-Sleep`, `time.sleep`, `setTimeout`). GitHub garde le code, la préparation, la relecture et la fusion ;
+// le geste à l'heure passe par un planificateur hébergé dédié, qui se replanifie, avec un filet à heures décalées.
+// L'EXCEPTION SE DÉCIDE (R-66) : `geste-a-l-heure-github: D-<n> <motif>` dans le workflow, la décision citée. Sans
+// numéro de décision, la déclaration n'est pas reçue.
+// LA BORNE, DÉCLARÉE : le vocabulaire est fermé (réseaux nommés, « publier »/« publication », « publish to/on ») ; les
+// lignes de commentaire ne comptent pas ; une publication nommée autrement échappe au contrôle, et un workflow
+// planifié qui « publie » autre chose (un paquet, des pages) n'est vu que s'il emploie ces mots.
+const RE_WORKFLOW = /^\.github\/workflows\/[^/]+\.ya?ml$/i;
+const RE_RESEAU = /\b(?:instagram|linkedin|facebook|tiktok|threads|pinterest|youtube|bluesky|mastodon|twitter)\b/i;
+const RE_PUBLICATION = /\bpubli(?:er|cations?)\b|\bpublish(?:es|ing)?\s+(?:to|on)\b/i;
+const RE_ATTENTE = /\bsleep\s+["'$(\d]|\bStart-Sleep\b|\btime\.sleep\s*\(|\bsetTimeout\s*\(/;
+export const DECLARATION_GITHUB = /geste-a-l-heure-github\s*:\s*(D-\d+)\s+(\S.{8,})/i;
+
+/** Les workflows GitHub d'un dépôt qui confient une publication à `schedule` ou à une attente dans un runner. */
+export function gestesAHeureSurGithub(racine, fichiers = fichiersDuDepot(racine)) {
+  const sortie = [];
+  for (const rel of fichiers) {
+    if (!RE_WORKFLOW.test(rel)) continue;
+    const texte = lire(racine, rel);
+    if (texte === null) continue;
+    const lignes = texte.split(/\r?\n/);
+    const code = lignes.map((l) => (/^\s*#/.test(l) ? "" : l));
+    const corps = code.join("\n");
+    const planifie = /^\s*schedule\s*:/m.test(corps) && /\bcron\s*:/.test(corps);
+    const iAttente = code.findIndex((l) => RE_ATTENTE.test(l));
+    const iPlan = code.findIndex((l) => /^\s*schedule\s*:/.test(l));
+    const lu = basename(rel) + "\n" + corps;
+    const marque = RE_RESEAU.exec(lu) || RE_PUBLICATION.exec(lu); // un réseau nommé dit mieux que « publier »
+    if (!marque || (!planifie && iAttente < 0)) continue;
+    const declaration = lignes.map((l) => l.match(DECLARATION_GITHUB)).find(Boolean);
+    sortie.push({
+      fichier: rel,
+      par: [planifie ? "schedule" : null, iAttente >= 0 ? "attente (sleep)" : null].filter(Boolean).join(" et "),
+      ligne: (planifie ? iPlan : iAttente) + 1,
+      marque: marque[0],
+      decision: declaration ? declaration[1].toUpperCase() : null,
+    });
+  }
+  return sortie;
+}
+
 /**
  * Le constat d'un dépôt : promesses, porteurs, déclarations, et promesses sans porteur.
  * Retour : { promesses: [{fichier, nature, ligne, cadence, extrait}], porteurs: [{fichier, nature}],
