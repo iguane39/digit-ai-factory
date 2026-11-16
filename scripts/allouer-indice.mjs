@@ -32,7 +32,10 @@
  *                                  jour: "20260831", contenu, extension: ".html" });
  *   const nom = `${prefixe}${jour}${indice}${extension}`;
  *
- * PORTÉE DE LA RECHERCHE D'INDICES PRIS (TF-1450, 28/09/2026). Par défaut (`porte: "prefixe"`),
+ * PORTÉE DE LA RECHERCHE D'INDICES PRIS (TF-1450, 28/09/2026 ; défaut inversé par TF-2631, 16/11/2026).
+ * Le défaut du module est `porte: "dossier"`, celui de la ligne de commande : le module déclarait
+ * « prefixe » quand la commande portait « dossier », et seul l'appel en module sans option rendait un
+ * indice que R-4 refuse (RP-216). Avec `porte: "prefixe"`, demandable,
  * la fonction ne voit QUE les fichiers de son propre `prefixe` — or R-4 (`oracle-conformite-
  * projet.mjs`) juge l'indice unique PAR JOUR ET PAR DOSSIER, tous radicaux confondus (TF-0750).
  * Mesuré le 28/09 : dans un dossier où « <Marque> - Étude - 20260928a » existait déjà, un appel
@@ -40,7 +43,7 @@
  * « a » — collision immédiate avec le livrable existant, renommage manuel après coup. Passer
  * `porte: "dossier"` compte tous les fichiers du dossier qui portent CE jour, quel que soit leur
  * préfixe ou leur extension — le même repérage que R-4 — et c'est la portée à employer pour
- * RÉINDEXER un livrable que R-4 vient de signaler en collision :
+ * RÉINDEXER un livrable que R-4 vient de signaler en collision (c'est désormais le défaut) :
  *   const indice = allouerIndice({ dossier, prefixe, jour, contenu, extension, porte: "dossier" });
  *
  * Ce que ce module NE fait PAS, et c'est déclaré :
@@ -78,7 +81,7 @@ export const canonique = (texte, jour) =>
  * Rend l'indice à employer pour écrire `${prefixe}${jour}<indice>${extension}` dans `dossier`.
  * Voir le contrat en tête de fichier.
  */
-export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".html", porte = "prefixe", reserves = [] }) {
+export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".html", porte = "dossier", reserves = [] }) {
   if (!/^\d{8}$/.test(String(jour))) throw new Error(`jour attendu AAAAMMJJ, reçu « ${jour} »`);
   // TF-1450 : portée « dossier » — tous les radicaux du jour, quel que soit leur préfixe ou leur
   // extension (même repérage que R-4, ` - AAAAMMJJ<lettre>.<ext>` en fin de nom). Portée « prefixe »

@@ -76,13 +76,16 @@ try {
     att(canonique(`x ${JOUR}9 y`, JOUR) === `x ${JOUR}9 y`, "un chiffre a été pris pour un indice");
   });
 
-  check("un AUTRE jour et une AUTRE extension ne comptent pas parmi les indices pris", () => {
+  check("portée « prefixe » : un AUTRE jour et une AUTRE extension ne comptent pas parmi les indices pris", () => {
     const d = join(T, "voisins");
     mkdirSync(d, { recursive: true });
     writeFileSync(join(d, `${PREFIXE}20260830a.html`), "hier", "utf8");
     writeFileSync(join(d, `${PREFIXE}${JOUR}a.pdf`), "autre format", "utf8");
-    att(allouerIndice({ dossier: d, prefixe: PREFIXE, jour: JOUR, contenu: "x" }) === "a",
+    att(allouerIndice({ dossier: d, prefixe: PREFIXE, jour: JOUR, contenu: "x", porte: "prefixe" }) === "a",
       "un fichier d'un autre jour ou d'un autre format a réservé l'indice");
+    // TF-2631 : la portée par défaut est « dossier », comme R-4 — un autre format du même jour y COMPTE.
+    att(allouerIndice({ dossier: d, prefixe: PREFIXE, jour: JOUR, contenu: "x" }) === "b",
+      "la portée par défaut (dossier) ne voit pas l'indice du même jour pris dans un autre format");
   });
 
   check("un préfixe porteur de caractères spéciaux de regex ne casse pas le motif", () => {
@@ -99,12 +102,30 @@ try {
   // pris par un AUTRE radical du même jour — cas réel : l'étude du jour portait déjà « a », la
   // restitution en a reçu un autre, renommée à la main après coup. Double sens : la portée par
   // défaut REPRODUIT la collision (rouge) ; « dossier » l'évite (vert). --------------------------
-  check("TF-1450 rouge (portée par défaut) : un AUTRE radical du même jour, même dossier, n'est pas vu — la collision se reproduit", () => {
+  check("TF-1450 rouge (portée « prefixe » demandée) : un AUTRE radical du même jour, même dossier, n'est pas vu — la collision se reproduit", () => {
     const d = join(T, "collision-defaut");
     mkdirSync(d, { recursive: true });
     writeFileSync(join(d, `Produit - Etude - ${JOUR}a.md`), "etude du jour", "utf8");
-    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "rapport du jour" });
-    att(indice === "a", `indice ${indice} au lieu de « a » — si ce test casse, la portée par défaut a cessé de reproduire la collision de TF-1450`);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "rapport du jour", porte: "prefixe" });
+    att(indice === "a", `indice ${indice} au lieu de « a » — si ce test casse, la portée « prefixe » a cessé de reproduire la collision de TF-1450`);
+  });
+  // TF-2631 (16/11/2026, RP-216) : le défaut du MODULE était « prefixe » quand celui de la ligne de commande
+  // était « dossier » ; seul l'appel en module sans option rendait un indice que R-4 refuse. Le cas du
+  // lot de retours du 12/11 : « X - 20261112a.mp4 » posé, un autre radical demande son indice.
+  check("TF-2631 vert (portée par défaut) : « X - 20261112a.mp4 » posé, un AUTRE radical sans option rend « b » (celui de la ligne de commande)", () => {
+    const d = join(T, "defaut-module-dossier");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, "X - 20261112a.mp4"), "clip", "utf8");
+    const indice = allouerIndice({ dossier: d, prefixe: "Y - Brief - ", jour: "20261112", contenu: "brief", extension: ".md" });
+    att(indice === "b", `indice ${indice} au lieu de « b » — le module sans option ne voit pas l'indice pris par l'AUTRE radical (R-4)`);
+  });
+  check("TF-2631 accord : le module sans option et la ligne de commande rendent la même lettre sur le même dossier", () => {
+    const d = join(T, "defaut-module-cli");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, "X - 20261112a.mp4"), "clip", "utf8");
+    const cli = spawnSync(process.execPath, [fileURLToPath(new URL("./allouer-indice.mjs", import.meta.url)), "--dossier", d, "--prefixe", "Y - Brief - ", "--jour", "20261112", "--extension", ".md"], { encoding: "utf8" });
+    const module_ = allouerIndice({ dossier: d, prefixe: "Y - Brief - ", jour: "20261112", contenu: "brief", extension: ".md" });
+    att(cli.stdout.trim() === module_, `module « ${module_} », ligne de commande « ${cli.stdout.trim()} »`);
   });
   check("TF-1450 vert (portée « dossier ») : le même cas voit l'indice pris par l'AUTRE radical et rend « b », sans collision", () => {
     const d = join(T, "collision-dossier");
