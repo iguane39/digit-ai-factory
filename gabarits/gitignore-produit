@@ -51,6 +51,9 @@
 # development-testing/local-data/). Sources lues le 28/10/2026. Un modèle sans valeur reste versionné.
 **/.dev.vars*
 !**/.dev.vars.example
+# TF-2605 (16/11/2026) : la fiche d'accès LOCALE écrite par `forge/generer-acces-local.mjs` porte identifiants, mots de passe et clés en
+# clair (la fiche versionnée n'en porte aucun, R-23). Ignorée où qu'elle vive, elle ne se commite jamais ; R-23 refuse qu'elle soit suivie.
+**/ACCES-TEST.local.md
 **/.wrangler/
 
 # ---- Artefacts compilés et dépendances ---------------------------------------------------------
@@ -91,6 +94,11 @@ _oracles-journal*.json*
 forge/**/.env*
 forge/**/*mdp*
 forge/**/*motdepasse*
+# TF-2629 (16/11/2026, mesuré le 12/11 par `git check-ignore -v` chez un produit : `.gitignore:83:!forge/**`) : la
+# négation rouvrait aussi les caches Python que `__pycache__/` et `*.pyc` excluaient plus haut ; un `.pyc` écrit sous
+# `forge\` (un oracle Python du produit) redevenait suivi. Même remède que pour `.env*` : l'exclusion se répète APRÈS.
+forge/**/__pycache__/
+forge/**/*.pyc
 !forge/**/.env.example
 !forge/**/.env.exemple
 !forge/**/.env.*.exemple

@@ -44,7 +44,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const VERSION = "1.0.0"; // 1.0.0 (02/10/2026) : première version, TF-1399
+export const VERSION = "1.1.0"; // 1.0.0 (02/10/2026) : première version, TF-1399 ; 1.1.0 (16/11/2026) : DEM-4, TF-2650
 
 /** Le gabarit que chaque remède fait ouvrir — cible CANONIQUE chez le produit (HERITAGE.json). */
 const GABARIT_DEMANDE = "forge\\demandes\\GABARIT-DEMANDE.md";
@@ -65,6 +65,17 @@ const RUBRIQUES = [
   { cle: "preuve_faite", titre: "Comment je saurai que c'est fait", re: /^##\s+Comment je saurai que c['’]est fait\s*$/im },
   { cle: "exclusions", titre: "Ce que cette demande ne réclame pas", re: /^##\s+Ce que cette demande ne r[ée]clame pas\s*$/im },
 ];
+
+// DEM-4 (TF-2650, 16/11/2026) — une demande qui PRESCRIT la valeur d'un paramètre d'API tierce dit d'où viennent les valeurs admises.
+// LE FAIT : demande Produit-86 du 12/11/2026, en-tête `X-Produit-86-Access` proposé pour `read_service_tokens_from_header` de Cloudflare
+// Access ; l'API n'admet que `Authorization` (« must be one of [Authorization] », réponse de Produit-84 du 13/11) — un correctif, une
+// recette et un redéploiement de plus. La rubrique est DUE à partir des demandes datées du 16/11/2026 (la date est dans le nom) : une
+// demande d'avant n'a rien fait de mal, c'est la règle qui a bougé. Chaque ligne de la rubrique porte sa source ou « à confirmer par
+// le propriétaire » ; sans ligne, la rubrique déclare « aucun paramètre d'API tierce n'est prescrit ». La JUSTESSE de la source n'est pas jugée.
+const DATE_DEM4 = "20261116";
+const RUBRIQUE_API = { titre: "Les paramètres d'API tierce prescrits", re: /^##\s+Les param[èe]tres d['’]API tierce prescrits\s*$/im };
+const SOURCE_OU_RENVOI = /source[^:\n]*:|https?:\/\/|à confirmer par le propriétaire/i;
+const AUCUN_PARAMETRE = /aucun\s+param[èe]tre/i;
 
 /** Le corps d'une section, jusqu'au prochain titre de niveau 2 — même fonction qu'oracle-lot-retours. */
 function corpsDeSection(texte, re) {
@@ -127,6 +138,29 @@ export function verifier(cheminDemande, texteFourni) {
     ajouter("DEM-3", "PASS", "cinq rubriques présentes et substantielles", null);
   }
 
+  if (m && m[2] >= DATE_DEM4) {
+    const corps = RUBRIQUE_API.re.test(texte) ? corpsDeSection(texte, RUBRIQUE_API.re) : null;
+    const utile = corps === null ? "" : corps.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]*>/g, "").trim();
+    // une ligne de rubrique : une puce ou une ligne de tableau (hors en-tête et filet) ; chacune porte sa source ou son renvoi
+    const lignes = utile.split(/\r?\n/).map((l) => l.trim())
+      .filter((l) => /^([-*]|\|)/.test(l) && !/^\|?[\s:|-]+\|?$/.test(l) && !/^\|\s*param[èe]tre\b/i.test(l) && !AUCUN_PARAMETRE.test(l));
+    const sansSource = lignes.filter((l) => !SOURCE_OU_RENVOI.test(l));
+    if (corps === null || !utile) {
+      ajouter("DEM-4", "FAIL",
+        `rubrique « ${RUBRIQUE_API.titre} » ${corps === null ? "absente" : "vide ou réduite au texte d'exemple"} d'une demande datée du ${m[2]}, donc à partir du ${DATE_DEM4} (TF-2650) — `
+        + "une valeur d'API tierce prescrite de mémoire coûte au destinataire un correctif, une recette et un redéploiement",
+        `ajouter la rubrique : une ligne par paramètre prescrit avec « source : … » ou « à confirmer par le propriétaire », ou « Aucun paramètre d'API tierce n'est prescrit. » Gabarit : ${GABARIT_DEMANDE}`);
+    } else if (lignes.length ? sansSource.length : !AUCUN_PARAMETRE.test(utile)) {
+      ajouter("DEM-4", "FAIL",
+        lignes.length
+          ? `${sansSource.length}/${lignes.length} paramètre(s) d'API tierce prescrit(s) sans source des valeurs admises ni « à confirmer par le propriétaire » : ${sansSource.map((l) => `« ${l.slice(0, 60)} »`).join(" · ")}`
+          : "la rubrique ne liste aucun paramètre et ne déclare pas « aucun paramètre d'API tierce n'est prescrit » — une rubrique qui ne dit rien se lit comme un oubli",
+        "écrire, pour chaque paramètre prescrit, la source de ses valeurs admises (page de documentation relue, réponse du propriétaire) ou « à confirmer par le propriétaire »");
+    } else {
+      ajouter("DEM-4", "PASS", lignes.length ? `${lignes.length} paramètre(s) d'API tierce prescrit(s), chacun avec sa source ou son renvoi au propriétaire` : "aucun paramètre d'API tierce prescrit, déclaré", null);
+    }
+  }
+
   return { verdict: constats.some((c) => c.statut === "FAIL") ? "FAIL" : "PASS", constats };
 }
 
@@ -174,6 +208,39 @@ function selfTest() {
     const r = verifier("Produit-01 - DEMANDE - 20261002a.md", videe);
     const c = constat(r, "DEM-3");
     if (!c || c.statut !== "FAIL") throw new Error(`statut ${c ? c.statut : "absent"} — une section réduite à l'exemple du gabarit passe`);
+  });
+  // DEM-4 (TF-2650) — jugé sur des demandes datées du 16/11/2026 ; celles d'avant (VERTE, 20261002) ne portent pas la rubrique.
+  const NEUVE = "Produit-01 - DEMANDE - 20261116a.md";
+  const AVEC_API = (corps) => VERTE + `\n## Les paramètres d'API tierce prescrits\n\n${corps}\n`;
+  check("rouge DEM-4 — demande du 16/11 sans la rubrique : FAIL, nommée ; la même demande datée d'avant reste PASS", () => {
+    const c = constat(verifier(NEUVE, VERTE), "DEM-4");
+    if (!c || c.statut !== "FAIL" || !/absente/.test(c.message) || !/TF-2650/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+    if (verifier("Produit-01 - DEMANDE - 20261115a.md", VERTE).verdict !== "PASS") throw new Error("une demande d'avant le 16/11 est refusée à tort");
+  });
+  check("rouge DEM-4 — un paramètre prescrit sans source ni renvoi au propriétaire : FAIL, la ligne nommée", () => {
+    const c = constat(verifier(NEUVE, AVEC_API("- en-tête de lecture du jeton = X-Produit-86-Access")), "DEM-4");
+    if (!c || c.statut !== "FAIL" || !/X-Produit-86-Access/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+  check("rouge DEM-4 — deux paramètres, un seul sourcé : FAIL sur l'autre seulement", () => {
+    const c = constat(verifier(NEUVE, AVEC_API("- option A = x — source : https://exemple.test/doc relue le 2026-11-16\n- option B = y")), "DEM-4");
+    if (!c || c.statut !== "FAIL" || !/1\/2/.test(c.message) || !/option B/.test(c.message) || /option A/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+  check("rouge DEM-4 — la rubrique réduite au texte d'exemple entre chevrons : FAIL", () => {
+    const c = constat(verifier(NEUVE, AVEC_API("<Pour chaque valeur d'une API tierce que cette demande prescrit>")), "DEM-4");
+    if (!c || c.statut !== "FAIL" || !/vide/.test(c.message)) throw new Error(`statut ${c ? c.statut : "absent"} — ${c && c.message}`);
+  });
+  check("vert DEM-4 — source citée, « à confirmer par le propriétaire » et « aucun paramètre » : PASS, et le remède de DEM-4 joué passe", () => {
+    for (const corps of [
+      "- en-tête de lecture du jeton = Authorization — source : documentation Cloudflare Access relue le 2026-11-16",
+      "- en-tête de lecture du jeton = X-Produit-86-Access — à confirmer par le propriétaire",
+      "| Paramètre | Valeur | Source |\n|---|---|---|\n| en-tête | Authorization | source : https://exemple.test/doc |",
+      "Aucun paramètre d'API tierce n'est prescrit.",
+      "- Aucun paramètre d'API tierce n'est prescrit.",
+    ]) {
+      const r = verifier(NEUVE, AVEC_API(corps));
+      const c = constat(r, "DEM-4");
+      if (!c || c.statut !== "PASS" || r.verdict !== "PASS") throw new Error(`« ${corps.slice(0, 50)} » : ${c ? c.statut : "absent"} — ${c && c.message}`);
+    }
   });
   check("un fichier INTROUVABLE rend SKIP, jamais un PASS de complaisance", () => {
     const r = verifier("chemin/qui/n/existe/pas - DEMANDE - 20261002a.md");

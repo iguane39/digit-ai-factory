@@ -59,10 +59,10 @@ de sécurité se juge par les oracles de forge-websec, jamais par un contrôle r
 ## Conventions locales
 
 - `REGLES-PROJET.md` du pilot : `input\` en lecture seule, livrables datés sous `output\`, **`.env` jamais committé**
-  (secret reçu en session : `<valeur> | node forge/ranger-secret.mjs NOM`, TF-2127, D-167 (a)), push sur GO humain ; **aucun livrable publié sur un service hébergé sans GO humain consigné**, jamais proposé en option
-  (R-38) ; **aucune donnée d'identité de l'utilisateur vers un service tiers sans sa demande** (R-62). Des hooks y veillent.
-- Écart au socle : retour dans le tour (TF-1048) ; `ts` du ledger relevé à l'écriture (TF-1424) ; une version tenue
-  ouverte n'arrête pas la nouvelle (TF-1503).
+  (secret reçu en session : `<valeur> | node forge/ranger-secret.mjs NOM` ; clés d'un `.env` : `node <pilot>\scripts\env-masque.mjs <fichier> --cles`), push sur GO humain ; **aucun livrable publié sur un service hébergé sans GO humain consigné**, jamais proposé en option
+  (R-38) ; **aucune donnée d'identité de l'utilisateur vers un service tiers sans sa demande** (R-62).
+- Écart au socle : retour dans le tour ; `ts` du ledger relevé à l'écriture ; une version tenue
+  ouverte n'arrête pas la nouvelle.
 - `<conventions spécifiques au produit>`
 
 ## Lexique d'invocation (RV-6)

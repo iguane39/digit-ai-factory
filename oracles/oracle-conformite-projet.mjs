@@ -47,7 +47,8 @@ import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
 import { COMMANDE_RELATIVE_FACTORY } from "./lib-ouverture-async.mjs";
 import { cadencesSansPorteur } from "./lib-cadence-promise.mjs";
-import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs } from "../scripts/relever-heritage.mjs";
+import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs, copiesDuSocle } from "../scripts/relever-heritage.mjs";
+import { socleDePage } from "../scripts/lib-socle-page.mjs";
 // TF-0923 volet (a) : les rôles qui portent une page homonyme et la date d'entrée de la doctrine
 // sont DÉCLARÉS chez le générateur qui les applique, et LUS ici. Une copie se périmerait au
 // premier rôle ajouté là-bas, en silence.
@@ -1489,6 +1490,29 @@ else {
       so("R-47", `${aliasPerimes.length} alias de transition PÉRIMÉ(S) : l'ancien fichier survit à côté de la cible canonique et continue d'être lu et cité. `
         + `Constat DÉCLARÉ, jamais un défaut — le retrait est un geste du produit (TF-0881) : ${aliasPerimes.join(" · ")}`);
     }
+    // R-47 (suite) · LES COPIES DU SOCLE QU'UN PRODUIT FAIT À L'ENDROIT DE SON CHOIX (TF-2668, 16/11/2026). Les artefacts ci-dessus ont
+    // une cible FIXE ; `copies_du_socle` de HERITAGE.json déclare ceux qu'un produit copie ailleurs (le boilerplate de page, copié en
+    // `scripts/<produit>/gabarit.html`). Le 16/11, une copie d'avant TF-2384 (3 déclarations `color-scheme` et 1 commentaire d'écart) a
+    // fait échouer SC4 sur une page jugée PASS le 10/11 : ni R-47 ni l'ouverture ne comparaient cette copie au socle. Une copie PÉRIMÉE
+    // (le socle porte des lignes qu'elle n'a pas) est SIGNALÉE, jamais un défaut : une règle neuve se durcit sur un corpus lu, et
+    // un produit peut avoir une raison de s'écarter (TF-2668). Une copie qui n'AJOUTE que des lignes est une personnalisation, non jugée.
+    for (const c of (heritage.copies_du_socle || [])) {
+      if (c.resolution !== "socle-de-page") { so("R-47", `copies_du_socle : résolution « ${c.resolution} » inconnue pour ${c.source} — non jugé (TF-2668)`); continue; }
+      const assets = socleDePage().assets;
+      const fichierSocle = assets ? join(assets, basename(c.source)) : null;
+      if (!fichierSocle || !existsSync(fichierSocle)) {
+        so("R-47", `copies_du_socle : source ${c.source} introuvable sur ce poste (socle digit-ai-page-html non installé) — les copies du produit ne sont PAS comparées (TF-2668)`);
+        continue;
+      }
+      const copies = copiesDuSocle(p("."), c, readFileSync(fichierSocle, "utf8"));
+      const perimees = copies.filter((x) => x.etat === "perimee");
+      if (perimees.length) {
+        so("R-47", `${perimees.length} copie(s) PÉRIMÉE(S) du socle ${c.source} : `
+          + perimees.map((x) => `${x.chemin} — le socle porte ${x.manquantes.length} ligne(s) que la copie n'a pas (ex. « ${x.manquantes[0].slice(0, 90)} »)`).join(" · ")
+          + ". Constat DÉCLARÉ, jamais un défaut de produit (TF-2668) : une page dérivée d'une copie périmée échoue au contrôle de surcouche (SC4) alors que le socle l'accepte ; "
+          + "remède : recopier le fichier du socle puis reporter les lignes propres au produit");
+      }
+    }
     if (horsHistoire.length) {
       so("R-47", `${horsHistoire.length} artefact(s) hérité(s) tenu(s) sur le DISQUE mais pas dans l'HISTOIRE du dépôt — `
         + "une recopie n'est TENUE qu'une fois commise : un clone neuf, une CI ou un `git restore` ne les auraient pas. "
@@ -2911,8 +2935,87 @@ else {
       }
     });
     if (ok23) ok("R-23", "docs\\projet\\ACCES-TEST.md", "en-tête démo-locale présent, aucun motif de secret, comptes de démo nommés par variables");
+
+    // R-23 (suite) · CHAQUE ENVIRONNEMENT DÉPLOYÉ A SA LIGNE DANS ACCES-TEST (TF-2601, 16/11/2026). LE FAIT : le 12/11/2026 le porteur demande
+    // pourquoi aucun fichier ne liste les comptes de test de tous les environnements pour qu'il s'y connecte ; R-20 et R-23 bornaient
+    // `ACCES-TEST.md` à la démonstration locale et réduisaient tout environnement réel à une référence. La fiche indexe désormais, sous
+    // « Environnements déployés », adresse, variable d'identifiant et variable de secret de chaque environnement déployé de COMPOSANTS-OPS
+    // (frontmatter `environnements:` et colonne « Environnement » de l'inventaire, hors locale). ANTÉRIORITÉ : jugée dès un `verifie_le`
+    // du 16/11/2026 ; avant, c'est la règle qui a bougé (le manque se déclare au `non_juge`). Ce qui est jugé : la PRÉSENCE de la ligne de
+    // chaque environnement, une adresse non vide, et des NOMS de variable (jamais des valeurs, R-23). NON JUGÉ : que l'adresse réponde, que
+    // les variables existent au `.env`, que le compte fonctionne.
+    const copAcces = join(dp, "COMPOSANTS-OPS.md");
+    if (existsSync(copAcces)) {
+      const texteCop = readFileSync(copAcces, "utf8");
+      const nomEnv = (s) => s.replace(/[`*]/g, "").trim().toLowerCase();
+      const estGabaritEnv = (s) => /^[{<]/.test(s.trim()) || s.trim() === "";
+      const deployes = new Set();
+      const mEnv = /^environnements\s*:\s*\[([^\]]*)\]\s*$/m.exec(frontmatter(texteCop) || "");
+      if (mEnv) for (const e of mEnv[1].split(",")) if (!estGabaritEnv(e)) deployes.add(nomEnv(e));
+      let colEnv = -1;
+      for (const l of texteCop.split(/\r?\n/)) {
+        if (!l.trim().startsWith("|")) { colEnv = -1; continue; }
+        const cs = l.split("|").slice(1, -1).map((c) => c.trim());
+        const h = cs.findIndex((c) => /^environnement$/i.test(c));
+        if (h >= 0) { colEnv = h; continue; }
+        if (colEnv >= 0 && cs[colEnv] !== undefined && !/^:?-+:?$/.test(cs[colEnv]) && !estGabaritEnv(cs[colEnv])) deployes.add(nomEnv(cs[colEnv]));
+      }
+      for (const e of [...deployes]) if (/^(locale|local|localhost)$/.test(e)) deployes.delete(e);
+      if (deployes.size) {
+        const verifieAcces = (/^verifie_le\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/m.exec(frontmatter(t) || "") || [])[1] || null;
+        const lignes = t.split(/\r?\n/);
+        const debut = lignes.findIndex((l) => /^#{2,}\s.*environnements?\s+d[ée]ploy[ée]s/i.test(l));
+        const listes = new Map();
+        const ecarts = [];
+        if (debut >= 0) {
+          let entete = false;
+          for (let i = debut + 1; i < lignes.length && !/^#{1,6}\s/.test(lignes[i]); i++) {
+            if (!lignes[i].trim().startsWith("|")) { entete = false; continue; }
+            const cs = lignes[i].split("|").slice(1, -1).map((c) => c.trim());
+            if (!entete) { entete = true; continue; }                       // la ligne d'en-tête
+            if (cs.every((c) => /^:?-+:?$/.test(c))) continue;              // le filet
+            listes.set(nomEnv(cs[0] || ""), { i: i + 1, cs });
+          }
+        }
+        const manquants = [...deployes].filter((e) => !listes.has(e));
+        if (debut < 0) ecarts.push(`section « Environnements déployés » absente : ${deployes.size} environnement(s) déployé(s) sans ligne (${[...deployes].join(", ")})`);
+        else if (manquants.length) ecarts.push(`${manquants.length} environnement(s) déployé(s) de COMPOSANTS-OPS.md sans ligne dans « Environnements déployés » : ${manquants.join(", ")}`);
+        for (const [env, { i, cs }] of listes) {
+          if (!deployes.has(env)) continue;
+          if (!cs[1] || !cs[1].replace(/[`*]/g, "").trim()) ecarts.push(`${env} (ligne ${i}) : adresse vide`);
+          for (const [rang, intitule] of [[2, "identifiant"], [3, "secret"]])
+            if (cs[rang] === undefined || !estNomDeVariable(cs[rang]) || cs[rang].replace(/[`{}<>*]/g, "").trim() === "")
+              ecarts.push(`${env} (ligne ${i}) : le ${intitule} n'est pas un NOM de variable (« ${String(cs[rang] ?? "").slice(0, 40)} ») — une fiche versionnée nomme des variables, jamais des valeurs (R-23)`);
+        }
+        if (!ecarts.length) ok("R-23", "docs\\projet\\ACCES-TEST.md", `${deployes.size} environnement(s) déployé(s) de COMPOSANTS-OPS.md indexé(s) avec adresse et variables d'accès (TF-2601)`);
+        else if (verifieAcces && verifieAcces >= "2026-11-16")
+          ko("R-23", "docs\\projet\\ACCES-TEST.md", `${ecarts.join(" ; ")} — sans cette ligne le porteur ne sait ni où se connecter ni avec quel compte (TF-2601). Remède : une ligne par environnement sous « Environnements déployés » (adresse, variable d'identifiant, variable de secret, date), gabarit gabarits\\docs-projet\\ACCES-TEST.md`);
+        else
+          antecedences.push(`R-23 (environnements déployés) non jugé sur docs\\projet\\ACCES-TEST.md : la règle naît le 16/11/2026 (TF-2601) et la fiche porte verifie_le=${verifieAcces || "non daté"} — antériorité déclarée, jamais un défaut de produit (${ecarts.slice(0, 2).join(" ; ")})`);
+      }
+    }
   }
 
+  // R-23 (suite) · LA FICHE LOCALE QUI PORTE LES VALEURS NE SE VERSIONNE JAMAIS (TF-2605, 16/11/2026). La fiche versionnée n'a aucune valeur
+  // (R-23) ; `forge/generer-acces-local.mjs` écrit `docs/projet/ACCES-TEST.local.md`, qui en porte. Ce fichier ne sert que s'il est ignoré par git
+  // et jamais suivi : l'effet se juge sur git (`ls-files`, `check-ignore`), pas sur le motif du .gitignore. NON JUGÉ : la fraîcheur de ses valeurs.
+  {
+    const REL_LOCALE = "docs/projet/ACCES-TEST.local.md";
+    const presente = existsSync(p("docs", "projet", "ACCES-TEST.local.md"));
+    const suivie = aGit && (git("ls-files", "--", REL_LOCALE).stdout || "").trim() !== "";
+    if (suivie) {
+      ko("R-23", "docs\\projet\\ACCES-TEST.local.md", "la fiche d'accès LOCALE est SUIVIE par git alors qu'elle porte des valeurs (identifiants, mots de passe, clés en clair) — "
+        + "elle ne se versionne jamais (TF-2605). Remède : `git rm --cached docs/projet/ACCES-TEST.local.md`, ajouter `**/ACCES-TEST.local.md` au .gitignore (motif du socle), "
+        + "et faire pivoter les valeurs si l'index a déjà été publié");
+    } else if (presente && !aGit) {
+      so("R-23", "la fiche d'accès locale docs\\projet\\ACCES-TEST.local.md existe mais le dossier n'est pas un dépôt git : son ignorance n'est pas jugeable (TF-2605)");
+    } else if (presente && git("check-ignore", "-q", "--", REL_LOCALE).status !== 0) {
+      ko("R-23", "docs\\projet\\ACCES-TEST.local.md", "la fiche d'accès LOCALE n'est PAS ignorée par git : un `git add .` l'embarquerait avec ses valeurs (TF-2605). "
+        + "Remède : ajouter `**/ACCES-TEST.local.md` au .gitignore (motif du socle, gabarits\\gitignore-produit)");
+    } else if (presente) {
+      ok("R-23", "docs\\projet\\ACCES-TEST.local.md", "fiche d'accès locale présente, ignorée par git et non suivie — les valeurs restent sur le poste (TF-2605)");
+    }
+  }
   // ---- R-23, SECOND VOLET (TF-1088, 17/09/2026) — LA FICHE EST LUE, LA PAGE SERVIE NE L'EST PAS
   //
   // LE FAIT, relevé au banc des défauts échappés (cas E-01, phase MEP) : « des identifiants de
@@ -3244,6 +3347,8 @@ const nonJuge = [
   "seule la PRÉSENCE de CLAUDE.md/README est jugée, pas la pertinence de leur contenu",
   "R-11 ter (TF-2125) : les types d écrans sont reconnus à des SIGNAUX de fichier (balise <table> ; boutons, formulaires ou champs ; dossier locales ou i18n) dans les .html, .vue, .jsx, .tsx et .svelte hors output, input, docs, forge, old et tests — un écran construit par programme sans ces balises, ou servi par un gabarit hors du dépôt, n est pas vu. La ligne est reconnue à son LIBELLÉ (première colonne de la table), jamais à la pertinence de ses règles ; deux types seulement sont relevés (TYPES_D_ECRAN), les autres lignes du détail restent à la déclaration de la session",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
+  "R-47, copies du socle (TF-2668) : seule une copie dont le NOM est celui d'un gabarit et qui porte les marqueurs déclarés est comparée au fichier du socle ; une page instanciée depuis le gabarit, ou une copie renommée, n'est pas vue. Une copie périmée est signalée (SANS_OBJET), jamais un échec, et le socle introuvable sur le poste se déclare au lieu de passer pour un vert",
+  "R-23, fiche d'accès locale (TF-2605) : seul l'état git du fichier docs/projet/ACCES-TEST.local.md est jugé (suivi ? ignoré ?) — ni la fraîcheur de ses valeurs, ni leur présence au .env, ni le fait qu'une valeur écrite ailleurs que dans ce fichier soit versionnée (R-14 et le motif de secret fort s'en chargent)",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
   "R-23, volet « page servie » (TF-1088) : la reconnaissance passe par le NOM du fichier (connexion, login, sign-in, authentification, aide, help) — un identifiant de démonstration affiché depuis un composant dont le nom ne dit rien reste invisible. Le vocabulaire est étroit et fermé par choix : l'élargir à tout le code d'un produit rendrait la règle bavarde là où elle doit être opposable",
   "R-23, volet « page servie » : ni que la page soit réellement SERVIE, ni que le mode démo soit actif hors du poste local. L'oracle lit un gabarit sur le disque ; c'est la conjonction des deux — page publique et mode démo — qui a fait l'incident E-01, et seule la moitié lisible est jugée",

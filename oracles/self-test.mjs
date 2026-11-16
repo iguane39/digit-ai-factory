@@ -322,6 +322,120 @@ check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui 
   } finally { writeFileSync(f, avant); }
 });
 
+// TF-2601 (16/11/2026) — CHAQUE ENVIRONNEMENT DÉPLOYÉ DE COMPOSANTS-OPS A SA LIGNE DANS ACCES-TEST. Le 12/11/2026 le porteur demande
+// pourquoi aucun fichier ne liste les comptes de test de tous les environnements : R-20 et R-23 bornaient la fiche à la démo locale.
+// Trois états : un environnement déployé SANS ligne (FAIL qui le nomme), la même fiche complète (PASS, le remède joué), la fiche revue AVANT
+// le 16/11 (antériorité déclarée, jamais un FAIL). Fixtures minimales : le contrôle ne lit que les deux fiches.
+{
+  const COP = ["---", "role: composants", 'sources_de_verite: ["ops.mjs etat"]', "verifie_le: 2026-11-16", "environnements: [locale, staging, production]", "---", "", "# Composants Ops", "",
+    "## Inventaire par environnement", "", "| Composant | Environnement | URL |", "|---|---|---|", "| api | staging | https://x-staging.exemple.test |", "| api | production | https://x.exemple.test |", ""].join("\n");
+  const ACCES = (verifie, lignes) => ["---", "role: acces", 'sources_de_verite: ["seed"]', `verifie_le: ${verifie}`, "---", "# Accès", "",
+    "> comptes de démonstration locale — jamais valides hors MODE_DEMO", "", "## Environnements déployés — comptes de test", "",
+    "| Environnement | Adresse | Identifiant | Mot de passe ou clé | Mis à jour le |", "|---|---|---|---|---|", ...lignes, ""].join("\n");
+  const STAGING = "| staging | https://x-staging.exemple.test | `STAGING_ADMIN_IDENTIFIANT` | `STAGING_ADMIN_MOTDEPASSE` | 2026-11-16 |";
+  const PROD = "| production | https://x.exemple.test | `PROD_ADMIN_IDENTIFIANT` | `PROD_CLE_API` | 2026-11-16 |";
+  const projet2601 = (acces) => {
+    const d = mkdtempSync(join(tmpdir(), "conf-r23-env-"));
+    mkdirSync(join(d, "docs", "projet"), { recursive: true });
+    writeFileSync(join(d, "docs", "projet", "COMPOSANTS-OPS.md"), COP, "utf8");
+    writeFileSync(join(d, "docs", "projet", "ACCES-TEST.md"), acces, "utf8");
+    return d;
+  };
+  const r23env = (d) => { const { rapport } = lance(d); rmSync(d, { recursive: true, force: true }); return rapport; };
+  check("TF-2601 rouge — un environnement déployé de COMPOSANTS-OPS sans ligne dans ACCES-TEST : R-23 FAIL qui nomme `production`", () => {
+    const f = r23env(projet2601(ACCES("2026-11-16", [STAGING]))).findings.filter((x) => x.regle === "R-23" && x.statut === "FAIL" && /Environnements déployés/.test(x.message));
+    if (f.length !== 1 || !/production/.test(f[0].message) || /staging/.test(f[0].message.split("—")[0]) || !/TF-2601/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2601 rouge — la section « Environnements déployés » absente : FAIL qui nomme les deux environnements", () => {
+    const sans = ACCES("2026-11-16", [STAGING, PROD]).replace("## Environnements déployés — comptes de test", "## Autre section");
+    const f = r23env(projet2601(sans)).findings.filter((x) => x.regle === "R-23" && x.statut === "FAIL");
+    if (f.length !== 1 || !/section « Environnements déployés » absente/.test(f[0].message) || !/staging/.test(f[0].message) || !/production/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2601 rouge — une VALEUR à la place du nom de variable, ou une adresse vide : FAIL qui nomme la ligne", () => {
+    const valeur = r23env(projet2601(ACCES("2026-11-16", [STAGING, "| production | https://x.exemple.test | admin@exemple.test | `PROD_CLE_API` | 2026-11-16 |"]))).findings
+      .filter((x) => x.regle === "R-23" && x.statut === "FAIL");
+    if (valeur.length !== 1 || !/production \(ligne \d+\) : le identifiant n'est pas un NOM de variable/.test(valeur[0].message)) throw new Error(JSON.stringify(valeur));
+    const vide = r23env(projet2601(ACCES("2026-11-16", [STAGING, "| production |  | `PROD_ADMIN_IDENTIFIANT` | `PROD_CLE_API` | 2026-11-16 |"]))).findings
+      .filter((x) => x.regle === "R-23" && x.statut === "FAIL");
+    if (vide.length !== 1 || !/adresse vide/.test(vide[0].message)) throw new Error(JSON.stringify(vide));
+  });
+  check("TF-2601 vert — chaque environnement déployé a sa ligne (adresse, noms de variable) : R-23 PASS qui compte les deux, la locale n'en exige aucune", () => {
+    const r = r23env(projet2601(ACCES("2026-11-16", [STAGING, PROD])));
+    const f = r.findings.filter((x) => x.regle === "R-23" && /environnement\(s\) déployé\(s\)/.test(x.message));
+    if (f.length !== 1 || f[0].statut !== "PASS" || !/^2 environnement/.test(f[0].message)) throw new Error(JSON.stringify(f));
+    if (r.findings.some((x) => x.regle === "R-23" && x.statut === "FAIL")) throw new Error("un FAIL R-23 sur la fiche complète");
+  });
+  check("TF-2601 ANTÉRIEUR — la même fiche incomplète revue avant le 16/11 : antériorité déclarée au non_juge, jamais un FAIL", () => {
+    const r = r23env(projet2601(ACCES("2026-11-15", [STAGING])));
+    if (r.findings.some((x) => x.regle === "R-23" && x.statut === "FAIL")) throw new Error("une fiche d'avant la règle est accusée");
+    if (!JSON.stringify(r.non_juge || []).includes("R-23 (environnements déployés)")) throw new Error("l'antériorité n'est pas déclarée au non_juge");
+  });
+}
+
+// TF-2605 (16/11/2026) — LA FICHE D'ACCÈS LOCALE PORTE DES VALEURS : IGNORÉE ET JAMAIS SUIVIE. Le 12/11/2026 le porteur exige un fichier avec identifiants et
+// mots de passe pour se connecter ; la fiche versionnée reste sans valeur (R-23). Le contrôle juge l'ÉTAT GIT du fichier, dans les trois sens : non ignoré
+// (FAIL), suivi (FAIL), ignoré et non suivi (PASS). Dépôts jetables réels : `git ls-files` et `git check-ignore` jugent l'effet, pas le motif.
+{
+  const projet2605 = ({ gitignore, suivre }) => {
+    const d = mkdtempSync(join(tmpdir(), "conf-r23-locale-"));
+    mkdirSync(join(d, "docs", "projet"), { recursive: true });
+    sh("git", ["init", "-q", "-b", "main"], d);
+    writeFileSync(join(d, "docs", "projet", "ACCES-TEST.md"), "---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-11-16\n---\n# Accès\n\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n", "utf8");
+    writeFileSync(join(d, "docs", "projet", "ACCES-TEST.local.md"), "# Fiche locale\n\nliste des comptes, valeurs résolues au poste\n", "utf8");
+    if (gitignore !== undefined) writeFileSync(join(d, ".gitignore"), gitignore, "utf8");
+    if (suivre) sh("git", ["add", "-f", "--", "docs/projet/ACCES-TEST.local.md"], d);
+    return d;
+  };
+  const constatLocale = (d) => { const { rapport } = lance(d); rmSync(d, { recursive: true, force: true }); return rapport.findings.filter((x) => x.regle === "R-23" && /ACCES-TEST\.local\.md/.test(x.ou + " " + x.message)); };
+  check("TF-2605 rouge — la fiche d'accès locale NON IGNORÉE par git : R-23 FAIL qui nomme le motif à ajouter", () => {
+    const f = constatLocale(projet2605({ gitignore: "node_modules/\n" }));
+    if (f.length !== 1 || f[0].statut !== "FAIL" || !/n'est PAS ignorée/.test(f[0].message) || !/\*\*\/ACCES-TEST\.local\.md/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2605 rouge — la fiche d'accès locale SUIVIE par git (même ignorée ensuite) : R-23 FAIL qui nomme `git rm --cached`", () => {
+    const f = constatLocale(projet2605({ gitignore: "**/ACCES-TEST.local.md\n", suivre: true }));
+    if (f.length !== 1 || f[0].statut !== "FAIL" || !/SUIVIE par git/.test(f[0].message) || !/git rm --cached/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2605 vert — la fiche d'accès locale ignorée et non suivie : R-23 PASS, et le motif du gitignore SOCLE suffit (le remède prescrit joué)", () => {
+    const f = constatLocale(projet2605({ gitignore: "**/ACCES-TEST.local.md\n" }));
+    if (f.length !== 1 || f[0].statut !== "PASS") throw new Error(JSON.stringify(f));
+    const socle = constatLocale(projet2605({ gitignore: readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "gitignore-produit"), "utf8") }));
+    if (socle.length !== 1 || socle[0].statut !== "PASS") throw new Error(`gitignore du socle : ${JSON.stringify(socle)}`);
+  });
+}
+
+// TF-2668 (16/11/2026) — LA COPIE DU BOILERPLATE QU'UN PRODUIT FAIT DE SON CHEF DÉRIVE SANS SIGNAL. Le 16/11, la copie
+// `scripts/apdlb/gabarit.html` d'un produit datait d'avant `color-scheme` (TF-2384) : SC4 a échoué sur une page jugée PASS le 10/11, et R-47
+// ne comparait cette copie à rien. Double sens, sur le VRAI boilerplate du socle : la copie périmée est NOMMÉE par R-47 (constat déclaré,
+// jamais un FAIL), la copie à l'identique ne dit rien et la fixture verte reste PASS.
+{
+  const socle2668 = socleDePage();
+  const fichier2668 = socle2668.assets ? join(socle2668.assets, "boilerplate.html") : null;
+  const copie2668 = join(verte, "scripts", "apdlb", "gabarit.html");
+  const lancer2668 = (texte) => {
+    mkdirSync(dirname(copie2668), { recursive: true });
+    writeFileSync(copie2668, texte);
+    try { return lance(verte); } finally { rmSync(join(verte, "scripts", "apdlb"), { recursive: true, force: true }); }
+  };
+  const perimee = (rapport) => rapport.findings.filter((x) => x.regle === "R-47" && /copie\(s\) PÉRIMÉE\(S\) du socle/.test(x.message));
+  if (!fichier2668 || !existsSync(fichier2668)) {
+    console.log("  [SAUTÉ] TF-2668 — le socle digit-ai-page-html est introuvable sur ce poste : copie périmée non jouable");
+  } else {
+    const socleTexte = readFileSync(fichier2668, "utf8");
+    check("TF-2668 rouge — une copie du boilerplate d'avant color-scheme : R-47 la NOMME périmée, SANS_OBJET et jamais un FAIL", () => {
+      const ancienne = socleTexte.split(/\r?\n/).filter((l) => !/color-scheme\s*:/.test(l)).join("\n");
+      if (ancienne === socleTexte.split(/\r?\n/).join("\n")) throw new Error("témoin rouge mal construit : la copie est identique au socle");
+      const { exit, rapport } = lancer2668(ancienne);
+      const f = perimee(rapport);
+      if (exit !== 0 || f.length !== 1 || f[0].statut !== "SANS_OBJET" || !/scripts\/apdlb\/gabarit\.html/.test(f[0].message) || !/color-scheme/.test(f[0].message))
+        throw new Error(`exit ${exit}, constats : ${JSON.stringify(f)}`);
+    });
+    check("TF-2668 vert — la copie à l'identique du boilerplate (CRLF compris) ne dit rien, et la fixture reste PASS", () => {
+      const { exit, rapport } = lancer2668(socleTexte.split(/\r?\n/).join("\r\n"));
+      if (exit !== 0 || perimee(rapport).length) throw new Error(`exit ${exit}, constats : ${JSON.stringify(perimee(rapport))}`);
+    });
+  }
+}
+
 // TF-0330 — `forge\QUESTIONS.md` était prescrit par le contrat et jugé par RIEN. Double sens :
 // absent, il est DÉCLARÉ et jamais mis en échec (une dette antérieure aux produits ne doit pas
 // suspendre leur ouverture) ; présent, il est constaté PASS. Sans la seconde moitié, le

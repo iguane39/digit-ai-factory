@@ -63,6 +63,22 @@ borne ce qui EXISTE (les comptes de seed), pas ce qui s'AFFICHE : une qualif est
 Internet comme la production l'est. Ce qu'une page peut dire au plus : « des comptes de
 démonstration existent ; leurs identifiants sont remis par le canal de la mission ».
 
+## Environnements déployés — comptes de test (TF-2601)
+
+*Une ligne par environnement déployé de `COMPOSANTS-OPS.md` (staging, qualif, production…), hors locale.
+Sans elle, le porteur ne sait ni où se connecter ni avec quel compte : le 12/11/2026, il a demandé pourquoi
+aucun fichier ne listait les comptes de tous les environnements.* L'étape MEP, et tout déploiement de recette,
+met cette table à jour dans le même tour que le déploiement. `oracle-conformite-projet` (R-23) compare les
+environnements de cette table à ceux de `COMPOSANTS-OPS.md` et échoue sur un environnement déployé sans ligne.
+
+| Environnement | Adresse | Identifiant | Mot de passe ou clé | Mis à jour le |
+|---|---|---|---|---|
+| staging | {<URL_STAGING>} | `{VAR_IDENTIFIANT_STAGING}` | `{VAR_SECRET_STAGING}` | {AAAA-MM-JJ} |
+| production | {<URL_PROD>} | `{VAR_IDENTIFIANT_PROD}` | `{VAR_SECRET_PROD}` | {AAAA-MM-JJ} |
+
+L'adresse est une URL, jamais un secret ; **l'identifiant et le secret sont des NOMS de variable de `.env`,
+jamais des valeurs** (R-23) : la fiche est versionnée, et une valeur écrite ici finit publiée.
+
 ## Accès d'environnements réels (références, jamais de valeurs)
 
 La ligne **déploiement** est OBLIGATOIRE (TF-0735) : le principe de connexion à l'hébergeur a

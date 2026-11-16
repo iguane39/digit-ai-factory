@@ -94,6 +94,37 @@ try {
     att(echoue(r, "D3"), "une 5e rubrique vide sans déclaration devrait échouer");
   });
 
+  // ---- D4 : les paramètres d'API tierce prescrits (TF-2650, due aux demandes datées du 16/11/2026) ----
+  const NEUVE = "produit-demandeur - DEMANDE - 20261116a.md";
+  const AVEC_API = (corps) => DEMANDE() + `\n## 6. Les paramètres d'API tierce prescrits\n\n${corps}\n`;
+  const msgD4 = (r) => (r.constats.find((c) => c.regle === "D4") || {}).message || "";
+  check("rouge D4 — une demande du 16/11 sans la rubrique 6 échoue, nommée ; la même demande datée d'avant reste PASS", () => {
+    const r = verifier(DEMANDE(), NEUVE);
+    att(echoue(r, "D4") && /absente/.test(msgD4(r)), `D4 ne s'est pas déclenché : ${msgD4(r)}`);
+    att(verifier(DEMANDE(), "produit-demandeur - DEMANDE - 20261115a.md").verdict === "PASS", "une demande d'avant le 16/11 est refusée à tort");
+  });
+  check("rouge D4 — un paramètre prescrit sans source ni renvoi échoue, la ligne nommée ; un seul sourcé sur deux échoue sur l'autre", () => {
+    const r = verifier(AVEC_API("- en-tête de lecture du jeton = X-Produit-86-Access"), NEUVE);
+    att(echoue(r, "D4") && /X-Produit-86-Access/.test(msgD4(r)), `D4 : ${msgD4(r)}`);
+    const deux = verifier(AVEC_API("- option A = x — source : https://exemple.test/doc relue le 2026-11-16\n- option B = y"), NEUVE);
+    att(echoue(deux, "D4") && /1\/2/.test(msgD4(deux)) && /option B/.test(msgD4(deux)) && !/option A/.test(msgD4(deux)), `D4 : ${msgD4(deux)}`);
+  });
+  check("rouge D4 — la rubrique réduite au texte d'exemple entre chevrons ou à un commentaire échoue (vide)", () => {
+    const r = verifier(AVEC_API("<!-- Pour chaque valeur d'une API tierce -->\n\n<une ligne par paramètre>"), NEUVE);
+    att(echoue(r, "D4") && /vide/.test(msgD4(r)), `D4 : ${msgD4(r)}`);
+  });
+  check("verte D4 — source citée, « à confirmer par le propriétaire », tableau sourcé et « aucun paramètre » passent", () => {
+    for (const corps of [
+      "- en-tête de lecture du jeton = Authorization — source : documentation Cloudflare Access relue le 2026-11-16",
+      "- en-tête de lecture du jeton = X-Produit-86-Access — à confirmer par le propriétaire",
+      "| Paramètre | Valeur | Source |\n|---|---|---|\n| en-tête | Authorization | source : https://exemple.test/doc |",
+      "Aucun paramètre d'API tierce n'est prescrit.",
+    ]) {
+      const r = verifier(AVEC_API(corps), NEUVE);
+      att(r.verdict === "PASS" && !echoue(r, "D4"), `« ${corps.slice(0, 50)} » refusé : ${msgD4(r)}`);
+    }
+  });
+
   // ---- Forme générale ------------------------------------------------------------------
   check("VERSION exportée et stable", () => { att(typeof VERSION === "string" && /^\d+\.\d+\.\d+$/.test(VERSION), `VERSION invalide : ${VERSION}`); });
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }

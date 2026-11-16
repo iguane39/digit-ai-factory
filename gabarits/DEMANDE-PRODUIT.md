@@ -67,3 +67,15 @@ son motif et sa date (R-20 bis), jamais supprimé en silence.
      vide : « rien n'est écarté de cette demande ». -->
 
 <ce qui est hors de la demande, et pourquoi, ou « rien n'est écarté de cette demande »>
+
+## 6. Les paramètres d'API tierce prescrits
+
+<!-- Due depuis le 16/11/2026 (TF-2650). Pour chaque valeur d'une API tierce que la demande
+     prescrit au destinataire (en-tête, option, champ, nom de rôle) : une ligne qui donne le
+     paramètre, la valeur et la SOURCE de ses valeurs admises (page de documentation relue et
+     datée, ou réponse du propriétaire), ou la mention « à confirmer par le propriétaire ».
+     Aucune valeur prescrite : « Aucun paramètre d'API tierce n'est prescrit. » Le 12/11/2026, un
+     en-tête proposé de mémoire a coûté un correctif, une recette et un redéploiement : l'API
+     n'admettait qu'une seule valeur. -->
+
+<une ligne par paramètre, avec sa source ou « à confirmer par le propriétaire », ou « Aucun paramètre d'API tierce n'est prescrit. »>

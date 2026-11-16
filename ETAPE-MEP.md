@@ -256,6 +256,19 @@ Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fi
    déclenchée par la poussée) dès qu'une cible est un environnement géré, et la **déclaration de
    sauvegarde** `forge\etapes\mep\SAUVEGARDE.json` (format `forge-ops/sauvegarde@1`) dès que le
    produit garde des données — § 3 terdecies (M-16, M-17).
+6. **Les comptes de test des environnements déployés, mis à jour dans le même tour** (TF-2601,
+   décision R-58 du 16/11/2026). Le 12/11/2026, le porteur a demandé pourquoi aucun fichier ne
+   listait les comptes de tous les environnements pour qu'il s'y connecte : la fiche d'accès bornait
+   tout environnement réel à une référence. `docs\projet\ACCES-TEST.md` porte désormais, sous
+   « Environnements déployés », UNE ligne par environnement déployé de `COMPOSANTS-OPS.md` (adresse,
+   variable de l'identifiant, variable du secret, date). L'étape MEP, et tout déploiement de recette,
+   la met à jour dans le même tour que le déploiement. `oracle-conformite-projet` (R-23) compare les
+   environnements des deux fiches : un environnement déployé sans ligne est un FAIL. **Les valeurs
+   vivent ailleurs** (TF-2605, le porteur l'exige) : après chaque déploiement, la session exécute
+   `node forge/generer-acces-local.mjs`, qui écrit `docs\projet\ACCES-TEST.local.md`, la même fiche avec
+   les identifiants, mots de passe et clés lus dans le `.env` du poste et une consigne de connexion
+   d'essai par ligne. Ce fichier est ignoré par git et ne se commite jamais ; la fiche versionnée reste
+   sans valeur (R-23), et R-23 refuse une fiche locale suivie ou non ignorée.
 
 ## 2 bis. Un retour arrière ne vit pas dans un journal (TF-0512, 22/08/2026)
 
