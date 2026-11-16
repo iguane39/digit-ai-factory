@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 717 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 718 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -730,6 +730,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 - 20261109d.md | 20261109d | 10.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 - 20261109d.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 au soir - 20261109h.md | 20261109h | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 09-11 au soir - 20261109h.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md | 20261114a | 16 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md` |
+| Digit-AI - Synthese Mandat - Retours et TODOs du 16-11 - 20261116a.md | 20261116a | 16.7 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs du 16-11 - 20261116a.md` |
 | Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md | 20261029g | 10.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` |
 | Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md | 20261102b | 16.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` |
 | Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md | 20261103p | 8.3 Ko | `04-plans/Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` |
