@@ -10,6 +10,8 @@
  *  K6  vues synchronisées avec la source (generer-vues.mjs --check, exit 0)
  *  K7  chaque forge du catalogue est routée par CONTRAT-INTERFACE.md (cohérence points d'entrée)
  *  K8  chaque script cité en point d'entrée (node x.mjs, python x.py) existe dans le dépôt de sa forge (TF-2015)
+ *  K9  la version et la date du catalogue disent son contenu : le contenu des services est celui que `versions.jsonl`
+ *      a scellé sous cette version (TF-2667 ; la version 1.8.0 du 19/08 a porté 83, 91, 98 puis 111 services)
  * Usage : node oracle-catalogues.mjs [racine] | --self-test  — exit 0 PASS / 1 FAIL / 2 erreur.
  */
 import { readFileSync, existsSync, writeFileSync, mkdtempSync, mkdirSync, rmSync } from "node:fs";
@@ -17,6 +19,7 @@ import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { empreinteServices, lireJournal, comparerVersions, sceller } from "../catalogues/generer-vues.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const CHAMPS = ["id", "forge", "nom", "intention", "entrees", "sorties", "point_entree", "preuve", "statut", "cycle_de_vie", "challenge_date"];
@@ -98,7 +101,43 @@ export function validerPointsEntree(services, racineParc) {
   return findings;
 }
 
-/** Règles K6-K8 (environnement réel uniquement). */
+/**
+ * K9 (TF-2667, 16/11/2026) — un catalogue change de contenu sans changer de version ni de date : les deux
+ * instantanés vendus à un produit (83 services le 24/08, 111 le 15/11) portaient la même étiquette
+ * « v1.8.0 du 19/08/2026 ». `versions.jsonl` (ajout seul) scelle, par version, l'empreinte des lignes de
+ * services. Le contenu courant doit être celui de la version que la méta nomme, et cette version la dernière
+ * scellée ; les versions du journal montent strictement et leurs dates ne reculent pas. Le remède est dans
+ * le message : `node catalogues/generer-vues.mjs --sceller`.
+ */
+export function validerVersions(chemin, journal) {
+  const findings = [];
+  const ko = (message) => findings.push({ regle: "K9", statut: "FAIL", message });
+  const REMEDE = "node catalogues/generer-vues.mjs --sceller monte la version, date le contenu et régénère les vues";
+  let entrees;
+  try { entrees = lireJournal(journal); } catch (e) { ko(`journal des versions illisible (${journal}) : ${e.message}`); return findings; }
+  if (!entrees.length) { ko(`journal des versions absent ou vide (${journal}) : ${REMEDE}`); return findings; }
+  const SEMVER = /^\d+\.\d+\.\d+$/;
+  const ISO = /^\d{4}-\d{2}-\d{2}$/;
+  entrees.forEach((e, i) => {
+    if (!e || !SEMVER.test(e.version ?? "") || !ISO.test(e.genere ?? "") || !/^[0-9a-f]{64}$/.test(e.empreinte ?? "") || !Number.isInteger(e.services)) ko(`versions.jsonl ligne ${i + 1} : version, genere, empreinte (sha256) ou services mal formés`);
+    else if (i > 0 && comparerVersions(entrees[i - 1].version, e.version) >= 0) ko(`versions.jsonl ligne ${i + 1} : version ${e.version} réutilisée ou en recul après ${entrees[i - 1].version} — une version ne se rejoue jamais`);
+    else if (i > 0 && e.genere < entrees[i - 1].genere) ko(`versions.jsonl ligne ${i + 1} : date ${e.genere} antérieure à celle de la version précédente (${entrees[i - 1].genere})`);
+  });
+  if (findings.length) return findings;
+  let meta;
+  try { meta = JSON.parse(readFileSync(chemin, "utf8").split(/\r?\n/)[0]); } catch { ko("1re ligne du catalogue illisible"); return findings; }
+  const derniere = entrees.at(-1);
+  if (meta.version !== derniere.version) ko(`le catalogue porte la version ${meta.version}, la dernière version scellée est ${derniere.version} : ${REMEDE}`);
+  else if (meta.genere !== derniere.genere) ko(`le catalogue porte la date ${meta.genere}, la version ${derniere.version} a été scellée le ${derniere.genere} : ${REMEDE}`);
+  else {
+    const { empreinte, services } = empreinteServices(chemin);
+    if (empreinte !== derniere.empreinte) ko(`le contenu diffère de la version ${meta.version} scellée le ${derniere.genere} (${derniere.services} services scellés, ${services} aujourd'hui) à en-tête égal : ${REMEDE}`);
+  }
+  if (!findings.length) findings.push({ regle: "K9", statut: "PASS", message: `contenu conforme à la version ${meta.version} scellée le ${meta.genere} (${derniere.services} services, ${entrees.length} version(s) au journal)` });
+  return findings;
+}
+
+/** Règles K6-K9 (environnement réel uniquement). */
 function validerEnvironnement(racine) {
   const findings = [];
   const ko = (regle, message) => findings.push({ regle, statut: "FAIL", message });
@@ -123,6 +162,7 @@ function validerEnvironnement(racine) {
   }
   const services = readFileSync(join(racine, "catalogues", "catalogue.jsonl"), "utf8").split(/\r?\n/).filter((l) => l.trim()).slice(1).map((l) => JSON.parse(l));
   findings.push(...validerPointsEntree(services, join(racine, "..")));
+  findings.push(...validerVersions(join(racine, "catalogues", "catalogue.jsonl"), join(racine, "catalogues", "versions.jsonl")));
   return findings;
 }
 
@@ -167,6 +207,30 @@ function selfTest() {
   resultats.push({ fixture: "catalogue réel/oracle-arret-en-course de forge-agents-security (TF-2246)", attendu: "PASS",
     obtenu: reel.some((s) => s.forge === "agents-security" && /oracle-arret-en-course\.mjs/.test(s.point_entree)) ? "PASS" : "FAIL" });
 
+  // K9 (TF-2667) : deux instantanés à en-tête égal (version et date identiques) dont le contenu diffère.
+  // Le journal scelle l'instantané A ; B ajoute un service sans monter la version → FAIL. Le remède que le
+  // message recommande (`sceller`) est JOUÉ sur B et doit faire passer K9 ; le rejouer ne change plus rien.
+  const ecrire = (nom, lignes) => { const f = join(dossier, nom); writeFileSync(f, lignes.join("\n") + "\n", "utf8"); return f; };
+  const metaK9 = JSON.stringify({ schema: "pilot/catalogue@1", version: "0.0.1", genere: "2026-08-12" });
+  const svcB = service({ id: "cat-bbb-01", forge: "beta" });
+  const instA = ecrire("k9-a.jsonl", [metaK9, service({})]);
+  const instB = ecrire("k9-b.jsonl", [metaK9, service({}), svcB]);
+  const ligneJ = (version, genere, source) => JSON.stringify({ version, genere, ...empreinteServices(source) });
+  const journalA = ecrire("k9-journal-a.jsonl", [ligneJ("0.0.1", "2026-08-12", instA)]);
+  const k9 = (cat, jr, motif) => { const f = validerVersions(cat, jr); return f.some((x) => x.statut === "FAIL" && (!motif || motif.test(x.message))) ? "FAIL" : f.every((x) => x.statut === "PASS") ? "PASS" : "?"; };
+  resultats.push({ fixture: "K9/vert : contenu = version scellée", attendu: "PASS", obtenu: k9(instA, journalA) });
+  resultats.push({ fixture: "K9/rouge : 2 instantanés à en-tête égal, contenu différent", attendu: "FAIL", obtenu: k9(instB, journalA, /le contenu diffère de la version 0\.0\.1 .*à en-tête égal.*--sceller/) });
+  resultats.push({ fixture: "K9/rouge : version montée à la main sans scellé", attendu: "FAIL", obtenu: k9(ecrire("k9-v.jsonl", [metaK9.replace("0.0.1", "0.0.2"), service({})]), journalA, /dernière version scellée est 0\.0\.1/) });
+  resultats.push({ fixture: "K9/rouge : journal en recul (0.0.2 puis 0.0.1)", attendu: "FAIL", obtenu: k9(instA, ecrire("k9-journal-r.jsonl", [ligneJ("0.0.2", "2026-08-13", instA), ligneJ("0.0.1", "2026-08-14", instA)]), /réutilisée ou en recul/) });
+  resultats.push({ fixture: "K9/rouge : journal absent", attendu: "FAIL", obtenu: k9(instA, join(dossier, "absent.jsonl"), /absent ou vide/) });
+  const instC = ecrire("k9-c.jsonl", [metaK9, service({}), svcB]);
+  const journalC = ecrire("k9-journal-c.jsonl", [ligneJ("0.0.1", "2026-08-12", instA)]);
+  const scelle = sceller({ source: instC, journal: journalC, jour: "2026-11-16" });
+  resultats.push({ fixture: "K9/remède : --sceller monte la version (0.1.0) et date le contenu", attendu: "scelle 0.1.0 2026-11-16", obtenu: `${scelle.action} ${scelle.version} ${scelle.genere}` });
+  resultats.push({ fixture: "K9/remède : après --sceller, K9 passe", attendu: "PASS", obtenu: k9(instC, journalC) });
+  resultats.push({ fixture: "K9/remède : --sceller rejoué ne change plus rien", attendu: "inchange", obtenu: sceller({ source: instC, journal: journalC, jour: "2026-12-01" }).action });
+  resultats.push({ fixture: "K9/catalogue réel : contenu = dernière version scellée", attendu: "PASS", obtenu: k9(join(ICI, "..", "catalogues", "catalogue.jsonl"), join(ICI, "..", "catalogues", "versions.jsonl")) });
+
   rmSync(dossier, { recursive: true, force: true });
   const rates = resultats.filter((r) => r.attendu !== r.obtenu);
   console.log(JSON.stringify({ oracle: "oracle-catalogues", mode: "self-test", verdict: rates.length ? "FAIL" : "PASS", resultats }, null, 1));
@@ -189,7 +253,7 @@ if (lanceEnDirect) {
   }
   const echecs = findings.filter((f) => f.statut === "FAIL").length;
   console.log(JSON.stringify({
-    oracle: "oracle-catalogues", version: "1.0.0", verdict: echecs ? "FAIL" : "PASS", findings,
+    oracle: "oracle-catalogues", version: "1.1.0", verdict: echecs ? "FAIL" : "PASS", findings,
     non_juge: ["la véracité métier des preuves citées (relève des oracles des forges)", "la qualité des intentions rédigées"],
   }, null, 1));
   process.exit(echecs ? 1 : 0);
