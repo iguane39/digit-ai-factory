@@ -802,6 +802,40 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
       if (r.status !== 2 || !/AUTRE contenu/.test(r.stderr || "")) throw new Error(`sortie ${r.status} : ${(r.stderr || "").slice(0, 200)}`);
       if (auSas() !== avant) throw new Error("le sas a changé");
     });
+    // TF-2636 (RP-34 de Produit-79, 12/11/2026) : le juge rendait PASS avec l'avertissement « la porte du pilot REFUSERA ce lot tel quel (LOT-SIDECAR) », puis
+    // `--remettre` copiait le lot au sas : un lot remis ne se modifie plus, la correction a coûté un lot de plus et 2 numéros de retour. Le refus prédit
+    // bloque désormais la COPIE (sortie 1), pas le verdict du juge, qui reste PASS avec avertissement.
+    const avecSidecar = (nom, md, lignes) => {
+      const base = join(D, nom);
+      writeFileSync(`${base}.md`, md, "utf8");
+      writeFileSync(`${base}.tf.jsonl`, lignes.join("\n") + "\n", "utf8");
+      return `${base}.md`;
+    };
+    const FAMILLE_T = REF.classes[0].famille;
+    check("TF-2636 rouge — un sidecar dont la famille de classe est INCONNUE n'est PAS copié au sas : sortie 1, sas intact, la remise dit LOT-SIDECAR", () => {
+      const lot = avecSidecar("PROD - RETOURS - 20261013v", lotMd("\nclasse-neuve-essai\n"),
+        [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: "famille-qui-n-existe-pas", libelle: "Essai" } })]);
+      const avant = auSas();
+      const r = remettre(lot);
+      if (!/^verdict : PASS[^\n]*la porte du pilot REFUSERA/m.test(r.stdout || "")) throw new Error(`le juge ne prédit pas le refus (le cas ne reproduit pas RP-34) : ${(r.stdout || "").slice(0, 300)}`);
+      if (r.status !== 1) throw new Error(`sortie ${r.status}, attendu 1 : ${(r.stderr || "").slice(0, 200)}`);
+      if (auSas() !== avant) throw new Error(`le sas a changé : ${auSas()}`);
+      if (!/NON FAITE/.test(r.stderr || "") || !/LOT-SIDECAR/.test(r.stderr || "")) throw new Error(`la sortie ne dit pas pourquoi la remise n'est pas faite : ${(r.stderr || "").slice(0, 240)}`);
+    });
+    check("TF-2636 vert — le remède joué (le sidecar corrigé, sous l'indice suivant) est copié, sortie 0", () => {
+      const lot = avecSidecar("PROD - RETOURS - 20261013w", lotMd("\nclasse-neuve-essai\n"),
+        [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: FAMILLE_T, libelle: "Essai" } })]);
+      const avant = auSas();
+      const r = remettre(lot);
+      if (r.status !== 0) throw new Error(`sortie ${r.status}, attendu 0 : ${(r.stdout || "").slice(0, 200)} ${(r.stderr || "").slice(0, 200)}`);
+      if (auSas() === avant || !/20261013w\.md/.test(auSas()) || !/20261013w\.tf\.jsonl/.test(auSas())) throw new Error(`le lot corrigé n'est pas au sas : ${auSas()}`);
+    });
+    check("TF-2636 — le juge SEUL (sans --remettre) garde son contrat : PASS avec avertissement, sortie 0", () => {
+      const lot = avecSidecar("PROD - RETOURS - 20261013x", lotMd("\nclasse-neuve-essai\n"),
+        [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: "famille-qui-n-existe-pas", libelle: "Essai" } })]);
+      const r = spawnSyncS(process.execPath, [join(ICI_S, "oracle-lot-retours.mjs"), lot], { encoding: "utf8" });
+      if (r.status !== 0) throw new Error(`sortie ${r.status}, attendu 0 (le verdict reste PASS) : ${(r.stdout || "").slice(0, 200)}`);
+    });
     check("TF-2314 rouge — un lot sans sidecar et un sas introuvable ne sont pas remis, sortie 2", () => {
       const sansSidecar = poser("PROD - RETOURS - 20261013t", lotMd(), false);
       const r1 = remettre(sansSidecar);
