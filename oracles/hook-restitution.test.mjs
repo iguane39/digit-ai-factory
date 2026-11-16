@@ -1817,6 +1817,7 @@ try {
       [`${PILOT}\\references\\temoin\\t.html`, false], [`${PILOT}\\.claude\\skills\\s\\assets\\b.js`, false], [`${PILOT}\\todo\\generer-page.mjs`, false],
       [`${PILOT}\\.claude\\worktrees\\agent-x\\oracles\\o.js`, false, `${PILOT}\\.claude\\worktrees\\agent-x`], [`${PILOT}\\vite.config.js`, false], [`${PILOT}\\banc\\T5-page.html`, false],
       [`${PILOT}\\README.md`, false], [`${PILOT}\\todo\\vue.mjs`, false], [`${PILOT}\\site\\min.min.js`, false],
+      [`D:\\mesures\\agent5-ag\\lanceur.js`, false], [`/d/mesures/agent5-ag/lanceur.js`, false],   // TF-2598 : un .js hors du dépôt cible, sans page qui le référence
       [`${PILOT}\\output\\03-etudes\\2026-10\\etude.html`, true], [`${PILOT}\\site\\x.html`, true], [`${PILOT}\\site\\assets\\app.js`, true], [`${PILOT}\\public\\style.css`, true],
       [`${PILOT}\\.claude\\worktrees\\agent-x\\site\\x.html`, true, `${PILOT}\\.claude\\worktrees\\agent-x`], [`${PILOT}\\site\\assets\\scripts\\app.js`, true],
       [`C:\\dev\\produit\\backend\\app\\ui\\templates\\reorganisation.html`, true], [`C:\\dev\\produit\\forge\\etapes\\acquisition\\tableau.css`, true],
@@ -1828,6 +1829,11 @@ try {
       || !fichierServi(`${RACINE59}\\site\\assets\\c.js`, { racine: RACINE59, texte: "const fs = require('fs'); document.title = 'x'; window.x = 1" }).servi
       || fichierServi(join(tmpdir(), "brouillon.html"), { racine: RACINE59 }).servi)
       echecs.push("59 duodevicies : un .js au texte Node sans API de navigateur n'est pas servi, avec une API de navigateur il l'est ; un brouillon du dossier temporaire ne l'est pas");
+    // TF-2598 : un .js hors du dépôt cible n'est servi que si une page du tour le référence.
+    if (fichierServi("D:\\mesures\\agent5-ag\\lanceur.js", { racine: PILOT, pages: ['<script src="D:/mesures/agent5-ag/lanceur.js"></script>'] }).servi !== true
+      || fichierServi("D:\\mesures\\agent5-ag\\lanceur.js", { racine: PILOT, pages: ["<p>autre.js</p>"] }).servi !== false
+      || fichierServi("D:\\mesures\\agent5-ag\\lanceur.js", { racine: "" }).servi !== true)
+      echecs.push("59 duodevicies bis (TF-2598) : un .js hors du dépôt cible est servi seulement si une page du tour le nomme ; sans racine connue, la règle ne s'applique pas");
     // Les lectures unitaires : verdict, cibles, couverture.
     const lectures = [
       [verdictDeCritique(SORTIE_PASS), "PASS"], [verdictDeCritique(SORTIE_FAIL), "FAIL"], [verdictDeCritique(SORTIE_SKIP), "SKIP"],
@@ -2082,9 +2088,11 @@ try {
       const parVariable = critiqueDuTour(ecriture62(join(base, "ailleurs-62"), APP62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
       delete process.env.CLAUDE_PROJECT_DIR;
       // 62 quinquies : la règle réelle tient (brouillon par défaut) et l'injection la lève, quel que soit l'emplacement du dépôt.
-      const BROUILLON62 = join(tmpdir(), "page-62.js");
-      const brouillonReel = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, BROWSER62)).servis.length;
-      const brouillonLeve = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, BROWSER62), { estBrouillon: aucunBrouillon }).servis.length;
+      // TF-2598 (16/11/2026) : un .js hors du dépôt n'est servi que référencé par une page ; le brouillon de ce cas est donc une PAGE (la règle du brouillon, seule jugée ici, vaut pour les deux).
+      const BROUILLON62 = join(tmpdir(), "page-62.html");
+      const PAGE62 = "<html><body><p>x</p></body></html>";
+      const brouillonReel = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, PAGE62)).servis.length;
+      const brouillonLeve = critiqueDuTour(ecriture62(PROJ62, BROUILLON62, PAGE62), { estBrouillon: aucunBrouillon }).servis.length;
       if (brouillonReel !== 0) echecs.push(`62 quinquies : un script de navigateur écrit dans le dossier temporaire, règle réelle → attendu 0 fichier servi (brouillon), obtenu ${brouillonReel}`);
       if (brouillonLeve !== 1) echecs.push(`62 quinquies bis : le même fichier, règle du brouillon levée par l'appelant → attendu 1 fichier servi, obtenu ${brouillonLeve}`);
       if (depuisSous !== 1) echecs.push(`62 : un script de navigateur écrit sous src/scripts/ par un tour dont le cwd est src/ → attendu 1 fichier servi (la critique est exigée), obtenu ${depuisSous} : le hook a lu le sous-dossier comme racine`);

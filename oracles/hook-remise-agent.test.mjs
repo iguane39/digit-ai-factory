@@ -96,6 +96,27 @@ for (const [page, nom] of FORMES_2571) {
     if (r.code !== 0 || r.out.trim()) throw new Error(r.out.slice(0, 200));
   });
 }
+// TF-2598 (16/11/2026) : le 15/11, le hook a refusé 2 fois la remise de l'agent du lot ag pour un `lanceur.js` de 3 lignes, écrit dans son dossier de mesure (hors du dépôt
+// cible), sans page ni feuille de style. Un .js n'est servi que s'il vit sous le dépôt cible ou si une page écrite dans le tour le référence.
+const MESURE = "D:/mesures/agent5-ag";
+check("vert — TF-2598 : un .js du dossier de mesure de l'agent, hors du dépôt cible et référencé par aucune page, ne bloque pas la remise", () => {
+  for (const contenu of ["console.log('lancement');\nprocess.exitCode = 0;\n", "const t = Date.now();\nconsole.log(t);\n"]) {
+    const r = jouer([...ecrit("Write", { file_path: `${MESURE}/lanceur.js`, content: contenu }, 0)]);
+    if (r.code !== 0 || r.out.trim()) throw new Error(r.out.slice(0, 300));
+  }
+  const parCommande = jouer([...commande(`echo "console.log(1)" > ${MESURE}/lanceur.js`, 0)]);
+  if (parCommande.code !== 0 || parCommande.out.trim()) throw new Error(`par commande : ${parCommande.out.slice(0, 300)}`);
+});
+check("rouge — TF-2598 : le même .js hors du dépôt, mais référencé par une page écrite dans le tour, est servi : la remise est refusée et le script nommé", () => {
+  const page = `${PRODUIT}/site/mesure.html`;
+  const r = jouer([...ecrit("Write", { file_path: `${MESURE}/lanceur.js`, content: "console.log('lancement');" }, 0),
+    ...ecrit("Write", { file_path: page, content: '<html><script src="D:/mesures/agent5-ag/lanceur.js"></script></html>' }, 1)]);
+  if (!refuse(r) || !/lanceur\.js/.test(r.sortie.reason)) throw new Error(r.out.slice(0, 300));
+});
+check("rouge — TF-2598 : un .js SOUS le dépôt cible reste servi (aucun assouplissement) : la remise sans critique est refusée", () => {
+  const r = jouer([...ecrit("Write", { file_path: `${PRODUIT}/site/assets/app.js`, content: "document.title = 'x';" }, 0)]);
+  if (!refuse(r) || !/app\.js/.test(r.sortie.reason)) throw new Error(r.out.slice(0, 300));
+});
 check("vert — un agent qui n'écrit rien (lecture seule) se remet sans un mot", () => {
   const r = jouer([...commande("git status --short", 0)]);
   if (r.code !== 0 || r.out.trim()) throw new Error(r.out.slice(0, 200));

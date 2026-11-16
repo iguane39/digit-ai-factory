@@ -440,7 +440,10 @@ const normaliserChemin = (p) => String(p || "").replace(/\\/g, "/").replace(/^\.
 // TF-2404 (12/11/2026) : `estBrouillon` désigne ce qui compte pour un brouillon (le dossier temporaire du poste, par défaut). Il ne s'injecte qu'en
 // recette : un cas qui bâtit son projet dans le dépôt qui le joue ne peut pas, sinon, rendre le même verdict dans tous les emplacements — sous le dossier
 // temporaire (arbre de travail d'une campagne), le projet d'essai y devenait un brouillon et les cas 62 rougissaient sans que le code ait changé.
-export function fichierServi(chemin, { racine = "", texte = "", estBrouillon = TEMPORAIRE_NOMME } = {}) {
+// TF-2598 (16/11/2026) : un .js n'est servi que sous le dépôt cible (`racine`) ou référencé par une page écrite dans le tour (`pages`, leurs textes). Le 15/11, le lanceur
+// de 3 lignes du dossier de mesure d'un agent, hors du dépôt, a fait refuser sa remise deux fois. Sans racine connue, la règle ne s'applique pas.
+const versLecteur = (p) => p.replace(/^\/([a-z])\//, "$1:/");
+export function fichierServi(chemin, { racine = "", texte = "", estBrouillon = TEMPORAIRE_NOMME, pages = [] } = {}) {
   const brut = String(chemin || "");
   if (!SERVI_EXTENSION.test(brut)) return { servi: false, motif: "extension non servie" };
   if (estBrouillon(brut)) return { servi: false, motif: "brouillon du dossier temporaire" };
@@ -451,6 +454,12 @@ export function fichierServi(chemin, { racine = "", texte = "", estBrouillon = T
   if (HORS_SERVI_PARTOUT.test(relatif ?? p)) return { servi: false, motif: "outillage, fixture, gabarit ou dépendance" };
   if (relatif ? HORS_SERVI_AU_PREMIER_NIVEAU.test(relatif) : /(?:^|\/)(?:oracles|hooks|scripts)\//i.test(p))
     return { servi: false, motif: "outillage du dépôt (oracles, hooks, scripts)" };
+  if (/\.js$/i.test(brut) && r) {
+    const absolu = versLecteur(normaliserChemin(brut)), dedans = absolu.startsWith(versLecteur(r) + "/");
+    const nom = absolu.split("/").pop();
+    if (/^(?:[a-z]:\/|\/)/.test(absolu) && !dedans && !pages.some((t) => String(t).toLowerCase().includes(nom)))
+      return { servi: false, motif: "script hors du dépôt cible, référencé par aucune page du tour" };
+  }
   if (/\.js$/i.test(brut) && texte && MARQUEURS_NODE.test(texte) && !MARQUEURS_NAVIGATEUR.test(texte))
     return { servi: false, motif: "script Node (serveur ou outillage)" };
   return { servi: true, motif: "page, feuille de style ou script livré à un navigateur" };
@@ -568,7 +577,10 @@ export function critiqueDuTour(segment, { racine = "", estBrouillon } = {}) {
   // TF-1943 : un fichier se juge « servi » ou « outillage » depuis la racine du PROJET ; `dossier`, le répertoire courant du tour, peut être un sous-dossier
   // (après un `cd`), d'où `src/scripts/app.js` lu comme `scripts/app.js`, donc comme outillage du premier niveau. Il reste la base des chemins relatifs des commandes.
   const racineProjet = racine || (dossier ? racineDuProjet(dossier) : "");
-  const servis = [...ecrits.values()].map((x) => ({ ...x, ...fichierServi(x.fichier, { racine: racineProjet, texte: [...x.textes, surDisque(x.fichier)].join("\n"), estBrouillon }) }))
+  // TF-2598 : les pages écrites dans le tour, texte écrit et texte sur le disque, disent quels scripts elles référencent.
+  const surDisquePage = (f) => { try { return existsSync(f) && statSync(f).size < 400000 ? readFileSync(f, "utf8") : ""; } catch { return ""; } };
+  const pagesDuTour = [...ecrits.values()].filter((x) => /\.html?$/i.test(x.fichier)).map((x) => [...x.textes, surDisquePage(x.fichier)].join("\n"));
+  const servis = [...ecrits.values()].map((x) => ({ ...x, ...fichierServi(x.fichier, { racine: racineProjet, texte: [...x.textes, surDisque(x.fichier)].join("\n"), estBrouillon, pages: pagesDuTour }) }))
     .filter((x) => x.servi).map(({ fichier, rang: r, ts }) => ({ fichier, rang: r, ts }));
   return { servis, critiques };
 }
