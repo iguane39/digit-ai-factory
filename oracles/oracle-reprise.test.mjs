@@ -12,8 +12,11 @@
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, utimesSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { execFileSync } from "node:child_process";
-import { verifier, synchroniser, estExclu } from "./oracle-reprise.mjs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { verifier, synchroniser, estExclu, goVersDossierSynchronise } from "./oracle-reprise.mjs";
+
+const HOOK = join(fileURLToPath(new URL(".", import.meta.url)), "hook-reprise.mjs");
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -178,5 +181,66 @@ check("un fichier déjà SUIVI par git se met à jour (aucune exposition nouvell
   if (!/hors dépôt git/.test(verifier(h.produit, h.opt).findings.find((f) => f.regle === "RP6").message)) throw new Error("RP6 ne dit pas qu'il ne juge pas un produit hors git");
 });
 
-console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 7 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6 et l'envoi refusé), chacun avec son remède vert`);
+// ---- TF-2623 (RP-30, lot Produit-79 20261112f) : un feu vert de publication vise un dossier synchronisé, aucun manifeste.
+// Le 12/11/2026, un dossier Drive de reprise existait depuis le 11/10 ; go_publication au ledger le 24/10 (seq 793) et le 12/11
+// (seq 1178) ; aucun forge/REPRISE.json, donc le hook `reprise` se taisait et RP4 a rougi au premier passage.
+const ledgerGo = (...lignes) => lignes.map((l) => JSON.stringify(l)).join("\n") + "\n";
+function bancSansManifeste(ledger) {
+  const d = join(T, `s${++n}`), produit = join(d, "produit"), canal = join(d, "Mon Drive", "Produit - Reprise"), etat = join(d, "etat");
+  mkdirSync(join(produit, "forge"), { recursive: true });
+  mkdirSync(canal, { recursive: true });
+  if (ledger) writeFileSync(join(produit, "forge", "ledger.jsonl"), ledger, "utf8");
+  return { produit, canal, etat, opt: { etat } };
+}
+const jouerHook = (b, sens = "--restaurer") => spawnSync(process.execPath, [HOOK, sens], { cwd: b.produit, input: "", encoding: "utf8", env: { ...process.env, REPRISE_ETAT: b.etat } });
+const LEDGER_DRIVE = ledgerGo(
+  { seq: 1, ts: "2026-10-11T08:00:00Z", type: "run_open", run: "essai" },
+  { seq: 2, ts: "2026-10-24T09:00:00Z", type: "go_publication", r38: true, citation: "D-12 (a) du 24/10", cible: "dossier Google Drive de reprise du produit" },
+  { seq: 3, ts: "2026-11-12T09:00:00Z", type: "go_publication", r38: true, citation: "D-30 (a) du 12/11", cible: "même dossier Drive" },
+);
+
+check("TF-2623 rouge — un feu vert vise un dossier Drive et forge/REPRISE.json manque : RP7 FAIL, l'ouverture le signale, rien n'est restauré", () => {
+  const b = bancSansManifeste(LEDGER_DRIVE);
+  ecrire(join(b.canal, "input", "entrant.txt"), "porté par le canal");
+  const go = goVersDossierSynchronise(b.produit);
+  egal(go.map((g) => g.seq).join(","), "2,3", "feux verts relevés");
+  const v = verifier(b.produit, b.opt);
+  egal(statut(v, "RP1"), "SANS_OBJET", "RP1"); egal(statut(v, "RP7"), "FAIL", "RP7"); egal(v.verdict, "FAIL", "verdict");
+  if (!/seq 2, 3/.test(v.findings.find((f) => f.regle === "RP7").message)) throw new Error("le constat ne nomme pas les entrées du ledger");
+  const s = synchroniser(b.produit, "restaurer", b.opt);
+  if (!s.sans_objet || s.go_sans_manifeste?.length !== 2) throw new Error("la synchronisation ne porte pas le signal : " + JSON.stringify(s));
+  const h = jouerHook(b);
+  egal(h.status, 0, "le hook ne bloque jamais");
+  if (!/forge\/REPRISE\.json/.test(h.stdout) || !/seq 2, 3/.test(h.stdout) || !/dans CE tour/.test(h.stdout)) throw new Error("l'ouverture ne signale pas le manifeste à écrire : " + h.stdout);
+  if (existsSync(join(b.produit, "input", "entrant.txt"))) throw new Error("un fichier a été restauré sans manifeste");
+  egal(jouerHook(b, "--pousser").stdout, "", "la fin de tour n'ajoute pas le signal à l'ouverture");
+});
+
+check("TF-2623 vert (remède joué) — la session écrit forge/REPRISE.json dans le tour, le hook restaure : RP4 PASS au premier passage, RP7 PASS", () => {
+  const b = bancSansManifeste(LEDGER_DRIVE);
+  ecrire(join(b.canal, "input", "entrant.txt"), "porté par le canal");
+  egal(statut(verifier(b.produit, b.opt), "RP7"), "FAIL", "RP7 avant le manifeste");
+  writeFileSync(join(b.produit, "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { fournisseur: "Google Drive", chemins: [b.canal] }, elements: ["input"] }));
+  const h = jouerHook(b);
+  egal(h.status, 0, "hook");
+  if (!/1 fichier\(s\) restauré/.test(h.stdout)) throw new Error("le hook n'a pas restauré : " + h.stdout);
+  const v = verifier(b.produit, b.opt);
+  egal(statut(v, "RP4"), "PASS", "RP4 au premier passage"); egal(statut(v, "RP7"), "PASS", "RP7"); egal(v.verdict, "PASS", "verdict");
+  egal(readFileSync(join(b.produit, "input", "entrant.txt"), "utf8"), "porté par le canal", "contenu restauré");
+});
+
+check("TF-2623 — un feu vert qui ne vise aucun dossier synchronisé, ou pas de ledger : le hook se tait, SANS_OBJET, verdict PASS", () => {
+  const autre = bancSansManifeste(ledgerGo(
+    { seq: 1, ts: "2026-10-11T08:00:00Z", type: "run_open", run: "essai" },
+    { seq: 2, ts: "2026-10-12T08:00:00Z", type: "go_publication", r38: true, citation: "D-5 (a) du 12/10", cible: "page publiée sur claude.ai" },
+    { seq: 3, ts: "2026-10-13T08:00:00Z", type: "question_humain", texte: "faut-il copier le dossier Google Drive ?" },
+  ));
+  for (const b of [autre, bancSansManifeste(null)]) {
+    const v = verifier(b.produit, b.opt);
+    egal(statut(v, "RP1"), "SANS_OBJET", "RP1"); egal(statut(v, "RP7"), undefined, "RP7 absent"); egal(v.verdict, "PASS", "verdict");
+    egal(jouerHook(b).stdout, "", "le hook se tait");
+  }
+});
+
+console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 8 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7 et l'envoi refusé), chacun avec son remède vert`);
 process.exit(fail ? 1 : 0);

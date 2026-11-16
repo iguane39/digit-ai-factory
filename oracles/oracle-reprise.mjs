@@ -21,7 +21,8 @@
  *   --pousser    produit → canal : ce qui a changé hors de git sur ce poste (hook de fin de tour) ;
  *   --verifier   le juge (défaut) : RP1 manifeste valide · RP2 aucun secret déclaré · RP3 canal joignable
  *                sur ce poste · RP4 aucun écart non restauré · RP5 envoi actif sous feu vert consigné ·
- *                RP6 rien de ce que le canal poserait n'est commitable (TF-2441).
+ *                RP6 rien de ce que le canal poserait n'est commitable (TF-2441) · RP7 un feu vert de
+ *                publication consigné au ledger qui vise un dossier synchronisé a son manifeste (TF-2623).
  *   Options : --racine <produit> (défaut : dossier courant), --budget <secondes>, --etat <dossier>.
  *
  * DÉCISION FICHIER PAR FICHIER. Un état par poste et par produit, HORS du dépôt
@@ -54,7 +55,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 
-export const VERSION = "1.1.0";
+export const VERSION = "1.2.0";
 export const MANIFESTE = join("forge", "REPRISE.json");
 
 // Un motif par ligne : `*` vaut n'importe quel nom sans séparateur, et un motif sans « / » juge le
@@ -104,6 +105,31 @@ export const goComplet = (m) => {
   const g = m?.envoi?.go_publication;
   return !!(g && typeof g === "object" && String(g.decision || "").trim() && /^\d{4}-\d{2}-\d{2}$/.test(String(g.date || "")) && String(g.par || "").trim());
 };
+
+// TF-2623 (RP-30, lot Produit-79 20261112f) : un feu vert de publication consigné au ledger qui vise un dossier
+// synchronisé est le signe d'un canal de reprise que personne n'a déclaré. Le 12/11/2026, un dossier Drive de reprise
+// existait depuis le 11/10 ; go_publication aux seq 793 et 1178 ; aucun manifeste, donc un hook muet et RP4 rouge au
+// premier passage. Le signe se lit dans le texte de l'entrée (cible, détail, citation), par les noms des fournisseurs.
+export const FOURNISSEURS_SYNCHRONISES = /google\s*drive|\bdrive\b|onedrive|dropbox|sharepoint|icloud|dossier\s+synchronis/i;
+
+/** Les entrées `go_publication` du ledger du produit dont le texte nomme un dossier synchronisé : [{ seq, citation }]. */
+export function goVersDossierSynchronise(racine) {
+  const trouves = [];
+  for (const rel of [join("forge", "ledger.jsonl"), "ledger.jsonl"]) {
+    const f = join(racine, rel);
+    if (!existsSync(f)) continue;
+    let texte = "";
+    try { texte = readFileSync(f, "utf8"); } catch { continue; }
+    for (const ligne of texte.split(/\r?\n/)) {
+      if (!ligne.trim()) continue;
+      let e; try { e = JSON.parse(ligne); } catch { continue; }
+      if (e?.type === "go_publication" && FOURNISSEURS_SYNCHRONISES.test(ligne)) trouves.push({ seq: e.seq, citation: String(e.citation || "") });
+    }
+    if (trouves.length) break;
+  }
+  return trouves;
+}
+const listeSeq = (go) => go.map((g) => g.seq).join(", ");
 
 export function resoudreCanal(m) {
   const candidats = [process.env.REPRISE_CANAL, ...((m?.canal?.chemins) || [])].filter(Boolean).map(developper);
@@ -199,7 +225,10 @@ function copier(src, dst, sauvegarde) {
 /** Applique le plan dans un sens ; rend le compte de ce qui a été fait et de ce qui reste. */
 export function synchroniser(racine, sens, opt = {}) {
   const lu = lireManifeste(racine);
-  if (lu.absent) return { sans_objet: true, message: "aucun canal de reprise déclaré (forge/REPRISE.json absent)" };
+  if (lu.absent) {
+    const go = goVersDossierSynchronise(racine);
+    return { sans_objet: true, message: "aucun canal de reprise déclaré (forge/REPRISE.json absent)", ...(go.length ? { go_sans_manifeste: go } : {}) };
+  }
   if (lu.erreur) return { erreur: lu.erreur };
   const m = lu.m, defauts = defautsManifeste(m);
   if (defauts.length) return { erreur: `manifeste invalide : ${defauts.join(" ; ")}` };
@@ -240,12 +269,19 @@ export function verifier(racine, opt = {}) {
   const lu = lireManifeste(racine);
   if (lu.absent) {
     findings.push({ regle: "RP1", statut: "SANS_OBJET", message: "aucun canal de reprise déclaré (forge/REPRISE.json absent) — rien à juger ; un développeur qui travaille sur plusieurs postes le déclare (R-64)" });
+    const go = goVersDossierSynchronise(racine);
+    if (go.length) {
+      ko("RP7", `le ledger consigne ${go.length} feu(x) vert(s) de publication qui vise(nt) un dossier synchronisé (seq ${listeSeq(go)}) et forge/REPRISE.json est absent : le hook \`reprise\` ne restaure rien. Écrire le manifeste depuis gabarits/REPRISE.json dans ce tour (emplacements du dossier sur chaque poste, éléments hors git à reprendre), puis \`node forge/hooks/factory.mjs reprise --restaurer\` ; RP4 se juge ensuite sur un canal restauré`);
+      return { verdict: "FAIL", findings };
+    }
     return { verdict: "PASS", findings };
   }
   if (lu.erreur) { ko("RP1", lu.erreur); return { verdict: "FAIL", findings }; }
   const m = lu.m, defauts = defautsManifeste(m);
   if (defauts.length) { ko("RP1", `manifeste invalide : ${defauts.join(" ; ")}`); return { verdict: "FAIL", findings }; }
   ok("RP1", `manifeste valide : ${m.elements.length} élément(s) déclaré(s)`);
+  const goDrive = goVersDossierSynchronise(racine);
+  if (goDrive.length) ok("RP7", `le feu vert de publication qui vise un dossier synchronisé (seq ${listeSeq(goDrive)}) a son manifeste`);
   const secrets = m.elements.filter((e) => estExclu(e, []));
   secrets.length
     ? ko("RP2", `${secrets.length} élément(s) déclaré(s) sont des secrets ou des dossiers techniques, que la reprise ne transporte jamais : ${secrets.join(", ")} — les retirer du manifeste ; un secret se ressaisit sur chaque poste`)
@@ -277,6 +313,7 @@ export const NON_JUGE = [
   "deux postes qui écrivent le même fichier entre deux synchronisations : le plus récent gagne, l'autre reste en sauvegarde, sans fusion de contenu",
   "le périmètre ignoré d'un produit qui n'est pas un dépôt git : sans git, rien ne dit ce qui serait commitable, et la restauration ne refuse rien",
   "ce que le fournisseur du canal fait du fichier une fois déposé (versions, partage, rétention)",
+  "que le feu vert qui nomme un dossier synchronisé (RP7) soit bien pour une reprise : seul le texte de l'entrée `go_publication` du ledger sert d'indice (noms de fournisseurs), un partage de livrable sur Drive se lit aussi comme une reprise, et un feu vert consigné ailleurs que `forge/ledger.jsonl` n'est pas vu",
   "que le canal soit à jour du côté du fournisseur : le juge lit le miroir local, tel que le client de synchronisation l'a laissé",
 ];
 

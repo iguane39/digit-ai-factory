@@ -1890,6 +1890,11 @@ critique pour le travail des développeurs, leur efficacité, résilience. »
    `forge\REPRISE.json` depuis `gabarits\REPRISE.json` : les emplacements du dossier sur chaque poste,
    les chemins hors de git à reprendre, et la section « Reprise sur un autre poste » de son `CLAUDE.md`
    le nomme. Une notice à suivre à la main ou une mémoire de session ne sont pas une déclaration.
+   **Un feu vert de publication qui vise un dossier synchronisé est une déclaration à écrire (TF-2623, 16/11/2026)** :
+   quand `forge\ledger.jsonl` porte un `go_publication` dont le texte nomme Drive, OneDrive, Dropbox ou un dossier
+   synchronisé et que `forge\REPRISE.json` manque, l'ouverture le signale (hook `reprise`, rien n'est restauré) et la
+   session écrit le manifeste dans le tour, puis restaure. Le cas du 12/11/2026 : dossier Drive de reprise depuis le
+   11/10, feux verts aux seq 793 et 1178, aucun manifeste, RP4 rouge au premier passage.
 2. **La reprise se joue sans geste humain** : le hook `reprise` restaure à l'ouverture ce que le canal
    porte et que ce poste n'a pas, ou a plus ancien, et envoie en fin de tour ce qui a changé hors de
    git. Décision fichier par fichier sur l'empreinte de la dernière synchronisation ; quand les deux
@@ -1911,7 +1916,7 @@ critique pour le travail des développeurs, leur efficacité, résilience. »
 Contrôles exécutables : `oracles\oracle-reprise.mjs` (RP1 manifeste valide, RP2 aucun secret déclaré,
 RP3 canal joignable sur ce poste, RP4 aucun écart non restauré, RP5 envoi actif sous feu vert
 consigné, RP6 rien de ce que le canal poserait n'est commitable : un dossier ignoré puis renommé garde son
-ancien chemin dans `.gitignore`, TF-2441 ; recette `oracle-reprise.test.mjs`, 11 cas, dont le cas du 14/10 rejoué) ; `oracles\hook-reprise.mjs`,
+ancien chemin dans `.gitignore`, TF-2441 ; RP7 un feu vert de publication au ledger qui vise un dossier synchronisé a son manifeste, TF-2623 ; recette `oracle-reprise.test.mjs`, 14 cas, dont le cas du 14/10 rejoué et celui du 12/11) ; `oracles\hook-reprise.mjs`,
 câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.json` 1.26.0, et ajouté par le hook d'ouverture du produit depuis le gabarit (recette
 `gabarits\hooks-factory.test.mjs`, cas 12) ; la règle S77 d'`oracles\oracle-synthese.mjs` (point 5).
 Non jugé : une suppression ne se propage pas ; deux écritures du même fichier entre deux
