@@ -752,6 +752,34 @@ try {
     ["Bash", `az ad sp credential list --id ${APP} --query "[].endDateTime" -o tsv`, "credential list d'un principal de service, requêtée"],
     ["PowerShell", `az ad app federated-credential list --id ${APP}`, "federated-credential list"],
   ]) check(`vert (TF-2600) — ${nom} : laisse passer`, () => passe(jouer(projet(), outil, cmd)));
+
+  // ---- TF-2653 (16/11/2026) : le retrait d'une access policy Key Vault par l'API ARM ----------------------------------------
+  // Le 13/11/2026, `az keyvault delete-policy` a été refusé par la CLI (coffre en RBAC) ; `az rest --method put .../accessPolicies/remove` a
+  // retiré la policy sans être jugé, et `--poser` avait refusé d'inscrire la commande exacte au lot (message du joker, sans joker dans la commande) :
+  // la commande n'était pas un geste de la liste, donc « ne nomme pas l'outil et son verbe ». Rouge : la voie ARM (hôte nommé, chemin relatif, add et
+  // remove). Vert : la même URL en GET. Remède joué : `--poser` inscrit la commande exacte, puis elle passe.
+  const KV = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-essai/providers/Microsoft.KeyVault/vaults/kv-essai/accessPolicies";
+  const URL_ARM = (verbe) => `https://management.azure.com${KV}/${verbe}?api-version=2023-07-01`;
+  const ROUGES_2653 = [
+    ["Bash", `az rest --method put --url "${URL_ARM("remove")}" --body @corps.json`, "PUT sur accessPolicies/remove, hôte ARM nommé"],
+    ["Bash", `az rest -m PUT --uri '${URL_ARM("add")}' --body '{}'`, "PUT sur accessPolicies/add, -m et --uri"],
+    ["Bash", `az rest --method put --url "${KV}/remove?api-version=2023-07-01" --body @corps.json`, "PUT sur accessPolicies/remove, chemin relatif sans hôte"],
+    ["PowerShell", `az rest --method put --url "${URL_ARM("remove")}" --body @corps.json`, "PUT sur accessPolicies/remove sous PowerShell"],
+  ];
+  for (const [outil, cmd, nom] of ROUGES_2653) check(`rouge (TF-2653) — ${nom} : refusé sans lot`, () => refuse(jouer(projet(), outil, cmd)));
+  for (const [outil, cmd, nom] of [
+    ["Bash", `az rest --method get --url "${URL_ARM("remove")}"`, "la même URL en GET"],
+    ["Bash", `az rest --method get --url "${KV.replace("/accessPolicies", "")}?api-version=2023-07-01"`, "GET du coffre, chemin relatif"],
+    ["Bash", `az rest --method get --url https://management.azure.com${KV.replace("/accessPolicies", "")}/accessPolicies/remove?api-version=2023-07-01`, "az rest --method get sur le chemin ARM des policies"],
+  ]) check(`vert (TF-2653) — ${nom} : laisse passer`, () => passe(jouer(projet(), outil, cmd)));
+  check("vert (TF-2653) — le remède joué : `--poser` inscrit au lot la commande EXACTE du PUT, sans joker, puis la commande passe", () => {
+    const p = projet();
+    const commande = `az rest --method put --url "${URL_ARM("remove")}" --body @corps.json`;
+    const g = { commande, cible: "coffre kv-essai, policy d'un principal", effet: "retire l'access policy", retour_arriere: "az rest --method put .../accessPolicies/add avec la même policy" };
+    const w = poserAvec(p, { decision: "D-199", reponse_humaine: VRAI, gestes: [g] }, tVrai);
+    if (w.status !== 0) throw new Error(`--poser a refusé la commande exacte : ${w.status} ${w.stderr.slice(0, 300)}`);
+    passe(jouer(p, "Bash", commande, { transcript_path: tVrai }));
+  });
 } finally {
   try { rmSync(base, { recursive: true, force: true, maxRetries: 3 }); } catch { /* toléré */ }
 }
