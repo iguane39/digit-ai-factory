@@ -75,6 +75,7 @@ veut(lettresDeReponse("oui, fais-le", 48).length === 0 && lettresDeReponse("il y
 {
   const f = registre([47, "2026-11-10T09:00:00Z"], [48, "2026-11-18T09:00:00Z"], [49, "2026-11-19T09:00:00Z"], [51, "2026-11-02T09:00:00Z"], [51, "2026-11-19T10:00:00Z", "Question de la décision 51, reformulée ?"]);
   veut(sansReponse(f) === "D-48,D-49", `D3 rouge : D-48 et D-49, réservées sans réponse, doivent être rappelées ; D-47 (avant l'écrivain) et D-51 (réservée hors fenêtre, puis reformulée) non — lu « ${sansReponse(f)} »`);
+  veut(sansReponse(f, { jusqua: Date.parse("2026-11-18T23:59:59Z") }) === "D-48", `D3 bis : une synthèse du 18/11 ne rappelle pas D-49, posée après elle ; lu « ${sansReponse(f, { jusqua: Date.parse("2026-11-18T23:59:59Z") })} »`);
   veut(sansReponse(f, { depuis: "2026-11-01T00:00:00Z" }) === "D-47,D-48,D-49", "D4 vert : sans la borne de l'écrivain, D-47 (réservée il y a 10 jours) est rappelée ; D-51 reste hors fenêtre malgré sa reformulation");
   const brut = readFileSync(f, "utf8");
   const r = consignerReponse({ n: 48, lettres: ["B"], fichier: f });

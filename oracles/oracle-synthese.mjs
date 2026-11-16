@@ -1408,7 +1408,11 @@ function juger(texte, cheminJuge = null) {
       findings.push({ regle: "S93", statut: "SANS_OBJET", message: "hors d'un produit et hors du pilot (aucun forge/retours/ en remontant depuis le fichier jugé ou --racine, et le fichier n'est pas sous le dépôt du pilot) : pas de décision ouverte à rappeler" });
     } else {
       const lieu93 = produit93 ? "au ledger du produit" : "au registre du pilot";
-      const ouvertes93 = produit93 ? decisionsSansReponse(produit93) : decisionsPiloteSansReponse({ fichier: process.env.FORGE_REGISTRE_DECISIONS_PILOT || REGISTRE_PILOT });
+      // Au pilot, la synthèse datée par son indice (AAAAMMJJ) ne se juge que contre les décisions posées jusqu'à la fin de son jour, fenêtre comprise.
+      const jour93 = /(\d{4})(\d{2})(\d{2})[a-z]{0,2}\.md$/i.exec(basename(cheminJuge || ""));
+      const fin93 = jour93 ? Date.parse(`${jour93[1]}-${jour93[2]}-${jour93[3]}T23:59:59+01:00`) : NaN;
+      const borne93 = Number.isFinite(fin93) && fin93 < Date.now() ? { maintenant: fin93, jusqua: fin93 } : {};
+      const ouvertes93 = produit93 ? decisionsSansReponse(produit93) : decisionsPiloteSansReponse({ fichier: process.env.FORGE_REGISTRE_DECISIONS_PILOT || REGISTRE_PILOT, ...borne93 });
       const b3_93 = bloc(texte, BLOCS[2][0]) || "";
       const manquantes93 = ouvertes93.filter((d) => !new RegExp(`\\b${d.n}\\b`).test(b3_93));
       // TF-2266 : le remède se dit dans la forme que `manqueAuRappel` (S4) reconnaît — JJ/MM à HH:MM tirés de l'horodatage du ledger.

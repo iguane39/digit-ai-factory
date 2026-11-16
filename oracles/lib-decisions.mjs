@@ -201,7 +201,9 @@ export function consignerReponse({ n, lettres, fichier = REGISTRE_PILOT, session
  * Limite dite : une réponse donnée sans lettre (« oui », « fais-le »), ou hors d'une session du pilot, n'est pas consignée ; la décision reste rappelée
  * jusqu'à la fin de sa fenêtre, ce qui avertit sans bloquer.
  */
-export function decisionsPiloteSansReponse({ fichier = REGISTRE_PILOT, maintenant = Date.now(), fenetreJours = 14, depuis = REPONSES_DEPUIS } = {}) {
+// `jusqua` (16/11/2026) : une synthèse ne peut rappeler qu'une décision posée avant elle. Sans cette borne, la recette du
+// banc de mutation jugeait une synthèse du 17/10 contre les décisions réservées le 16/11 et la déclarait fautive.
+export function decisionsPiloteSansReponse({ fichier = REGISTRE_PILOT, maintenant = Date.now(), fenetreJours = 14, depuis = REPONSES_DEPUIS, jusqua = Infinity } = {}) {
   if (!existsSync(fichier)) return [];
   const reps = new Set(reponsesDuRegistre(fichier).map((r) => r.n));
   const parNumero = new Map();
@@ -215,7 +217,7 @@ export function decisionsPiloteSansReponse({ fichier = REGISTRE_PILOT, maintenan
   }
   const plancher = Math.max(maintenant - fenetreJours * 86400000, Date.parse(depuis));
   return [...parNumero.values()]
-    .filter((d) => Number.isFinite(d.t) && d.t >= plancher && !reps.has(d.n))
+    .filter((d) => Number.isFinite(d.t) && d.t >= plancher && d.t <= jusqua && !reps.has(d.n))
     .map((d) => ({ n: `D-${d.n}`, question: d.question, ts: d.ts, seq: null }))
     .sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
 }

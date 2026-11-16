@@ -72,7 +72,9 @@ const MOTIF_HACHAGE = /createHash\(\s*["']sha256["']\s*\)|hashlib\.sha256\(|empr
 // `skills/` — forge-design y range ses scripts et n'emploie pas `.claude/skills/` — et la RACINE
 // d'un dépôt, où vit `bootstrap.mjs`. Un balayage trop étroit ne rate pas seulement des sites : il
 // ACCUSE le registre d'être périmé sur des sites parfaitement vivants, ce qui est pire.
-const DOSSIERS_LUS = ["scripts", "oracles", "tools", "todo", "skills"];
+// `catalogues` y entre le 16/11/2026 : `catalogues/generer-vues.mjs` scelle le catalogue (TF-2667),
+// déclaré au registre, et E1 le disait mort faute de balayer son dossier.
+const DOSSIERS_LUS = ["scripts", "oracles", "tools", "todo", "skills", "catalogues"];
 const EXT = /\.(mjs|cjs|js|py)$/i;
 const IGNORES = new Set([".git", "node_modules", ".venv", "__pycache__", "dist", "build", "generated", "fixtures", "tests", "test"]);
 
