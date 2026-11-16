@@ -731,6 +731,27 @@ try {
     ["Write", "az group delete --name rg-essai", "un outil qui n'est pas une commande"],
   ];
   for (const [outil, cmd, nom] of VERTS) check(`vert — ${nom} : laisse passer`, () => passe(jouer(projet(), outil, cmd)));
+
+  // ---- TF-2600 (16/11/2026) : un secret d'application créé ou remplacé glissé dans une commande de relevé -------------------
+  // Le 12/11/2026, `az ad app credential reset --append` a été glissé, sortie masquée par `head -0`, dans une commande de relevé : la
+  // garde le laissait passer (seuls delete/purge/remove et les droits étaient listés). Rouge : le reset, seul, après un relevé, sortie masquée
+  // de trois façons, sous Bash et PowerShell, pour une application et pour un principal de service. Vert : `credential list`, qui ne montre que
+  // les empreintes et les dates.
+  const APP = "00000000-0000-0000-0000-000000000000";
+  const ROUGES_2600 = [
+    ["Bash", `az ad app credential reset --id ${APP} --append 2>&1 | head -0`, "le cas du 12/11 : reset --append, sortie masquée par head -0"],
+    ["Bash", `az ad app credential list --id ${APP} --query "[].keyId" -o tsv; az ad app credential reset --id ${APP} --append >/dev/null`, "reset derrière un relevé, sortie vers /dev/null"],
+    ["PowerShell", `az ad app credential reset --id ${APP} --append | Out-Null`, "reset sous PowerShell, sortie vers Out-Null"],
+    ["Bash", `az ad sp credential reset --id ${APP}`, "reset d'un principal de service"],
+    ["Bash", `az ad app credential reset --id ${APP}`, "reset sans --append (remplace tous les secrets)"],
+    ["Bash", `az ad app federated-credential create --id ${APP} --parameters @cred.json`, "identifiant fédéré créé"],
+  ];
+  for (const [outil, cmd, nom] of ROUGES_2600) check(`rouge (TF-2600) — ${nom} : refusé sans lot`, () => refuse(jouer(projet(), outil, cmd)));
+  for (const [outil, cmd, nom] of [
+    ["Bash", `az ad app credential list --id ${APP}`, "credential list d'une application"],
+    ["Bash", `az ad sp credential list --id ${APP} --query "[].endDateTime" -o tsv`, "credential list d'un principal de service, requêtée"],
+    ["PowerShell", `az ad app federated-credential list --id ${APP}`, "federated-credential list"],
+  ]) check(`vert (TF-2600) — ${nom} : laisse passer`, () => passe(jouer(projet(), outil, cmd)));
 } finally {
   try { rmSync(base, { recursive: true, force: true, maxRetries: 3 }); } catch { /* toléré */ }
 }

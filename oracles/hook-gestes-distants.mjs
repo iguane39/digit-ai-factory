@@ -37,7 +37,8 @@
  *   · état et infrastructure : `terraform|tofu destroy`, `apply -destroy`, `state rm`, `workspace delete`
  *     (l'état supprimé ne se reconstruit pas, les ressources deviennent orphelines) ;
  *   · droits : `az role assignment|definition create|update`, `az ad app permission add|grant|admin-consent`,
- *     `az ad group|app|sp member|owner add`, `az keyvault set-policy`, `az devops security group
+ *     `az ad group|app|sp member|owner add`, `az ad app|sp credential reset|create|update` et `federated-credential create|update`
+ *     (TF-2600), `az keyvault set-policy`, `az devops security group
  *     membership add|group create|permission update|reset`, `az devops user add|update`, cmdlets
  *     `New-AzRoleAssignment`, `Set-AzRoleAssignment`, `New-Mg…AppRoleAssignment|Oauth2PermissionGrant|
  *     GroupMember|GroupOwner|DirectoryRoleMember` ; et toute requête HTTP qui écrit (POST, PUT, PATCH)
@@ -596,6 +597,9 @@ const AZ_DROITS = [
   /^ad app permission (add|grant|admin-consent)\b/,
   /^ad (group|app|sp) (member|owner) add\b/,
   /^keyvault set-policy\b/,
+  // TF-2600 (16/11/2026) : un secret d'application qu'on crée ou qu'on remplace ouvre un accès. Le 12/11/2026, `az ad app credential reset --append`
+  // a été glissé dans une commande de relevé, sortie masquée, pour fournir une trace : la garde ne le lisait pas (retrait : `delete`, déjà jugé).
+  /^ad (app|sp) (federated-)?credential (reset|create|update)\b/,
   /^devops security (group membership add|group create|permission (update|reset|reset-all))\b/,
   /^devops user (add|update)\b/,
   // D-196 (b) : les politiques de branche et les politiques Azure, dont l'exemption contourne la règle (retrait : `delete`, déjà jugé).
