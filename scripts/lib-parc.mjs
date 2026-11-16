@@ -71,7 +71,11 @@ export const FORGES = [
 // `factory-digit-ai-fr` et `forge-digit-ai-fr` y entrent le 14/11/2026 (D-214 (a), réponse « 214a », mot pour mot :
 // « Site web portant la présentation complète de la Factory et ses forges ») : les deux graphies d'un même dépôt,
 // le préfixe de ses lots et son dossier local, déjà citées en clair dans 21 fichiers suivis du pilot (TF-2556).
-export const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing", "digit-ai-prospection", "factory-digit-ai-fr", "forge-digit-ai-fr"]);
+// `factory.digit-ai.fr` y entre le 16/11/2026 en application de la même décision : c'est le nom de domaine du site et
+// le vrai nom de son dossier local (R-47 le localise en C:\dev\factory.digit-ai.fr). Absente de cette liste, cette
+// troisième graphie a été inscrite à la table des pseudonymes le 16/11 à 13:46, et la porte de publication a refusé
+// le pilot sur 3 fichiers déjà publiés.
+export const PRODUITS_DE_L_ECOSYSTEME = new Set(["digit-ai-marketing", "digit-ai-prospection", "factory-digit-ai-fr", "forge-digit-ai-fr", "factory.digit-ai.fr"]);
 
 // LE PILOT ET SES NOMS D'HIER (TF-0525, mesuré le 25/08/2026). Le pilot n'est pas une forge et ne
 // figure pas dans `FORGES` : son nom s'écrivait donc en littéral à chaque endroit qui en avait
