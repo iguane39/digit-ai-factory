@@ -219,7 +219,7 @@ export function replierTableaux(html) {
     if (!tetes.length) return tout;
     const corps = dedans.replace(/<tr>([\s\S]*?)<\/tr>/g, (ligne, cellules) => {
       let i = 0;
-      return `<tr>${cellules.replace(/<td>/g, () => `<td data-label="${esc(tetes[i++] ?? "")}">`)}</tr>`;
+      return `<tr>${cellules.replace(/<td((?:\s[^>]*)?)>/g, (_, attrs) => `<td${attrs} data-label="${esc(tetes[i++] ?? "")}">`)}</tr>`;
     });
     const classes = /\bclass="/.test(attrs) ? attrs.replace(/\bclass="/, 'class="repli-cartes ') : `${attrs} class="repli-cartes"`;
     return `<table${classes}>${corps}</table>`;
@@ -277,6 +277,176 @@ export function cablerComposants(html, ids, poseur) {
     .replace(/<main>\n/, `<main>\n${barre}`);
 }
 
+// ── LE SOMMAIRE D'UNE PAGE LONGUE (TF-1437, TF-1566 ; déplacé ici le 16/11/2026, TF-2665) ──────────
+//
+// Ces quatre éléments vivaient dans `generer-page-etude.mjs`, qui les ré-exporte. Les vues d'architecture
+// et de modèle de données les emploient aussi : L25 de `check_html.py` exige, au-delà de trois
+// chapitres, un sommaire visible en permanence, et ces deux vues n'en posaient pas.
+
+/**
+ * UNE ÉTUDE LONGUE POSE SON SOMMAIRE, ET LE SOMMAIRE POINTE VERS DE VRAIS CHAPITRES (TF-1437,
+ * 28/09/2026, retour Produit-78 20260928a RP-3).
+ *
+ * LE FAIT : `check_html.py` du socle avertit L6 (« aucun sommaire détecté ») sur une étude de 17
+ * chapitres, et sa règle L25 exige, au-delà de trois `<h2>`, un `<nav aria-label="Sommaire">` (ou
+ * `nav.toc`) listant CHAQUE chapitre, chacun avec une ancre vers un `id` réel et une annonce
+ * `.toc-d` d'au moins 12 caractères (L6). Le socle fournit déjà la position collante
+ * (`nav.toc.colle`, `boilerplate.html`) ; personne ne posait le MARQUAGE qui l'active.
+ *
+ * L'ANNONCE `.toc-d` NE PEUT PAS SE CONTENTER DU TITRE : le gabarit d'étude porte des titres
+ * courts et réels (« 5. Verdict » ne fait que 10 caractères) — les tronquer serait inventer une
+ * contrainte de longueur sur la PROSE de l'auteur pour satisfaire un contrôle de forme, exactement
+ * le contournement que ce fichier refuse ailleurs (cf. `decrireColonnes`). L'annonce porte donc la
+ * position du chapitre dans le sommaire (« Chapitre 2 sur 5 »), toujours ≥ 15 caractères dès que le
+ * sommaire existe (il ne s'affiche qu'à partir de 4 chapitres) : un fait vrai, pas un remplissage.
+ */
+/**
+ * UN CHAPITRE EST UNE VRAIE SECTION DU DOM, PAS UN TITRE SEUL (TF-1566, 02/10/2026).
+ *
+ * LE FAIT. `check_html.py` (règle L7) exige qu'un élément `.ch-apprend` soit DESCENDANT du nœud
+ * que le sommaire cible — et un `id` posé sur le seul `<h2>` (version antérieure de cette
+ * fonction) ne porte jamais ce qui le suit : en HTML, un `<h2>` et les paragraphes qui viennent
+ * après sont FRÈRES, jamais parent et enfant. Toute page portant un sommaire (TF-1437) échouait
+ * donc L7 par construction, quel que soit le contenu du chapitre : mesuré le 01/10/2026, 16
+ * échecs sur l'étude d'un produit, 9 sur une étude du pilot régénérée — et le self-test de ce
+ * générateur restait vert parce qu'il ne jouait jamais `check_html.py` (classe
+ * `fixture-jugee-par-son-seul-oracle`).
+ *
+ * LA CORRECTION. Chaque chapitre devient un `<section id="…">` qui enveloppe son `<h2>` et tout
+ * ce qui le suit jusqu'au chapitre suivant ; l'`id` QUITTE le `<h2>` pour la section — le poser
+ * sur les deux ferait gagner le DERNIER rencontré dans `index_ids` du socle (un dict Python),
+ * jamais la section. Le découpage en « chap lire » (largeur de lecture, 1080 px, TF-1239) doit
+ * rester NICHÉ dans cette section plutôt que la couper en deux : un essai séparé — poser
+ * `enChapitres` du socle APRÈS ce balisage — casse la section du premier chapitre en deux dès
+ * qu'un tableau y apparaît (`enChapitres` referme son `section.chap.lire` sur le tableau, sans
+ * savoir qu'un `<section id>` l'enveloppe), preuve sur l'étude réelle du 19/09/2026 qui porte un
+ * tableau au chapitre 2. Fusionner les deux passes en une seule — celle-ci — ferme ce trou :
+ * chaque frontière de chapitre referme explicitement son `<section id>`, jamais un marqueur de
+ * tableau qui n'a aucune idée d'où il vit.
+ *
+ * LE CHAPEAU `.ch-apprend` EST ÉCRIT, JAMAIS GÉNÉRÉ (L7 du socle le refuse explicitement — un
+ * chapeau généré serait le défaut fondateur de la règle, TF-0423). Convention au même patron que
+ * `decrireColonnes` ci-dessus : une citation Markdown (`> …`) qui ouvre un chapitre — RIEN entre
+ * le `## ` et elle — en devient le chapeau, convertie en `<p class="ch-apprend">`. Un chapitre qui
+ * n'en porte pas reste SANS chapeau, à bon droit : en inventer un depuis le seul titre serait
+ * exactement le remplissage que la règle existe pour refuser.
+ */
+export function identifierChapitres(html) {
+  const lignes = html.split("\n");
+  const pris = new Set();
+  const chapitres = [];
+  const sortie = [];
+  let prose = [];
+  let chapitre = null; // { id, lignes } hors de tout chapitre : `null`, avant le premier `## `.
+
+  const fermerProse = () => {
+    if (!prose.length) return;
+    const bloc = ['<section class="chap lire" data-mesure-lecture>', ...prose, "</section>"];
+    (chapitre ? chapitre.lignes : sortie).push(...bloc);
+    prose = [];
+  };
+  const fermerChapitre = () => {
+    fermerProse();
+    if (!chapitre) return;
+    sortie.push(`<section id="${chapitre.id}">`, ...chapitre.lignes, "</section>");
+    chapitre = null;
+  };
+
+  for (const l of lignes) {
+    const h2 = /^<h2>([\s\S]*?)<\/h2>$/.exec(l.trim());
+    if (h2) {
+      fermerChapitre();
+      // Le texte affiché est déjà échappé par inline() (esc() puis balises) : on ne le rééchappe
+      // jamais, et on retire les balises inline (code, strong, lien) pour n'en garder que le
+      // texte, qui sert À LA FOIS d'ancre (normalisée) et de libellé affiché dans le sommaire.
+      const texte = h2[1].replace(/<[^>]+>/g, "").trim();
+      const base = (texte || "chapitre").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "chapitre";
+      let id = base, suffixe = 2;
+      while (pris.has(id)) { id = `${base}-${suffixe}`; suffixe += 1; }
+      pris.add(id);
+      chapitres.push({ id, texte });
+      chapitre = { id, lignes: [l] };
+      continue;
+    }
+    // Un tableau, son compteur et une figure sont des FRÈRES de la prose, à l'intérieur du
+    // chapitre courant — même règle de partage qu'`enChapitres` du socle, reprise ici parce
+    // qu'elle doit désormais composer avec la frontière de chapitre (cf. commentaire ci-dessus).
+    if (/^<div class="defile">/.test(l) || /^<p class="tf-count"/.test(l) || /^\s*<figure/.test(l)) {
+      fermerProse();
+      (chapitre ? chapitre.lignes : sortie).push(l);
+      continue;
+    }
+    prose.push(l);
+  }
+  fermerChapitre();
+  fermerProse(); // de la prose hors de tout chapitre (avant le premier `## `, ou page sans `## `).
+
+  const dote = sortie.join("\n").replace(
+    /(<section id="[^"]+">\s*<h2>[\s\S]*?<\/h2>\s*(?:<section class="chap lire" data-mesure-lecture>\s*)?)<blockquote><p>([\s\S]*?)<\/p><\/blockquote>/g,
+    (tout, avant, texteChapeau) => `${avant}<p class="ch-apprend">${texteChapeau}</p>`,
+  );
+  return { html: dote, chapitres };
+}
+
+/** L25 du socle : « au-delà de trois chapitres », donc le sommaire se pose DÈS le 4e. */
+export const SEUIL_SOMMAIRE = 4;
+
+/**
+ * Le style du sommaire, posé UNE fois, seulement quand il est câblé.
+ *
+ * Espacements à l'échelle 4 pt (T3 d'`oracle-tokens`, TF-1566, 02/10/2026) : les valeurs
+ * d'origine — `gap:6px 18px`, `gap:2px` — n'étaient pas des multiples de 4 et faisaient échouer
+ * T3 sur `nav.toc` de toute page portant un sommaire, à chaque régénération.
+ *
+ * `nav.barre` : seconde navigation, compacte et collante EN PERMANENCE, sous 900 px seulement
+ * (cf. commentaire de `sommaireLateral`). Elle passe à la ligne au lieu de défiler (TF-1463,
+ * 13/10/2026) : en défilement horizontal, ses liens au-delà de la fenêtre faisaient échouer V1 de
+ * `render_page.py` à 390 et 768 px, 8 et 6 débordements mesurés sur l'étude du 07/09/2026.
+ */
+export const STYLE_SOMMAIRE = `  <style>
+    nav.toc{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
+    nav.toc a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink)}
+    nav.toc a:hover{text-decoration:underline}
+    nav.toc a strong{font-size:.85rem;font-weight:600}
+    .toc-d{color:var(--muted);font-size:.72rem;font-weight:400}
+    .ch-apprend{margin:0 0 16px;color:var(--muted)}
+    nav.barre{display:none}
+    @media (max-width:900px){
+      nav.barre{display:flex;flex-wrap:wrap;gap:4px 16px;position:sticky;top:var(--hh);z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 20px}
+      nav.barre a{flex:0 1 auto;text-decoration:none;color:var(--ink);font-size:.8rem;font-weight:600}
+      nav.barre a:hover{text-decoration:underline}
+    }
+  </style>
+`;
+
+/**
+ * Le sommaire du socle, prêt à insérer en tête de `<main>` — chaîne vide sous le seuil (page
+ * courte, un sommaire y serait du bruit, cf. commentaire de `identifierChapitres`).
+ *
+ * DEUX NAVIGATIONS, UNE SEULE TOUJOURS VISIBLE AU DÉFILEMENT (TF-1566, 02/10/2026, patron TF-1145).
+ * `nav.toc.colle` du socle repasse `position: static` sous 900 px (`boilerplate.html`) — à bon
+ * droit : une bande de cartes annotées, large, n'a rien à faire collée sur un écran de poche. Mais
+ * alors AUCUNE navigation ne reste dans la fenêtre au défilement, et `render_page.py` le refuse
+ * (famille `sommaire_perdu`) : mesuré le 01/10/2026 sur l'étude du pilot du 19/09 régénérée, aux
+ * trois largeurs ≤ 900 px (900, 768, 390). `nav.barre` est la seconde navigation que TF-1145
+ * prescrit pour ce cas — compacte (titres seuls, sans l'annonce `.toc-d`), collante EN PERMANENCE
+ * sous 900 px (la media query de `STYLE_SOMMAIRE`), invisible au-delà pour ne pas doubler la bande
+ * déjà collante du bureau. `check_html.py` ne lit que le PREMIER `nav` pour L6/L7/L10 : `nav.barre`
+ * est donc posée APRÈS `nav.toc` dans le document, pour ne jamais lui voler ce rôle.
+ */
+export function sommaireLateral(chapitres) {
+  if (chapitres.length < SEUIL_SOMMAIRE) return "";
+  const total = chapitres.length;
+  const entrees = chapitres.map(({ id, texte }, i) =>
+    `<a href="#${id}"><strong>${texte}</strong> <span class="toc-d">Chapitre ${i + 1} sur ${total}</span></a>`).join("\n      ");
+  // `title` : L8 refuse un lien interne dont le libellé est court et recopie sa cible (« Flux » → #flux) ; une
+  // vue a des chapitres brefs (TF-2665), une étude rarement.
+  const barre = chapitres.map(({ id, texte }) => `<a href="#${id}" title="Aller au chapitre : ${texte}">${texte}</a>`).join("");
+  return `<nav class="toc colle" aria-label="Sommaire">\n      ${entrees}\n    </nav>\n`
+    + `<nav class="barre" aria-label="Sommaire permanent">${barre}</nav>\n`;
+}
+
 // ── LES VUES DE docs\projet : ARCHITECTURE ET MODÈLE DE DONNÉES (TF-1321) ────────────────────
 //
 // CE QUE LA VUE GARDE DE L'ANCIENNE COQUILLE, et pourquoi chacun de ces traits survit :
@@ -295,6 +465,12 @@ export function cablerComposants(html, ids, poseur) {
 // chacune des vues du parc, comme la coquille d'avant le 20/09 l'a été (TF-1162).
 const STYLE_VUE = `  <style>
     .meta{color:var(--muted);font-size:.85rem;margin:4px 0 0}
+    /* Le bandeau est un flex : sa colonne de titre porte la ligne de métadonnées, dont les sources de
+       vérité sont de longs chemins sans point de coupure. Sans min-width ni coupure, la colonne
+       s'élargit avec eux et pousse le bouton de bascule hors de la fenêtre (mesuré le 12/11/2026 à
+       390 px : page de 418 px, bouton à 418). TF-2626. */
+    header.doc > div{min-width:0}
+    .meta code{overflow-wrap:anywhere}
     figure.schema{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;overflow-x:auto}
     figure.schema figcaption{color:var(--muted);font-size:.85rem;margin-top:8px}
     figure.schema svg{max-width:100%;height:auto}
@@ -326,9 +502,14 @@ export function pageDeVue({ gabarit, poseur, titre, description, front = {}, svg
     : "";
   // La figure reste HORS du découpage en chapitres : `enChapitres` lit ligne à ligne, et un schéma
   // écrit sur plusieurs lignes y serait coupé en deux, sa fin rangée dans une section de prose.
+  // TF-2665 : au-delà de trois chapitres, L25 de check_html.py exige un sommaire visible en permanence ;
+  // les vues n'en posaient pas (ARCHITECTURE.html à 11 chapitres, MODELE-DONNEES.html à 4). Le même
+  // découpage que les études : chaque `## ` devient une section à id, le sommaire les liste tous.
+  const { html: enSections, chapitres } = identifierChapitres(corpsHtml);
+  const sommaire = sommaireLateral(chapitres);
   const brut = coquilleDuSocle({
     gabarit, titre, description, indice, titreDocument,
-    corpsHtml: figure + enChapitres(corpsHtml),
+    corpsHtml: sommaire + figure + (sommaire ? enSections : enChapitres(corpsHtml)),
     surtitre, lettre: initiale, apresTitre: meta,
     pied: `Vue générée — NE PAS ÉDITER (la source Markdown fait foi ; la régénérer via le script du pilot). Sceau source <code>${sceau}</code>.`,
     // TF-1442 : le contenu du marquage TR2 est LU dans le frontmatter de la source de la vue,
@@ -336,7 +517,7 @@ export function pageDeVue({ gabarit, poseur, titre, description, front = {}, svg
     marqueurIA: front.assistant,
   });
   const { html, ids } = armerTableaux(brut);
-  return cablerComposants(replierTableaux(html), ids, poseur).replace("</head>", `${STYLE_VUE}</head>`);
+  return cablerComposants(replierTableaux(html), ids, poseur).replace("</head>", `${sommaire ? STYLE_SOMMAIRE : ""}${STYLE_VUE}</head>`);
 }
 
 /**
