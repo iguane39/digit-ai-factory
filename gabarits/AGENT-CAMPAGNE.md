@@ -461,3 +461,10 @@ donc elle se lance d'emblée en arrière-plan. `python recette/preparer_arbre.py
 modifie rien et rend 3 s'il manque un préalable. Sans préparation, la recette rend « PRÉREQUIS
 ABSENT » (code 3) avec la commande, jamais un verdict. Elle ne couvre ni le navigateur Playwright
 ni Docker.
+
+## Une copie de dossier n'emporte aucun fichier d'environnement (TF-2619, 16/11/2026)
+
+**Le fait, le 12/11/2026.** Un agent `constructeur` a copié `deploy/railway/` de façon récursive. La copie a emporté dans son bloc-notes un fichier d'environnement de l'instance hébergée, que l'agent n'a pas ouvert et a supprimé aussitôt. La règle « aucun `.env` lu, copié ou déplacé » (section Environnement) ne nommait pas la copie récursive : l'agent l'a tenue après coup, pas au moment de copier.
+
+- **Toute copie de dossier exclut les fichiers d'environnement** : `.env` et `.env.*`, à toute profondeur. Les copies récursives sont visées (`cp -r`, `Copy-Item -Recurse`, `robocopy`, `xcopy`, `rsync`) ; le plus sûr est de copier des fichiers nommés, pas un dossier.
+- **L'absence se vérifie après la copie**, avant tout autre geste : `Get-ChildItem -Recurse -Force -Filter ".env*" <destination>` (ou `find <destination> -name ".env*"`) ne rend rien. Un fichier trouvé se supprime sans être ouvert ni affiché, et son chemin seul, jamais son contenu, entre aux `restes` du rapport.
