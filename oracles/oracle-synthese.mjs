@@ -133,6 +133,9 @@
  *       alors que le ledger ne porte aucun run ouvert est signalée ; numéro pris au suivant libre (S125) plus 10 ; SANS_OBJET hors produit ; avertissante ;
  *   S145 UNE RESTITUTION NOMME UN RÔLE, PAS UNE PERSONNE (14/11, TF-2410, RT de Produit-81, préférence du porteur du 09/11) : une forme que `todo/noms-de-personnes.mjs` relève à l'accueil des lots (« Prénom NOM », « Prénom Nom »
  *       à prénom de la liste fermée, civilité suivie d'un nom, adresse électronique nominative) est signalée hors des blocs de code, le rôle étant le remède ; numéro pris au suivant libre (S135) plus 10 ; avertissante ;
+ *   S155 UNE ACTION `auto_ia` QUI ATTEND UN AUTRE AGENT PORTE SON MOYEN DE REPRISE (16/11, TF-2642, RP-220 de digit-ai-marketing, gabarit 2.70.0) : le motif ou l'événement de départ d'une action `auto_ia` qui attend la fin d'un agent
+ *       (sous-agent, session Codex, constructeur) dit comment la session reprendra la main (surveillance du fichier de sortie, ticket, notification de fin), sinon l'action est `manuelle_utilisateur` ; numéro pris au suivant libre (S145) plus 10 ; avertissante ;
+ *   S11 étendue (16/11, TF-2610, TF-2614) : « programmée, départ : <événement> » est un motif ; `hors_mandat` seul est refusé sous un mandat cité « jusqu'à épuisement » quand aucune dépendance n'est dite ;
  *   S115 UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (09/11, TF-2304, loi n° 5, gabarit 2.65.0) : une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage
  *       (decision, depense, irreversible) porte une commande d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, cmdlets Az et Graph ; pas git, node ni npm, souvent demandés pour un autre poste), la même figure ailleurs dans le texte, et aucune ligne qui la porte ne montre un code de retour d'échec ;
  *       numéro pris au suivant libre (S105) plus 10, comme S103, pour ne pas heurter une règle qu'une autre session ajoute le même jour ; avertissante ;
@@ -1620,10 +1623,25 @@ function juger(texte, cheminJuge = null) {
   const CONSIGNE_UN_RETOUR = /\b(?:consign|signal|remont|enregistr|journalis|[ée]cri)\w*[^.\n|]{0,80}(?<![\w-])(?:retours?|remont[ée]es?|frictions?)\b|(?<![\w-])(?:retours?|frictions?)\b[^.\n|]{0,60}\bconsign\w*|ledger\.(?:py|mjs)\s+retour|\btype\s*:?\s*retour\b/i;
   const REGISTRE_DU_PILOT = /TODO\.jsonl|TODO-FORGE|journaliser\.mjs|ingerer-lot|registre (?:du )?pilot/i;
   const consigneUnRetour = (g) => CONSIGNE_UN_RETOUR.test(g) && !REGISTRE_DU_PILOT.test(g);
-  juger8("S11", /\bauto_ia\b/, (g, zm) => MOTIFS_IA.test(zm) && !(/\bhors_mandat\b/.test(zm) && consigneUnRetour(g)),
+  // TF-2610 (16/11/2026, retour de Produit-81, hors-run seq 26) — `hors_mandat` NE COUVRE PAS UN MANDAT QUI DIT « JUSQU'À ÉPUISEMENT ». Le 12/11/2026, sur le mandat « avancer sur toutes les actions
+  // urgentes et prioritaires traitables sans dépendance », la session s'est arrêtée après un premier lot et a classé le lot restant `auto_ia` sous `hors_mandat` ; le hook de restitution l'a
+  // accepté et le porteur a dû relancer. Quand le mandat cité dans la restitution (hors bloc 8) dit « jusqu'à épuisement » ou l'équivalent, et que l'action n'a pour motif que `hors_mandat`
+  // sans aucune dépendance dite, le motif est refusé : le mandat couvre le lot restant. NON JUGÉ : un mandat que la restitution ne cite pas.
+  const MANDAT_JUSQUA_EPUISEMENT = /jusqu['’]\s*[àa]\s*(?:l['’]\s*)?[ée]puisement|jusqu['’]\s*au\s+bout|jusqu['’]\s*[àa]\s+la\s+fin\s+(?:de\s+la\s+)?(?:liste|file)|tant\s+qu['’]\s*il\s+(?:en\s+)?(?:reste|y\s+a)|sans\s+(?:vous\s+|t['’]\s*)?arr[êe]ter|(?:toutes?|tout)\s+(?:les\s+)?(?:actions?|t[âa]ches?|[ée]l[ée]ments?|lots?)\b[^.\n]{0,80}\b(?:sans\s+d[ée]pendances?|traitables?)\b/i;
+  const AUTRE_MOTIF_QUE_MANDAT = /\b(?:gate_gouvernance|dependance_bloc_3|garde_fou|borne_atteinte|dependance_externe)\b/;
+  const DEPENDANCE_DITE = /\b(?:attend\w*|d[ée]pend\w*|apr[èe]s\s+(?:la|le|les|l['’])|bloqu[ée]\w*\s+par)\b/i;
+  const texteHorsBloc8 = bActions ? texte.replace(bActions, " ") : texte;
+  const mandatCouvreLeLot = (g, zm) => /\bhors_mandat\b/.test(zm) && !AUTRE_MOTIF_QUE_MANDAT.test(zm) && !PROGRAMMEE.test(zm)
+    && !DEPENDANCE_DITE.test(g) && MANDAT_JUSQUA_EPUISEMENT.test(texteHorsBloc8);
+  // TF-2614 (16/11/2026, retour RT-30 de Produit-82) — UNE ACTION `auto_ia` PROGRAMMÉE N'EST PAS UNE ACTION BLOQUÉE. Le 12/11/2026, le porteur demande pourquoi A-47 et A-48, en attente de la fin
+  // d'un agent constructeur, ne sont pas exécutées : « Motif de non-exécution » se lisait comme un blocage ou un renvoi à l'humain. Une action que la session exécutera d'elle-même à un
+  // événement précis se dit « programmée, départ : <l'événement> » (ex. « programmée, départ : fin de l'agent X ») et compte comme motif de S11 ; sans événement de départ, « programmée » n'est pas un motif.
+  const PROGRAMMEE = /\bprogramm(?:ee|ée)s?\b[^\n;|]{0,60}?\bd[ée]part\s*:\s*[^\n;|]*\S/i;
+  juger8("S11", /\bauto_ia\b/, (g, zm) => (MOTIFS_IA.test(zm) || PROGRAMMEE.test(zm)) && !(/\bhors_mandat\b/.test(zm) && consigneUnRetour(g)) && !mandatCouvreLeLot(g, zm),
     "une action `auto_ia` listée en RESTE sans motif de non-exécution : la voie automatisée est le défaut, " +
-    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat. " +
-    "`hors_mandat` ne couvre pas une action qui consigne un retour : l'écrire au ledger du produit est du ressort de toute session (TF-2137).",
+    "donc ce qui n'a pas été fait se justifie. Vocabulaire : gate_gouvernance, dependance_bloc_3, garde_fou, borne_atteinte, dependance_externe, hors_mandat, ou « programmée, départ : <événement> » (TF-2614) pour une action que la session exécutera d'elle-même à cet événement. " +
+    "`hors_mandat` ne couvre pas une action qui consigne un retour : l'écrire au ledger du produit est du ressort de toute session (TF-2137), " +
+    "ni le lot restant d'un mandat qui dit « jusqu'à épuisement » quand rien ne le retient (TF-2610) : la session le traite, ou dit ce qui l'en empêche.",
     "chaque action `auto_ia` non exécutée porte son motif");
 
   juger8("S12", HUMAINS, (g, zm) => MOTIFS_HUMAIN.test(zm),
@@ -3339,6 +3357,26 @@ function juger(texte, cheminJuge = null) {
     else ko("S145", `${formes145.length} forme(s) nomment une personne ou donnent son adresse (${formes145.slice(0, 4).map((f) => `« ${f} »`).join(" ; ")}${formes145.length > 4 ? ` ; +${formes145.length - 4}` : ""}) : une restitution nomme un RÔLE, `
       + "jamais une personne par son nom ou son adresse (préférence du porteur du 09/11/2026). Remplace chaque forme par son rôle (« la personne qui administre l'abonnement », « le titulaire du compte »). "
       + "Si la forme ne désigne aucune personne (nom de produit, personnage d'exemple), motive-le à l'appel de `--prejuger` : `--motif S145=\"<raison>\"` (TF-2410)");
+  }
+
+  // ---- S155 (16/11/2026, TF-2642, RP-220 de digit-ai-marketing) — UNE ACTION `auto_ia` QUI ATTEND UN AUTRE AGENT PORTE SON MOYEN DE REPRISE ---------------------------------
+  //
+  // LE FAIT. Le 12/11/2026, un briefing écrit à 17:12 pour une session Codex ouverte par le dirigeant annonçait l'action `auto_ia` « appliquer la proposition ». Codex a fini à 17:53 ; la session
+  // n'a pas repris, faute de surveillance, et le dirigeant a dû demander pourquoi. La file de tickets porte ce relais avec reçu, mais son routage ne prévoit pas l'échange de fond.
+  // LA RÈGLE (décision R-58 du 16/11/2026). Une action `auto_ia` dont le motif ou l'événement de départ attend la fin, le retour ou la réponse d'un autre agent (sous-agent, session Codex, constructeur)
+  // dit comment la session reprendra la main : une surveillance du fichier de sortie de cet agent, un ticket de la file, ou la notification de fin de sa tâche d'arrière-plan. Sans moyen de reprise,
+  // l'action est `manuelle_utilisateur` : personne ne la reprendra. AVERTISSANTE à son entrée (hors de `BLOQUANTES` du hook de restitution).
+  // NON JUGÉ : que la surveillance annoncée tourne réellement ; une attente que le motif dit autrement qu'avec les mots « agent », « Codex », « constructeur », « autre session ».
+  {
+    const ATTEND_UN_AGENT = /(?:attend\w*|en attente|d[ée]part\s*:|apr[èe]s|d[èe]s|quand|lorsque|une fois)[^.\n|]{0,70}\b(?:agents?|sous-agents?|Codex|constructeur|autre session|session\s+Codex)\b/i;
+    const MOYEN_DE_REPRISE = /\breprise\s*:[^\n]*\S|\bsurveill\w+[^.\n|]{0,60}(?:fichier|sortie|avancement)|\bticket\b|notification de fin|hook[- ]suivi[- ]agents|asyncRewake|\bguetteur\b/i;
+    const concernes155 = groupes8.filter((g) => /\bauto_ia\b/.test(g) && ATTEND_UN_AGENT.test(zoneMotif(g)));
+    const sans155 = concernes155.filter((g) => !MOYEN_DE_REPRISE.test(g));
+    if (!concernes155.length) ok("S155", "aucune action `auto_ia` n'attend un autre agent");
+    else if (!sans155.length) ok("S155", `${concernes155.length} action(s) \`auto_ia\` attendent un autre agent, chacune porte son moyen de reprise`);
+    else ko("S155", `${sans155.length} action(s) \`auto_ia\` sur ${concernes155.length} attendent un autre agent sans dire comment la session reprendra la main. Ex. : ${sans155[0].replace(/\s+/g, " ").trim().slice(0, 110)}. `
+      + "Écris le moyen de reprise dans l'action : « reprise : surveillance du fichier de sortie `<chemin>` », « reprise : ticket <identifiant> » ou la notification de fin de la tâche d'arrière-plan. "
+      + "Sans moyen de reprise, personne ne reprendra l'action : elle est `manuelle_utilisateur`, avec sa raison (TF-2642).");
   }
 
   // ---- S30 (28/08/2026) — UNE DÉCISION SE SÉLECTIONNE, DONC ELLE PORTE UN NUMÉRO ------------
@@ -6664,13 +6702,13 @@ Aucun écart : la demande a été suivie à la lettre.
   // du bloc 2. C'est la seule façon de prouver que ce qui est jugé est la FORME, et non un reste
   // du document. Le premier sens est celui qui manquait au 17/09 : un point d'étape écrit à la
   // lettre du gabarit doit être ACCEPTÉ, là où il rendait S1 et S3 FAIL — les deux bloquantes.
-  if (veut(2302, 2304, 115, 1182, 23, 51, 791, 25, 1189, 18, 1427, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1580, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 4, 1429, 1467, 45, 70, 71, 72, 1708, 1709, 1711, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 2137, 88, 1979, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 1982, 1987, 85, 86, 1949, 55, 56, 1493, 1498)) {
+  if (veut(2302, 2304, 115, 1182, 23, 51, 791, 25, 1189, 18, 1427, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1580, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 4, 1429, 1467, 45, 70, 71, 72, 1708, 1709, 1711, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 2137, 88, 1979, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 1982, 1987, 85, 86, 1949, 55, 56, 1493, 1498, 2610, 2614, 2642)) {
   var EN_TETE_V = "## 1. En-tête\nCampagne · forge-tests · terminée le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot · intention : prouver que la surveillance de la forge de tests attrape ce qu'elle doit attraper, pas seulement faire tourner la recette. Test rétro : les 19 défauts plantés sont tous détectés, l'intention est servie.";
   var VERDICT_V = "## 2. Verdict\nRecette S-01 (banc rouge de la forge de tests) TENU — 19/19 défauts détectés au banc rouge, pytest 365.";
   }
   // La glose de « S-01 » vit dans la ligne de verdict que la forme remplace : elle se reporte dans
   // la ligne de mesure, sinon la fixture échouerait sur S23 et non sur ce qu'on prétend prouver.
-  if (veut(2302, 2304, 115, 23, 51, 791, 25, 1189, 18, 1427, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1580, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 4, 1429, 1467, 45, 70, 71, 72, 1708, 1709, 1711, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 2137, 88, 1979, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 1982, 1987, 85, 86, 1949, 55, 56, 1493, 1498)) {
+  if (veut(2302, 2304, 115, 23, 51, 791, 25, 1189, 18, 1427, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1580, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 4, 1429, 1467, 45, 70, 71, 72, 1708, 1709, 1711, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 2137, 88, 1979, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 1982, 1987, 85, 86, 1949, 55, 56, 1493, 1498, 2610, 2614, 2642)) {
   const MESURE = "Reste à mesurer : la recette S-01 (banc rouge de la forge de tests) rejouée sur la version déployée — par `node oracles\\self-tests.mjs`, au retour du déploiement lancé à 15h44.";
   const pe = verte
     .replace(EN_TETE_V, "## 1. En-tête\nPoint d'étape · forge-tests · déploiement lancé le 2026-08-14 à 15h48 (Europe/Paris) · durée 12 min · agent pilot"
@@ -6782,7 +6820,7 @@ Aucun écart : la demande a été suivie à la lettre.
   // entier, c'est le remède que le constat recommande, joué ici (TF-1013). Une barre posée AVANT la
   // colonne du motif le déplace : S12 refuse, et son constat nomme la coupure comme cause. Une
   // cellule absente est l'autre sens de la même règle.
-  if (veut(2302, 2304, 115, 18, 1427, 1982, 2137, 1987, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 1467, 70, 71, 72, 1708, 1709, 1711, 85, 86, 1949, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 88, 1979, 23, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 55, 56, 1493, 1498, 45, 4)) {
+  if (veut(2302, 2304, 115, 18, 1427, 1982, 2137, 1987, 1469, 57, 1503, 58, 1496, 61, 1567, 62, 1262, 63, 1582, 64, 1, 1632, 65, 1514, 66, 1565, 67, 1579, 68, 1985, 91, 89, 1984, 52, 1588, 1428, 1449, 1467, 70, 71, 72, 1708, 1709, 1711, 85, 86, 1949, 73, 74, 1694, 1695, 78, 36, 38, 1981, 775, 11, 88, 1979, 23, 87, 9, 1973, 2016, 92, 2077, 93, 94, 95, 49, 80, 1847, 75, 76, 1766, 1802, 79, 82, 1866, 83, 1936, 84, 1938, 1646, 55, 56, 1493, 1498, 45, 4, 2610, 2614, 2642)) {
   var constatDe = (r, regle) => {
     try { return (JSON.parse(r.stdout).findings || []).find((f) => f.regle === regle) || {}; } catch { return {}; }
   };
@@ -7705,6 +7743,75 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`S11 (consignation d'un retour, TF-2137, 05/11) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S11").message || "sortie illisible").slice(0, 200));
     if (!/TF-2137/.test(constatDe(s11a, "S11").message || "") || !/consigne un retour/.test(constatDe(s11a, "S11").message || ""))
       casse.push("S11 (TF-2137) : le constat doit dire que `hors_mandat` ne couvre pas une action qui consigne un retour : " + String(constatDe(s11a, "S11").message || "").slice(0, 200));
+  }
+  }
+  // 16/11 — S11 ET LES DEUX MOTIFS QUI SE LISAIENT À CONTRESENS (TF-2610, TF-2614). (a) Rouge : le mandat cité dit « jusqu'à épuisement » et le lot restant est laissé `auto_ia` sous le seul
+  // `hors_mandat`, sans dépendance — le cas du 12/11. (b) Rouge : le mandat du 12/11 mot pour mot (« toutes les actions urgentes et prioritaires traitables sans dépendance »), même action.
+  // (c) Vert : le même lot sous `dependance_externe`. (d) Vert : `hors_mandat` qui dit sa dépendance (« attend la décision D-5 »). (e) Vert : `hors_mandat` sans mandat cité. (f) Vert, TF-2614 :
+  // l'action « programmée, départ : fin de l'agent constructeur du lot pa ». (g) Rouge : « programmée » sans événement de départ n'est pas un motif. (h) Vert : un mandat « jusqu'à épuisement »
+  // et une action programmée — la programmation n'est pas `hors_mandat`.
+  if (veut(11, 2610, 2614)) {
+  {
+    const ACTION_MOTIF = (motif) => "- **A-3** — enfin TF-0222 (auto_ia) — regrouper les constats par cause racine.\n"
+      + `  - motif de non-exécution : ${motif}\n  - si rien n'est fait : les constats restent listés un par un, sans leur cause commune.\n`;
+    const MANDAT = "- Mandat du porteur, cité mot pour mot : « avance sur toutes les actions traitables sans dépendance, jusqu'à épuisement ».\n";
+    const MANDAT_12_11 = "- Mandat du porteur, cité mot pour mot : « avancer sur toutes les actions urgentes et prioritaires traitables sans dépendance ».\n";
+    const avec = (motif, mandat = "") => verte.replace("## 4. Traité\n", `## 4. Traité\n${mandat}`).replace(/- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/, ACTION_MOTIF(motif));
+    const m11a = jouerPe("s11-mandat-epuisement-hors-mandat.md", avec("hors_mandat — le lot restant relève d'un autre mandat.", MANDAT));
+    const m11b = jouerPe("s11-mandat-12-11-hors-mandat.md", avec("hors_mandat — le lot restant relève d'un autre mandat.", MANDAT_12_11));
+    const m11c = jouerPe("s11-mandat-epuisement-dependance-externe.md", avec("dependance_externe — attend la réponse de l'API du fournisseur.", MANDAT));
+    const m11d = jouerPe("s11-mandat-epuisement-hors-mandat-dependance-dite.md", avec("hors_mandat — attend la décision D-5 du bloc 3.", MANDAT));
+    const m11e = jouerPe("s11-hors-mandat-sans-mandat-cite.md", avec("hors_mandat — le lot restant relève d'un autre mandat."));
+    const m11f = jouerPe("s11-programmee-depart-fin-agent.md", avec("programmée, départ : fin de l'agent constructeur du lot pa."));
+    const m11g = jouerPe("s11-programmee-sans-depart.md", avec("programmée — la session s'en occupera."));
+    const m11h = jouerPe("s11-mandat-epuisement-programmee.md", avec("programmée, départ : fin de l'agent constructeur du lot pa.", MANDAT));
+    if (avec("hors_mandat — x.", MANDAT) === verte) casse.push("S11 (TF-2610) : la fixture n'a pas été modifiée — le cas ne prouve plus rien");
+    for (const [r, statut, quoi] of [
+      [m11a, "FAIL", "le mandat « jusqu'à épuisement » et le lot restant laissé sous le seul `hors_mandat` passent — le cas du 12/11"],
+      [m11b, "FAIL", "le mandat du 12/11 mot pour mot (« toutes les actions … traitables sans dépendance ») et `hors_mandat` passent"],
+      [m11c, "PASS", "le même lot sous `dependance_externe`, un obstacle réel, est accusé"],
+      [m11d, "PASS", "`hors_mandat` qui dit sa dépendance (« attend la décision D-5 ») est accusé"],
+      [m11e, "PASS", "`hors_mandat` sans mandat cité est accusé"],
+      [m11f, "PASS", "l'action « programmée, départ : fin de l'agent constructeur du lot pa » est lue comme un blocage"],
+      [m11g, "FAIL", "« programmée » sans événement de départ passe pour un motif"],
+      [m11h, "PASS", "une action programmée sous un mandat « jusqu'à épuisement » est accusée comme `hors_mandat`"],
+    ]) if (constatDe(r, "S11").statut !== statut)
+      casse.push(`S11 (mandat « jusqu'à épuisement » et action programmée, TF-2610, TF-2614, 16/11) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S11").message || "sortie illisible").slice(0, 200));
+    for (const [r, nom] of [[m11a, "le cas du 12/11"], [m11b, "le mandat du 12/11 mot pour mot"]])
+      if (!/TF-2610/.test(constatDe(r, "S11").message || "") || !/jusqu'à épuisement/.test(constatDe(r, "S11").message || ""))
+        casse.push(`S11 (TF-2610) : le constat sur ${nom} doit dire que \`hors_mandat\` ne couvre pas un mandat « jusqu'à épuisement » : ` + String(constatDe(r, "S11").message || "").slice(0, 200));
+    if (!/programmée, départ/.test(constatDe(m11g, "S11").message || ""))
+      casse.push("S11 (TF-2614) : le constat sur « programmée » sans départ doit nommer la forme attendue « programmée, départ : <événement> » : " + String(constatDe(m11g, "S11").message || "").slice(0, 200));
+  }
+  }
+  // 16/11 — S155, UNE ACTION `auto_ia` QUI ATTEND UN AUTRE AGENT PORTE SON MOYEN DE REPRISE (TF-2642), DANS SES SENS. (a) Rouge : « attend la fin de l'agent Codex » sous `dependance_externe`, sans
+  // moyen de reprise — le cas du 12/11. (b) Rouge : « programmée, départ : fin de l'agent Codex », sans moyen. (c) Vert : la même, « reprise : surveillance du fichier de sortie » — la restitution
+  // passe en entier, S11 compris. (d) Vert : « reprise : ticket ». (e) Vert : une attente qui n'est pas celle d'un agent (`dependance_bloc_3`). (f) Vert : `hors_mandat` sans attente d'agent.
+  if (veut(2642)) {
+  {
+    const ACTION_MOTIF = (motif) => "- **A-3** — enfin TF-0222 (auto_ia) — appliquer la proposition rendue par l'agent.\n"
+      + `  - motif de non-exécution : ${motif}\n  - si rien n'est fait : la proposition reste lettre morte.\n`;
+    const avec = (motif) => verte.replace(/- \*\*A-3\*\* — enfin TF-0222 \(auto_ia\)[\s\S]*$/, ACTION_MOTIF(motif));
+    const r155a = jouerPe("s155-attend-agent-sans-reprise.md", avec("dependance_externe — attend la fin de l'agent Codex ouvert par le dirigeant."));
+    const r155b = jouerPe("s155-programmee-sans-reprise.md", avec("programmée, départ : fin de l'agent Codex."));
+    const r155c = jouerPe("s155-programmee-surveillance.md", avec("programmée, départ : fin de l'agent Codex ; reprise : surveillance du fichier de sortie `C:\\dev\\x\\sortie.md`."));
+    const r155d = jouerPe("s155-programmee-ticket.md", avec("programmée, départ : fin de l'agent Codex ; reprise : ticket digit-ai-queue TKT-12."));
+    const r155e = jouerPe("s155-attend-decision-bloc-3.md", avec("dependance_bloc_3 — attend la décision de publication ci-dessus."));
+    const r155f = jouerPe("s155-hors-mandat-sans-attente.md", avec("hors_mandat — le lot restant relève d'un autre mandat."));
+    if (avec("hors_mandat — x.") === verte) casse.push("S155 (TF-2642) : la fixture n'a pas été modifiée — le cas ne prouve plus rien");
+    for (const [r, statut, quoi] of [
+      [r155a, "FAIL", "une action `auto_ia` qui attend la fin d'un agent, sans moyen de reprise, passe — le cas du 12/11"],
+      [r155b, "FAIL", "« programmée, départ : fin de l'agent Codex » sans moyen de reprise passe"],
+      [r155c, "PASS", "la même action avec « reprise : surveillance du fichier de sortie » est accusée"],
+      [r155d, "PASS", "la même action avec « reprise : ticket » est accusée"],
+      [r155e, "PASS", "une attente de décision (`dependance_bloc_3`) est prise pour l'attente d'un agent"],
+      [r155f, "PASS", "`hors_mandat` sans attente d'agent est accusé"],
+    ]) if (constatDe(r, "S155").statut !== statut)
+      casse.push(`S155 (reprise d'une action qui attend un agent, TF-2642, 16/11) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S155").message || "sortie illisible").slice(0, 200));
+    if (r155c.status !== 0 || constatDe(r155c, "S11").statut !== "PASS")
+      casse.push("S155 (TF-2642) : l'action programmée avec son moyen de reprise doit faire passer la restitution en entier (exit 0, S11 compris), le remède du constat : exit " + r155c.status);
+    if (!/TF-2642/.test(constatDe(r155a, "S155").message || "") || !/manuelle_utilisateur/.test(constatDe(r155a, "S155").message || ""))
+      casse.push("S155 (TF-2642) : le constat doit nommer le moyen de reprise attendu et dire que sans lui l'action est `manuelle_utilisateur` : " + String(constatDe(r155a, "S155").message || "").slice(0, 200));
   }
   }
   // 29/10 — S88, « DE QUOI S'AGIT-IL » DIT CE QU'EST L'OBJET AVANT SON NOM INTERNE (TF-1979), DANS SES SENS. Le champ de FORMAT_B est la forme de référence : S88 PASS. (a) Rouge :
