@@ -480,6 +480,13 @@ crontab, minuterie, tâche planifiée Windows, ou, hors dépôt, une déclaratio
 **Contrôle exécutable** : la règle R-35 bis d'`oracles\oracle-conformite-projet.mjs`, en AVERTISSEMENT
 (vocabulaire et limites : `oracles\lib-cadence-promise.mjs`).
 
+**Et un porteur ne tient pas une HEURE s'il est GitHub (R-35 ter, TF-2617, 16/11/2026).** La planification
+`schedule` de GitHub a tourné 1 fois sur 18 pour des publications Instagram, et un workflow qui attend l'heure
+dans un runner coûte des minutes sans alerte. Un workflow de produit qui porte une publication par `schedule` ou
+par `sleep` est refusé : le geste à l'heure passe par un planificateur hébergé dédié, qui se replanifie, avec un
+filet à heures décalées. L'exception se décide et se déclare (`geste-a-l-heure-github: D-<n> <motif>`).
+**Contrôle exécutable** : la règle R-35 ter d'`oracles\oracle-conformite-projet.mjs`, en REFUS.
+
 ### § 3 septies — Un geste destructif et un inventaire se jugent contre le réel (O-13, O-14)
 
 **Le fait, mesuré le 14/09/2026 chez un produit.** Un correctif réussi sur un environnement a été

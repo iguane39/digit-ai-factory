@@ -33,7 +33,28 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
 - **L'humain programme dans l'outil gratuit de la plateforme ; aucun outil maison de diffusion.**
   7 réseaux sur 9 offrent une programmation gratuite, relevée sur source officielle le 21/09/2026 :
   elle remplace « publier à l'heure ». Aucun script, robot ni extension, jamais. Un outil de
-  diffusion par interface officielle ne se rouvre qu'à une revue, sur un temps humain mesuré.
+  diffusion par interface officielle ne se rouvre qu'à une revue, sur un temps humain mesuré. Si une
+  revue l'a rouvert, le geste à l'heure passe par un planificateur hébergé dédié, qui se replanifie,
+  avec un filet à heures décalées, jamais par un workflow GitHub : sa planification a tourné 1 fois
+  sur 18 le 20/10/2026, et une attente dans un runner coûte sans alerte (`R-35 ter`, TF-2617).
+- **Une échéance ajoutée entre deux tours n'attend pas le lendemain** (TF-2609, 12/11/2026). Quand une
+  chaîne programme une publication auprès d'un planificateur hébergé, la tâche ne replanifie qu'à ses
+  tours : une semaine programmée à 12 h 32 n'avait aucun tour avant le lendemain (tours à 7 h 07 et
+  8 h 07 UTC). Toute chaîne qui ajoute une échéance déclenche une replanification, ou s'appuie sur un
+  exécutant d'intervalle plus court que la fenêtre entre l'ajout et l'heure. L'agent relève les tours
+  à l'API du planificateur, jamais de mémoire, et les dépose avec les échéances du jour dans
+  `planificateur.json` (schéma `pilot/planificateur@1`, fuseau écrit sur chaque instant), dans le
+  dossier de semaine ou son parent ; RR9 refuse l'échéance qui n'a aucun tour entre son ajout et son
+  heure. Sans ce fichier, RR9 le dit et ne juge rien : la programmation est alors humaine (N3).
+- **Un texte qu'une personne nommée relit, modifie et publie elle-même ne porte pas la mention
+  d'IA** (TF-2644, D-187 (c) du 12/11/2026). Le cas : le dirigeant relit, modifie et publie chaque
+  texte de son compte à la main, et répond de la ligne éditoriale. La publication le déclare au
+  frontmatter, par deux champs : `responsable_editorial: <nom ou rôle>` et `decision_editoriale: D-<n>`,
+  la décision consignée qui établit cette responsabilité. `oracle-transparence` (règle TR4, forge-agents,
+  TF-2645) rend alors un PASS motivé à la place de la mention, et RR4 cite le responsable et la décision
+  à son verdict. Le champ sans décision reste refusé ; sans le champ, la mention reste due (TR1, depuis
+  le 02/08/2026). Le contrôle ne vérifie pas que la décision existe ni que la relecture a eu lieu : le
+  numéro se lit au registre des décisions du produit.
 - **Les règles d'une plateforme se lisent dans le référentiel daté, nulle part ailleurs.** Si
   `perime_le` est dépassé, le run relit le référentiel avant toute autre chose. Aucune « règle
   d'algorithme » sans source primaire datée n'entre dans un contenu ni dans un skill.
@@ -91,8 +112,22 @@ installé avant la première écriture, ledger dès l'ouverture, fraîcheur, rou
    `oracle-claims` ; transparence par `oracle-transparence` (une publication générée sans mention
    fait FAIL) ; voix par les règles de l'émetteur (`voix.json`, RR8). Une légende d'image joint son
    visuel ; une réponse à un avis joint l'avis, tel que collé par l'humain, avec sa date.
+
+   **Où vit le dossier de semaine (TF-2638).** Chez le produit, sous `output\` : un dossier par
+   semaine, qui porte `calendrier.md` et au moins un `publication*.md`, avec ses `avis-*.md`, ses
+   visuels, son `accord.json` et son `mesures.json`. Deux rangements tiennent R-4. Sous un
+   dossier-livrable daté, un par lot : `output\<Marque> - <Objet> - AAAAMMJJ<i>\<AAAA-MM-JJ>\`.
+   Ou sous un dossier de run sans date : `output\run-reseau\<AAAA-MM-JJ>\`. Dans les deux cas
+   `oracle-conformite-projet` reconnaît la semaine à son contenu (calendrier et publication
+   ensemble) et ne juge pas le nommage daté de ses parties, dont les noms fixes sont ceux que lit
+   `oracle-run-reseau`. Le plafond de chemin de 150 caractères, sidecar d'oracle compris, vaut
+   toujours pour chaque fichier : on raccourcit l'`<Objet>` du dossier-livrable, jamais le nom
+   d'un fichier fixe. `emetteur.json` et `voix.json` se posent dans le dossier de semaine ou dans
+   son parent.
 3. **Accorder et programmer (N3).** Accord humain consigné au ledger (R-38), **un par lot**, qui
-   nomme chaque fichier couvert. Puis programmation ou publication **par l'humain**, dans l'outil
+   nomme chaque fichier couvert. `accord.json` se pose dans le dossier de la semaine accordée, à
+   côté des publications qu'il couvre, une fois l'accord donné et jamais avant ; son `lot` les
+   nomme toutes. Puis programmation ou publication **par l'humain**, dans l'outil
    de la plateforme. Chaque publication est archivée chez le produit, avec sa date réelle.
 4. **Animer (N4).** Réponses, modération et **réponses aux avis** **par l'humain**. L'IA propose
    une réponse sur un texte collé ; elle ne lit aucun compte. Sur la fiche d'établissement, la
@@ -148,10 +183,13 @@ format `gabarits\RESTITUTION.md`.
 **Le contrôle de chaque semaine** : `node oracles\oracle-run-reseau.mjs <dossier-semaine>
 [--mentions <formules de la marque>]`. Il lit `emetteur.json` et `voix.json` (dans la semaine ou
 dans son parent), `calendrier.md`, chaque `publication*.md`, `accord.json` et `mesures.json`, et
-juge 8 règles : calendrier à 4 semaines ; contrat de sortie du modèle que chaque publication
-déclare ; faits sourcés (`oracle-claims`) ; transparence (`oracle-transparence`) ; accord humain
+juge 9 règles : calendrier à 4 semaines ; contrat de sortie du modèle que chaque publication
+déclare ; faits sourcés (`oracle-claims`) ; transparence (`oracle-transparence`, mention d'IA ou
+responsable éditorial déclaré et appuyé) ; accord humain
 couvrant tout le lot ; mesure avec temps humain ; fiche de l'émetteur complète et sans secret ;
-voix de l'émetteur tenue par chaque publication de sa portée. Un `voix.json` absent, non daté, non
+voix de l'émetteur tenue par chaque publication de sa portée ; et, quand un `planificateur.json`
+est déposé, un tour du planificateur entre l'ajout et l'heure de chaque échéance (RR9, TF-2609).
+Un `voix.json` absent, non daté, non
 sourcé ou qui porte encore un trou du gabarit rend FAIL ; une règle `lecture_humaine` est nommée à
 chaque verdict, jamais jugée. Les contrats
 de sortie sont une donnée publiée par forge-agents
@@ -167,7 +205,18 @@ Instagram, réponse à un avis) PASS ; une semaine rouge FAIL sur les 8 règles 
 la semaine verte qui rougissent chacune une seule règle et nomment ce qu'elles voient ; des
 contrats absents qui rougissent RR2. Pour la voix, 5 cas de plus : un mot qui en contient un
 écarté sans l'être passe, et une voix sans règle mécanisable mais motivée aussi. Le gabarit brut
-est refusé, puis lu une fois instancié ; le remède d'un taux en accroche est joué. Aucun accord ni
+est refusé, puis lu une fois instancié ; le remède d'un taux en accroche est joué. Depuis le
+16/11/2026 (TF-2646), 9 cas de plus sur la forme élidée : une valeur « je » se lit aussi dans « j'attends »,
+une valeur « j' » n'exige rien après son apostrophe, et « jeu » ni « jeton » ne les portent
+(36 cas en tout). Le 16/11/2026 aussi (TF-2609), 11 cas pour RR9 : le cas du 12/11, tours
+à 7 h 07 et 8 h 07 UTC et une échéance ajoutée à 12 h 32, rend FAIL ; les deux remèdes du message (replanification
+à l'ajout, exécutant d'intervalle) et un tour dans la fenêtre rendent PASS ; un intervalle plus long que
+la fenêtre, un instant sans fuseau, une échéance ajoutée après son heure et un relevé sans tour rendent FAIL ;
+sans `planificateur.json`, RR9 dit qu'elle n'a rien jugé (47 cas en tout). Enfin 4 cas pour RR4 (TF-2644) :
+le verdict d'`oracle-transparence` cite le responsable éditorial et sa décision quand il passe par eux,
+la raison du refus quand le champ n'a pas de décision, et reste inchangé pour une mention ou une absence ;
+51 cas. Trois cas de bout en bout s'y ajoutent (54 en tout) dès que l'oracle de forge-agents lit
+`responsable_editorial` : tant qu'il ne le lit pas, la recette les dit EN ATTENTE, jamais verts. Aucun accord ni
 publication réels. La séquence est donc prouvée **à blanc**. Elle
 ne l'est pas encore **en vrai** : tant que le premier cas réel de 4 semaines n'est pas mesuré
 (TF-1160), rien ne dit que le rendez-vous tient dans un agenda.
