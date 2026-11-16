@@ -62,5 +62,31 @@ check("rouge (TF-2621) — le contrat privé de la section ne prescrit plus le m
   vrai(mutant !== CONTRAT && !OCCUPATION.pose.test(mutant) && !OCCUPATION.hook.test(mutant), "la chirurgie n'a pas retiré la section");
 });
 
+// ---- TF-2625 : la critique d'implémentation d'un écran écrit, et la relecture indépendante déclarée au rapport ------------
+const MODELE_RAPPORT = CONTRAT.slice(CONTRAT.indexOf("**Rapport final (le livrable).**"), CONTRAT.indexOf("**Mesurer, et rendre une mesure"));
+const CRITIQUE = {
+  section: /^## Un écran écrit se juge sur l'instance servie, et le rapport dit s'il a été relu \(TF-2625/m,
+  critique: /Tout écran écrit passe la critique d'implémentation sur la page telle que l'instance la sert/,
+  commande: /run-oracles-design\.mjs <page> --rendu/,
+  relecture: /Le rapport déclare la relecture indépendante/,
+  absence: /« absente — non jouée par l'agent »/,
+};
+const RUBRIQUES_RAPPORT = [/^relecture_independante: /m, /^critique_rendu: /m];
+check("vert (TF-2625) — le contrat prescrit la critique d'implémentation de tout écran écrit et la déclaration de la relecture indépendante", () => {
+  for (const [nom, motif] of Object.entries(CRITIQUE)) vrai(motif.test(CONTRAT), `le contrat ne porte plus « ${nom} » (${motif})`);
+});
+check("vert (TF-2625) — le gabarit de rapport porte les rubriques relecture_independante et critique_rendu, dans le bloc du rapport final", () => {
+  vrai(MODELE_RAPPORT.length > 200, "le bloc du rapport final n'a pas été retrouvé");
+  for (const m of RUBRIQUES_RAPPORT) vrai(m.test(MODELE_RAPPORT), `le gabarit de rapport ne porte plus ${m}`);
+  vrai(/absente — non jouée par l'agent/.test(MODELE_RAPPORT), "le gabarit de rapport ne dit plus l'absence déclarée");
+});
+check("rouge (TF-2625) — le gabarit de rapport d'avant (sans les deux rubriques) est vu : le contrôle ne passe pas", () => {
+  const avant = MODELE_RAPPORT.split("\n").filter((l) => !/^(relecture_independante|critique_rendu): /.test(l)).join("\n");
+  vrai(avant !== MODELE_RAPPORT, "la chirurgie n'a rien retiré");
+  vrai(RUBRIQUES_RAPPORT.every((m) => !m.test(avant)), "les rubriques subsistent dans le gabarit d'avant");
+  const sansSection = sansBloc(CONTRAT, /Un écran écrit se juge sur l'instance servie|Tout écran écrit passe la critique|Le rapport déclare la relecture indépendante/);
+  vrai(sansSection !== CONTRAT && !CRITIQUE.critique.test(sansSection), "le contrat privé de la section prescrit encore la critique");
+});
+
 console.log(`\ncontrat-agent-campagne.test : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

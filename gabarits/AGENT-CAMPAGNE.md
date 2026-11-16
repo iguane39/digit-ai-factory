@@ -223,6 +223,8 @@ preuve: <sortie de vérification native, avant/après mesuré>
 gains_constates: <effet mesurable, chiffré si possible — exigé pour corrige>
 commit: <sha court> (local, non poussé) — nature : code | référentiel | configuration —
   vérification : <commande jouée, verdict>   (une ligne par commit de l'item, TF-2436)
+critique_rendu: <verdict de run-oracles-design par écran écrit, sur la page servie> | sans objet (aucun écran écrit)
+relecture_independante: faite par <agent ou session, en lecture seule> — <constats> | absente — non jouée par l'agent
 restes: <ce qui manque — classé IA / développeur / utilisateur (R-29, REGLES-PROJET.md
   §I ; format actions[] de forge-tests généralisé), constats hors périmètre,
   candidatures nouvelles>
@@ -476,3 +478,10 @@ ni Docker.
 - **La session qui crée une copie y pose son marqueur** : `node scripts\occuper-copie.mjs --poser <copie> --session <identifiant> --run <run> --agent <agent>`. Le marqueur (session, run, agent, date) vit dans le répertoire git de la copie, hors de l'arbre : il n'est jamais suivi ni commité, et disparaît avec la copie.
 - **`oracles\hook-flotte.mjs` le lit avant tout lancement d'agent**, pour le dossier courant et pour les chemins que la consigne nomme, et refuse (exit 2) quand une autre session vivante occupe la copie. Une session est vivante quand sa transcription a été écrite depuis moins de 15 minutes. Le refus nomme l'occupante et le remède : créer sa propre copie, ou attendre la fin de l'autre session.
 - **L'agent ne pose ni ne retire le marqueur.** La session le retire (`--liberer <copie>`) à la fusion ou au retrait de la copie ; `--lire <copie>` dit qui l'occupe.
+
+## Un écran écrit se juge sur l'instance servie, et le rapport dit s'il a été relu (TF-2625, 16/11/2026)
+
+**Le fait, le 12/11/2026.** Un agent `constructeur` a livré 5 jalons, `make test` à exit 0 avant chaque commit. Une relecture indépendante en lecture seule a trouvé ensuite 1 défaut bloquant, 2 majeurs et 4 tests trop faibles ; la critique de rendu jouée par la session sur l'instance servie a refusé 7 écrans sur 9, et l'agent ne l'avait pas jouée. Un test vert juge ce que le code fait, pas ce que l'écran montre.
+
+- **Tout écran écrit passe la critique d'implémentation sur la page telle que l'instance la sert**, avant le commit qui le livre : `node <FORGE_ROOT>\digit-ai-forge-design\oracles\run-oracles-design.mjs <page> --rendu`, lancé après la dernière écriture du fichier (`gabarits\RESTITUTION.md`, contrôle CRITIQUE, TF-1913). Un écran est une page, une feuille de style ou un script livré à un navigateur. Le verdict se cite à la rubrique `critique_rendu` du rapport, écran par écran.
+- **Le rapport déclare la relecture indépendante** par la rubrique `relecture_independante` : « faite » avec son auteur (un autre agent, ou la session, en lecture seule) et ses constats, ou « absente — non jouée par l'agent ». Un agent ne s'attribue pas une relecture indépendante de son propre travail.
