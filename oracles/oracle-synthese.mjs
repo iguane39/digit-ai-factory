@@ -117,7 +117,8 @@
  *   S89 UN ÉCART ENTRE DEUX RÉFÉRENCES GIT (29/10, TF-1984, gabarit 2.54.0) : des fichiers dits « absents de » ou « pas dans » une référence git exigent, dans le texte,
  *       `git diff --name-status`, `--diff-filter` ou un essai d'existence (`cat-file -e`, `ls-tree`) ; avertissante ;
  *   S93 UNE DÉCISION POSÉE SANS RÉPONSE SE RAPPELLE AU BLOC 3 (06/11, TF-2214, RP-34, gabarit 2.63.0) : chez un produit, chaque D-N que `forge\ledger.jsonl` pose (`question_humain`, depuis 14 jours au plus) sans `reponse_humain`
- *       postérieure qui la nomme est nommée au bloc 3 (`lib-decisions.mjs`, `decisionsSansReponse`) ; SANS_OBJET hors produit ; avertissante ;
+ *       postérieure qui la nomme est nommée au bloc 3 (`lib-decisions.mjs`, `decisionsSansReponse`) ; au PILOT (16/11, TF-2214), chaque D-N réservée à `decisions\REGISTRE.jsonl` depuis 14 jours au plus et
+ *       depuis le 16/11/2026, sans entrée `reponse` (écrite par `hook-lexique.mjs` quand le porteur colle sa lettre au numéro), est nommée de même (`decisionsPiloteSansReponse`) ; SANS_OBJET ailleurs ; avertissante ;
  *   S94 UN LIVRABLE DÉJÀ LIÉ « LIVRÉ » ET RÉÉCRIT PREND L'INDICE SUIVANT (06/11, TF-2191, RT-50, gabarit 2.63.0) : rejoue `scripts/verifier-jugement.mjs` (J-1) sur chaque cible de la ligne « Livré : » portant un sceau, posé par le hook de fin
  *       de tour au PASS qui la lie ; un contenu changé depuis le sceau FAIL, l'indice suivant nommé ; BLOQUANTE au hook ;
  *   S95 UNE DÉCISION QUI EN REMPLACE UNE AUTRE LISTE LES ARTEFACTS DE LA PREMIÈRE ET DIT LEUR SORT (06/11, TF-2206 et TF-2210, RP-26, RP-30, gabarit 2.63.0) : « D-N remplace D-M » exige la ligne `Artefacts de D-M : <liste>` avec le sort
@@ -242,7 +243,7 @@ import { chiffresSansReleve } from "./lib-chiffres-releves.mjs";
 import { estPointDeSuivi, lignesAgent } from "./lib-suivi-agents.mjs";
 import { lireCarte, derniereDemande, etatDesLivrables, sessionDe, REPLI_DIT } from "./lib-mobilisation.mjs";
 import { motifDeResteAuProduit, retourNommeNonEcrit } from "./lib-frictions.mjs";
-import { decisionsSansReponse } from "./lib-decisions.mjs";
+import { decisionsSansReponse, decisionsPiloteSansReponse, estAuPilot, REGISTRE_PILOT } from "./lib-decisions.mjs";
 import { relever as personnesNommees, PRENOMS as PRENOMS_145 } from "../todo/noms-de-personnes.mjs";   // S145 (TF-2410) : le relevé des personnes de l'accueil des lots
 
 // --racine <dossier> (TF-1644, 14/10/2026) : le dossier du PROJET dont la restitution est jugée,
@@ -1395,23 +1396,27 @@ function juger(texte, cheminJuge = null) {
   // de Produit-86, ledger seq 553). Chez un produit (un `forge\retours\` en remontant depuis `--racine`), chaque D-N que `forge\ledger.jsonl` pose (`question_humain`) sans qu'une
   // entrée `reponse_humain` postérieure la nomme, posée depuis 14 jours au plus, est nommée au bloc 3 : posée à nouveau, ou rappelée en une ligne. AVERTISSANTE (hors de BLOQUANTES du
   // hook). NON JUGÉ : une réponse que le produit n'a pas consignée avec son numéro (elle compte comme absente : mesure du 06/11/2026, 25 décisions sur 40 sans réponse nommée sur
-  // 11 ledgers locaux) ; une décision posée il y a plus de 14 jours ; le pilot, dont le registre `decisions\REGISTRE.jsonl` ne consigne pas les réponses ; que le rappel dise la bonne question.
+  // 11 ledgers locaux) ; une décision posée il y a plus de 14 jours ; au pilot, une réponse donnée sans lettre collée au numéro, ou hors d'une session du pilot (le registre ne la consigne pas), et toute décision réservée avant le 16/11/2026 (aucun écrivain ne consignait les réponses) ; que le rappel dise la bonne question.
   {
     const produit93 = produitDuJuge(cheminJuge);
-    if (!produit93) {
-      findings.push({ regle: "S93", statut: "SANS_OBJET", message: "hors d'un produit (aucun forge/retours/ en remontant depuis le fichier jugé ou --racine) : le pilot ne consigne pas les réponses, pas de décision ouverte à rappeler" });
+    // TF-2214 (16/11/2026) : au PILOT aussi — le registre `decisions\REGISTRE.jsonl` porte la réponse du porteur (entrée `reponse`, écrite par `hook-lexique.mjs`).
+    const auPilot93 = !produit93 && [cheminJuge ? dirname(resolve(cheminJuge)) : null, RACINE_PROJET].filter(Boolean).some((d) => estAuPilot(d));
+    if (!produit93 && !auPilot93) {
+      findings.push({ regle: "S93", statut: "SANS_OBJET", message: "hors d'un produit et hors du pilot (aucun forge/retours/ en remontant depuis le fichier jugé ou --racine, et le fichier n'est pas sous le dépôt du pilot) : pas de décision ouverte à rappeler" });
     } else {
-      const ouvertes93 = decisionsSansReponse(produit93);
+      const lieu93 = produit93 ? "au ledger du produit" : "au registre du pilot";
+      const ouvertes93 = produit93 ? decisionsSansReponse(produit93) : decisionsPiloteSansReponse({ fichier: process.env.FORGE_REGISTRE_DECISIONS_PILOT || REGISTRE_PILOT });
       const b3_93 = bloc(texte, BLOCS[2][0]) || "";
       const manquantes93 = ouvertes93.filter((d) => !new RegExp(`\\b${d.n}\\b`).test(b3_93));
       // TF-2266 : le remède se dit dans la forme que `manqueAuRappel` (S4) reconnaît — JJ/MM à HH:MM tirés de l'horodatage du ledger.
       const horodate93 = (ts) => { const t = new Date(ts); if (Number.isNaN(t.getTime())) return "JJ/MM à HH:MM"; const p = (n) => String(n).padStart(2, "0"); return `${p(t.getDate())}/${p(t.getMonth() + 1)} à ${p(t.getHours())}:${p(t.getMinutes())}`; };
-      if (!ouvertes93.length) ok("S93", "aucune décision posée au ledger du produit depuis 14 jours n'attend de réponse");
+      if (!ouvertes93.length) ok("S93", `aucune décision posée ${lieu93} depuis 14 jours n'attend de réponse`);
       else if (!manquantes93.length) ok("S93", `${ouvertes93.length} décision(s) en attente de réponse, toutes nommées au bloc 3 (${ouvertes93.map((d) => d.n).join(", ")})`);
-      else ko("S93", `${manquantes93.length} décision(s) posée(s) au ledger du produit sans réponse nommée ne sont pas rappelées au bloc 3 : `
+      else ko("S93", `${manquantes93.length} décision(s) posée(s) ${lieu93} sans réponse nommée ne sont pas rappelées au bloc 3 : `
         + manquantes93.slice(0, 5).map((d) => `${d.n} (posée le ${String(d.ts).slice(0, 10)}${d.seq != null ? `, ledger seq ${d.seq}` : ""}${d.question ? ` : « ${d.question.slice(0, 80)} »` : ""})`).join(" ; ")
         + `${manquantes93.length > 5 ? ` (+${manquantes93.length - 5})` : ""}. Rappelle chacune en une ligne au bloc 3, dans la forme que S4 lit comme un rappel, sans option ni question : « ${manquantes93[0].n} : <son sujet, trois mots au moins>, posée le ${horodate93(manquantes93[0].ts)}, inchangée » (TF-2266 : la forme « > **D-N — <la question ?>** posée le <jour>, sans réponse » était refusée par S4), ou écris qu'elle est répondue `
-        + "et consigne la réponse au ledger (`reponse_humain`, avec son numéro). Le 03/11/2026, D-48 restée sans rappel a laissé des ressources facturées deux jours (TF-2214).");
+        + (produit93 ? "et consigne la réponse au ledger (`reponse_humain`, avec son numéro)." : "et la réponse du porteur se consigne seule au registre quand il colle sa lettre au numéro (« 223a », `hook-lexique.mjs`).")
+        + " Le 03/11/2026, D-48 restée sans rappel a laissé des ressources facturées deux jours (TF-2214).");
     }
   }
   // S94 (TF-2191, 06/11/2026, gabarit 2.63.0) — UN LIVRABLE DÉJÀ LIÉ « LIVRÉ » ET RÉÉCRIT PREND L'INDICE SUIVANT. LE FAIT : l'étude 20261105b, liée « Livré » dans une restitution, a été réécrite
@@ -7861,6 +7866,32 @@ Aucun écart : la demande a été suivie à la lettre.
       casse.push(`S93 (TF-2214) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S93").message || "sortie illisible").slice(0, 200));
     if (!/D-90/.test(String(constatDe(rS93Rouge, "S93").message || "")) || !/seq 305/.test(String(constatDe(rS93Rouge, "S93").message || "")))
       casse.push("S93 : le constat doit nommer D-90 et son numéro de séquence au ledger : " + String(constatDe(rS93Rouge, "S93").message || "").slice(0, 200));
+    // TF-2214 (16/11/2026) — S93 AU PILOT : la décision réservée au registre `decisions\REGISTRE.jsonl` sans entrée `reponse` se rappelle au bloc 3 ; la réponse consignée par
+    // `hook-lexique.mjs` la sort ; une décision réservée avant l'entrée en service de l'écrivain (16/11/2026) n'est pas jugée. La racine jugée est le dépôt du pilot, le registre un
+    // fichier d'essai (FORGE_REGISTRE_DECISIONS_PILOT) : le registre réel du pilot n'est jamais lu ni écrit par la recette.
+    {
+      const pilot93 = join(dirname(moi), "..");
+      const regPilot = join(base93, "registre-pilot.jsonl");
+      const entreeReg = (n, jours) => JSON.stringify({ type: "decision", n, question: "Supprime-t-on le réseau vide créé en Europe du Nord ?", date: il93(jours).slice(0, 10), ts: il93(jours), origine: "reservation" });
+      const ecrireReg = (...lignes) => writeFileSync(regPilot, [JSON.stringify({ type: "registre", version: 1 }), ...lignes].join(nl) + nl, "utf8");
+      const jouerPilote = (nom, contenu) => { const f = join(dir, nom); writeFileSync(f, contenu, "utf8"); return spawnSync(process.execPath, [moi, f, "--racine", pilot93], { encoding: "utf8", env: { ...process.env, FORGE_REGISTRE_DECISIONS_PILOT: regPilot } }); };
+      ecrireReg(entreeReg(90, 0.01));
+      const rPiloteRouge = jouerPilote("s93-pilot-non-rappelee.md", verte);
+      const rPiloteRappel = jouerPilote("s93-pilot-rappelee.md", rappel93);
+      ecrireReg(entreeReg(90, 0.01), JSON.stringify({ type: "reponse", n: 90, lettres: ["a"], date: il93(0).slice(0, 10), ts: il93(0), origine: "hook-lexique" }));
+      const rPiloteRepondue = jouerPilote("s93-pilot-repondue.md", verte);
+      ecrireReg(entreeReg(90, 5));
+      const rPiloteAvantEcrivain = jouerPilote("s93-pilot-avant-ecrivain.md", verte);
+      for (const [r, statut, quoi] of [
+        [rPiloteRouge, "FAIL", "une décision réservée au registre du pilot, sans réponse consignée, absente du bloc 3 (le cas D-48 du 03/11, au pilot) passe"],
+        [rPiloteRappel, "PASS", "la MÊME décision rappelée au bloc 3 (le remède) est accusée"],
+        [rPiloteRepondue, "PASS", "une décision dont le registre porte l'entrée `reponse` est accusée"],
+        [rPiloteAvantEcrivain, "PASS", "une décision réservée avant l'entrée en service de l'écrivain (16/11/2026) est accusée"],
+      ]) if (constatDe(r, "S93").statut !== statut)
+        casse.push(`S93 (TF-2214, pilot) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S93").message || "sortie illisible").slice(0, 200));
+      if (!/au registre du pilot/.test(String(constatDe(rPiloteRouge, "S93").message || "")) || !/D-90/.test(String(constatDe(rPiloteRouge, "S93").message || "")))
+        casse.push("S93 (TF-2214, pilot) : le constat doit nommer D-90 et le registre du pilot : " + String(constatDe(rPiloteRouge, "S93").message || "").slice(0, 200));
+    }
     // TF-2266 (06/11/2026) — LE REMÈDE DE S93 SE JOUE AVEC S4. Rouge d'origine : S93 prescrivait « > **D-N — <la question ?>** posée le <jour>, sans réponse », que S4 (bloquante) refusait
     // (question, pas d'heure, pas de « inchangée »). Ici la ligne est EXTRAITE du message de S93, son sujet rempli, puis posée seule au bloc 3 : S93 et S4 doivent passer ensemble.
     const ligne93 = (String(constatDe(rS93Rouge, "S93").message || "").match(/« (D-90 : <son sujet, trois mots au moins>, posée le \d{2}\/\d{2} à \d{2}:\d{2}, inchangée) »/) || [])[1];
