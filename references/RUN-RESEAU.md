@@ -167,7 +167,10 @@ Instagram, réponse à un avis) PASS ; une semaine rouge FAIL sur les 8 règles 
 la semaine verte qui rougissent chacune une seule règle et nomment ce qu'elles voient ; des
 contrats absents qui rougissent RR2. Pour la voix, 5 cas de plus : un mot qui en contient un
 écarté sans l'être passe, et une voix sans règle mécanisable mais motivée aussi. Le gabarit brut
-est refusé, puis lu une fois instancié ; le remède d'un taux en accroche est joué. Aucun accord ni
+est refusé, puis lu une fois instancié ; le remède d'un taux en accroche est joué. Depuis le
+16/11/2026 (TF-2646), 9 cas de plus sur la forme élidée : une valeur « je » se lit aussi dans « j'attends »,
+une valeur « j' » n'exige rien après son apostrophe, et « jeu » ni « jeton » ne les portent
+(36 cas en tout). Aucun accord ni
 publication réels. La séquence est donc prouvée **à blanc**. Elle
 ne l'est pas encore **en vrai** : tant que le premier cas réel de 4 semaines n'est pas mesuré
 (TF-1160), rien ne dit que le rendez-vous tient dans un agenda.

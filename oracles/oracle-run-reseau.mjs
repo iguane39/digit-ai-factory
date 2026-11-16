@@ -140,12 +140,20 @@ const MARQUEUR_GABARIT = /<[^<>\n]{2,160}>/;
 const aplatir = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’ʼ]/g, "'")
   .toLowerCase().replace(/\s+/g, " ");
 
-/** L'expression figure-t-elle dans le texte en MOTS ENTIERS, sans casse ni accents ? */
+/** Forme élidée d'un mot français devant une voyelle : « je » s'écrit « j'attends » (TF-2646). */
+const ELISIONS = { je: "j'" };
+
+/**
+ * L'expression figure-t-elle dans le texte en MOTS ENTIERS, sans casse ni accents ? Une valeur qui finit
+ * par une apostrophe (« j' ») n'exige pas de non-lettre après elle : l'apostrophe est la frontière.
+ * Une valeur qui a une forme élidée (« je ») est aussi vue sous cette forme.
+ */
 export function contientExpression(texte, expression) {
   const e = aplatir(expression).trim();
   if (!e) return false;
-  const motif = e.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+");
-  return new RegExp(`(?<![\\p{L}\\p{N}])${motif}(?![\\p{L}\\p{N}])`, "u").test(aplatir(texte));
+  const motifs = [e, ELISIONS[e]].filter(Boolean).map((f) =>
+    f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+") + (f.endsWith("'") ? "" : "(?![\\p{L}\\p{N}])"));
+  return new RegExp(`(?<![\\p{L}\\p{N}])(?:${motifs.join("|")})`, "u").test(aplatir(texte));
 }
 
 /** Les émojis d'un texte, comptés par graphème : un drapeau, une famille, un pouce teinté = 1. */
@@ -550,9 +558,39 @@ if (arg === "--self-test") {
       if (!/le déplacer hors de l'accroche/.test(prescrit)) casse.push(`remède RR8 : le message ne prescrit pas le déplacement — ${prescrit}`);
       else if (enEchec(f).length) casse.push(`remède RR8 joué : le taux déplacé hors de l'accroche laisse ${enEchec(f).join(", ")} rouge(s)`);
     }
+
+    // 28 à 31 — la forme élidée (TF-2646) : « j'attends » porte « je » et « j' », et « jeu » ne porte ni l'un ni l'autre
+    {
+      const c = [
+        ["l'écrit « je », forme élidée", contientExpression("Ce que j'attends d'une étude", "je"), true],
+        ["l'écrit « j' », apostrophe finale", contientExpression("Ce que j'attends d'une étude", "j'"), true],
+        ["apostrophe typographique", contientExpression("Ce que j’attends d'une étude", "je"), true],
+        ["« je » seul reste un mot entier", contientExpression("Je pense que", "je"), true],
+        ["« jeu » n'est pas « je »", contientExpression("Un jeu de rôle", "je"), false],
+        ["« jeton » n'est pas « j' »", contientExpression("Le jeton est rendu", "j'"), false],
+        ["« objet » ne porte pas « j' »", contientExpression("Un objet de plus", "j'"), false],
+      ];
+      for (const [nom, obtenu, attendu] of c) { cas++; if (obtenu !== attendu) casse.push(`élision : ${nom} — attendu ${attendu}, obtenu ${obtenu}`); }
+      // Le cas du 13/11 de bout en bout : une formule imposée « je » en accroche, une accroche qui ouvre sur « j'attends ».
+      const d = join(base, "formule-elidee");
+      semaine(d, { rouge: false });
+      voix(d, (x) => { x.regles.push({ id: "V7", type: "formules_imposees", libelle: "la publication parle à la première personne", valeurs: ["je"], portee: "accroche", modeles: ["publication-reseau"] }); });
+      remplacer(d, "publication-linkedin.md", ACCROCHE_VERTE, "Ce que j'attends d'une étude faite en une matinée : qu'elle évite de construire ce qu'il ne fallait pas construire.");
+      const f = juger(d);
+      cas++;
+      if (enEchec(f).length) casse.push(`formule « je » imposée, accroche « j'attends » : refus à tort — ${enEchec(f).join(", ")} : ${(f.find((x) => x.regle === "RR8") || {}).message}`);
+      // Et le sens inverse : « je » écarté doit voir « j'attends » (« ni imposé ni écarté », RP-223).
+      const e = join(base, "formule-elidee-ecartee");
+      semaine(e, { rouge: false });
+      voix(e, (x) => { x.regles.push({ id: "V7", type: "mots_ecartes", libelle: "jamais de première personne", valeurs: ["je"], modeles: ["publication-reseau"] }); });
+      remplacer(e, "publication-linkedin.md", ACCROCHE_VERTE, "Ce que j'attends d'une étude faite en une matinée : qu'elle évite de construire ce qu'il ne fallait pas construire.");
+      const g = juger(e);
+      cas++;
+      if (!enEchec(g).includes("RR8") || !/« je »/.test((g.find((x) => x.regle === "RR8") || {}).message || "")) casse.push(`« je » écarté ne voit pas « j'attends » — ${enEchec(g).join(", ") || "aucune règle rouge"}`);
+    }
   } finally { rmSync(base, { recursive: true, force: true }); }
   console.log(JSON.stringify({ outil: "oracle-run-reseau --self-test", verdict: casse.length ? "FAIL" : "PASS", cas, regles: 8, casse }, null, 1));
-  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR8 ; 19 altérations à une règle ; contrats absents ; voix sans règle mécanisable mais motivée PASS ; mot entier PASS ; gabarit brut refusé et instancié lu ; remède RR8 joué)`);
+  console.log(`Self-test run-reseau : ${casse.length ? "FAIL" : `${cas}/${cas} PASS`} (semaine verte à 3 publications PASS ; semaine rouge FAIL sur RR1 à RR8 ; 19 altérations à une règle ; contrats absents ; voix sans règle mécanisable mais motivée PASS ; mot entier PASS ; gabarit brut refusé et instancié lu ; remède RR8 joué ; forme élidée « j'attends » vue sous « je » et « j' », imposée comme écartée)`);
   process.exit(casse.length ? 1 : 0);
 }
 if (!arg || !existsSync(arg)) { console.log(JSON.stringify({ oracle: "oracle-run-reseau", verdict: "SKIP", motif: "dossier de semaine absent" })); process.exit(2); }
