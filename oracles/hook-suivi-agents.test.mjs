@@ -129,6 +129,26 @@ let hr = T0 + 15 * M;
 const r3 = await veiller({ session_id: "sv", transcript_path: sv.transcript }, { maintenant: () => hr, dormirMs: async () => { hr += M; } });
 verifier("veille : deux réveils espacés d'au moins 4 min", r3.code === 2 && hr - (T0 + 15 * M) >= 0, `${r3.code} ${iso(hr)}`);
 
+// 4 bis. TF-2656 (16/11/2026) : après un point rendu, les fins de tour suivantes n'en redemandent pas avant 15 minutes. Le retour du 13/11 décrit 6 fins de tour de suite, chacune
+// suivie du même point, avec un agent actif. Joué ici : 6 fins de tour consécutives, le point rendu absent du transcript (une session VS Code ne l'y écrit pas) puis présent.
+// Le premier point est dû tout de suite (l'agent a 16 min de course) ; chacun des 5 suivants attend son échéance, 14 min au moins d'attente de la veille.
+for (const auTranscript of [false, true]) {
+  const s6 = session(`s-six-${auTranscript}`);
+  agent(s6, "six0001", { lance: T0, derniere: T0 + 1 * M, av: [{ ts: iso(T0 + 14 * M), faits: ["a"], restants: ["b"] }] });
+  let h = T0 + 16 * M;
+  const reveils = [];
+  for (let tour = 1; tour <= 6; tour++) {
+    const debut = h;
+    const r = await veiller({ session_id: `six-${auTranscript}`, transcript_path: s6.transcript }, { maintenant: () => h, dormirMs: async () => { h += M / 2; } });
+    reveils.push({ code: r.code, attente_min: (h - debut) / M });
+    if (r.code === 2 && auTranscript)
+      appendFileSync(s6.transcript, JSON.stringify({ type: "assistant", timestamp: iso(h + 5000), message: { role: "assistant", content: [{ type: "text", text: r.point }] } }) + "\n");
+    h += 30000;
+  }
+  verifier(`veille : 6 fins de tour consécutives, point ${auTranscript ? "écrit au transcript" : "absent du transcript"} — le premier point est dû tout de suite, chacun des 5 suivants attend son échéance`,
+    reveils[0].code === 2 && reveils[0].attente_min === 0 && reveils.slice(1).every((x) => x.code === 2 && x.attente_min >= 14), JSON.stringify(reveils));
+}
+
 // 5. En tour (PostToolUse) : rappel au point dû, silence avant ; consigne d'agent sans avancement signalée.
 const st = session("s-tour", { humainA: T0 });
 const avant = enTour({ session_id: "st1", transcript_path: st.transcript, tool_name: "Bash" }, T0 + 10 * M);
