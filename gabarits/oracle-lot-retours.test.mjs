@@ -13,6 +13,10 @@
  * section, donc un remède qui envoyait le lecteur créer une section au mauvais nom.
  */
 import { verifier, dateDuLot, SEUILS } from "./oracle-lot-retours.mjs";
+import { allouerIndice } from "../scripts/allouer-indice.mjs";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 let pass = 0, echec = 0;
 const check = (nom, fn) => {
@@ -50,6 +54,36 @@ check("verte LOT-DATE — le même lot, nommé du jour qui le juge, passe", () =
   const r = verifier(lot("20260924a"), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20260924" });
   const c = r.constats.find((x) => x.regle === "LOT-DATE");
   if (r.verdict !== "PASS" || !c || c.statut !== "PASS") throw new Error(`verdict ${r.verdict}, LOT-DATE ${c && c.statut}`);
+});
+// TF-2681 (16/11/2026) — le 28e lot d'un jour : après « z », l'allocateur propose « za », « zb »… ; le juge lisait
+// « 20261115zb » comme sans date (SANS_OBJET : la forme n'était pas jugée). Il le juge comme une lettre simple.
+check("rouge TF-2681 — un lot à double suffixe est JUGÉ (date lue, règles jouées), pas SANS_OBJET", () => {
+  const r = verifier(lot("20261115zb"), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20261115" });
+  if (r.verdict === "SANS_OBJET") throw new Error(`verdict SANS_OBJET : ${JSON.stringify(r.constats.map((c) => c.message))}`);
+  if (r.date !== "20261115") throw new Error(`date lue « ${r.date} » au lieu de 20261115`);
+  const c = r.constats.find((x) => x.regle === "LOT-DATE");
+  if (!c || c.statut !== "PASS") throw new Error(`LOT-DATE ${c && c.statut}`);
+});
+check("verte TF-2681 — un lot à double suffixe qui manque une section est REFUSÉ comme un lot à lettre simple (la forme est jugée)", () => {
+  const r = verifier(lot("20261115zb"), `# lot\n\n${R46}`, { aujourdhui: "20261115" });
+  const c = constat(r, "R-45");
+  if (r.verdict !== "FAIL" || !c || c.statut !== "FAIL") throw new Error(`verdict ${r.verdict}, R-45 ${c && c.statut}`);
+});
+check("TF-2681 — dateDuLot lit le double suffixe du .md et du sidecar, et ne lit toujours pas « z » + 2 lettres", () => {
+  if (dateDuLot("PROD - RETOURS - 20261115za.md") !== "20261115") throw new Error("date du .md à double suffixe non lue");
+  if (dateDuLot("PROD - RETOURS - 20261115zb.tf.jsonl") !== "20261115") throw new Error("date du sidecar à double suffixe non lue");
+  if (dateDuLot("PROD - RETOURS - 20261115zb.normalise.tf.jsonl") !== "20261115") throw new Error("date du sidecar normalisé non lue");
+  if (dateDuLot("PROD - RETOURS - 20261115abc.md") !== null) throw new Error("un triple suffixe est lu comme un lot");
+});
+check("TF-2681 — le nom proposé par l'allocateur pour le 28e lot est jugé par l'oracle de lot (les deux outils s'accordent)", () => {
+  const d = mkdtempSync(join(tmpdir(), "lot-28e-"));
+  try {
+    for (const l of "abcdefghijklmnopqrstuvwxyz") writeFileSync(join(d, `PROD - RETOURS - 20261115${l}.md`), "x", "utf8");
+    const indice = allouerIndice({ dossier: d, prefixe: "PROD - RETOURS - ", jour: "20261115", extension: ".md" });
+    const r = verifier(lot(`20261115${indice}`), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20261115" });
+    if (indice !== "za") throw new Error(`l'allocateur propose « ${indice} » au lieu de « za »`);
+    if (r.verdict === "SANS_OBJET") throw new Error("le juge ne lit pas le nom que l'allocateur propose");
+  } finally { rmSync(d, { recursive: true, force: true }); }
 });
 check("rouge — section R-45 absente : FAIL, et le remède nomme LE TITRE de la section", () => {
   const r = verifier(lot("20260824a"), `# lot\n\n${R46}`);
@@ -767,6 +801,40 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
       const r = remettre(conforme);
       if (r.status !== 2 || !/AUTRE contenu/.test(r.stderr || "")) throw new Error(`sortie ${r.status} : ${(r.stderr || "").slice(0, 200)}`);
       if (auSas() !== avant) throw new Error("le sas a changé");
+    });
+    // TF-2636 (RP-34 de Produit-79, 12/11/2026) : le juge rendait PASS avec l'avertissement « la porte du pilot REFUSERA ce lot tel quel (LOT-SIDECAR) », puis
+    // `--remettre` copiait le lot au sas : un lot remis ne se modifie plus, la correction a coûté un lot de plus et 2 numéros de retour. Le refus prédit
+    // bloque désormais la COPIE (sortie 1), pas le verdict du juge, qui reste PASS avec avertissement.
+    const avecSidecar = (nom, md, lignes) => {
+      const base = join(D, nom);
+      writeFileSync(`${base}.md`, md, "utf8");
+      writeFileSync(`${base}.tf.jsonl`, lignes.join("\n") + "\n", "utf8");
+      return `${base}.md`;
+    };
+    const FAMILLE_T = REF.classes[0].famille;
+    check("TF-2636 rouge — un sidecar dont la famille de classe est INCONNUE n'est PAS copié au sas : sortie 1, sas intact, la remise dit LOT-SIDECAR", () => {
+      const lot = avecSidecar("PROD - RETOURS - 20261013v", lotMd("\nclasse-neuve-essai\n"),
+        [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: "famille-qui-n-existe-pas", libelle: "Essai" } })]);
+      const avant = auSas();
+      const r = remettre(lot);
+      if (!/^verdict : PASS[^\n]*la porte du pilot REFUSERA/m.test(r.stdout || "")) throw new Error(`le juge ne prédit pas le refus (le cas ne reproduit pas RP-34) : ${(r.stdout || "").slice(0, 300)}`);
+      if (r.status !== 1) throw new Error(`sortie ${r.status}, attendu 1 : ${(r.stderr || "").slice(0, 200)}`);
+      if (auSas() !== avant) throw new Error(`le sas a changé : ${auSas()}`);
+      if (!/NON FAITE/.test(r.stderr || "") || !/LOT-SIDECAR/.test(r.stderr || "")) throw new Error(`la sortie ne dit pas pourquoi la remise n'est pas faite : ${(r.stderr || "").slice(0, 240)}`);
+    });
+    check("TF-2636 vert — le remède joué (le sidecar corrigé, sous l'indice suivant) est copié, sortie 0", () => {
+      const lot = avecSidecar("PROD - RETOURS - 20261013w", lotMd("\nclasse-neuve-essai\n"),
+        [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: FAMILLE_T, libelle: "Essai" } })]);
+      const avant = auSas();
+      const r = remettre(lot);
+      if (r.status !== 0) throw new Error(`sortie ${r.status}, attendu 0 : ${(r.stdout || "").slice(0, 200)} ${(r.stderr || "").slice(0, 200)}`);
+      if (auSas() === avant || !/20261013w\.md/.test(auSas()) || !/20261013w\.tf\.jsonl/.test(auSas())) throw new Error(`le lot corrigé n'est pas au sas : ${auSas()}`);
+    });
+    check("TF-2636 — le juge SEUL (sans --remettre) garde son contrat : PASS avec avertissement, sortie 0", () => {
+      const lot = avecSidecar("PROD - RETOURS - 20261013x", lotMd("\nclasse-neuve-essai\n"),
+        [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: "famille-qui-n-existe-pas", libelle: "Essai" } })]);
+      const r = spawnSyncS(process.execPath, [join(ICI_S, "oracle-lot-retours.mjs"), lot], { encoding: "utf8" });
+      if (r.status !== 0) throw new Error(`sortie ${r.status}, attendu 0 (le verdict reste PASS) : ${(r.stdout || "").slice(0, 200)}`);
     });
     check("TF-2314 rouge — un lot sans sidecar et un sas introuvable ne sont pas remis, sortie 2", () => {
       const sansSidecar = poser("PROD - RETOURS - 20261013t", lotMd(), false);

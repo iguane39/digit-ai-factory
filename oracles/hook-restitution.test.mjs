@@ -2579,6 +2579,13 @@ try {
       // Un tour qui n'a RIEN écrit n'a pas écrit de retour : celui que le ledger date de ce tour vient d'une autre session du produit (deux sessions vivantes, TF-2329 non jugé (1)).
       const lu = controlerLotDansLeTour({ racine: dProd, depuis: DEBUT72, tourEcrit: false });
       if (lu.verdict !== "SANS_OBJET" || !/rien écrit/.test(lu.motif || "")) echecs.push(`75 septies : un tour qui n'a rien écrit ne doit pas être accusé du retour d'une autre session, obtenu ${JSON.stringify(lu).slice(0, 220)}`);
+      // TF-2652 (RU-24, 16/11/2026) : la remise d'un lot consignée au ledger (`type: lot_remis`, admis par ledger.py) n'est PAS un retour que le hook exige de remettre
+      // en lot ; consignée en `retour` (seq 300 le 10/11, seq 311 le 13/11), elle l'était. Même entrée, deux types : seul le second est accusé.
+      const remise = { lot: "Produit - RETOURS - 20261110a.md", sas: "input/00-retours/_arrivee" };
+      const remiseTypee = controlerLotDansLeTour({ racine: produit72({ ledger: [retour72(3, PENDANT72, { type: "lot_remis", ...remise })] }), depuis: DEBUT72, tourEcrit: true });
+      if (remiseTypee.verdict !== "PASS" || remiseTypee.retours.length) echecs.push(`75 novies : une remise de lot consignée en lot_remis ne doit pas créer de retour orphelin au hook, obtenu ${JSON.stringify(remiseTypee).slice(0, 220)}`);
+      const remiseEnRetour = controlerLotDansLeTour({ racine: produit72({ ledger: [retour72(3, PENDANT72, { objet: "remise du lot Produit - RETOURS - 20261110a.md au sas" })] }), depuis: DEBUT72, tourEcrit: true });
+      if (remiseEnRetour.verdict !== "FAIL" || remiseEnRetour.retours.length !== 1) echecs.push(`75 decies : le témoin rouge — la même remise consignée en retour — doit rester accusée (retour orphelin), obtenu ${JSON.stringify(remiseEnRetour).slice(0, 220)}`);
       const lecture = join(base, "tour-75-lecture.jsonl");
       writeFileSync(lecture, [{ type: "user", timestamp: DEBUT72, message: { role: "user", content: "où en est le produit ?" } },
         { type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", name: "Read", input: { file_path: join(dProd, "forge", "ledger.jsonl") } }] } },

@@ -17,6 +17,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { decisionsSansReponse, DECISION_RETIREE } from "../oracles/lib-decisions.mjs";
 import { VARIABLE_SESSION } from "../oracles/lib-session.mjs";
+import { retoursSansLot } from "../oracles/lib-retours-produit.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // Fins de ligne normalisées : un poste qui extrait le gabarit en CRLF faisait manquer la chirurgie du
@@ -625,14 +626,14 @@ try {
   check("rouge → vert — TF-2549 : --essai rend l'entrée sans rien écrire, et l'écriture qui suit prend le seq annoncé", () => {
     const { d, script } = unProduit();
     const avant = octets(d);
-    const r = ecrire(script, "oracles_verdict", "--essai", "--etape", "x", "--verdict", "PASS");
+    const r = ecrire(script, "oracles_verdict", "--essai", "--oracle", "oracle-essai", "--etape", "x", "--verdict", "PASS");
     att(r.status === 0, `--essai refusé : exit ${r.status} ${r.stderr}`);
     att(Buffer.compare(avant, octets(d)) === 0, "--essai a modifié le ledger");
     att(!existsSync(join(d, "forge", "ledger.jsonl.lock")) && !existsSync(join(d, "forge", "hors-run.jsonl")), "--essai a laissé un verrou ou un journal hors run");
     const montre = JSON.parse(r.stdout.trim().split("\n").at(-1));
     att(montre.type === "oracles_verdict" && montre.etape === "x" && montre.verdict === "PASS" && montre.seq === 2 && !("essai" in montre), `entrée montrée : ${r.stdout}`);
     att(/\[ESSAI\] rien n'est écrit/.test(r.stderr), `l'essai ne se dit pas : ${r.stderr}`);
-    const vrai = ecrire(script, "oracles_verdict", "--etape", "x", "--verdict", "PASS");
+    const vrai = ecrire(script, "oracles_verdict", "--oracle", "oracle-essai", "--etape", "x", "--verdict", "PASS");
     att(vrai.status === 0 && entrees(d).at(-1).seq === 2 && entrees(d).length === 2, "l'écriture réelle ne prend pas le seq annoncé");
   });
   check("vert — TF-2549 : --essai joue les contrôles d'une écriture (type inconnu, première entrée) et refuse comme elle, sans rien créer", () => {
@@ -641,7 +642,7 @@ try {
     att(inconnu.status !== 0 && /type inconnu/.test(inconnu.stderr), `type inconnu accepté en essai : ${inconnu.stderr}`);
     const vide = mkdtempSync(join(tmpdir(), "ledger-essai-")); dossiers.push(vide); mkdirSync(join(vide, "forge"));
     const s = join(vide, "forge", "ledger.py"); writeFileSync(s, GABARIT, "utf8");
-    const o = ecrire(s, "oracles_verdict", "--essai", "--etape", "x");
+    const o = ecrire(s, "oracles_verdict", "--essai", "--oracle", "oracle-essai", "--verdict", "PASS", "--etape", "x");
     att(o.status !== 0 && /run_open/.test(o.stderr), `première entrée non juge en essai : ${o.stderr}`);
     att(!existsSync(join(vide, "forge", "ledger.jsonl")), "l'essai a créé un ledger");
     att(entrees(d).length === 1, "le ledger du produit a changé");
@@ -657,8 +658,82 @@ try {
     const mutant = GABARIT.replace('essai = "--essai" in a', "essai = False");
     att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
     const { d, script } = unProduit(mutant);
-    ecrire(script, "oracles_verdict", "--essai", "--etape", "x", "--verdict", "PASS");
+    ecrire(script, "oracles_verdict", "--essai", "--oracle", "oracle-essai", "--etape", "x", "--verdict", "PASS");
     att(entrees(d).length === 2, "le mutant n'a rien écrit : le défaut du 14/11 n'est pas reproduit");
+  });
+
+  // ---- TF-2630 (retour Produit-86 20261112g RP-69, seq 981, 16/11/2026) : un appel `--champ clé=valeur` écrivait une entrée amputée ----
+  // Le fait : l'usage de l'en-tête disait `<type> --champ valeur` ; un appel `oracles_verdict --champ oracle=x --champ verdict=PASS` a écrit une
+  // entrée au seul champ « champ » (la dernière valeur), sans oracle ni verdict, exit 0 (seq 976 d'un produit, annulée par la 977). Un ledger
+  // ne se réécrit pas : le refus doit venir AVANT l'écriture. L'aide donne désormais un exemple réel, joué ici.
+  const unOracleVerdict = ["--oracle", "oracle-essai", "--verdict", "PASS", "--cible", "forge"];
+  check("rouge → vert — TF-2630 : `--champ clé=valeur` est refusé AVANT d'écrire, le refus nomme le champ et donne un exemple réel", () => {
+    const { d, script } = unProduit();
+    const r = ecrire(script, "oracles_verdict", "--champ", "oracle=oracle-essai", "--champ", "verdict=PASS");
+    att(r.status !== 0, `exit ${r.status} : l'appel --champ clé=valeur a été accepté (le défaut du 12/11)`);
+    att(entrees(d).length === 1, `une entrée amputée a été écrite : ${JSON.stringify(entrees(d).at(-1))}`);
+    att(/--champ/.test(r.stderr) && /nom de champ/.test(r.stderr) && /rien n'est écrit/.test(r.stderr), `le refus ne nomme pas --champ : ${r.stderr}`);
+    att(/oracles_verdict --oracle \S+ --verdict PASS/.test(r.stderr), `le refus ne donne pas d'exemple réel : ${r.stderr}`);
+    const autre = ecrire(script, "etape_close", "--champ", "resume=x");
+    att(autre.status !== 0 && entrees(d).length === 1, `un champ nommé « champ » est refusé pour tout type, pas seulement oracles_verdict : exit ${autre.status}`);
+  });
+  check("rouge → vert — TF-2630 : une entrée oracles_verdict sans oracle, sans verdict ou avec un verdict sans valeur est refusée, le champ manquant nommé", () => {
+    const { d, script } = unProduit();
+    for (const [args, nomme] of [[["--verdict", "PASS"], "oracle"], [["--oracle", "oracle-essai"], "verdict"], [["--etape", "x"], "oracle"],
+      [["--oracle", "oracle-essai", "--verdict"], "verdict"], [["--oracle", "  ", "--verdict", "PASS"], "oracle"]]) {
+      const r = ecrire(script, "oracles_verdict", ...args);
+      att(r.status !== 0 && new RegExp(`\`${nomme}\``).test(r.stderr) && /rien n'est écrit/.test(r.stderr), `${args.join(" ")} : exit ${r.status}, ${r.stderr}`);
+    }
+    const essai = ecrire(script, "oracles_verdict", "--essai", "--etape", "x");
+    att(essai.status !== 0, "--essai accepte une entrée oracles_verdict sans oracle ni verdict : l'essai doit refuser comme l'écriture");
+    att(entrees(d).length === 1, `une entrée a été écrite : ${JSON.stringify(entrees(d).at(-1))}`);
+  });
+  check("vert — TF-2630 : l'exemple de l'aide, rejoué tel quel, est écrit avec son oracle et son verdict ; une entrée complète l'est aussi", () => {
+    const { d, script } = unProduit();
+    const exemple = /python forge\/ledger\.py (oracles_verdict --oracle \S+ --verdict PASS[^\n]*)/.exec(GABARIT.split('"""')[1]);
+    att(exemple, "l'aide du gabarit ne donne pas d'exemple d'oracles_verdict");
+    const mots = exemple[1].trim().split(/\s+/).map((m) => m.replace(/^"|"$/g, ""));
+    const r = ecrire(script, ...mots);
+    att(r.status === 0, `l'exemple de l'aide est refusé : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "oracles_verdict" && e.oracle && e.verdict === "PASS" && !("champ" in e), `entrée : ${JSON.stringify(e)}`);
+    const complete = ecrire(script, "oracles_verdict", ...unOracleVerdict);
+    att(complete.status === 0 && entrees(d).at(-1).oracle === "oracle-essai" && entrees(d).at(-1).cible === "forge", `entrée complète refusée : ${complete.stderr}`);
+  });
+  check("rouge — TF-2630 : sans le contrôle de forme, l'entrée amputée s'écrit (le témoin voit la chirurgie)", () => {
+    const mutant = GABARIT.replace("    controler_forme(type_, champs)\n", "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const { d, script } = unProduit(mutant);
+    ecrire(script, "oracles_verdict", "--champ", "oracle=oracle-essai", "--champ", "verdict=PASS");
+    att(entrees(d).length === 2 && entrees(d)[1].champ === "verdict=PASS", `le mutant n'écrit pas l'entrée amputée du 12/11 : ${JSON.stringify(entrees(d))}`);
+  });
+
+  // ---- TF-2652 (RU-24, lot Produit-84 20261113b, seq 311) : consigner la remise d'un lot au ledger créait un retour orphelin ----
+  // Le fait : le gabarit n'admettait aucun type pour la remise d'un lot ; consignée en `retour` (seq 300 le 10/11, seq 311 le 13/11), elle devenait un
+  // retour que le hook de fin de tour exige de remettre en lot. `lot_remis` est admis, et le hook (qui ne compte que `type: retour`) ne le lit pas.
+  const REMISE = ["--lot", "Produit - RETOURS - 20261113b.md", "--sas", "input/00-retours/_arrivee", "--verdict", "PASS"];
+  check("rouge → vert — TF-2652 : `lot_remis` est un type admis, écrit avec ses champs ; une remise consignée en `retour` reste un retour sans lot, pas elle", () => {
+    const { d, script } = unProduit();
+    att(!/lot_remis/.test(readFileSync(join(d, "forge", "ledger.jsonl"), "utf8")), "le ledger neuf porte déjà un lot_remis");
+    const r = ecrire(script, "lot_remis", ...REMISE);
+    att(r.status === 0, `lot_remis refusé : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "lot_remis" && e.lot === "Produit - RETOURS - 20261113b.md" && e.verdict === "PASS", `entrée : ${JSON.stringify(e)}`);
+    // Le hook de fin de tour lit les `retour` du ledger : la remise consignée en lot_remis n'en crée aucun.
+    att(retoursSansLot(d, join(ICI, ".."), { seuilH: -Infinity }).length === 0, `un lot_remis est lu comme un retour sans lot : ${JSON.stringify(retoursSansLot(d, join(ICI, ".."), { seuilH: -Infinity }))}`);
+    // Témoin rouge : la même remise consignée en `retour` (le geste du 13/11) EST un retour sans lot, que le hook refuse.
+    const ancien = ecrire(script, "retour", "--objet", "remise du lot Produit - RETOURS - 20261113b.md au sas");
+    att(ancien.status === 0, `retour refusé : ${ancien.stderr}`);
+    const orphelins = retoursSansLot(d, join(ICI, ".."), { seuilH: -Infinity });
+    att(orphelins.length === 1 && orphelins[0].seq === entrees(d).at(-1).seq, `le témoin ne reproduit pas le retour orphelin : ${JSON.stringify(orphelins)}`);
+  });
+  check("vert — TF-2652 : `lot_remis` est au vocabulaire sans rendre `secret_range` moins dernier, et `--verifier` ne le déclare pas hors vocabulaire", () => {
+    att(vocabulaire(GABARIT).has("lot_remis"), "lot_remis absent de TYPES");
+    att(/, "secret_range"\}/.test(GABARIT), "secret_range n'est plus le dernier type (la chirurgie de ranger-secret.test.mjs le retire par sa position)");
+    const { d, script } = unProduit();
+    ecrire(script, "lot_remis", ...REMISE);
+    const v = ecrire(script, "--verifier");
+    att(v.status === 0 && !/DÉCLARÉ/.test(v.stdout), `--verifier : ${v.stdout}${v.stderr}`);
   });
 
   // ---- TF-2527 (14/11/2026) : decision_retiree, lu par lib-decisions.mjs depuis TF-2415, n'était écrivable ni ici ni par ledger.mjs ----

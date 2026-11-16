@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { allouerIndice, canonique } from "./allouer-indice.mjs";
+import { allouerIndice, allouerIndiceVuDuRegistre, canonique } from "./allouer-indice.mjs";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -76,13 +76,16 @@ try {
     att(canonique(`x ${JOUR}9 y`, JOUR) === `x ${JOUR}9 y`, "un chiffre a été pris pour un indice");
   });
 
-  check("un AUTRE jour et une AUTRE extension ne comptent pas parmi les indices pris", () => {
+  check("portée « prefixe » : un AUTRE jour et une AUTRE extension ne comptent pas parmi les indices pris", () => {
     const d = join(T, "voisins");
     mkdirSync(d, { recursive: true });
     writeFileSync(join(d, `${PREFIXE}20260830a.html`), "hier", "utf8");
     writeFileSync(join(d, `${PREFIXE}${JOUR}a.pdf`), "autre format", "utf8");
-    att(allouerIndice({ dossier: d, prefixe: PREFIXE, jour: JOUR, contenu: "x" }) === "a",
+    att(allouerIndice({ dossier: d, prefixe: PREFIXE, jour: JOUR, contenu: "x", porte: "prefixe" }) === "a",
       "un fichier d'un autre jour ou d'un autre format a réservé l'indice");
+    // TF-2631 : la portée par défaut est « dossier », comme R-4 — un autre format du même jour y COMPTE.
+    att(allouerIndice({ dossier: d, prefixe: PREFIXE, jour: JOUR, contenu: "x" }) === "b",
+      "la portée par défaut (dossier) ne voit pas l'indice du même jour pris dans un autre format");
   });
 
   check("un préfixe porteur de caractères spéciaux de regex ne casse pas le motif", () => {
@@ -99,12 +102,30 @@ try {
   // pris par un AUTRE radical du même jour — cas réel : l'étude du jour portait déjà « a », la
   // restitution en a reçu un autre, renommée à la main après coup. Double sens : la portée par
   // défaut REPRODUIT la collision (rouge) ; « dossier » l'évite (vert). --------------------------
-  check("TF-1450 rouge (portée par défaut) : un AUTRE radical du même jour, même dossier, n'est pas vu — la collision se reproduit", () => {
+  check("TF-1450 rouge (portée « prefixe » demandée) : un AUTRE radical du même jour, même dossier, n'est pas vu — la collision se reproduit", () => {
     const d = join(T, "collision-defaut");
     mkdirSync(d, { recursive: true });
     writeFileSync(join(d, `Produit - Etude - ${JOUR}a.md`), "etude du jour", "utf8");
-    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "rapport du jour" });
-    att(indice === "a", `indice ${indice} au lieu de « a » — si ce test casse, la portée par défaut a cessé de reproduire la collision de TF-1450`);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "rapport du jour", porte: "prefixe" });
+    att(indice === "a", `indice ${indice} au lieu de « a » — si ce test casse, la portée « prefixe » a cessé de reproduire la collision de TF-1450`);
+  });
+  // TF-2631 (16/11/2026, RP-216) : le défaut du MODULE était « prefixe » quand celui de la ligne de commande
+  // était « dossier » ; seul l'appel en module sans option rendait un indice que R-4 refuse. Le cas du
+  // lot de retours du 12/11 : « X - 20261112a.mp4 » posé, un autre radical demande son indice.
+  check("TF-2631 vert (portée par défaut) : « X - 20261112a.mp4 » posé, un AUTRE radical sans option rend « b » (celui de la ligne de commande)", () => {
+    const d = join(T, "defaut-module-dossier");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, "X - 20261112a.mp4"), "clip", "utf8");
+    const indice = allouerIndice({ dossier: d, prefixe: "Y - Brief - ", jour: "20261112", contenu: "brief", extension: ".md" });
+    att(indice === "b", `indice ${indice} au lieu de « b » — le module sans option ne voit pas l'indice pris par l'AUTRE radical (R-4)`);
+  });
+  check("TF-2631 accord : le module sans option et la ligne de commande rendent la même lettre sur le même dossier", () => {
+    const d = join(T, "defaut-module-cli");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, "X - 20261112a.mp4"), "clip", "utf8");
+    const cli = spawnSync(process.execPath, [fileURLToPath(new URL("./allouer-indice.mjs", import.meta.url)), "--dossier", d, "--prefixe", "Y - Brief - ", "--jour", "20261112", "--extension", ".md"], { encoding: "utf8" });
+    const module_ = allouerIndice({ dossier: d, prefixe: "Y - Brief - ", jour: "20261112", contenu: "brief", extension: ".md" });
+    att(cli.stdout.trim() === module_, `module « ${module_} », ligne de commande « ${cli.stdout.trim()} »`);
   });
   check("TF-1450 vert (portée « dossier ») : le même cas voit l'indice pris par l'AUTRE radical et rend « b », sans collision", () => {
     const d = join(T, "collision-dossier");
@@ -171,14 +192,56 @@ try {
     att(indice === "a", `indice « ${indice} » au lieu de « a » — la portée est le dossier cible, pas le parc`);
   });
 
-  check("TF-1850 : dossier PLEIN (a à z pris) → l'outil échoue avec un message clair, il ne rend pas un nom refusé", () => {
-    const d = join(T, "plein");
+  // ---- TF-2681 (16/11/2026) : le 28e lot d'un jour n'avait aucun nom que l'allocateur et le juge de lot
+  // acceptent — l'allocateur refusait (26 lettres prises) et proposait le lendemain, que LOT-DATE refuse.
+  // Après « z », l'allocateur propose un double suffixe « za », « zb »… « zz » (26 de plus) ; il échoue
+  // seulement quand les 52 sont prises. Le juge de lot l'accepte comme une lettre simple (son banc).
+  const DOUBLES = [...LETTRES_26].map((l) => `z${l}`);
+  check("TF-2681 : 26 lettres prises → l'allocateur propose « za » (au lieu d'échouer), avec le défaut du module", () => {
+    const d = join(T, "plein-doubles");
     peupler(d, [...LETTRES_26]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    att(indice === "za", `indice « ${indice} » au lieu de « za »`);
+  });
+  check("TF-2681 : « za » pris → « zb » ; « za » à « zy » pris → « zz » (l'ordre des doubles suit celui des lettres)", () => {
+    const d = join(T, "plein-doubles-suite");
+    peupler(d, [...LETTRES_26, "za"]);
+    att(allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }) === "zb", "après za, « zb » attendu");
+    const d2 = join(T, "plein-doubles-fin");
+    peupler(d2, [...LETTRES_26, ...DOUBLES.slice(0, 25)]);
+    att(allouerIndice({ dossier: d2, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }) === "zz", "après zy, « zz » attendu");
+  });
+  check("TF-2681 : un double pris par un AUTRE radical (portée dossier) est sauté, comme une lettre simple", () => {
+    const d = join(T, "plein-doubles-radical");
+    peupler(d, [...LETTRES_26]);
+    peupler(d, ["za"], "Produit - Etude");
+    att(allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }) === "zb", "le « za » de l'autre radical n'est pas vu");
+  });
+  check("TF-2681 : contenu identique à un fichier à double suffixe → son indice « zb » (identité de contenu)", () => {
+    const d = join(T, "plein-doubles-identique");
+    peupler(d, [...LETTRES_26]);
+    writeFileSync(join(d, `Produit - Rapport - ${JOUR}zb.md`), `REF-${JOUR}zb corps`, "utf8");
+    att(allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: `REF-${JOUR}zc corps`, extension: ".md" }) === "zb", "la forme canonique ne neutralise pas un double suffixe");
+  });
+  check("TF-2681 : canonique() neutralise un double suffixe sans laisser sa seconde lettre", () => {
+    att(canonique(`x ${JOUR}za y`, JOUR) === `x ${JOUR} y`, `« ${canonique(`x ${JOUR}za y`, JOUR)} »`);
+    att(canonique(`x ${JOUR}z y`, JOUR) === `x ${JOUR} y`, "la lettre simple z n'est plus neutralisée");
+  });
+  check("TF-2681 : le nom proposé est unique dans le dossier du jour et ne reprend pas un fichier existant", () => {
+    const d = join(T, "plein-doubles-unique");
+    peupler(d, [...LETTRES_26]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    att(!existsSync(join(d, `Produit - Rapport - ${JOUR}${indice}.md`)), "le nom proposé existe déjà");
+  });
+
+  check("TF-1850 / TF-2681 : dossier PLEIN (a-z et za-zz pris) → l'outil échoue avec un message clair, il ne rend pas un nom pris", () => {
+    const d = join(T, "plein");
+    peupler(d, [...LETTRES_26, ...DOUBLES]);
     let message = null;
     try { allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }); }
     catch (e) { message = e.message; }
     att(message !== null, "dossier plein : aucune erreur levée — un nom déjà pris ou refusé a été rendu");
-    att(/aucune lettre libre/.test(message) && /26/.test(message) && message.includes(JOUR), `message peu clair : « ${message} »`);
+    att(/aucune lettre libre/.test(message) && /26/.test(message) && /za-zz/.test(message) && message.includes(JOUR), `message peu clair : « ${message} »`);
   });
 
   check("TF-1850 : dossier plein mais contenu IDENTIQUE à un fichier présent → son indice (pas d'erreur : rien à écrire)", () => {
@@ -244,11 +307,58 @@ try {
     att(r.status === 1 && r.stdout === "" && /AAAAMMJJ/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
   });
 
-  check("TF-1863 rouge : dossier plein (a à z) → exit 1 « aucune lettre libre », jamais un nom refusé", () => {
+  check("TF-1863 rouge : dossier plein (a-z et za-zz) → exit 1 « aucune lettre libre », jamais un nom refusé", () => {
     const d = join(T, "cli-plein");
-    peupler(d, [...LETTRES_26]);
+    peupler(d, [...LETTRES_26, ...DOUBLES]);
     const r = lancer([d, "Produit - Rapport - ", JOUR]);
     att(r.status === 1 && r.stdout === "" && /aucune lettre libre/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+  });
+  check("TF-2681 vert : ligne de commande, 26 lettres prises → imprime `za` (exit 0)", () => {
+    const d = join(T, "cli-plein-26");
+    peupler(d, [...LETTRES_26]);
+    const r = lancer([d, "Produit - Rapport - ", JOUR]);
+    att(r.status === 0 && r.stdout === "za\n", `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+  });
+
+  // ---- TF-2634 (RP-217, 12/11/2026) : deux sessions d'un même produit ont écrit un lot sous le même nom, la seconde a écrasé la première au sas.
+  // L'indice d'un lot se lit dans `forge/retours/` ET dans le sas, juste avant l'écriture : `--aussi <dossier>` (répétable) ajoute les noms d'un autre
+  // dossier à ceux qui sont pris. Le lot de l'autre session n'est qu'au sas (ou n'y est pas encore copié) : sans `--aussi`, la collision se reproduit.
+  const PREFIXE_LOT = "Produit-86 - RETOURS - ";
+  const deuxDossiers = (nom) => {
+    const retours = join(T, nom, "forge", "retours"), sas = join(T, nom, "sas");
+    mkdirSync(retours, { recursive: true }); mkdirSync(sas, { recursive: true });
+    writeFileSync(join(retours, `${PREFIXE_LOT}${JOUR}a.md`), "mon lot", "utf8");
+    writeFileSync(join(sas, `${PREFIXE_LOT}${JOUR}b.md`), "le lot de l'autre session, remis au sas", "utf8");
+    return { retours, sas };
+  };
+  check("TF-2634 rouge : sans `--aussi`, le lot d'une AUTRE session remis au sas n'est pas vu — « b » est proposé, déjà pris au sas", () => {
+    const { retours } = deuxDossiers("lots-sans-aussi");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe"]);
+    att(r.status === 0 && r.stdout.trim() === "b", `exit ${r.status}, sortie « ${r.stdout.trim()} » — si ce test casse, la collision de RP-217 ne se reproduit plus sans l'option`);
+  });
+  check("TF-2634 vert : `--aussi <sas>` lit le sas au moment de l'appel — l'indice du lot saute « b » et rend « c »", () => {
+    const { retours, sas } = deuxDossiers("lots-avec-aussi");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe", "--aussi", sas]);
+    att(r.status === 0 && r.stdout.trim() === "c", `exit ${r.status}, sortie « ${r.stdout.trim()} », stderr « ${r.stderr.trim()} »`);
+    // Le lot de l'autre session arrive au sas ENTRE deux appels : le second appel le voit.
+    writeFileSync(join(sas, `${PREFIXE_LOT}${JOUR}c.md`), "un troisième lot, remis entre-temps", "utf8");
+    const r2 = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe", "--aussi", sas]);
+    att(r2.status === 0 && r2.stdout.trim() === "d", `second appel : exit ${r2.status}, sortie « ${r2.stdout.trim()} » — le sas n'est pas relu`);
+  });
+  check("TF-2634 vert : plusieurs `--aussi` (le sas et la boîte) comptent tous, et le module les accepte par `aussi`", () => {
+    const { retours, sas } = deuxDossiers("lots-plusieurs-aussi");
+    const boite = join(T, "lots-plusieurs-aussi", "boite"); mkdirSync(boite, { recursive: true });
+    writeFileSync(join(boite, `${PREFIXE_LOT}${JOUR}c.md`), "lot déjà ingéré", "utf8");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe", "--aussi", sas, "--aussi", boite]);
+    att(r.status === 0 && r.stdout.trim() === "d", `exit ${r.status}, sortie « ${r.stdout.trim()} »`);
+    att(allouerIndiceVuDuRegistre({ dossier: retours, prefixe: PREFIXE_LOT, jour: JOUR, extension: ".md", porte: "prefixe", aussi: [sas, boite] }) === "d", "le module ne lit pas `aussi`");
+  });
+  check("TF-2634 rouge : `--aussi` vers un dossier introuvable → exit 2, jamais un indice calculé sans lui (aucune borne silencieuse)", () => {
+    const { retours } = deuxDossiers("lots-aussi-absent");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--aussi", join(T, "n-existe-pas")]);
+    att(r.status === 2 && r.stdout === "" && /introuvable/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+    const sans = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--aussi"]);
+    att(sans.status === 2 && sans.stdout === "", `--aussi sans valeur : exit ${sans.status}`);
   });
 
   check("TF-1863 rouge : option inconnue → exit 2 (usage), pas d'indice deviné", () => {
