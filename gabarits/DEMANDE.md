@@ -31,3 +31,12 @@ destinataire reste juge de la façon de faire, et de l'ordre.>
 
 <Ce qu'un lecteur pressé pourrait croire inclus, et qui ne l'est pas. Dans le doute, le dire :
 une demande qui ne borne pas son périmètre laisse le destinataire deviner.>
+
+## Les paramètres d'API tierce prescrits
+
+<Due depuis le 16/11/2026 (TF-2650). Pour chaque valeur d'une API tierce que la demande prescrit au
+destinataire (en-tête, option, champ, nom de rôle) : une ligne qui donne le paramètre, la valeur et
+la SOURCE de ses valeurs admises — page de documentation relue et datée, ou réponse du propriétaire —,
+ou la mention « à confirmer par le propriétaire ». Aucune valeur prescrite : « Aucun paramètre d'API
+tierce n'est prescrit. » Le 12/11/2026, un en-tête proposé de mémoire a coûté un correctif, une recette
+et un redéploiement : l'API n'admettait qu'une seule valeur.>

@@ -33,7 +33,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { basename } from "node:path";
 
-export const VERSION = "1.0.0";
+export const VERSION = "1.1.0"; // 1.1.0 (16/11/2026) : D4, TF-2650
 
 //: D1 — le nom du fichier : `<demandeur> - DEMANDE - AAAAMMJJ<indice>.md` (§3 sexies, point 1).
 const NOM_FICHIER = /^.+ - DEMANDE - \d{8}[a-z]?\.md$/i;
@@ -59,6 +59,21 @@ function contenuDeSection(texte, motif) {
   const fin = apres.search(/\n##\s+/);
   return (fin < 0 ? apres : apres.slice(0, fin))
     .split("\n").filter((l) => l.trim() && !l.trim().startsWith("<!--") && !/^<.*>$/.test(l.trim())).join("\n").trim();
+}
+
+//: D4 — la sixième rubrique, due à partir du 16/11/2026 (TF-2650), jugée sur la date AAAAMMJJ du nom de fichier.
+const DATE_D4 = "20261116";
+const RUBRIQUE_API = /^##\s*6\.\s*Les\s+param[èe]tres\s+d['’]API\s+tierce\s+prescrits\s*$/im;
+const SOURCE_OU_RENVOI = /source[^:\n]*:|https?:\/\/|à confirmer par le propriétaire/i;
+const AUCUN_PARAMETRE = /aucun\s+param[èe]tre/i;
+/** Le corps de la rubrique 6 sans commentaire HTML ni texte d'exemple entre chevrons ; `null` si le titre est absent. */
+function contenuDeRubriqueApi(texte) {
+  const m = texte.match(RUBRIQUE_API);
+  if (!m) return null;
+  const apres = texte.slice(m.index + m[0].length);
+  const fin = apres.search(/\n##\s+/);
+  return (fin < 0 ? apres : apres.slice(0, fin)).replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>\n]*>/g, "")
+    .split("\n").filter((l) => l.trim()).join("\n").trim();
 }
 
 export function verifier(cheminOuTexte, nomFichier) {
@@ -100,6 +115,30 @@ export function verifier(cheminOuTexte, nomFichier) {
     ko("D3", `${vides.length} rubrique(s) VIDE(S) : ${vides.join(" · ")} — une section vide se lit comme un oubli (loi n° 3), sauf la 5e qui admet « rien n'est écarté de cette demande »`,
       "remplir la ou les rubriques, ou — pour la 5e seulement — écrire « rien n'est écarté de cette demande »");
   } else ok("D3", "les cinq rubriques sont présentes, chacune remplie");
+
+  // ---- D4 : les paramètres d'API tierce prescrits (TF-2650, 16/11/2026) ----------------------------
+  // LE FAIT : demande du 12/11/2026, en-tête `X-Produit-86-Access` proposé pour `read_service_tokens_from_header` de Cloudflare Access ;
+  // l'API n'admet que `Authorization` — un correctif, une recette et un redéploiement de plus. Due aux demandes datées du 16/11/2026
+  // ou après (la date est dans le nom) ; chaque ligne porte sa source ou « à confirmer par le propriétaire », la justesse n'est pas jugée.
+  const dateNom = /- DEMANDE - (\d{8})/i.exec(nom);
+  if (dateNom && dateNom[1] >= DATE_D4) {
+    const corps = contenuDeRubriqueApi(texte);
+    if (corps === null || !corps) {
+      ko("D4", `rubrique « 6. Les paramètres d'API tierce prescrits » ${corps === null ? "absente" : "vide"} d'une demande datée du ${dateNom[1]}, donc à partir du ${DATE_D4} (TF-2650) — `
+        + "une valeur d'API tierce prescrite de mémoire coûte au destinataire un correctif, une recette et un redéploiement",
+        "ajouter la rubrique (gabarits\\DEMANDE-PRODUIT.md) : une ligne par paramètre avec « source : … » ou « à confirmer par le propriétaire », ou « Aucun paramètre d'API tierce n'est prescrit. »");
+    } else {
+      const lignes = corps.split("\n").map((l) => l.trim())
+        .filter((l) => /^([-*]|\|)/.test(l) && !/^\|?[\s:|-]+\|?$/.test(l) && !/^\|\s*param[èe]tre\b/i.test(l) && !AUCUN_PARAMETRE.test(l));
+      const sansSource = lignes.filter((l) => !SOURCE_OU_RENVOI.test(l));
+      if (lignes.length ? sansSource.length : !AUCUN_PARAMETRE.test(corps)) {
+        ko("D4", lignes.length
+          ? `${sansSource.length}/${lignes.length} paramètre(s) d'API tierce prescrit(s) sans source des valeurs admises ni « à confirmer par le propriétaire » : ${sansSource.map((l) => `« ${l.slice(0, 60)} »`).join(" · ")}`
+          : "la rubrique ne liste aucun paramètre et ne déclare pas « aucun paramètre d'API tierce n'est prescrit » — une rubrique qui ne dit rien se lit comme un oubli",
+          "écrire, pour chaque paramètre prescrit, la source de ses valeurs admises (page de documentation relue, réponse du propriétaire) ou « à confirmer par le propriétaire »");
+      } else ok("D4", lignes.length ? `${lignes.length} paramètre(s) d'API tierce prescrit(s), chacun avec sa source ou son renvoi au propriétaire` : "aucun paramètre d'API tierce prescrit, déclaré");
+    }
+  }
 
   return { fichier: nom, version: VERSION, constats,
     verdict: constats.some((c) => c.statut === "FAIL") ? "FAIL" : "PASS" };
