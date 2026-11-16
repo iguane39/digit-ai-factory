@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.73.0",
- "date": "2026-11-12",
+ "version": "1.74.0",
+ "date": "2026-11-16",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -3809,6 +3809,466 @@
     "TF-2442"
    ],
    "regle": "Retour de produit du 12/11/2026 : workflow de publication en échec sur 5 exécutions du 03/11 au 12/11, 3 publications non parties.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "numero-de-version-alloue-par-deux-lignees",
+   "famille": "versionnement-livrable",
+   "libelle": "Deux lignees d un meme artefact partage allouent INDEPENDAMMENT le meme numero de version, de sorte que le numero cesse de designer un contenu. Rien ne reserve ni ne coordonne l allocation entre les clones.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-1307"
+   ],
+   "regle": "Retour de produit du 21/09/2026 : Seconde collision de numero sur le socle page-html en quatre jours : le distant est en 1.24.0, ce poste aussi, et la divergence passe de 16 a 49 enregistrements.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "produit-a-plusieurs-pseudonymes",
+   "famille": "anonymisation",
+   "libelle": "Un même produit reçoit un pseudonyme par graphie de son nom : ses lots se dispersent, et les règles qui comparent les lots d'un même produit n'en voient aucun.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-1432"
+   ],
+   "regle": "Retour de produit du 28/09/2026 : Un même produit porte un pseudonyme par graphie de son nom.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "fenetre-refermee-selon-qui-l-a-ouverte",
+   "famille": "hook-ou-gate",
+   "libelle": "Une autorisation temporaire ne se referme que si l outil l a ouverte lui-meme : ouverte par un humain a l ecran, elle reste ouverte.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-1547"
+   ],
+   "regle": "Retour de produit du 01/10/2026 : Une permission accordee a l ecran par l exploitant echappe a une fenetre d autorisation qui ne referme que ce qu elle a ouvert.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "tableau-de-bord-sans-valeur-informationnelle",
+   "famille": "page-html-socle",
+   "libelle": "Un tableau de bord passe tous les oracles sans interpréter un seul de ses graphiques.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-1856"
+   ],
+   "regle": "Retour de produit du 17/10/2026 : Un tableau de bord passe check_html, filtres, render_page et forge-design sans interpréter un seul graphique.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "agent-remesure-ce-qu-un-autre-a-deja-mesure",
+   "famille": "contrat-interface-forge",
+   "libelle": "Chaque agent d'un même lot remesure les mêmes prémisses et repart d'un contexte de départ complet, faute d'une fiche vérifiée une fois et d'un type d'agent dimensionné à son rôle.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2236",
+    "TF-2241"
+   ],
+   "regle": "Retour de produit du 06/11/2026 : Prompt-analyzer-l99, mode boucle : les relecteurs aveugles revérifient chacun les mêmes prémisses d'environnement ; une fiche de prémisses vérifiée une fois les leur donnerait.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "boucle-decide-sous-le-bruit-de-ses-juges",
+   "famille": "regle-morte",
+   "libelle": "Une boucle d'amélioration décide garder, rejeter ou s'arrêter sur des écarts de score plus petits que le bruit mesuré de ses juges.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2237",
+    "TF-2238",
+    "TF-2240"
+   ],
+   "regle": "Retour de produit du 06/11/2026 : Prompt-analyzer-l99, mode boucle : le bruit toléré (B8, 2 points au plus) et le gain minimal (3 points) sont sous le bruit mesuré des relecteurs.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "droit-eprouve-par-essai-d-ecriture",
+   "famille": "hook-ou-gate",
+   "libelle": "Pour prouver une impossibilite d'acces, la session lance une commande d'ecriture distante hors du lot de gestes approuves, au lieu de lire ses droits.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2600"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Droit d'accès éprouvé par un essai d'écriture glissé dans une commande de lecture.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "acces-test-limite-a-la-demo-locale",
+   "famille": "heritage-produit",
+   "libelle": "La fiche d'accès ne donne pas à l'humain les comptes de test des environnements déployés ni les valeurs qui permettent de s'y connecter.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2601",
+    "TF-2605"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : La fiche d accès ne donne pas à l humain les comptes de test des environnements déployés.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "texte-corrompu-non-detecte",
+   "famille": "hook-ou-gate",
+   "libelle": "Un document cite du texte UTF-8 relu en Windows-1252 et passe l'oracle d'écriture : aucun contrôle ne cherche les séquences typiques de cet encodage corrompu.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2604"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Texte corrompu (UTF-8 relu en Windows-1252) non vu par l'oracle d'écriture.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "exemple-de-formation-hors-du-contexte-client",
+   "famille": "gabarit-document",
+   "libelle": "Les consignes types, démonstrations et jeux de données d une formation sont génériques ou tirés d un autre métier que celui du client servi.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2606"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Les exemples d'une formation ne viennent pas du contexte du client servi.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "verdict-d-oracle-dependant-de-l-emplacement",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un même fichier reçoit deux verdicts d un oracle selon le dossier où il est posé, parce que l oracle résout son référentiel à partir du chemin.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2608"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Oracle-charte-pptx-semantique rend PASS ou FAIL sur le même deck selon son dossier.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "echeance-ajoutee-entre-deux-tours",
+   "famille": "hook-ou-gate",
+   "libelle": "Une échéance ajoutée entre deux tours d'un planificateur hébergé reste sans déclencheur jusqu'au tour suivant.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2609"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Échéance ajoutée entre deux tours d'un planificateur hébergé, laissée sans déclencheur.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "identite-unique-non-exigee",
+   "famille": "heritage-produit",
+   "libelle": "Les exigences socle ne demandent pas une identité unique par personne.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2611"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Redige-les-exigences : aucune exigence socle ne demande une identité unique par personne.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "exclusion-de-run-perimee-par-une-capacite-neuve",
+   "famille": "regle-morte",
+   "libelle": "Une référence de run exclut un livrable parce qu aucun verbe outillé ne le produit ; une capacité versée ensuite le produit, et l exclusion survit sans que personne ne rouvre le point.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2613"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : L exclusion « Pas de vidéo » de RUN-RESEAU.md survit à son motif depuis le skill clip-de-presentation.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "allocateur-aveugle-a-la-regle-qu-il-sert",
+   "famille": "versionnement-livrable",
+   "libelle": "L allocateur d indice ne compte que les noms de son propre radical alors que R-4 refuse un indice du jour porté par deux radicaux distincts.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2616",
+    "TF-2622",
+    "TF-2631"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Allouer-indice.mjs ne compte que son propre radical, alors que R-4 refuse un indice du jour porté par deux radicaux.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "geste-a-l-heure-sur-github",
+   "famille": "hook-ou-gate",
+   "libelle": "Un geste qui doit partir à une heure précise est confié à GitHub Actions (schedule ou runner qui attend), dont la planification saute des passages.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2617"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Publication à l'heure confiée à GitHub Actions, peu fiable ; solution de référence : planificateur hébergé dédié.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "agent-ledger-contradictoire",
+   "famille": "contrat-interface-forge",
+   "libelle": "La définition d un agent et le contrat de campagne se contredisent sur le ledger.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2620"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Définition d agent constructeur : écrire au ledger contredit le contrat.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "constructeur-sans-relecture-independante",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Un agent constructeur rend un travail vert sur ses propres tests sans critique de rendu ni relecture indépendante.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2625"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : AGENT-CAMPAGNE.md : un agent constructeur rend un travail vert sans critique de rendu ni relecture indépendante.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "score-de-passe-a-plusieurs-juges-non-defini",
+   "famille": "contrat-interface-forge",
+   "libelle": "Le protocole lance plusieurs juges par passe mais le journal n admet qu un score par passe, sans règle pour les agréger.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2633"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Le mode boucle de prompt-analyzer-l99 lance 2 relecteurs par passe sans règle d agrégation des notes.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "controle-conditionne-a-une-categorie-declaree",
+   "famille": "hook-ou-gate",
+   "libelle": "Un contrôle ne s'applique qu'aux contenus d'une catégorie que leur auteur déclare, et laisse passer le même contenu rangé ailleurs.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2635"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Un contrôle conditionné à une catégorie que l'auteur choisit laisse passer le contenu rangé ailleurs.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "mise-en-forme-incompatible-avec-la-langue-du-texte",
+   "famille": "gabarit-document",
+   "libelle": "Un outil de mise en forme prescrit par un skill ne traite que l alphabet ASCII et produit un rendu cassé sur un texte français.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2637"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Linkedin_unicode_formatting.py ne met en gras que l ASCII, les lettres accentuées restent maigres.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "format-de-run-sans-emplacement-conforme",
+   "famille": "emplacement-livrable",
+   "libelle": "Une référence de run prescrit des fichiers à nom fixe sans dire où ils vivent, et l emplacement naturel fait échouer la règle de nommage.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2638"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : RUN-RESEAU N2 ne dit pas où vit le dossier de semaine, et sous output sans ancêtre daté chaque fichier prend un FAIL R-4.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "livrable-genere-sans-source",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un agent livre des images ou fichiers générés sans les données ni la commande qui les rendent.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2639"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Un agent livre des images générées sans leurs données ni leur commande de rendu.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "type-livrable-sans-voie-de-production",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un type de livrable demandé n a ni voie de production outillée au poste ni oracle, et la session découvre l impasse en cours de tour.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2640",
+    "TF-2643"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : L animation d un personnage depuis une photo (image vers vidéo) n a ni voie de production ni oracle au poste.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "relais-vers-un-autre-agent-sans-reprise",
+   "famille": "hook-ou-gate",
+   "libelle": "Une session confie un travail à un autre agent hors de la file, sans surveillance ni reçu, et ne reprend pas quand ce travail est fini.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2642"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Un relais vers un autre agent hors de la file de tickets n a ni surveillance ni reprise.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "regle-de-transparence-sans-cas-de-responsabilite-editoriale-humaine",
+   "famille": "hook-ou-gate",
+   "libelle": "La règle de transparence impose la mention à tout contenu public généré, sans cas pour un texte qu une personne relit, modifie et publie elle-même sous sa responsabilité éditoriale.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2644"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : La règle de transparence n a aucun cas pour un texte qu une personne relit, modifie et publie elle-même.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "oracle-sans-declaration-de-responsable-editorial",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un oracle de transparence n a aucun moyen de lire qu un contenu est publié sous la responsabilité éditoriale d une personne nommée.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2645"
+   ],
+   "regle": "Retour de produit du 12/11/2026 : Oracle-transparence ne sait pas lire qu un contenu est publié sous la responsabilité éditoriale d une personne.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "garde-de-file-sans-regard-sur-la-cible",
+   "famille": "hook-ou-gate",
+   "libelle": "Une garde de la file de tickets bloque une écriture légitime (édition d'un ticket pas encore remis, écriture hors de la file) parce qu'elle juge l'état de la file sans regarder la cible de l'écriture.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2647",
+    "TF-2651"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : La garde de la file bloque l'auteur d'un ticket pas encore remis.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "remise-de-lot-sans-type-au-ledger",
+   "famille": "tracabilite-ledger",
+   "libelle": "La remise d'un lot n'a pas de type au ledger et devient un retour orphelin.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2652"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : Consigner la remise d'un lot au ledger crée un retour orphelin.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "garde-distante-point-de-droits-non-couvert",
+   "famille": "hook-ou-gate",
+   "libelle": "Un point d'acces de droits d'une plateforme couverte echappe a la liste fermee : le geste passe sans lot et le lot refuse de l'inscrire.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2653"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : Un retrait d'access policy Key Vault par l'API ARM passe sans lot, et le lot refuse de l'inscrire.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "perimetre-exclu-compte-en-securite",
+   "famille": "hook-ou-gate",
+   "libelle": "Le pan sécurité de forge-tests compte des constats dans le périmètre que le rapport déclare exclu.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2654"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : Pan sécurité : constats comptés dans le périmètre que le rapport déclare exclu.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "veille-rearmee-sans-intervalle",
+   "famille": "hook-ou-gate",
+   "libelle": "Une veille periodique se rearme a chaque fin de tour au lieu d'attendre son intervalle : la meme exigence revient en boucle.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2656"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : La veille des agents redemande le meme point de suivi a chaque fin de tour.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "declaration-doublon-sur-message",
+   "famille": "hook-ou-gate",
+   "libelle": "Le registre des constats contestés dédoublonne sur l identifiant sans le message.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2658"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : Constats contestés : 2 déclarations refusées comme doublons alors que leur message diffère.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "intention-sans-usager",
+   "famille": "hook-ou-gate",
+   "libelle": "L'usager que vise une demande ou une intention n'est ni nommé ni relu : une recommandation ou une intention passe sans que aucun contrôle ne voie l'absence.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2659",
+    "TF-2660"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : La recommandation d'une décision n'est pas relue contre l'usager de la demande.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "campagne-residus-instance",
+   "famille": "hook-ou-gate",
+   "libelle": "Une campagne de tests laisse ses objets dans la base d'une instance hébergée.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2661"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : Une campagne sur une instance hébergée y laisse ses données de test.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-tests) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "consigne-rubriques-contrat",
+   "famille": "hook-ou-gate",
+   "libelle": "Une consigne d'agent part sans les rubriques que le contrat d'agent exige.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2663"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : Une consigne d'agent part sans les rubriques que le contrat d'agent exige.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "voie-de-lecture-des-secrets-non-nommee",
+   "famille": "secret-hors-perimetre",
+   "libelle": "Le CLAUDE.md d'un produit nomme la voie de rangement d'un secret mais pas la voie masquée de sa lecture.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2666"
+   ],
+   "regle": "Retour de produit du 16/11/2026 : Le CLAUDE.md d'un produit ne nomme pas la voie masquée pour lister les clés du fichier d'environnement.",
+   "oracle": "à porter par la forge cible (factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "oracle-cite-propre-a-un-produit",
+   "famille": "regle-morte",
+   "libelle": "Une référence transverse nomme comme existant un oracle propre à un seul produit.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2671"
+   ],
+   "regle": "Retour de produit du 16/11/2026 : La chaîne A de traduction nomme comme existants des contrôles propres à un produit pionnier.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "secret-non-range-hors-run",
+   "famille": "secret-hors-perimetre",
+   "libelle": "Le geste de rangement d'un secret echoue hors run faute de ledger.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2676"
+   ],
+   "regle": "Retour de produit du 13/11/2026 : Ranger-secret refuse hors run, alors que reserver-decision ecrit au journal hors run.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "reprise-base-derivee-vide",
+   "famille": "heritage-produit",
+   "libelle": "Une base dérivée ignorée par git n'est ni copiée ni régénérée à la reprise.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2680"
+   ],
+   "regle": "Retour de produit du 15/11/2026 : La reprise sur un autre poste ne régénère pas une base dérivée ignorée par git.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "nommage-lot-sans-issue",
+   "famille": "versionnement-livrable",
+   "libelle": "L'allocateur d'indice et le juge de lot n'acceptent aucun nom commun pour le 28e lot d'un jour.",
+   "creee_le": "2026-11-16",
+   "fondee_par": [
+    "TF-2681"
+   ],
+   "regle": "Retour de produit du 15/11/2026 : Le 28e lot d'un jour n'a aucun nom que l'allocateur et le juge de lot acceptent.",
    "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
   }
  ],
