@@ -2029,7 +2029,8 @@ else {
   // échec : 4 déclarations d'un produit du parc, d'octobre 2026, portent « inconnu, antérieur à <date> », et un ledger est en ajout seul).
   const NAISSANCE_TS_REEL_LISIBLE = Date.parse("2026-11-15T00:00:00Z");
   const tsReelLisible = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(v.trim()) && !Number.isNaN(Date.parse(v));
-  for (const { e } of entrees) {
+  const tsReelAnterieurs = []; // TF-2596 : `ts_reel_estime` illisible d'une rectification écrite avant la règle — dit, jamais jugé, comme `verify`
+  for (const { n, e } of entrees) {
     if (!e || (e.type || e.ev) !== "rectification_horodatage") continue;
     const exigerTsLisible = !(Date.parse(String(e.ts || "")) < NAISSANCE_TS_REEL_LISIBLE);
     for (const d of (Array.isArray(e.entrees) ? e.entrees : [])) {
@@ -2042,7 +2043,7 @@ else {
         continue;
       }
       const seq = Number(d && d.seq);
-      if (!Number.isFinite(seq) || (Number.isFinite(Number(e.seq)) && seq >= Number(e.seq))) continue;
+      if (!Number.isFinite(seq)) continue;
       const tsCollision = String((d && (d.ts_consigne || d.ts_reel_estime)) || "");
       if (!tsCollision) {
         rectificationsInvalides.push(`seq ${seq} : rectification sans ts_consigne ni ts_reel_estime — non opposable (TF-1466)`);
@@ -2068,6 +2069,16 @@ else {
       // TF-2587 (suite) : la valeur de `ts_reel_estime` doit être un instant, pour une rectification née avec la règle (`tsReelLisible`, plus haut).
       if (exigerTsLisible && !tsReelLisible(d.ts_reel_estime)) {
         rectificationsInvalides.push(`seq ${seq} : déclaration incomplète — \`ts_reel_estime\` illisible (${JSON.stringify(d.ts_reel_estime)}) — une date ET une heure ISO 8601 sont attendues (2026-01-01T12:30:00Z), comme chez \`ledger.mjs verify\` (TF-2587)`);
+        continue;
+      }
+      // TF-2596 (16/11/2026) — LE SEQ D'UNE DÉCLARATION DOIT ÊTRE ANTÉRIEUR À LA RECTIFICATION QUI LE PORTE : `ledger.mjs verify` (forge-agents, TF-1425) refuse
+      // une déclaration de seq supérieur ou égal à celui de la rectification (« on ne se dédouane pas d'avance »), même à côté d'une déclaration valide ; R-42
+      // l'ignorait en silence (`continue` sans écart) — mesuré le 15/11/2026 par l'agent du lot pc, 2 formes (seq 9 et seq 4 pour une rectification au seq 4) :
+      // R-42 PASS, `verify` exit 1. Même ordre qu'à `verify` : après les champs dus et la lisibilité de `ts_reel_estime`. Le repère [ANTÉRIEUR] de `verify`
+      // (une rectification d'avant le 15/11/2026 n'est pas jugée sur `ts_reel_estime`) se dit aussi ici, plus bas.
+      if (!exigerTsLisible && !tsReelLisible(d.ts_reel_estime)) tsReelAnterieurs.push(`ligne ${n} (rectification_horodatage, seq ${e.seq}) seq ${seq}`);
+      if (Number.isFinite(Number(e.seq)) && seq >= Number(e.seq)) {
+        rectificationsInvalides.push(`rectification du seq ${e.seq} : déclare le seq ${seq}, qui ne lui est pas ANTÉRIEUR — une rectification ne couvre jamais un seq postérieur ni elle-même : on ne se dédouane pas d'avance, comme chez \`ledger.mjs verify\` (TF-2596)`);
         continue;
       }
       const instantRectif = Date.parse(String(e.ts || ""));
@@ -2125,6 +2136,8 @@ else {
   let avecSeq = 0;
   if (illisibles.length) ecarts.push(`ligne(s) JSON illisible(s) : ${illisibles.slice(0, 5).join(", ")}${illisibles.length > 5 ? " …" : ""}`);
   if (rectificationsInvalides.length) ecarts.push(...rectificationsInvalides); // TF-1466
+  // TF-2596 : le repère de `verify` (forge-agents), même texte — la valeur illisible d'une rectification d'avant le 15/11/2026 se COMPTE à voix haute, elle ne se juge pas.
+  if (tsReelAnterieurs.length) notes.push(`[ANTÉRIEUR] ts_reel_estime — ${tsReelAnterieurs.length} déclaration(s) à \`ts_reel_estime\` illisible, écrite(s) avant la règle du ${new Date(NAISSANCE_TS_REEL_LISIBLE).toISOString().slice(0, 10)}, non jugée(s) sur ce champ (TF-2587) : ${tsReelAnterieurs.join(", ")}`);
   const lues = entrees.filter((x) => x.e).map((x) => x.e);
   if (lues.length) {
     const premier = lues[0];
