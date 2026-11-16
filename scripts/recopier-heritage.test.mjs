@@ -294,6 +294,24 @@ try {
     att(!absents.length, `le CLAUDE.md hérité ne porte plus : ${absents.join(", ")}`);
   });
 
+  // TF-2666 (16/11/2026) : le CLAUDE.md d'un produit nommait la voie de RANGEMENT d'un secret (ranger-secret.mjs), pas celle de LECTURE des
+  // clés d'un `.env` ; le 16/11, une session a listé les clés par grep, le hook fichiers-env l'a refusé (D-106 (b)) et lui a indiqué le script.
+  // Le script reste au pilot (aucune copie chez le produit, héritage 1.64.0) : la phrase le nomme par `<pilot>\scripts\env-masque.mjs`.
+  const nommeLaVoieMasquee = (texte) => /ranger-secret\.mjs[^)]*env-masque\.mjs <fichier> --cles/.test(texte);
+  check("TF-2666 — le CLAUDE.md recopié chez un produit nomme, à côté de ranger-secret.mjs, la voie masquée qui liste les clés d'un `.env`", () => {
+    const produit = join(T, "produit-voie-masquee");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    const claude = readFileSync(join(produit, "CLAUDE.md"), "utf8");
+    att(nommeLaVoieMasquee(claude), "le CLAUDE.md recopié ne nomme pas `node <pilot>\\scripts\\env-masque.mjs <fichier> --cles` à côté de ranger-secret.mjs");
+    att(existsSync(join(PILOT, "scripts", "env-masque.mjs")), "le script nommé n'existe pas au pilot : la phrase pointerait dans le vide");
+  });
+  check("TF-2666 rouge — le prédicat distingue : le même texte sans la phrase est refusé", () => {
+    const sans = readFileSync(join(PILOT, "gabarits", "CLAUDE-PRODUIT.md"), "utf8").replace(/ ; clés d'un `\.env` : `node <pilot>[^`]*`/, "");
+    att(sans.length > 0 && !nommeLaVoieMasquee(sans), "le prédicat accepte un texte sans la phrase, ou la phrase n'a pas été retirée du témoin");
+  });
+
   check("TF-1949 — sans perte : le détail du pilot garde, mot pour mot, chaque section sortie du gabarit", () => {
     const detail = join(PILOT, "references", "CLAUDE-PRODUIT-DETAIL.md");
     att(existsSync(detail), "references/CLAUDE-PRODUIT-DETAIL.md absent : le texte sorti du gabarit n'a plus de lieu");
