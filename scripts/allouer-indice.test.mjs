@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { allouerIndice, canonique } from "./allouer-indice.mjs";
+import { allouerIndice, allouerIndiceVuDuRegistre, canonique } from "./allouer-indice.mjs";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -318,6 +318,47 @@ try {
     peupler(d, [...LETTRES_26]);
     const r = lancer([d, "Produit - Rapport - ", JOUR]);
     att(r.status === 0 && r.stdout === "za\n", `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+  });
+
+  // ---- TF-2634 (RP-217, 12/11/2026) : deux sessions d'un même produit ont écrit un lot sous le même nom, la seconde a écrasé la première au sas.
+  // L'indice d'un lot se lit dans `forge/retours/` ET dans le sas, juste avant l'écriture : `--aussi <dossier>` (répétable) ajoute les noms d'un autre
+  // dossier à ceux qui sont pris. Le lot de l'autre session n'est qu'au sas (ou n'y est pas encore copié) : sans `--aussi`, la collision se reproduit.
+  const PREFIXE_LOT = "Produit-86 - RETOURS - ";
+  const deuxDossiers = (nom) => {
+    const retours = join(T, nom, "forge", "retours"), sas = join(T, nom, "sas");
+    mkdirSync(retours, { recursive: true }); mkdirSync(sas, { recursive: true });
+    writeFileSync(join(retours, `${PREFIXE_LOT}${JOUR}a.md`), "mon lot", "utf8");
+    writeFileSync(join(sas, `${PREFIXE_LOT}${JOUR}b.md`), "le lot de l'autre session, remis au sas", "utf8");
+    return { retours, sas };
+  };
+  check("TF-2634 rouge : sans `--aussi`, le lot d'une AUTRE session remis au sas n'est pas vu — « b » est proposé, déjà pris au sas", () => {
+    const { retours } = deuxDossiers("lots-sans-aussi");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe"]);
+    att(r.status === 0 && r.stdout.trim() === "b", `exit ${r.status}, sortie « ${r.stdout.trim()} » — si ce test casse, la collision de RP-217 ne se reproduit plus sans l'option`);
+  });
+  check("TF-2634 vert : `--aussi <sas>` lit le sas au moment de l'appel — l'indice du lot saute « b » et rend « c »", () => {
+    const { retours, sas } = deuxDossiers("lots-avec-aussi");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe", "--aussi", sas]);
+    att(r.status === 0 && r.stdout.trim() === "c", `exit ${r.status}, sortie « ${r.stdout.trim()} », stderr « ${r.stderr.trim()} »`);
+    // Le lot de l'autre session arrive au sas ENTRE deux appels : le second appel le voit.
+    writeFileSync(join(sas, `${PREFIXE_LOT}${JOUR}c.md`), "un troisième lot, remis entre-temps", "utf8");
+    const r2 = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe", "--aussi", sas]);
+    att(r2.status === 0 && r2.stdout.trim() === "d", `second appel : exit ${r2.status}, sortie « ${r2.stdout.trim()} » — le sas n'est pas relu`);
+  });
+  check("TF-2634 vert : plusieurs `--aussi` (le sas et la boîte) comptent tous, et le module les accepte par `aussi`", () => {
+    const { retours, sas } = deuxDossiers("lots-plusieurs-aussi");
+    const boite = join(T, "lots-plusieurs-aussi", "boite"); mkdirSync(boite, { recursive: true });
+    writeFileSync(join(boite, `${PREFIXE_LOT}${JOUR}c.md`), "lot déjà ingéré", "utf8");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--porte", "prefixe", "--aussi", sas, "--aussi", boite]);
+    att(r.status === 0 && r.stdout.trim() === "d", `exit ${r.status}, sortie « ${r.stdout.trim()} »`);
+    att(allouerIndiceVuDuRegistre({ dossier: retours, prefixe: PREFIXE_LOT, jour: JOUR, extension: ".md", porte: "prefixe", aussi: [sas, boite] }) === "d", "le module ne lit pas `aussi`");
+  });
+  check("TF-2634 rouge : `--aussi` vers un dossier introuvable → exit 2, jamais un indice calculé sans lui (aucune borne silencieuse)", () => {
+    const { retours } = deuxDossiers("lots-aussi-absent");
+    const r = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--aussi", join(T, "n-existe-pas")]);
+    att(r.status === 2 && r.stdout === "" && /introuvable/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+    const sans = lancer(["--dossier", retours, "--prefixe", PREFIXE_LOT, "--jour", JOUR, "--extension", ".md", "--aussi"]);
+    att(sans.status === 2 && sans.stdout === "", `--aussi sans valeur : exit ${sans.status}`);
   });
 
   check("TF-1863 rouge : option inconnue → exit 2 (usage), pas d'indice deviné", () => {

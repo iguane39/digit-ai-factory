@@ -179,16 +179,31 @@ function lettreAvecReservations(options, { noms, propre }) {
   return propre && !existsSync(join(options.dossier, `${options.prefixe}${options.jour}${calcul}${options.extension}`)) ? propre : calcul;
 }
 
+/**
+ * TF-2634 (RP-217, 12/11/2026) : les noms des AUTRES dossiers où le même indice peut être pris (le sas du pilot, la boîte d'entrée, pour un lot de retours dont
+ * le fichier de l'autre session n'est pas dans `forge/retours/`). Lus à l'appel, donc juste avant l'écriture. Un dossier introuvable est une erreur d'usage :
+ * l'ignorer rendrait un indice calculé sans lui, sans le dire.
+ */
+export function nomsDesDossiers(dossiers = []) {
+  const noms = [];
+  for (const d of dossiers) {
+    let liste;
+    try { liste = readdirSync(d); } catch (e) { throw new ErreurUsage(`--aussi : dossier introuvable ou illisible (${resolve(d)} : ${e.code || e.message}) — l'indice n'est pas rendu sans lui`); }
+    noms.push(...liste);
+  }
+  return noms;
+}
+
 /** L'indice que rend la commande sans `--reserver` : le disque, plus les réservations des sessions vivantes du produit, lues sans verrou.
- *  Hors d'un produit, ou registre illisible, le disque seul (le second cas est dit à `avertir`). */
-export function allouerIndiceVuDuRegistre({ dossier, prefixe = "", jour, contenu, extension = ".html", porte = "dossier", session = sessionCourante().id, avertir = () => {} }) {
+ *  Hors d'un produit, ou registre illisible, le disque seul (le second cas est dit à `avertir`). `aussi` : d'autres dossiers dont les noms comptent comme pris (TF-2634). */
+export function allouerIndiceVuDuRegistre({ dossier, prefixe = "", jour, contenu, extension = ".html", porte = "dossier", session = sessionCourante().id, avertir = () => {}, aussi = [] }) {
   const p = registreDuDossier(dossier);
   let reservations = { noms: [], propre: null };
   if (p) {
     try { reservations = nomsReserves(etatDesSessions(lireRegistre(p.reg.racines).lignes), p.relatif, { prefixe, extension, jour, session, dossier: p.dossier }); }
     catch (e) { avertir(`registre des sessions illisible, réservations des autres sessions non lues : ${e.message}`); }
   }
-  return lettreAvecReservations({ dossier, prefixe, jour, contenu, extension, porte }, reservations);
+  return lettreAvecReservations({ dossier, prefixe, jour, contenu, extension, porte }, { ...reservations, noms: [...reservations.noms, ...nomsDesDossiers(aussi)] });
 }
 
 /**
@@ -196,7 +211,7 @@ export function allouerIndiceVuDuRegistre({ dossier, prefixe = "", jour, contenu
  * revendication du nom de fichier (`origine: allouer-indice --reserver`). Rend { lettre, nom, chemin, deja, registre, session, source }.
  * Lève `ErreurUsage` hors d'un produit, ou sans session identifiée.
  */
-export function reserverIndice({ dossier, prefixe = "", jour, contenu, extension = ".html", porte = "dossier", session = sessionCourante(), maintenant = Date.now() }) {
+export function reserverIndice({ dossier, prefixe = "", jour, contenu, extension = ".html", porte = "dossier", session = sessionCourante(), maintenant = Date.now(), aussi = [] }) {
   if (!/^\d{8}$/.test(String(jour))) throw new Error(`jour attendu AAAAMMJJ, reçu « ${jour} »`);
   if (!session?.id) throw new ErreurUsage("--reserver exige une session identifiée : FORGE_SESSION_ID (posée par le hook SessionStart) ou CLAUDE_CODE_SESSION_ID");
   const p = registreDuDossier(dossier);
@@ -204,8 +219,9 @@ export function reserverIndice({ dossier, prefixe = "", jour, contenu, extension
   let r;
   sousVerrouDuRegistre(p.reg, (lu) => {
     const etat = etatDesSessions(lu.lignes, { maintenant });
+    const reservees = nomsReserves(etat, p.relatif, { prefixe, extension, jour, session: session.id, dossier: p.dossier });
     const lettre = lettreAvecReservations({ dossier: p.dossier, prefixe, jour, contenu, extension, porte },
-      nomsReserves(etat, p.relatif, { prefixe, extension, jour, session: session.id, dossier: p.dossier }));
+      { ...reservees, noms: [...reservees.noms, ...nomsDesDossiers(aussi)] });
     const nom = `${prefixe}${jour}${lettre}${extension}`;
     const chemin = p.relatif ? `${p.relatif}/${nom}` : nom;
     r = { lettre, nom, chemin, deja: tientDeja(etat, chemin, session.id) };
@@ -221,7 +237,11 @@ export function reserverIndice({ dossier, prefixe = "", jour, contenu, extension
  *
  *   node scripts/allouer-indice.mjs [dossier] [prefixe] [jour]
  *   node scripts/allouer-indice.mjs --dossier <d> --prefixe <p> --jour AAAAMMJJ [--extension .md]
- *                                   [--contenu-fichier <f>] [--porte dossier|prefixe] [--reserver]
+ *                                   [--contenu-fichier <f>] [--porte dossier|prefixe] [--reserver] [--aussi <dossier>]...
+ *
+ * `--aussi <dossier>` (répétable, TF-2634) : les noms de cet autre dossier comptent comme pris. Pour un LOT DE RETOURS, l'indice se lit dans
+ * `forge/retours/` ET dans le sas du pilot (`input/00-retours/_arrivee`) juste avant l'écriture : une autre session du produit a pu remettre un lot
+ * du même jour sans qu'il soit chez celle-ci (RP-217, 12/11/2026). Un dossier introuvable est refusé (exit 2), jamais ignoré.
  *
  * Défauts : dossier = répertoire courant, prefixe = « » (aucun), jour = aujourd'hui (heure locale),
  * portée « dossier » (celle de R-4 : une lettre par jour et par dossier, tous radicaux confondus ;
@@ -234,14 +254,16 @@ export function reserverIndice({ dossier, prefixe = "", jour, contenu, extension
 export function executerCli(argv, { sortie = (t) => process.stdout.write(t), erreur = (t) => process.stderr.write(t) } = {}) {
   const valeurs = {};
   const positions = [];
-  const AVEC_VALEUR = new Set(["dossier", "prefixe", "jour", "extension", "contenu-fichier", "porte"]);
+  const AVEC_VALEUR = new Set(["dossier", "prefixe", "jour", "extension", "contenu-fichier", "porte", "aussi"]);
   let reserver = false;
+  const aussi = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--reserver") { reserver = true; continue; }
     if (a.startsWith("--")) {
       const cle = a.slice(2);
       if (!AVEC_VALEUR.has(cle) || i + 1 >= argv.length) { erreur(`option inconnue ou sans valeur : ${a}\n`); return 2; }
+      if (cle === "aussi") { aussi.push(argv[++i]); continue; }
       valeurs[cle] = argv[++i];
     } else positions.push(a);
   }
@@ -262,12 +284,12 @@ export function executerCli(argv, { sortie = (t) => process.stdout.write(t), err
   const extension = valeurs.extension ?? ".html";
   try {
     if (reserver) {
-      const r = reserverIndice({ dossier, prefixe, jour, contenu, extension, porte });
+      const r = reserverIndice({ dossier, prefixe, jour, contenu, extension, porte, aussi });
       sortie(`${r.lettre}\n`);
       erreur(`indice ${r.lettre} ${r.deja ? "déjà réservé" : "réservé"} pour la session ${r.session.slice(0, 8)} (${r.source}) : ${r.chemin}, registre ${r.registre}\n`);
       return 0;
     }
-    sortie(`${allouerIndiceVuDuRegistre({ dossier, prefixe, jour, contenu, extension, porte, avertir: (t) => erreur(`${t}\n`) })}\n`);
+    sortie(`${allouerIndiceVuDuRegistre({ dossier, prefixe, jour, contenu, extension, porte, aussi, avertir: (t) => erreur(`${t}\n`) })}\n`);
     return 0;
   } catch (e) { erreur(`${e.message}\n`); return e instanceof ErreurUsage ? 2 : 1; }
 }

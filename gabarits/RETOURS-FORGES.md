@@ -102,7 +102,10 @@ l'ouverture évite d'attendre la fin du délai.
 
 **L'indice est PRIS dès que le lot est remis (R-49, TF-0884, 08/09)** : avant d'écrire un lot,
 demander l'indice libre du jour — `node scripts\allouer-indice.mjs` — plutôt que de reprendre
-celui qu'un mandat nomme. Le 06/09, un compte rendu a pris l'indice « a » que son mandat citait,
+celui qu'un mandat nomme. Une autre session du même produit a pu remettre un lot du jour que ce
+dossier ne porte pas (RP-217, 12/11/2026 : le lot de l'une a été écrasé par celui de l'autre au sas) :
+l'indice d'un lot se lit donc dans `forge\retours\` ET dans le sas, juste avant l'écriture,
+`node scripts\allouer-indice.mjs --dossier forge\retours --prefixe "<projet> - RETOURS - " --extension .md --porte prefixe --aussi "<sas du pilot>"`. Le 06/09, un compte rendu a pris l'indice « a » que son mandat citait,
 déjà porté par un lot du même produit remis et **ingéré le matin même** ; une écriture ordinaire
 l'a remplacé, et *aucun contrôle ne s'y est opposé* — ni ce gabarit, qui l'écrit pourtant, ni
 l'oracle de forme, ni la boîte d'entrée, qui ne l'aurait vu qu'à l'ouverture suivante. L'histoire
