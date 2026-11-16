@@ -97,7 +97,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.9.0"; // 1.9.0 (10/11/2026) : `--remettre [<sas>]` lie la copie au sas au verdict du juge, TF-2314 · 1.8.1 (15/10/2026) : le lancement direct se reconnaît par le chemin réel, un chemin à nom court Windows ne rend plus le module muet · 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.9.1"; // 1.9.1 (16/11/2026) : un lot à double suffixe « za » à « zz » est jugé comme une lettre simple, TF-2681 · 1.9.0 (10/11/2026) : `--remettre [<sas>]` lie la copie au sas au verdict du juge, TF-2314 · 1.8.1 (15/10/2026) : le lancement direct se reconnaît par le chemin réel, un chemin à nom court Windows ne rend plus le module muet · 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 /**
  * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
@@ -179,8 +179,8 @@ const AUCUN_R46 = /aucun\s+document\s+produit\s+depuis\s+un\s+gabarit/i;
 /** La date portée par le NOM du lot — jamais celle du disque, qu'une copie suffit à changer. */
 export function dateDuLot(chemin) {
   const nom = basename(String(chemin).split("\\").join("/"));
-  const m = /(\d{8})[a-z]?\.(?:md|tf\.jsonl)$/i.exec(nom)
-    || /(\d{8})[a-z]?\.normalise\.tf\.jsonl$/i.exec(nom);
+  const m = /(\d{8})(?:z[a-z]|[a-z])?\.(?:md|tf\.jsonl)$/i.exec(nom)
+    || /(\d{8})(?:z[a-z]|[a-z])?\.normalise\.tf\.jsonl$/i.exec(nom);
   return m ? m[1] : null;
 }
 
@@ -193,7 +193,8 @@ export const SEUIL_IDS = "20260914";
 // un tableau de rappel (« ce que ce retour ajoute aux lots du jour ») accusait huit reprises à tort.
 const ID_EN_TETE_DE_LIGNE = /^\s*\|\s*\**\s*(R[A-Z])-0*(\d+)\b[^|\n]*\|(?:[^|\n]*\|)?\s*\**\s*(?:bloquant|majeur|mineur)\b/gim;
 const ID_EN_TITRE = /^#{2,4}\s+\**\s*(R[A-Z])-0*(\d+)\b/gm;
-const NOM_DE_LOT = /^(.*) - RETOURS - (\d{8}[a-z]?)\.md$/i;
+// TF-2681 : l'indice d'un lot est une lettre, ou « za » à « zz » quand l'allocateur a épuisé les 26 lettres du jour.
+const NOM_DE_LOT = /^(.*) - RETOURS - (\d{8}(?:z[a-z]|[a-z])?)\.md$/i;
 
 /**
  * TF-1458 (28/09/2026) — LE PRÉFIXE DE COMPARAISON, PAS LE PRÉFIXE BRUT. Au sas d'arrivée

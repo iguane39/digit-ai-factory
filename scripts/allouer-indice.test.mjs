@@ -192,14 +192,56 @@ try {
     att(indice === "a", `indice « ${indice} » au lieu de « a » — la portée est le dossier cible, pas le parc`);
   });
 
-  check("TF-1850 : dossier PLEIN (a à z pris) → l'outil échoue avec un message clair, il ne rend pas un nom refusé", () => {
-    const d = join(T, "plein");
+  // ---- TF-2681 (16/11/2026) : le 28e lot d'un jour n'avait aucun nom que l'allocateur et le juge de lot
+  // acceptent — l'allocateur refusait (26 lettres prises) et proposait le lendemain, que LOT-DATE refuse.
+  // Après « z », l'allocateur propose un double suffixe « za », « zb »… « zz » (26 de plus) ; il échoue
+  // seulement quand les 52 sont prises. Le juge de lot l'accepte comme une lettre simple (son banc).
+  const DOUBLES = [...LETTRES_26].map((l) => `z${l}`);
+  check("TF-2681 : 26 lettres prises → l'allocateur propose « za » (au lieu d'échouer), avec le défaut du module", () => {
+    const d = join(T, "plein-doubles");
     peupler(d, [...LETTRES_26]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    att(indice === "za", `indice « ${indice} » au lieu de « za »`);
+  });
+  check("TF-2681 : « za » pris → « zb » ; « za » à « zy » pris → « zz » (l'ordre des doubles suit celui des lettres)", () => {
+    const d = join(T, "plein-doubles-suite");
+    peupler(d, [...LETTRES_26, "za"]);
+    att(allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }) === "zb", "après za, « zb » attendu");
+    const d2 = join(T, "plein-doubles-fin");
+    peupler(d2, [...LETTRES_26, ...DOUBLES.slice(0, 25)]);
+    att(allouerIndice({ dossier: d2, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }) === "zz", "après zy, « zz » attendu");
+  });
+  check("TF-2681 : un double pris par un AUTRE radical (portée dossier) est sauté, comme une lettre simple", () => {
+    const d = join(T, "plein-doubles-radical");
+    peupler(d, [...LETTRES_26]);
+    peupler(d, ["za"], "Produit - Etude");
+    att(allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }) === "zb", "le « za » de l'autre radical n'est pas vu");
+  });
+  check("TF-2681 : contenu identique à un fichier à double suffixe → son indice « zb » (identité de contenu)", () => {
+    const d = join(T, "plein-doubles-identique");
+    peupler(d, [...LETTRES_26]);
+    writeFileSync(join(d, `Produit - Rapport - ${JOUR}zb.md`), `REF-${JOUR}zb corps`, "utf8");
+    att(allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: `REF-${JOUR}zc corps`, extension: ".md" }) === "zb", "la forme canonique ne neutralise pas un double suffixe");
+  });
+  check("TF-2681 : canonique() neutralise un double suffixe sans laisser sa seconde lettre", () => {
+    att(canonique(`x ${JOUR}za y`, JOUR) === `x ${JOUR} y`, `« ${canonique(`x ${JOUR}za y`, JOUR)} »`);
+    att(canonique(`x ${JOUR}z y`, JOUR) === `x ${JOUR} y`, "la lettre simple z n'est plus neutralisée");
+  });
+  check("TF-2681 : le nom proposé est unique dans le dossier du jour et ne reprend pas un fichier existant", () => {
+    const d = join(T, "plein-doubles-unique");
+    peupler(d, [...LETTRES_26]);
+    const indice = allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" });
+    att(!existsSync(join(d, `Produit - Rapport - ${JOUR}${indice}.md`)), "le nom proposé existe déjà");
+  });
+
+  check("TF-1850 / TF-2681 : dossier PLEIN (a-z et za-zz pris) → l'outil échoue avec un message clair, il ne rend pas un nom pris", () => {
+    const d = join(T, "plein");
+    peupler(d, [...LETTRES_26, ...DOUBLES]);
     let message = null;
     try { allouerIndice({ dossier: d, prefixe: "Produit - Rapport - ", jour: JOUR, contenu: "neuf", extension: ".md" }); }
     catch (e) { message = e.message; }
     att(message !== null, "dossier plein : aucune erreur levée — un nom déjà pris ou refusé a été rendu");
-    att(/aucune lettre libre/.test(message) && /26/.test(message) && message.includes(JOUR), `message peu clair : « ${message} »`);
+    att(/aucune lettre libre/.test(message) && /26/.test(message) && /za-zz/.test(message) && message.includes(JOUR), `message peu clair : « ${message} »`);
   });
 
   check("TF-1850 : dossier plein mais contenu IDENTIQUE à un fichier présent → son indice (pas d'erreur : rien à écrire)", () => {
@@ -265,11 +307,17 @@ try {
     att(r.status === 1 && r.stdout === "" && /AAAAMMJJ/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
   });
 
-  check("TF-1863 rouge : dossier plein (a à z) → exit 1 « aucune lettre libre », jamais un nom refusé", () => {
+  check("TF-1863 rouge : dossier plein (a-z et za-zz) → exit 1 « aucune lettre libre », jamais un nom refusé", () => {
     const d = join(T, "cli-plein");
-    peupler(d, [...LETTRES_26]);
+    peupler(d, [...LETTRES_26, ...DOUBLES]);
     const r = lancer([d, "Produit - Rapport - ", JOUR]);
     att(r.status === 1 && r.stdout === "" && /aucune lettre libre/.test(r.stderr), `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
+  });
+  check("TF-2681 vert : ligne de commande, 26 lettres prises → imprime `za` (exit 0)", () => {
+    const d = join(T, "cli-plein-26");
+    peupler(d, [...LETTRES_26]);
+    const r = lancer([d, "Produit - Rapport - ", JOUR]);
+    att(r.status === 0 && r.stdout === "za\n", `exit ${r.status}, stdout « ${r.stdout} », stderr « ${r.stderr.trim()} »`);
   });
 
   check("TF-1863 rouge : option inconnue → exit 2 (usage), pas d'indice deviné", () => {

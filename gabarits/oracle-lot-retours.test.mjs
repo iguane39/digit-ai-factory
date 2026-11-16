@@ -13,6 +13,10 @@
  * section, donc un remède qui envoyait le lecteur créer une section au mauvais nom.
  */
 import { verifier, dateDuLot, SEUILS } from "./oracle-lot-retours.mjs";
+import { allouerIndice } from "../scripts/allouer-indice.mjs";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 let pass = 0, echec = 0;
 const check = (nom, fn) => {
@@ -50,6 +54,36 @@ check("verte LOT-DATE — le même lot, nommé du jour qui le juge, passe", () =
   const r = verifier(lot("20260924a"), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20260924" });
   const c = r.constats.find((x) => x.regle === "LOT-DATE");
   if (r.verdict !== "PASS" || !c || c.statut !== "PASS") throw new Error(`verdict ${r.verdict}, LOT-DATE ${c && c.statut}`);
+});
+// TF-2681 (16/11/2026) — le 28e lot d'un jour : après « z », l'allocateur propose « za », « zb »… ; le juge lisait
+// « 20261115zb » comme sans date (SANS_OBJET : la forme n'était pas jugée). Il le juge comme une lettre simple.
+check("rouge TF-2681 — un lot à double suffixe est JUGÉ (date lue, règles jouées), pas SANS_OBJET", () => {
+  const r = verifier(lot("20261115zb"), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20261115" });
+  if (r.verdict === "SANS_OBJET") throw new Error(`verdict SANS_OBJET : ${JSON.stringify(r.constats.map((c) => c.message))}`);
+  if (r.date !== "20261115") throw new Error(`date lue « ${r.date} » au lieu de 20261115`);
+  const c = r.constats.find((x) => x.regle === "LOT-DATE");
+  if (!c || c.statut !== "PASS") throw new Error(`LOT-DATE ${c && c.statut}`);
+});
+check("verte TF-2681 — un lot à double suffixe qui manque une section est REFUSÉ comme un lot à lettre simple (la forme est jugée)", () => {
+  const r = verifier(lot("20261115zb"), `# lot\n\n${R46}`, { aujourdhui: "20261115" });
+  const c = constat(r, "R-45");
+  if (r.verdict !== "FAIL" || !c || c.statut !== "FAIL") throw new Error(`verdict ${r.verdict}, R-45 ${c && c.statut}`);
+});
+check("TF-2681 — dateDuLot lit le double suffixe du .md et du sidecar, et ne lit toujours pas « z » + 2 lettres", () => {
+  if (dateDuLot("PROD - RETOURS - 20261115za.md") !== "20261115") throw new Error("date du .md à double suffixe non lue");
+  if (dateDuLot("PROD - RETOURS - 20261115zb.tf.jsonl") !== "20261115") throw new Error("date du sidecar à double suffixe non lue");
+  if (dateDuLot("PROD - RETOURS - 20261115zb.normalise.tf.jsonl") !== "20261115") throw new Error("date du sidecar normalisé non lue");
+  if (dateDuLot("PROD - RETOURS - 20261115abc.md") !== null) throw new Error("un triple suffixe est lu comme un lot");
+});
+check("TF-2681 — le nom proposé par l'allocateur pour le 28e lot est jugé par l'oracle de lot (les deux outils s'accordent)", () => {
+  const d = mkdtempSync(join(tmpdir(), "lot-28e-"));
+  try {
+    for (const l of "abcdefghijklmnopqrstuvwxyz") writeFileSync(join(d, `PROD - RETOURS - 20261115${l}.md`), "x", "utf8");
+    const indice = allouerIndice({ dossier: d, prefixe: "PROD - RETOURS - ", jour: "20261115", extension: ".md" });
+    const r = verifier(lot(`20261115${indice}`), `# lot\n\n${R45}\n${R46}`, { aujourdhui: "20261115" });
+    if (indice !== "za") throw new Error(`l'allocateur propose « ${indice} » au lieu de « za »`);
+    if (r.verdict === "SANS_OBJET") throw new Error("le juge ne lit pas le nom que l'allocateur propose");
+  } finally { rmSync(d, { recursive: true, force: true }); }
 });
 check("rouge — section R-45 absente : FAIL, et le remède nomme LE TITRE de la section", () => {
   const r = verifier(lot("20260824a"), `# lot\n\n${R46}`);

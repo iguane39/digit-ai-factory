@@ -18,7 +18,8 @@
  *     inchangé n'est pas une nouvelle version, sinon l'outil pond un fichier par lancement ;
  *   · sinon                                       → l'indice SUIVANT le dernier pris ;
  *   · le dernier pris est « z » (TF-1850)         → la PREMIÈRE LETTRE LIBRE DU JOUR DANS LE
- *     DOSSIER (tous radicaux, comme R-4) ; les 26 prises → erreur claire, jamais un nom refusé.
+ *     DOSSIER (tous radicaux, comme R-4) ; les 26 prises → le PREMIER DOUBLE SUFFIXE LIBRE, « za » à
+ *     « zz » (TF-2681, le 28e lot du 15/11) ; les 52 prises → erreur claire, jamais un nom pris.
  *
  * LA COMPARAISON SE FAIT SUR UNE FORME CANONIQUE où l'indice est neutralisé, parce que la
  * référence imprimée DANS le document (`REF-…-20260827a`, nom de fichier auto-cité) contient
@@ -73,9 +74,12 @@ import { cleDeChemin, etatDesSessions, ligneRevendique, lireRegistre, racineDeSe
 
 const LETTRES = "abcdefghijklmnopqrstuvwxyz";
 
-/** La forme canonique : chaque occurrence de `<jour><lettre>` perd sa lettre. */
+// TF-2681 : après « z », l'indice est un double suffixe « za » à « zz » (52 noms par jour et par dossier).
+const INDICE = "(?:z[a-z]|[a-z])";
+
+/** La forme canonique : chaque occurrence de `<jour><indice>` perd son indice (une lettre, ou « z » et sa seconde lettre). */
 export const canonique = (texte, jour) =>
-  String(texte).replaceAll(new RegExp(`${jour}[a-z]`, "g"), jour);
+  String(texte).replaceAll(new RegExp(`${jour}${INDICE}`, "g"), jour);
 
 /**
  * Rend l'indice à employer pour écrire `${prefixe}${jour}<indice>${extension}` dans `dossier`.
@@ -87,9 +91,9 @@ export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".h
   // extension (même repérage que R-4, ` - AAAAMMJJ<lettre>.<ext>` en fin de nom). Portée « prefixe »
   // (par défaut, inchangée) : uniquement CE préfixe, la seule que R-4 ne peut pas voir en collision.
   const motif = porte === "dossier"
-    ? new RegExp(` - ${jour}([a-z])\\.[\\w.]+$`)
+    ? new RegExp(` - ${jour}(${INDICE})\\.[\\w.]+$`)
     : new RegExp(
-      `^${String(prefixe).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}${jour}([a-z])${String(extension).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`);
+      `^${String(prefixe).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}${jour}(${INDICE})${String(extension).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`);
   // D-218 (b) : un nom réservé par une autre session compte comme un fichier présent du dossier.
   const noms = [...new Set([...(existsSync(dossier) ? readdirSync(dossier) : []), ...reserves])];
   const pris = noms.map((f) => ({ f, m: f.match(motif) })).filter((x) => x.m)
@@ -106,21 +110,25 @@ export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".h
     }
   }
   const derniere = pris[pris.length - 1].lettre;
-  const suivant = LETTRES.indexOf(derniere) + 1;
+  // Un double suffixe (TF-2681) n'a pas de rang dans LETTRES : seule une lettre simple avant « z » a une suivante.
+  const suivant = derniere.length === 1 ? LETTRES.indexOf(derniere) + 1 : LETTRES.length;
   if (suivant < LETTRES.length) return LETTRES[suivant];
   // TF-1850 (18/10/2026, RP-13) : « z » est pris et la suivante n'existe pas — l'ancienne branche
   // rendait « z », un nom DÉJÀ PRIS. R-4 n'admet qu'UNE lettre (` - \d{8}[a-z]?\.`) et la juge par
   // jour ET par dossier, tous radicaux confondus : on rend donc la PREMIÈRE LETTRE LIBRE DU JOUR
   // DANS LE DOSSIER, quelle que soit la portée demandée (une lettre libre pour CE préfixe peut être
   // prise par un AUTRE radical, que R-4 verrait en collision). Mesuré le 15/10 : 17 lettres du jour
-  // restaient libres dans 06-rapports. Aucune libre : l'outil échoue, il ne rend pas un nom que
-  // l'oracle de nommage refuserait.
-  const motifDossier = new RegExp(` - ${jour}([a-z])\\.[\\w.]+$`);
+  // restaient libres dans 06-rapports.
+  // TF-2681 (16/11/2026) : les 26 lettres prises, l'allocateur refusait et proposait le lendemain, que le
+  // juge de lot refuse (LOT-DATE) : le 28e lot du 15/11 n'avait aucun nom. Il propose désormais le premier
+  // double suffixe libre, « za » à « zz » ; il échoue quand les 52 noms du jour sont pris.
+  const motifDossier = new RegExp(` - ${jour}(${INDICE})\\.[\\w.]+$`);
   const prisDuDossier = new Set(noms.map((f) => f.match(motifDossier)).filter(Boolean).map((m) => m[1]));
-  const libre = [...LETTRES].find((l) => !prisDuDossier.has(l));
+  const libre = [...LETTRES].find((l) => !prisDuDossier.has(l))
+    ?? [...LETTRES].map((l) => `z${l}`).find((d) => !prisDuDossier.has(d));
   if (!libre) {
-    throw new Error(`aucune lettre libre pour le jour ${jour} dans ${dossier} : les 26 lettres a-z sont prises `
-      + "(R-4 n'admet qu'une lettre par jour et par dossier) — ranger ce livrable dans un autre dossier, ou le dater du jour suivant");
+    throw new Error(`aucune lettre libre pour le jour ${jour} dans ${dossier} : les 26 lettres a-z et les 26 doubles za-zz sont prises `
+      + "— ranger ce livrable dans un autre dossier, ou le dater du jour suivant (le juge de lot refuse un lot daté d'un jour à venir : LOT-DATE)");
   }
   return libre;
 }
@@ -142,7 +150,7 @@ function registreDuDossier(dossier) {
 }
 
 const DU_RADICAL = (nom, prefixe, extension) => nom.startsWith(prefixe) && nom.endsWith(extension)
-  && /^\d{8}[a-z]$/.test(nom.slice(prefixe.length, nom.length - extension.length));
+  && new RegExp(`^\\d{8}${INDICE}$`).test(nom.slice(prefixe.length, nom.length - extension.length));
 
 /**
  * Les réservations vivantes du dossier : `noms`, les noms de fichier réservés par les autres sessions, et par la session courante pour un
@@ -157,7 +165,7 @@ export function nomsReserves(etat, relatifDossier, { prefixe = "", extension = "
     if (cleDeChemin(i >= 0 ? c.slice(0, i) : "") !== cleDeChemin(relatifDossier)) continue;
     const nom = i >= 0 ? c.slice(i + 1) : c;
     if (s.session === session && DU_RADICAL(nom, prefixe, extension) && (!jour || nom.slice(prefixe.length, prefixe.length + 8) === String(jour))) {
-      if (!propre && dossier && !existsSync(join(dossier, nom))) propre = nom.charAt(prefixe.length + 8);
+      if (!propre && dossier && !existsSync(join(dossier, nom))) propre = nom.slice(prefixe.length + 8, nom.length - extension.length);
       continue;
     }
     noms.push(nom);
