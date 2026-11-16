@@ -17,6 +17,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { decisionsSansReponse, DECISION_RETIREE } from "../oracles/lib-decisions.mjs";
 import { VARIABLE_SESSION } from "../oracles/lib-session.mjs";
+import { retoursSansLot } from "../oracles/lib-retours-produit.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // Fins de ligne normalisées : un poste qui extrait le gabarit en CRLF faisait manquer la chirurgie du
@@ -705,6 +706,34 @@ try {
     const { d, script } = unProduit(mutant);
     ecrire(script, "oracles_verdict", "--champ", "oracle=oracle-essai", "--champ", "verdict=PASS");
     att(entrees(d).length === 2 && entrees(d)[1].champ === "verdict=PASS", `le mutant n'écrit pas l'entrée amputée du 12/11 : ${JSON.stringify(entrees(d))}`);
+  });
+
+  // ---- TF-2652 (RU-24, lot Produit-84 20261113b, seq 311) : consigner la remise d'un lot au ledger créait un retour orphelin ----
+  // Le fait : le gabarit n'admettait aucun type pour la remise d'un lot ; consignée en `retour` (seq 300 le 10/11, seq 311 le 13/11), elle devenait un
+  // retour que le hook de fin de tour exige de remettre en lot. `lot_remis` est admis, et le hook (qui ne compte que `type: retour`) ne le lit pas.
+  const REMISE = ["--lot", "Produit - RETOURS - 20261113b.md", "--sas", "input/00-retours/_arrivee", "--verdict", "PASS"];
+  check("rouge → vert — TF-2652 : `lot_remis` est un type admis, écrit avec ses champs ; une remise consignée en `retour` reste un retour sans lot, pas elle", () => {
+    const { d, script } = unProduit();
+    att(!/lot_remis/.test(readFileSync(join(d, "forge", "ledger.jsonl"), "utf8")), "le ledger neuf porte déjà un lot_remis");
+    const r = ecrire(script, "lot_remis", ...REMISE);
+    att(r.status === 0, `lot_remis refusé : exit ${r.status} ${r.stderr}`);
+    const e = entrees(d).at(-1);
+    att(e.type === "lot_remis" && e.lot === "Produit - RETOURS - 20261113b.md" && e.verdict === "PASS", `entrée : ${JSON.stringify(e)}`);
+    // Le hook de fin de tour lit les `retour` du ledger : la remise consignée en lot_remis n'en crée aucun.
+    att(retoursSansLot(d, join(ICI, ".."), { seuilH: -Infinity }).length === 0, `un lot_remis est lu comme un retour sans lot : ${JSON.stringify(retoursSansLot(d, join(ICI, ".."), { seuilH: -Infinity }))}`);
+    // Témoin rouge : la même remise consignée en `retour` (le geste du 13/11) EST un retour sans lot, que le hook refuse.
+    const ancien = ecrire(script, "retour", "--objet", "remise du lot Produit - RETOURS - 20261113b.md au sas");
+    att(ancien.status === 0, `retour refusé : ${ancien.stderr}`);
+    const orphelins = retoursSansLot(d, join(ICI, ".."), { seuilH: -Infinity });
+    att(orphelins.length === 1 && orphelins[0].seq === entrees(d).at(-1).seq, `le témoin ne reproduit pas le retour orphelin : ${JSON.stringify(orphelins)}`);
+  });
+  check("vert — TF-2652 : `lot_remis` est au vocabulaire sans rendre `secret_range` moins dernier, et `--verifier` ne le déclare pas hors vocabulaire", () => {
+    att(vocabulaire(GABARIT).has("lot_remis"), "lot_remis absent de TYPES");
+    att(/, "secret_range"\}/.test(GABARIT), "secret_range n'est plus le dernier type (la chirurgie de ranger-secret.test.mjs le retire par sa position)");
+    const { d, script } = unProduit();
+    ecrire(script, "lot_remis", ...REMISE);
+    const v = ecrire(script, "--verifier");
+    att(v.status === 0 && !/DÉCLARÉ/.test(v.stdout), `--verifier : ${v.stdout}${v.stderr}`);
   });
 
   // ---- TF-2527 (14/11/2026) : decision_retiree, lu par lib-decisions.mjs depuis TF-2415, n'était écrivable ni ici ni par ledger.mjs ----

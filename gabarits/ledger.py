@@ -95,6 +95,11 @@ RUNS = FORGE.parent / "runs"
 # comme une sortie de la décision depuis TF-2415, et ni cet écrivain ni `ledger.mjs` ne l'acceptaient (TF-2527, 14/11/2026) ; une retraite
 # s'écrivait en `reponse_humain --decision D-M --remplace D-N`. Elle nomme la décision retirée (`decision`, `decisions` ou
 # `decisions_retirees`, au format D-N) et sa `cause` (20 caractères au moins) : une décision qui disparaît sans motif ne se relit pas.
+# `lot_remis` consigne la REMISE d'un lot de retours au sas du pilot (TF-2652, RP « RU-24 » du lot Produit-84 20261113b, seq 311) : ce gabarit
+# n'admettait aucun type pour elle, la remise s'écrivait donc en `retour` (seq 300 le 10/11, seq 311 le 13/11), et le hook de fin de tour du pilot
+# (D-191 (a), `oracles/lib-retours-produit.mjs`) lisait ce faux retour comme un retour à remettre en lot : un retour orphelin créé par la consignation
+# de sa propre remise. Le hook ne compte que `type: retour` : un `lot_remis` n'entre pas dans son contrôle des lots. Champs conseillés : `lot` (nom
+# du lot remis), `sas` (dossier de destination), `verdict` (celui de `oracle-lot.mjs`). Le type est à porter aussi dans `ledger.mjs` de forge-agents.
 # `secret_range` reste le DERNIER type : la chirurgie du banc de `scripts/ranger-secret.test.mjs` le retire par sa position.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
@@ -102,7 +107,7 @@ TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_mo
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
          "deplacement_en_attente", "demande_humain", "qualification_enclenchement",
-         "anteriorite_ledger", "rectification_doublon", "decision_retiree", "secret_range"}
+         "anteriorite_ledger", "rectification_doublon", "decision_retiree", "lot_remis", "secret_range"}
 
 
 # TF-2223 (RP-2, 06/11/2026) : hors run, ces types s'écrivent à `forge/hors-run.jsonl`, jamais au ledger du run, dont R-42
