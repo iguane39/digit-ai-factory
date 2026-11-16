@@ -1,6 +1,6 @@
 # Relecture d'intention — essai sur tous les travaux
 
-Référentiel versionné (loi n° 4, daté-éditable) — **version 1.2.0, 19/10/2026** : chaque livrable d'agent est relu à sa réception, la forme d'abord, puis l'ensemble d'une campagne côte à côte, et la consigne commune d'une campagne se relit en une fois (décision humaine D-47 (a) et actions A-1 à A-3 du 19/10/2026, section « Les campagnes à agents »). Version 1.1.0 du 18/10/2026 : la boucle de correction bornée à 2 passes et trois ajouts au relecteur, décision humaine D-26 (a) (section « La boucle de correction ») ; première version : 1.0.0. Né de la décision humaine D-23 (a) du 18/10/2026, sur l'étude `output\03-etudes\20261018-etude-opportunite-relecteur-d-intention-v2.md` (option O4) ; mesure : `output\03-etudes\20261018-mesure-relecteur-d-intention.json`. Porté par la **loi transverse n° 7** (le résultat sert l'intention, pas la lettre, `references\INTENTION.md`). Voyage chez les produits par la restitution (`forge\RESTITUTION.md`, ligne « Relecture d'intention » du bloc 4) ; l'outil et le registre restent au pilot.
+Référentiel versionné (loi n° 4, daté-éditable) — **version 1.3.0, 16/11/2026** : la relecture juge aussi chaque recommandation de décision contre la phrase du porteur (quatrième règle du relecteur, TF-2659), et `--preparer consigne` refuse une consigne d'agent à qui manque l'une des quatre rubriques que le contrat exige (TF-2663). Version 1.2.0 du 19/10/2026 : chaque livrable d'agent est relu à sa réception, la forme d'abord, puis l'ensemble d'une campagne côte à côte, et la consigne commune d'une campagne se relit en une fois (décision humaine D-47 (a) et actions A-1 à A-3 du 19/10/2026, section « Les campagnes à agents »). Version 1.1.0 du 18/10/2026 : la boucle de correction bornée à 2 passes et trois ajouts au relecteur, décision humaine D-26 (a) (section « La boucle de correction ») ; première version : 1.0.0. Né de la décision humaine D-23 (a) du 18/10/2026, sur l'étude `output\03-etudes\20261018-etude-opportunite-relecteur-d-intention-v2.md` (option O4) ; mesure : `output\03-etudes\20261018-mesure-relecteur-d-intention.json`. Porté par la **loi transverse n° 7** (le résultat sert l'intention, pas la lettre, `references\INTENTION.md`). Voyage chez les produits par la restitution (`forge\RESTITUTION.md`, ligne « Relecture d'intention » du bloc 4) ; l'outil et le registre restent au pilot.
 
 ## Le fait
 
@@ -41,11 +41,12 @@ Une seule consigne, pour tous les types de travaux, en **version 2 depuis le 202
 
 > une restriction ou un recadrage que la demande n autorisait pas est une dérive, même annoncé, justifié ou validé ; une conclusion négative n en est pas une si la demande posait la question
 
-La version 2 la complète de 3 règles, dans cet ordre (`CONSIGNE_V2` de `scripts\relecture-intention.mjs` : la stricte, un point, puis les trois) :
+La version 2 la complète de 4 règles (la quatrième depuis le 16/11/2026), dans cet ordre (`CONSIGNE_V2` de `scripts\relecture-intention.mjs` : la stricte, un point, puis les quatre) :
 
 1. **Le contenu visible ajouté** (deuxième ajout) : un contenu visible ajouté sans demande — une source, une mention, une section, une phrase, une colonne, un avertissement, un élément d'interface que la demande ne nommait pas — est un écart majeur, même annoncé, justifié ou validé en bloc ; ce que les règles applicables imposent n'en est pas un. *Le fait* : la mesure du 18/10 chez les produits a classé « mineure », 2 fois sur 2, la source ajoutée à une présentation (TF-1391).
 2. **L'usage des règles applicables** (premier ajout) : quand des règles applicables au type de travail sont fournies, sous leur propre titre et distinctes de la demande humaine, ce sont les règles de la Factory que le livrable doit tenir même si la demande ne les nomme pas : un livrable qui en enfreint une est un écart, la règle citée, majeur quand le demandeur devrait redemander ce qu'il croyait acquis.
 3. **La nature de chaque écart** (boucle de correction) : chaque écart porte sa nature : « hors_demande » quand il sort de la demande (une restriction ou un recadrage non autorisé, une partie oubliée, un contenu visible ajouté sans demande, une règle applicable enfreinte) ; « choix_humain » quand il touche un choix qui revient à l'humain (une dépense, un périmètre à trancher, une publication, ou une décision humaine déjà prise) ; dans le doute, « choix_humain ».
+4. **La recommandation de décision** (TF-2659, 16/11/2026) : quand le livrable recommande une décision à l'humain (une option à choisir, une voie à suivre), la recommandation se juge aussi contre la phrase du porteur : nommer qui agit et avec quel outil, et vérifier que cette personne dispose de cet outil et du savoir-faire qu'il suppose ; une recommandation qui suppose chez la personne visée un geste que la phrase du porteur ne lui prête pas (écrire du code, tenir une clé d'API personnelle) est un écart majeur de nature « hors_demande », même suivie par le porteur. *Le fait* : le 12/11/2026, le porteur demande que chaque rôle puisse utiliser les modèles mis à sa disposition ; la session recommande une clé d'API personnelle et écarte l'écran de conversation, le porteur suit ; le lendemain il demande l'interface de conversation, parce que la personne visée n'écrit pas de code. La relecture jugeait la consigne de construction, jamais cette recommandation.
 
 **Ce qui est mesuré et ce qui ne l'est pas.** La stricte v1 a une mesure : sur les études seulement, elle voit 2 dérives sur 2. Les 3 règles de la v2 n'en ont pas encore ; elles sont mises à l'essai, et la revue du 2026-11-08 les mesure avec le reste.
 
@@ -79,6 +80,15 @@ Chaque restitution d'un tour de travail porte au **bloc 4** une ligne `Relecture
 signale en tête de sa sortie une consigne qui nomme une règle par son identifiant (`XYZ0202-R05`, « règle R-38 ») sans une citation
 d'au moins 6 mots, ou une ligne citée, sur la ligne ou dans les 3 suivantes. Le 20/10/2026, un plan et un prompt ont contredit une
 règle écrite et claire d'un produit, relus 4 fois sans son texte. Rien n'est imposé au livrable ; une citation se vérifie à la source.
+
+**Une consigne d'agent sans ses quatre rubriques est refusée** (décision R-58 du 16/11/2026, TF-2663). Le 13/11/2026, la consigne d'un agent
+`constructeur` ne nommait ni dossier temporaire, ni la raison de l'affectation à Opus, et sa version de départ précédait le commit qui la
+portait ; la relecture, jouée avant le lancement, ne lisait pas ces rubriques et l'agent les a relevées à son arrivée. `--preparer consigne`
+lit désormais le premier `--fichier` et refuse (exit 1, rien n'est préparé) quand manque : le dossier temporaire de l'agent (un chemin
+`agent-<lot>`), la raison de l'affectation (exigée quand `constructeur` ou Opus est nommé), la version de départ, ou le commit qui la porte
+(un commit du dépôt, que le départ contient, vérifié dans git). `--sans-rubriques "<motif de 20 caractères au moins>"` déclare une consigne qui
+n'est pas une délégation d'écriture (consigne commune d'une campagne, agent en lecture seule) : le motif s'écrit dans la sortie. Non jugé :
+la justesse d'une rubrique présente. Le détail : `gabarits\AGENT-CAMPAGNE.md`, section « La consigne d'un agent porte ses quatre rubriques ».
 
 ## La boucle de correction (D-26 (a) du 18/10/2026)
 

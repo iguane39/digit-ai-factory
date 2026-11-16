@@ -11,7 +11,7 @@
  * Joué par `oracles\self-tests.mjs` (I2).
  */
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -237,6 +237,63 @@ check("vert — TF-2426 : l'ancien nom d'outil Task est jugé comme Agent ; un a
   if (!refus(isole(beta, alpha, {}, "Task"))) throw new Error("Task n'est pas refusé");
   const r = isole(beta, alpha, {}, "Bash");
   if (r.code !== 0 || r.out.trim() || r.err.trim()) throw new Error(`exit ${r.code} ${r.out.slice(0, 100)} ${r.err.slice(0, 100)}`);
+});
+
+// TF-2621 (16/11/2026) — UNE COPIE DE TRAVAIL OCCUPÉE PAR UNE SESSION PORTE SON MARQUEUR, ET UNE AUTRE SESSION N'Y LANCE PAS SON AGENT.
+// Le fait (Produit-86, RP-67) : le 12/11/2026, deux sessions d'un même produit ont fait travailler chacune un constructeur dans la même copie : 10 fichiers d'un agent
+// écrits au milieu du travail commité de l'autre. Le marqueur (session, run, agent, date) se pose dans le répertoire git de la copie ; le hook le lit avant tout lancement d'agent
+// et REFUSE (exit 2) quand l'occupante est une AUTRE session encore vivante. Cas : DEUX sessions sur UNE copie, jouées sur un dépôt git réel et un arbre lié.
+const OCCUPER = join(dirname(HOOK), "..", "scripts", "occuper-copie.mjs");
+const refusOcc = (r) => r.code === 2 && /COPIE DE TRAVAIL OCCUPÉE \(TF-2621/.test(r.err);
+const lance = (cwd, session, extra = {}) => jouer({ tool_name: "Agent", session_id: session, tool_input: { prompt: "Corrige le sujet et rends le rapport.", description: "Campagne", subagent_type: "campagne", ...extra }, cwd });
+const marqueurDe = (copie) => join(String(git(copie, "rev-parse", "--path-format=absolute", "--git-dir").stdout).trim(), "occupation-copie.json");
+const occuper = (...args) => spawnSync(process.execPath, [OCCUPER, ...args], { encoding: "utf8", env: { ...process.env, USERPROFILE: maison, HOME: maison, CLAUDE_CONFIG_DIR: "", CLAUDE_CODE_SESSION_ID: "" } });
+const poser = (copie, session, extra = []) => occuper("--poser", copie, "--session", session, "--run", "run-1", "--agent", "constructeur", ...extra);
+check("rouge — TF-2621 : deux sessions sur une même copie : la session B est refusée (exit 2), la session A occupante, son run, son agent et le remède sont nommés", () => {
+  const p = poser(alphaLie, "session-A"); if (p.status !== 0) throw new Error(`pose du marqueur : exit ${p.status} ${p.stderr}${p.stdout}`);
+  const r = lance(alphaLie, "session-B");
+  if (!refusOcc(r)) throw new Error(`exit ${r.code}, stderr « ${r.err.slice(0, 200)} »`);
+  for (const m of ["session-A", "run-1", "constructeur", "git worktree add", "--liberer"]) if (!r.err.includes(m)) throw new Error(`le refus ne dit pas « ${m} » : ${r.err.slice(0, 400)}`);
+});
+check("vert — TF-2621 : la session occupante relance dans sa propre copie sans refus", () => {
+  const r = lance(alphaLie, "session-A");
+  if (r.code !== 0 || r.err.trim()) throw new Error(`exit ${r.code} ${r.err.slice(0, 200)}`);
+});
+check("rouge — TF-2621 : la copie n'est nommée que par la consigne (dossier courant ailleurs) : la session B est refusée aussi", () => {
+  const r = jouer({ tool_name: "Agent", session_id: "session-B", tool_input: { prompt: `Dépôt de la copie de travail : ${alphaLie}\nCorrige le sujet.`, description: "Campagne", subagent_type: "campagne" }, cwd: projet });
+  if (!refusOcc(r)) throw new Error(`exit ${r.code}, stderr « ${r.err.slice(0, 200)} »`);
+});
+check("vert — TF-2621 : une AUTRE copie du même dépôt, sans marqueur, reste libre pour la session B ; une entrée sans session_id n'est pas jugée", () => {
+  const r = lance(alpha, "session-B"); if (r.code !== 0 || r.err.trim()) throw new Error(`autre copie : exit ${r.code} ${r.err.slice(0, 200)}`);
+  const s = jouer({ tool_name: "Agent", tool_input: { prompt: "x", description: "y", subagent_type: "campagne" }, cwd: alphaLie });
+  if (s.code !== 0 || s.err.trim()) throw new Error(`sans session_id : exit ${s.code} ${s.err.slice(0, 200)}`);
+});
+check("vert — TF-2621 : un marqueur ancien dont l'occupante n'écrit plus (aucune transcription, date de plus de 15 minutes) ne retient personne", () => {
+  const f = marqueurDe(alphaLie), m = JSON.parse(readFileSync(f, "utf8"));
+  writeFileSync(f, JSON.stringify({ ...m, date: new Date(Date.now() - 2 * 3600 * 1000).toISOString() }));
+  const r = lance(alphaLie, "session-B");
+  if (r.code !== 0 || r.err.trim()) throw new Error(`exit ${r.code} ${r.err.slice(0, 200)}`);
+});
+check("rouge — TF-2621 : un marqueur ancien dont l'occupante écrit encore (transcription modifiée à l'instant) retient la copie : refus", () => {
+  const dossier = join(maison, ".claude", "projects", "p"); mkdirSync(dossier, { recursive: true });
+  writeFileSync(join(dossier, "session-A.jsonl"), "{}\n");
+  const r = lance(alphaLie, "session-B");
+  if (!refusOcc(r)) throw new Error(`exit ${r.code}, stderr « ${r.err.slice(0, 200)} »`);
+  rmSync(join(dossier, "session-A.jsonl"));
+});
+check("vert — TF-2621 : --lire dit l'occupante ; --liberer retire le marqueur, la session B lance ; --poser sur une copie déjà occupée par une autre session est refusé (1), --forcer l'écrase", () => {
+  poser(alphaLie, "session-A", ["--forcer"]);
+  const l = occuper("--lire", alphaLie); if (l.status !== 0 || !/session-A/.test(l.stdout)) throw new Error(`--lire : exit ${l.status} ${l.stdout}${l.stderr}`);
+  const deuxieme = poser(alphaLie, "session-B"); if (deuxieme.status !== 1 || !/occupée/.test(deuxieme.stderr + deuxieme.stdout)) throw new Error(`--poser par B : exit ${deuxieme.status} ${deuxieme.stderr}${deuxieme.stdout}`);
+  const f = occuper("--liberer", alphaLie); if (f.status !== 0) throw new Error(`--liberer : exit ${f.status} ${f.stderr}`);
+  if (existsSync(marqueurDe(alphaLie))) throw new Error("le marqueur subsiste après --liberer");
+  const r = lance(alphaLie, "session-B"); if (r.code !== 0 || r.err.trim()) throw new Error(`après libération : exit ${r.code} ${r.err.slice(0, 200)}`);
+  const sans = occuper("--lire", alphaLie); if (sans.status !== 0 || !/aucun marqueur/.test(sans.stdout)) throw new Error(`--lire sans marqueur : ${sans.stdout}`);
+});
+check("rouge — TF-2621 : options invalides : --poser sans session (ni CLAUDE_CODE_SESSION_ID) rend 2, un dossier qui n'est pas un dépôt rend 2, une option inconnue rend 2", () => {
+  if (occuper("--poser", alphaLie).status !== 2) throw new Error("--poser sans session accepté");
+  if (occuper("--poser", join(racine, "vide"), "--session", "s").status !== 2) throw new Error("dossier hors dépôt accepté");
+  if (occuper("--inconnue").status !== 2) throw new Error("option inconnue acceptée");
 });
 
 rmSync(racine, { recursive: true, force: true });

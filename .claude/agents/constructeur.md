@@ -29,4 +29,4 @@ Construction complexe — architecture, code neuf d'ampleur, maquette complète,
 ## Règles de frontière
 - Ne lire que les entrées déclarées ci-dessus — jamais le contexte d'autres agents.
 - Chaque sortie porte un en-tête de provenance : agent émetteur, verdict d'arbitre, hypothèses non résolues.
-- Un ✗ traverse la frontière signalé — jamais masqué. Consigner chaque étape au ledger du run.
+- Un ✗ traverse la frontière signalé — jamais masqué. Proposer chaque étape comme entrée de ledger dans le rapport final : la session l'écrit, jamais l'agent (gabarits/AGENT-CAMPAGNE.md, « Rapport final »).

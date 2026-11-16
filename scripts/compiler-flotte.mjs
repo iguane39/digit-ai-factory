@@ -18,6 +18,11 @@
  * (déclaration périmée : l'outil a été retiré, la ligne reste et masquerait le prochain constat), ou si la ligne est mal formée.
  * Le compilateur de forge-agents ignore les commentaires : aucune clé ne s'ajoute à `agent.def`, il n'y a donc rien à y changer.
  *
+ * LEDGER PAR LE RAPPORT (TF-2620, 16/11/2026) : le gabarit de forge-agents écrit pour tout agent « Consigner chaque étape au ledger du run »,
+ * que le contrat d'agent contredit (le rapport est la seule sortie). Une ligne `# ledger-par-rapport : <motif>` de la source fait remplacer
+ * cette phrase par la prescription du rapport ; la définition installée qui la garde malgré la déclaration, un motif de moins de 60 caractères
+ * ou une déclaration périmée (le gabarit ne porte plus la phrase) sont refusés.
+ *
  * Usage : node scripts\compiler-flotte.mjs               compile dans un tampon, juge, installe si rien n'est refusé
  *         node scripts\compiler-flotte.mjs --verifier    juge les agents DÉJÀ installés, sans compiler ni écrire (état du parc, I4)
  *         options : --json (verdict JSON) · --sources <dossier> · --agents <dossier> · --oracle <oracle-scan-agentdef.mjs> · --compilateur <compile-agent-def.mjs>
@@ -32,13 +37,46 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const VERSION = "1.0.0";
+export const VERSION = "1.1.0";
 export const MOTIF_MIN = 60;
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE_PILOT = resolve(ICI, "..");
 const GRAVES = new Set(["bloquant", "majeur"]);
 const LIGNE_DECLARATION = /^\s*#\s*scan-agentdef\b(.*)$/;
 const FORME_DECLARATION = /^\s+(CAP-[1-4])\s*:\s*(\S.*)$/;
+
+// TF-2620 (16/11/2026) : le gabarit de forge-agents écrit, pour TOUT agent, « Consigner chaque étape au ledger du run », alors que le contrat
+// d'agent (gabarits/AGENT-CAMPAGNE.md) fait du rapport la seule sortie. Une source qui déclare `# ledger-par-rapport : <motif>` fait remplacer
+// cette phrase, à la compilation, par la prescription du rapport. Le gabarit vit dans digit-ai-forge-agents (compile-agent-def.mjs) : cette
+// déclaration est le contournement du pilot, à retirer quand le gabarit ne prescrit plus l'écriture au ledger (une déclaration périmée est refusée).
+export const PHRASE_LEDGER_GABARIT = "Consigner chaque étape au ledger du run.";
+export const PHRASE_LEDGER_RAPPORT = "Proposer chaque étape comme entrée de ledger dans le rapport final : la session l'écrit, jamais l'agent (gabarits/AGENT-CAMPAGNE.md, « Rapport final »).";
+const LIGNE_LEDGER_RAPPORT = /^\s*#\s*ledger-par-rapport\s*:\s*(\S.*)$/;
+
+/** La déclaration `# ledger-par-rapport : <motif>` d'une source `.yaml` : { motif, ligne }, ou null. */
+export function lireLedgerParRapport(texteYaml) {
+  const lignes = texteYaml.split(/\r?\n/);
+  for (let i = 0; i < lignes.length; i++) { const m = LIGNE_LEDGER_RAPPORT.exec(lignes[i]); if (m) return { motif: m[1].trim(), ligne: i + 1 }; }
+  return null;
+}
+
+/** La définition compilée avec la prescription du rapport à la place de celle du gabarit ; null si la phrase du gabarit n'y est pas. */
+export function appliquerLedgerParRapport(texteAgent) {
+  return texteAgent.includes(PHRASE_LEDGER_GABARIT) ? texteAgent.replace(PHRASE_LEDGER_GABARIT, () => PHRASE_LEDGER_RAPPORT) : null;
+}
+
+/** Le jugement de la déclaration d'un agent : constats { sev, regle, msg } ; `texteAgent` est la définition compilée (ou installée). */
+export function jugerLedger({ id, declaration, texteAgent }) {
+  if (!declaration) return [];
+  const constats = [];
+  if (declaration.motif.length < MOTIF_MIN)
+    constats.push({ sev: "bloquant", regle: "LEDGER", msg: `${id} : ledger-par-rapport déclaré (ligne ${declaration.ligne}) avec un motif de ${declaration.motif.length} caractères, ${MOTIF_MIN} au moins` });
+  if (texteAgent.includes(PHRASE_LEDGER_GABARIT))
+    constats.push({ sev: "bloquant", regle: "LEDGER", msg: `${id} : la définition demande encore « ${PHRASE_LEDGER_GABARIT} » alors que sa source déclare ledger-par-rapport (TF-2620) : le rapport est la seule sortie de l'agent. Remède : recompiler (node scripts\\compiler-flotte.mjs).` });
+  else if (!texteAgent.includes(PHRASE_LEDGER_RAPPORT))
+    constats.push({ sev: "bloquant", regle: "LEDGER", msg: `${id} : déclaration périmée (ligne ${declaration.ligne}) — la définition ne porte plus la phrase du gabarit de forge-agents que la déclaration remplace ; retirer la ligne, qui masquerait le prochain changement du gabarit` });
+  return constats;
+}
 
 /** Les déclarations d'une source `.yaml` : { declarations: [{regle, motif, ligne}], illisibles: [{ligne, texte}] }. */
 export function lireDeclarations(texteYaml) {
@@ -114,6 +152,7 @@ export function jugerFlotte({ agents, sources, oracle }) {
     const src = join(sources, `${id}.yaml`);
     const { declarations, illisibles } = existsSync(src) ? lireDeclarations(readFileSync(src, "utf8")) : { declarations: [], illisibles: [] };
     constats.push(...jugerAgent({ id, scan: scanner(oracle, join(agents, f)), declarations, illisibles }));
+    constats.push(...jugerLedger({ id, declaration: existsSync(src) ? lireLedgerParRapport(readFileSync(src, "utf8")) : null, texteAgent: readFileSync(join(agents, f), "utf8") }));
   }
   if (!fichiers.length) constats.push({ sev: "bloquant", regle: "FLOTTE", msg: `aucun agent .md dans ${agents}` });
   const refus = constats.filter((c) => c.sev === "bloquant");
@@ -129,6 +168,13 @@ export function compiler({ sources, agents, oracle, compilateur }) {
     const yamls = readdirSync(sources).filter((f) => f.endsWith(".yaml")).sort().map((f) => join(sources, f));
     const c = spawnSync(process.execPath, [compilateur, ...yamls, "--out", tampon], { encoding: "utf8" });
     if (c.status !== 0) return { verdict: "FAIL", agents: 0, installes: [], constats: [{ sev: "bloquant", regle: "COMPILATION", msg: `compile-agent-def a refusé (exit ${c.status}) : ${(c.stderr || c.stdout || "").trim().slice(0, 300)}` }] };
+    // TF-2620 : la prescription du rapport remplace celle du gabarit AVANT le jugement ; une phrase absente se dit au jugement (déclaration périmée).
+    for (const f of readdirSync(tampon).filter((x) => x.endsWith(".md"))) {
+      const src = join(sources, `${f.slice(0, -3)}.yaml`);
+      if (!existsSync(src) || !lireLedgerParRapport(readFileSync(src, "utf8"))) continue;
+      const neuf = appliquerLedgerParRapport(readFileSync(join(tampon, f), "utf8"));
+      if (neuf !== null) writeFileSync(join(tampon, f), neuf);
+    }
     const r = jugerFlotte({ agents: tampon, sources, oracle });
     if (r.verdict !== "PASS") return { ...r, installes: [] };
     const installes = [];

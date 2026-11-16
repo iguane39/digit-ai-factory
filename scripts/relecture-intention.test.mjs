@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { executer, STRICTE, FORME_JSON, FORME_JSON_V1, CONSIGNE_V2, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, MAX_PASSES, TYPES, texteHumain, lireVerdict, etatChaine, releverRegistre, numerosDeDecision, problemesReferentiel, verifierSources, reglesDesTypes, relusALaReception, sectionsDeConclusion, jugerForme, ecrituresParCommande } from "./relecture-intention.mjs";
+import { executer, STRICTE, FORME_JSON, FORME_JSON_V1, CONSIGNE_V2, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, AJOUT_RECOMMANDATION, consigneRelecteur, rubriquesDeConsigne, MAX_PASSES, TYPES, texteHumain, lireVerdict, etatChaine, releverRegistre, numerosDeDecision, problemesReferentiel, verifierSources, reglesDesTypes, relusALaReception, sectionsDeConclusion, jugerForme, ecrituresParCommande } from "./relecture-intention.mjs";
 import { SCHEMA } from "../oracles/lib-fiches-agents.mjs";
 import { SCHEMA_VERDICT } from "./noter-fiche.mjs";
 
@@ -85,6 +85,8 @@ const lignes = [
 const TRANSCRIPT = join(T, "session.jsonl");
 writeFileSync(TRANSCRIPT, lignes.join("\n") + "\n");
 const CTX = { cwd: PROJET, maison: MAISON };
+// TF-2663 : `--preparer consigne` refuse une consigne sans les quatre rubriques du contrat ; les cas qui testent AUTRE CHOSE (alerte de règle, décisions, secrets…) déclarent l'exemption.
+const MOTIF_HORS_RUBRIQUES = "recette : la consigne de ce cas n'est pas une délégation d'agent d'écriture";
 const SORTIE = join(T, "sortie");
 const REG = join(T, "registre.jsonl");
 
@@ -164,13 +166,13 @@ try {
   });
   check("vert — le référentiel recopie la consigne stricte, la forme JSON, les dates de l'essai et le seuil", () => {
     const ref = readFileSync(join(RACINE, "references", "RELECTURE-INTENTION.md"), "utf8");
-    for (const m of [STRICTE, FORME_JSON, FORME_JSON_V1, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, "2026-10-18", "2026-11-01", "2026-11-08", "6 000 000 de jetons", "`verificateur`", "alerte"])
+    for (const m of [STRICTE, FORME_JSON, FORME_JSON_V1, AJOUT_CONTENU_VISIBLE, AJOUT_REGLES, AJOUT_NATURE, AJOUT_RECOMMANDATION, "2026-10-18", "2026-11-01", "2026-11-08", "6 000 000 de jetons", "`verificateur`", "alerte"])
       if (!ref.includes(m)) throw new Error(`référentiel sans « ${m.slice(0, 60)} »`);
   });
   check("vert — --preparer consigne : la consigne de délégation est le livrable, la demande reste celle de la transcription", () => {
     const c = join(T, "consigne-agent.md"); writeFileSync(c, "Corrige les listes dès 8 lignes.\n");
     const d = join(T, "sortie-consigne");
-    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX);
+    const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX);
     egal(r.code, 0, "exit");
     if (!readFileSync(join(d, "livrables.md"), "utf8").includes("Corrige les listes dès 8 lignes.")) throw new Error("consigne absente de livrables.md");
     if (!readFileSync(join(d, "demande.txt"), "utf8").includes(`2. « ${H2} »`)) throw new Error("demande absente");
@@ -178,21 +180,21 @@ try {
   });
   check("TF-1972 rouge — une consigne qui nomme une règle sans son texte déclenche l'alerte, écrite en tête de la sortie", () => {
     const c = join(T, "consigne-regle.md"); writeFileSync(c, "Applique la règle XYZ0202-R05 au plan de cartes, et la règle R-38 aussi.\n");
-    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-regle")], {}, new Date(), CTX);
+    const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-regle")], {}, new Date(), CTX);
     egal(r.code, 0, "l'alerte ne bloque pas");
     if (!/^ALERTE \(D-116 \(b\), TF-1972\) : cette consigne nomme 2 règle\(s\)/.test(r.sortie) || !/XYZ0202-R05 \(l\.1\)/.test(r.sortie)) throw new Error(`sortie : ${r.sortie.slice(0, 200)}`);
   });
   check("TF-1972 vert — la même règle avec son texte cité, ou aucune règle nommée : pas d'alerte ; ISO27001 et SHA256 ne sont pas des règles", () => {
     const c = join(T, "consigne-texte.md"); writeFileSync(c, "Applique la règle XYZ0202-R05 : « une carte ne porte jamais plus de deux montants affichés » au plan.\nConforme à ISO27001 et SHA256.\n");
-    const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-texte")], {}, new Date(), CTX);
+    const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-texte")], {}, new Date(), CTX);
     if (/ALERTE \(D-116/.test(r.sortie)) throw new Error(`alerte à tort : ${r.sortie.slice(0, 200)}`);
     const l = join(T, "consigne-citee.md"); writeFileSync(l, "Applique ADR0501.\n> Toute décision d'architecture porte sa date.\n");
-    const q = executer(["--preparer", "consigne", "--fichier", l, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-citee")], {}, new Date(), CTX);
+    const q = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", l, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-citee")], {}, new Date(), CTX);
     if (/ALERTE \(D-116/.test(q.sortie)) throw new Error("une ligne citée en dessous ne compte pas");
   });
   check("rouge — --preparer consigne sans --fichier, ou avec un fichier absent : 2", () => {
     egal(executer(["--preparer", "consigne", "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "sans fichier");
-    egal(executer(["--preparer", "consigne", "--fichier", join(T, "absent.md"), "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "fichier absent");
+    egal(executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", join(T, "absent.md"), "--transcript", TRANSCRIPT], {}, new Date(), CTX).code, 2, "fichier absent");
   });
 
   // ---- la transcription par défaut --------------------------------------------------------------------------------
@@ -343,7 +345,7 @@ try {
   // ==== D-26 (a) du 18/10/2026 : la consigne du relecteur en version 2, la nature de chaque écart, la boucle de correction ====
   check("vert — la consigne version 2 : la stricte v1 mot pour mot en tête, puis les 3 ajouts (contenu visible, règles applicables, nature)", () => {
     if (!CONSIGNE_V2.startsWith(STRICTE)) throw new Error("la consigne v2 ne commence pas par la stricte v1 mot pour mot");
-    for (const [ajout, quoi] of [[AJOUT_CONTENU_VISIBLE, "contenu visible"], [AJOUT_REGLES, "règles applicables"], [AJOUT_NATURE, "nature des écarts"]])
+    for (const [ajout, quoi] of [[AJOUT_CONTENU_VISIBLE, "contenu visible"], [AJOUT_REGLES, "règles applicables"], [AJOUT_NATURE, "nature des écarts"], [AJOUT_RECOMMANDATION, "recommandation de décision"]])
       if (!CONSIGNE_V2.includes(ajout) || !fin.sortie.includes(ajout)) throw new Error(`l'ajout « ${quoi} » manque à la consigne v2 ou à la sortie de --preparer`);
     if (!/écart majeur/.test(AJOUT_CONTENU_VISIBLE) || !/sans demande/.test(AJOUT_CONTENU_VISIBLE)) throw new Error("un contenu visible ajouté sans demande n'est pas dit écart majeur");
     if (!/hors_demande/.test(AJOUT_NATURE) || !/choix_humain/.test(AJOUT_NATURE)) throw new Error("les deux natures ne sont pas dites");
@@ -821,7 +823,7 @@ try {
     humain(H_B),
     assistant([texte("Exécuté.")]),
   ].join("\n") + "\n");
-  const dec = (() => { const d = join(T, "sortie-decisions"); executer(["--preparer", "consigne", "--fichier", PETIT, "--transcript", transcriptDec, "--sortie", d], {}, new Date(), CTX); return readFileSync(join(d, "demande.txt"), "utf8"); })();
+  const dec = (() => { const d = join(T, "sortie-decisions"); executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", PETIT, "--transcript", transcriptDec, "--sortie", d], {}, new Date(), CTX); return readFileSync(join(d, "demande.txt"), "utf8"); })();
   check("vert — « 24a + comment faire… », « 25 relever le seuil à 4 millions. 26 : a » et « 23a + b » retrouvent D-24, D-25, D-26 et D-23, chacune telle qu'elle a été posée, avant le bon message", () => {
     for (const [n, sujet, rang] of [[23, "Faut-il lancer l'essai", 2], [24, "Faut-il publier l'essai", 3], [25, "Faut-il suspendre les relectures", 4], [26, "Faut-il une boucle de correction", 4]])
       if (!new RegExp(`D-${n} \\(posée avant le message ${rang}\\)`).test(dec) || !dec.includes(`**D-${n} — ${sujet} ?**`) || !dec.includes(`| (a) Oui | A${n} |`)) throw new Error(`D-${n} non retrouvée telle que posée : ` + dec.slice(dec.indexOf("Décisions"), dec.indexOf("Décisions") + 400));
@@ -833,7 +835,7 @@ try {
     const posee25 = dec.slice(dec.indexOf("D-25 (posée"), dec.indexOf("D-26 (posée"));
     if (posee25.includes("boucle de correction") || !posee25.includes("suspendre les relectures")) throw new Error("D-25 et D-26 mêlées : " + posee25.slice(0, 300));
     const tr = join(T, "decision-absente.jsonl"); writeFileSync(tr, [humain("Étudie X."), assistant([texte("Fait.")]), humain("24a")].join("\n") + "\n");
-    const d = join(T, "sortie-decision-absente"); const r = executer(["--preparer", "consigne", "--fichier", PETIT, "--transcript", tr, "--sortie", d], {}, new Date(), CTX);
+    const d = join(T, "sortie-decision-absente"); const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", PETIT, "--transcript", tr, "--sortie", d], {}, new Date(), CTX);
     egal(r.code, 0, "exit"); if (/Décisions auxquelles répondent/.test(readFileSync(join(d, "demande.txt"), "utf8"))) throw new Error("une décision inventée");
   });
   check("vert — la ligne de commande : --preparer imprime la consigne (exit 0) ; --releve sur un registre absent rend 0", () => {
@@ -944,7 +946,7 @@ try {
     const g = join(T, "gabarit.md"), s = join(T, "sujets.md");
     writeFileSync(g, "Étudie l'opportunité <SUJET> au gabarit d'étude."); writeFileSync(s, "1. jeton d'abonnement\n2. vidéo de lancement");
     const d = join(T, "sortie-campagne");
-    egal(executer(["--preparer", "consigne", "--fichier", g, "--fichier", s, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX).code, 0, "exit");
+    egal(executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", g, "--fichier", s, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX).code, 0, "exit");
     const l = readFileSync(join(d, "livrables.md"), "utf8");
     if (!/2 pièces lues ensemble/.test(l) || !l.includes("<SUJET>") || !l.includes("vidéo de lancement")) throw new Error(l.slice(0, 400));
   });
@@ -1066,7 +1068,7 @@ try {
   check("rouge — TF-2160 : --preparer consigne refuse (2) un fichier ignoré par git ou un *.cle désigné par --fichier, et n'écrit rien", () => {
     for (const f of [F2.ignore, F2.cle, F2.sousSecrets]) {
       const d = join(T, `sortie-refus-${Math.random().toString(36).slice(2)}`);
-      const r = executer(["--preparer", "consigne", "--fichier", f, "--transcript", TRSEC, "--sortie", d], {}, new Date(), { cwd: REPO2, maison: MAISON });
+      const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", f, "--transcript", TRSEC, "--sortie", d], {}, new Date(), { cwd: REPO2, maison: MAISON });
       egal(r.code, 2, `exit pour ${f}`); if (!/n'est pas embarqué|ne transite jamais|ignoré par git|fichier de secret/.test(r.sortie)) throw new Error(r.sortie);
       egal(existsSync(d), false, "dossier de sortie créé par un refus");
     }
@@ -1076,7 +1078,7 @@ try {
     const r = executer(["--preparer", "reception", "--fichier", F2.cle, "--transcript", TRSEC, "--sortie", d], {}, new Date(), { cwd: REPO2, maison: MAISON });
     // L'oracle de forme ne juge que les .md : le .cle passe à la préparation, et son contenu n'est pas cité.
     egal(r.code, 0, "exit réception"); if (readFileSync(join(d, "livrables.md"), "utf8").includes("VALEUR-FICHIER-CLE")) throw new Error("le contenu d'un .cle est cité à la réception");
-    const c = executer(["--preparer", "consigne", "--fichier", F2.ordinaire, "--transcript", TRSEC, "--sortie", join(T, "sortie-consigne-ok")], {}, new Date(), { cwd: REPO2, maison: MAISON });
+    const c = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", F2.ordinaire, "--transcript", TRSEC, "--sortie", join(T, "sortie-consigne-ok")], {}, new Date(), { cwd: REPO2, maison: MAISON });
     egal(c.code, 0, "exit consigne ordinaire");
   });
   // ==== TF-2235 : la demande d'ouverture d'une session non interactive est un message humain ; sans aucune demande, rien n'est préparé ====
@@ -1111,7 +1113,7 @@ try {
     writeFileSync(TRVIDE, [JSON.stringify({ type: "user", isMeta: true, timestamp: "2026-11-06T10:00:00Z", message: { role: "user", content: "<system-reminder>RAPPEL-SYSTEME</system-reminder>" } }),
       assistant([texte("Rien à faire.")], "2026-11-06T10:00:05Z")].join("\n") + "\n");
     const piece = join(T, "piece-vide.md"); writeFileSync(piece, "# Une pièce\n\nUn contenu.\n");
-    for (const [point, extra] of [["fin-de-tour", []], ["consigne", ["--fichier", piece]], ["coherence", ["--fichier", piece, "--fichier", PETIT]]]) {
+    for (const [point, extra] of [["fin-de-tour", []], ["consigne", ["--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", piece]], ["coherence", ["--fichier", piece, "--fichier", PETIT]]]) {
       const d = join(T, `sortie-vide-${point}`);
       const r = executer(["--preparer", point, ...extra, "--transcript", TRVIDE, "--sortie", d], {}, new Date("2026-11-06T12:00:00Z"), CTX);
       egal(r.code, 2, `exit au point ${point}`);
@@ -1119,6 +1121,97 @@ try {
       egal(existsSync(d), false, `dossier de sortie créé par un refus au point ${point}`);
     }
   });
+  // ==== TF-2659 (16/11/2026) : la recommandation d'une décision se juge contre la phrase du porteur ====
+  // Le fait (Produit-82, RT-41) : le porteur demande que chaque rôle puisse utiliser les modèles mis à sa disposition ; la session recommande une clé d'API personnelle et écarte
+  // l'écran de conversation ; le lendemain, le porteur demande l'interface de conversation : la personne visée n'écrit pas de code. La relecture jugeait la consigne de
+  // construction, pas la recommandation. Le relecteur est un modèle : ce que la recette joue, c'est ce qu'il REÇOIT, sur le cas du retour.
+  {
+    const PORTEUR = "Je veux que chaque rôle puisse utiliser les modèles mis à sa disposition.";
+    const RECO = "# Décision à prendre\n\n**Recommandation : une clé d'API personnelle par rôle, saisie dans son environnement local ; l'écran de conversation est écarté.**\n";
+    const trReco = join(T, "session-recommandation.jsonl");
+    writeFileSync(trReco, [humain(PORTEUR), assistant([texte("Je prépare la décision.")])].join("\n") + "\n");
+    const fReco = join(T, "decision-recommandation.md"); writeFileSync(fReco, RECO);
+    check("vert (TF-2659) — le quatrième ajout dit qui agit, avec quel outil, le geste que la phrase ne prête pas (écrire du code, clé d'API) et la gravité majeure hors_demande", () => {
+      for (const m of [/phrase du porteur/, /qui agit et avec quel outil/, /écrire du code/, /clé d'API personnelle/, /écart majeur/, /hors_demande/, /même suivie par le porteur/])
+        if (!m.test(AJOUT_RECOMMANDATION)) throw new Error(`l'ajout ne dit pas ${m}`);
+      if (!CONSIGNE_V2.endsWith(AJOUT_RECOMMANDATION) || !CONSIGNE_V2.startsWith(STRICTE)) throw new Error("la consigne v2 ne finit pas par l'ajout ou ne commence plus par la stricte v1");
+    });
+    check("rouge → vert (TF-2659) — le cas du retour : la phrase du porteur et la recommandation (clé d'API personnelle) arrivent au relecteur avec la règle qui les confronte, à chaque point", () => {
+      const d = join(T, "s-recommandation");
+      const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", fReco, "--transcript", trReco, "--sortie", d], {}, new Date(), CTX);
+      egal(r.code, 0, `exit : ${r.sortie.slice(0, 300)}`);
+      if (!readFileSync(join(d, "demande.txt"), "utf8").includes(PORTEUR)) throw new Error("la phrase du porteur n'est pas citée mot pour mot");
+      if (!readFileSync(join(d, "livrables.md"), "utf8").includes("une clé d'API personnelle par rôle")) throw new Error("la recommandation n'est pas citée");
+      if (!r.sortie.includes(AJOUT_RECOMMANDATION)) throw new Error("la règle qui confronte la recommandation à la phrase du porteur n'est pas dans la consigne du relecteur");
+      for (const point of ["fin-de-tour", "consigne", "reception", "coherence"])
+        if (!consigneRelecteur(point, "demande.txt", "livrables.md").includes(AJOUT_RECOMMANDATION)) throw new Error(`le point « ${point} » ne porte pas la règle`);
+      // Le rouge : la consigne d'avant le 16/11/2026 (sans le quatrième ajout) ne dit rien de la recommandation.
+      const avant = CONSIGNE_V2.replace(`. ${AJOUT_RECOMMANDATION}`, "");
+      if (avant === CONSIGNE_V2 || /qui agit/.test(avant)) throw new Error("la consigne d'avant devrait ignorer la recommandation de décision");
+    });
+  }
+  // ==== TF-2663 (16/11/2026) : une consigne d'agent part avec les quatre rubriques que le contrat exige ====
+  // Le fait (Produit-82, RT-45) : une consigne de constructeur sans dossier temporaire, sans raison d'affectation à Opus, dont la version de départ précédait le commit qui la portait.
+  // Dépôt git RÉEL jetable : deux commits, c1 puis c2.
+  {
+    const DEPOT = join(T, "depot-rubriques"); mkdirSync(DEPOT, { recursive: true });
+    const g = (...a) => spawnSync("git", ["-C", DEPOT, "-c", "user.email=t@t", "-c", "user.name=t", "-c", "commit.gpgsign=false", ...a], { encoding: "utf8" });
+    g("init", "-q", "-b", "main");
+    writeFileSync(join(DEPOT, "a.txt"), "a\n"); g("add", "-A"); g("commit", "-q", "-m", "c1"); const C1 = g("rev-parse", "--short=8", "HEAD").stdout.trim();
+    writeFileSync(join(DEPOT, "b.txt"), "b\n"); g("add", "-A"); g("commit", "-q", "-m", "c2"); const C2 = g("rev-parse", "--short=8", "HEAD").stdout.trim();
+    const AGENT = String.raw`C:\Users\x\Temp\session\scratchpad\agent-lot`;
+    const base = (extra = {}) => [
+      `Lot « lot » de la campagne. Dépôt cible : ${DEPOT}.`,
+      extra.dossier === null ? "Ton dossier de travail : le dossier courant." : `Dossier temporaire de l'agent : ${AGENT}`,
+      extra.affectation ?? "",
+      extra.depart === null ? "" : `Arbre : ${DEPOT}, branche camp-lot, départ ${extra.depart ?? C2}.`,
+      extra.commit ?? "",
+    ].filter(Boolean).join("\n") + "\n";
+    const jouer = (nom, texte, extra = []) => {
+      const c = join(T, `consigne-${nom}.md`); writeFileSync(c, texte);
+      const d = join(T, `s-rub-${nom}`);
+      const r = executer(["--preparer", "consigne", "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", d, ...extra], {}, new Date(), CTX);
+      return { r, d };
+    };
+    const refuse = (nom, texte, id, motif) => {
+      const { r, d } = jouer(nom, texte);
+      egal(r.code, 1, `exit (${nom})`);
+      if (!r.sortie.includes(id) || !motif.test(r.sortie)) throw new Error(`le refus ne nomme pas « ${id} » ou son constat : ${r.sortie.slice(0, 400)}`);
+      if (!/--sans-rubriques/.test(r.sortie)) throw new Error("le refus ne dit pas l'exemption déclarée");
+      egal(existsSync(d), false, `dossier de sortie créé par un refus (${nom})`);
+    };
+    check("vert (TF-2663) — une consigne qui porte les quatre rubriques (dossier agent-, départ qui est un commit du dépôt) passe, sans raison d'affectation exigée hors constructeur", () => {
+      const { r, d } = jouer("conforme", base());
+      egal(r.code, 0, `exit : ${r.sortie.slice(0, 300)}`); egal(existsSync(join(d, "livrables.md")), true, "rien n'est préparé");
+    });
+    check("rouge (TF-2663) — sans dossier temporaire : refusée, la rubrique et son remède nommés, rien n'est préparé", () => refuse("sans-dossier", base({ dossier: null }), "dossier-temporaire", /agent-/));
+    check("rouge (TF-2663) — constructeur nommé sans raison d'affectation : refusée ; avec la raison (complexité manifeste), elle passe", () => {
+      refuse("sans-raison", base({ affectation: "Agent : constructeur, modèle Opus." }), "raison-affectation", /Opus/);
+      const { r } = jouer("avec-raison", base({ affectation: "Agent : constructeur (Opus), raison de l'affectation : complexité manifeste, code neuf d'ampleur." }));
+      egal(r.code, 0, `exit : ${r.sortie.slice(0, 300)}`);
+    });
+    check("rouge (TF-2663) — sans version de départ : refusée", () => refuse("sans-depart", base({ depart: null }), "version-depart", /départ/));
+    check("rouge (TF-2663) — la version de départ PRÉCÈDE le commit qui la porte (le cas du retour) : refusée, les deux commits nommés ; le remède (partir du commit porteur) passe", () => {
+      const texte = base({ depart: C1, commit: `Le commit qui porte la décision : ${C2}.` });
+      refuse("depart-precede", texte, "commit-porteur", new RegExp(`${C1}.*${C2}|${C2}.*${C1}`));
+      const { r } = jouer("depart-corrige", base({ depart: C2, commit: `Le commit qui porte la décision : ${C2}.` }));
+      egal(r.code, 0, `le remède proposé ne passe pas : ${r.sortie.slice(0, 300)}`);
+    });
+    check("rouge (TF-2663) — un départ qui n'est pas un commit du dépôt désigné par « Arbre : » est refusé", () => refuse("depart-inconnu", base({ depart: "deadbee1" }), "version-depart", /n'est pas un commit/));
+    check("vert (TF-2663) — --sans-rubriques « motif » : une consigne commune passe, le motif est écrit dans la sortie ; un motif de moins de 20 caractères rend 2", () => {
+      const { r } = jouer("commune", "Consigne commune d'une campagne : le détail de chaque agent vient dans son appel.\n", ["--sans-rubriques", "consigne commune relue une fois, rubriques de chaque agent à son appel"]);
+      egal(r.code, 0, `exit : ${r.sortie.slice(0, 300)}`);
+      if (!/rubriques de consigne NON contrôlées/.test(r.sortie) || !/consigne commune relue une fois/.test(r.sortie)) throw new Error(`l'exemption n'est pas dite : ${r.sortie.slice(0, 300)}`);
+      egal(jouer("commune-court", "x\n", ["--sans-rubriques", "court"]).r.code, 2, "motif trop court");
+    });
+    check("pur (TF-2663) — rubriquesDeConsigne : une consigne vide manque dossier et départ ; sans dépôt, la vérification dans git est dite non faite", () => {
+      const r = rubriquesDeConsigne("Corrige les listes.\n");
+      egal(r.manquantes.map((m) => m.id).sort().join(), "commit-porteur,dossier-temporaire,version-depart", "manquantes");
+      const sans = rubriquesDeConsigne("Dossier : C:\\t\\agent-x\\ ; départ abcdef12.\n", { depot: null });
+      egal(sans.manquantes.length, 0, "manquantes"); if (!sans.notes.some((n) => /non vérifiés dans git/.test(n))) throw new Error("la vérification manquante n'est pas dite");
+    });
+  }
+
   check("borne — le registre du pilot n'a pas été touché par la recette", () => {
     const pilote = join(RACINE, "todo", "relectures-intention.jsonl");
     if (existsSync(pilote) && /RI-20261018-0[12]"/.test(readFileSync(pilote, "utf8")) && /"session":"sess-1"/.test(readFileSync(pilote, "utf8"))) throw new Error("la recette a écrit au registre du pilot");

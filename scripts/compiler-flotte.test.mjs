@@ -19,7 +19,7 @@ import { existsSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { MOTIF_MIN, compiler, compilateurParDefaut, jugerAgent, jugerFlotte, lireDeclarations, oracleParDefaut } from "./compiler-flotte.mjs";
+import { MOTIF_MIN, PHRASE_LEDGER_GABARIT, PHRASE_LEDGER_RAPPORT, appliquerLedgerParRapport, compiler, compilateurParDefaut, jugerAgent, jugerFlotte, lireDeclarations, lireLedgerParRapport, oracleParDefaut } from "./compiler-flotte.mjs";
 import { CAUSES_ANALYSEES } from "./noter-fiche.mjs";
 
 let pass = 0, fail = 0;
@@ -51,7 +51,7 @@ const a = process.argv.slice(2), out = a[a.indexOf("--out") + 1];
 for (const y of a.filter((x) => x.endsWith(".yaml"))) {
   const t = readFileSync(y, "utf8");
   const outils = /^outils:\\s*\\[(.*)\\]\\s*$/m.exec(t)[1];
-  writeFileSync(join(out, basename(y, ".yaml") + ".md"), "---\\nname: " + basename(y, ".yaml") + "\\ntools: " + outils + "\\n---\\n");
+  writeFileSync(join(out, basename(y, ".yaml") + ".md"), "---\\nname: " + basename(y, ".yaml") + "\\ntools: " + outils + "\\n---\\n\\n## Règles de frontière\\n- Un ✗ traverse la frontière signalé — jamais masqué. Consigner chaque étape au ledger du run.\\n");
 }
 console.log("[OK] compilé");
 `);
@@ -205,6 +205,71 @@ if (!oracleReel || !compilateurReel) {
     egal(r.verdict, "PASS", JSON.stringify(r.constats).slice(0, 300)); egal(r.installes.join(), "reseau.md");
     writeFileSync(join(sources, "reseau.yaml"), source("Read, Grep, Edit, Write"));
     egal(compiler({ sources, agents, oracle: oracleReel, compilateur: compilateurReel }).verdict, "PASS");
+  });
+}
+
+// ---- TF-2620 (16/11/2026) : la définition d'un agent d'écriture ne lui demande pas d'écrire au ledger ---------------------------------
+// Le fait (Produit-82, RT-33) : le gabarit de forge-agents ajoute à TOUT agent « Consigner chaque étape au ledger du run », et le contrat
+// d'agent fait du rapport la seule sortie : l'agent a tranché pour le contrat. Une source qui déclare `# ledger-par-rapport : <motif>`
+// remplace la phrase à la compilation ; une définition installée qui la garde malgré la déclaration est refusée.
+{
+  const MOTIF_LEDGER = "Le contrat d'agent fait du rapport la seule sortie : le ledger du run s'écrit par la session, l'agent y propose ses entrées (TF-2620)";
+  const declLedger = (motif = MOTIF_LEDGER) => `# ledger-par-rapport : ${motif}`;
+  const md = (id) => `---\nname: ${id}\ntools: Read\n---\n\n## Règles de frontière\n- Un ✗ traverse la frontière signalé — jamais masqué. ${PHRASE_LEDGER_GABARIT}\n`;
+  console.log("Le ledger s'écrit par le rapport (TF-2620)");
+  check("lecture — la déclaration est lue avec son motif et sa ligne ; sans ligne, null ; une ligne sans motif est ignorée", () => {
+    const r = lireLedgerParRapport(`# autre\n${declLedger()}\nid: x\n`);
+    egal(r.motif, MOTIF_LEDGER); egal(r.ligne, 2);
+    egal(lireLedgerParRapport("id: x\n"), null); egal(lireLedgerParRapport("# ledger-par-rapport :\n"), null);
+  });
+  check("VERT — la phrase du gabarit est remplacée par la prescription du rapport, et rien d'autre ne change", () => {
+    const neuf = appliquerLedgerParRapport(md("a"));
+    vrai(neuf !== null && !neuf.includes(PHRASE_LEDGER_GABARIT) && neuf.includes(PHRASE_LEDGER_RAPPORT), "phrase non remplacée");
+    egal(neuf.replace(PHRASE_LEDGER_RAPPORT, PHRASE_LEDGER_GABARIT), md("a"), "le reste du texte a changé");
+  });
+  check("ROUGE — une définition sans la phrase du gabarit n'est pas réécrite : null (le gabarit de forge-agents a changé)", () => egal(appliquerLedgerParRapport("---\nname: a\n---\n"), null));
+  check("VERT — la compilation d'une source déclarée installe un agent sans consigne d'écriture au ledger ; un agent non déclaré garde le gabarit", () => {
+    const { sources, agents } = jeu({ ecrit: ["Read", [declLedger()]], autre: ["Read"] });
+    const r = compiler({ sources, agents, oracle: FAUX_ORACLE, compilateur: FAUX_COMPILATEUR });
+    egal(r.verdict, "PASS", JSON.stringify(r.constats).slice(0, 300));
+    const ecrit = readFileSync(join(agents, "ecrit.md"), "utf8"), autre = readFileSync(join(agents, "autre.md"), "utf8");
+    vrai(!ecrit.includes(PHRASE_LEDGER_GABARIT) && ecrit.includes(PHRASE_LEDGER_RAPPORT), "l'agent déclaré porte encore la consigne d'écriture au ledger");
+    vrai(autre.includes(PHRASE_LEDGER_GABARIT), "l'agent non déclaré a été réécrit sans déclaration");
+  });
+  check("ROUGE — un motif de moins de " + MOTIF_MIN + " caractères est refusé à la compilation, et rien n'est installé", () => {
+    const { sources, agents } = jeu({ ecrit: ["Read", [declLedger("rapport seul")]] });
+    const avant = readFileSync(join(agents, "ecrit.md"), "utf8");
+    const r = compiler({ sources, agents, oracle: FAUX_ORACLE, compilateur: FAUX_COMPILATEUR });
+    egal(r.verdict, "FAIL"); vrai(graves(r.constats).some((c) => /ledger-par-rapport/.test(c.msg) && /caractères/.test(c.msg)), JSON.stringify(r.constats));
+    egal(readFileSync(join(agents, "ecrit.md"), "utf8"), avant, "un refus a écrit dans les agents");
+  });
+  check("ROUGE — une déclaration périmée (le compilateur n'écrit plus la phrase) est refusée : elle masquerait le prochain changement du gabarit", () => {
+    const { sources, agents } = jeu({ ecrit: ["Read", [declLedger()]] });
+    const sansPhrase = join(T, "compilateur-sans-phrase.mjs");
+    writeFileSync(sansPhrase, `import { readFileSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
+const a = process.argv.slice(2), out = a[a.indexOf("--out") + 1];
+for (const y of a.filter((x) => x.endsWith(".yaml"))) writeFileSync(join(out, basename(y, ".yaml") + ".md"), "---\\nname: x\\ntools: Read\\n---\\n");
+`);
+    const r = compiler({ sources, agents, oracle: FAUX_ORACLE, compilateur: sansPhrase });
+    egal(r.verdict, "FAIL"); vrai(graves(r.constats).some((c) => c.regle === "LEDGER" && /périmée/.test(c.msg)), JSON.stringify(r.constats));
+  });
+  check("ROUGE — --verifier refuse une définition installée qui garde la phrase du gabarit alors que sa source déclare, et le remède (recompiler) la rend PASS", () => {
+    const { sources, agents } = jeu({ ecrit: ["Read", [declLedger()]] });
+    writeFileSync(join(agents, "ecrit.md"), md("ecrit"));
+    const r = jugerFlotte({ agents, sources, oracle: FAUX_ORACLE });
+    egal(r.verdict, "FAIL"); vrai(graves(r.constats).some((c) => /recompiler/.test(c.msg) && /ledger/.test(c.msg)), JSON.stringify(r.constats));
+    egal(compiler({ sources, agents, oracle: FAUX_ORACLE, compilateur: FAUX_COMPILATEUR }).verdict, "PASS", "le remède proposé ne passe pas");
+    egal(jugerFlotte({ agents, sources, oracle: FAUX_ORACLE }).verdict, "PASS", "après recompilation");
+  });
+  const RACINE_L = join(ICI, "..");
+  const lireL = (...p) => readFileSync(join(RACINE_L, ...p), "utf8").replace(/\r\n/g, "\n");
+  check("TF-2620 vert — constructeur : sa source déclare « ledger-par-rapport », et l'agent installé ne porte plus aucune consigne d'écriture au ledger", () => {
+    vrai(lireLedgerParRapport(lireL("gabarits", "flotte", "constructeur.yaml")) !== null, "la source du constructeur ne déclare pas « ledger-par-rapport »");
+    const inst = lireL(".claude", "agents", "constructeur.md");
+    vrai(!inst.includes(PHRASE_LEDGER_GABARIT), "constructeur.md demande encore de consigner chaque étape au ledger : recompiler (node scripts\\compiler-flotte.mjs)");
+    vrai(inst.includes(PHRASE_LEDGER_RAPPORT), "constructeur.md ne renvoie pas au rapport comme sortie des entrées de ledger");
+    vrai(!/au ledger du run/.test(inst.split("\n").filter((l) => /Consigner|Écrire|écrire/.test(l)).join("\n")), "une consigne d'écriture au ledger subsiste");
   });
 }
 

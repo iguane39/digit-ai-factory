@@ -223,6 +223,8 @@ preuve: <sortie de vérification native, avant/après mesuré>
 gains_constates: <effet mesurable, chiffré si possible — exigé pour corrige>
 commit: <sha court> (local, non poussé) — nature : code | référentiel | configuration —
   vérification : <commande jouée, verdict>   (une ligne par commit de l'item, TF-2436)
+critique_rendu: <verdict de run-oracles-design par écran écrit, sur la page servie> | sans objet (aucun écran écrit)
+relecture_independante: faite par <agent ou session, en lecture seule> — <constats> | absente — non jouée par l'agent
 restes: <ce qui manque — classé IA / développeur / utilisateur (R-29, REGLES-PROJET.md
   §I ; format actions[] de forge-tests généralisé), constats hors périmètre,
   candidatures nouvelles>
@@ -461,3 +463,38 @@ donc elle se lance d'emblée en arrière-plan. `python recette/preparer_arbre.py
 modifie rien et rend 3 s'il manque un préalable. Sans préparation, la recette rend « PRÉREQUIS
 ABSENT » (code 3) avec la commande, jamais un verdict. Elle ne couvre ni le navigateur Playwright
 ni Docker.
+
+## Une copie de dossier n'emporte aucun fichier d'environnement (TF-2619, 16/11/2026)
+
+**Le fait, le 12/11/2026.** Un agent `constructeur` a copié `deploy/railway/` de façon récursive. La copie a emporté dans son bloc-notes un fichier d'environnement de l'instance hébergée, que l'agent n'a pas ouvert et a supprimé aussitôt. La règle « aucun `.env` lu, copié ou déplacé » (section Environnement) ne nommait pas la copie récursive : l'agent l'a tenue après coup, pas au moment de copier.
+
+- **Toute copie de dossier exclut les fichiers d'environnement** : `.env` et `.env.*`, à toute profondeur. Les copies récursives sont visées (`cp -r`, `Copy-Item -Recurse`, `robocopy`, `xcopy`, `rsync`) ; le plus sûr est de copier des fichiers nommés, pas un dossier.
+- **L'absence se vérifie après la copie**, avant tout autre geste : `Get-ChildItem -Recurse -Force -Filter ".env*" <destination>` (ou `find <destination> -name ".env*"`) ne rend rien. Un fichier trouvé se supprime sans être ouvert ni affiché, et son chemin seul, jamais son contenu, entre aux `restes` du rapport.
+
+## Une copie de travail occupée porte son marqueur (TF-2621, 16/11/2026)
+
+**Le fait, le 12/11/2026.** Deux sessions du même produit ont fait travailler chacune un constructeur dans la même copie de travail, créée hors de l'isolation automatique : 10 fichiers d'un agent écrits au milieu du travail commité de l'autre. Rien ne disait que la copie était prise ; la collision n'a été vue que par un message entre sessions.
+
+- **La session qui crée une copie y pose son marqueur** : `node scripts\occuper-copie.mjs --poser <copie> --session <identifiant> --run <run> --agent <agent>`. Le marqueur (session, run, agent, date) vit dans le répertoire git de la copie, hors de l'arbre : il n'est jamais suivi ni commité, et disparaît avec la copie.
+- **`oracles\hook-flotte.mjs` le lit avant tout lancement d'agent**, pour le dossier courant et pour les chemins que la consigne nomme, et refuse (exit 2) quand une autre session vivante occupe la copie. Une session est vivante quand sa transcription a été écrite depuis moins de 15 minutes. Le refus nomme l'occupante et le remède : créer sa propre copie, ou attendre la fin de l'autre session.
+- **L'agent ne pose ni ne retire le marqueur.** La session le retire (`--liberer <copie>`) à la fusion ou au retrait de la copie ; `--lire <copie>` dit qui l'occupe.
+
+## Un écran écrit se juge sur l'instance servie, et le rapport dit s'il a été relu (TF-2625, 16/11/2026)
+
+**Le fait, le 12/11/2026.** Un agent `constructeur` a livré 5 jalons, `make test` à exit 0 avant chaque commit. Une relecture indépendante en lecture seule a trouvé ensuite 1 défaut bloquant, 2 majeurs et 4 tests trop faibles ; la critique de rendu jouée par la session sur l'instance servie a refusé 7 écrans sur 9, et l'agent ne l'avait pas jouée. Un test vert juge ce que le code fait, pas ce que l'écran montre.
+
+- **Tout écran écrit passe la critique d'implémentation sur la page telle que l'instance la sert**, avant le commit qui le livre : `node <FORGE_ROOT>\digit-ai-forge-design\oracles\run-oracles-design.mjs <page> --rendu`, lancé après la dernière écriture du fichier (`gabarits\RESTITUTION.md`, contrôle CRITIQUE, TF-1913). Un écran est une page, une feuille de style ou un script livré à un navigateur. Le verdict se cite à la rubrique `critique_rendu` du rapport, écran par écran.
+- **Le rapport déclare la relecture indépendante** par la rubrique `relecture_independante` : « faite » avec son auteur (un autre agent, ou la session, en lecture seule) et ses constats, ou « absente — non jouée par l'agent ». Un agent ne s'attribue pas une relecture indépendante de son propre travail.
+
+## La consigne d'un agent porte ses quatre rubriques (TF-2663, 16/11/2026)
+
+**Le fait, le 13/11/2026.** La consigne d'un agent `constructeur` ne nommait ni dossier temporaire (exigé depuis TF-2437), ni la raison de l'affectation à Opus, et sa version de départ précédait le commit qui la portait. La relecture d'intention jouée avant le lancement ne lisait pas ces rubriques : l'agent les a relevées à son arrivée.
+
+`node scripts\relecture-intention.mjs --preparer consigne --fichier <consigne.md>` contrôle quatre rubriques dans le premier fichier et refuse (exit 1, rien n'est préparé) quand l'une manque :
+
+- **le dossier temporaire** de l'agent, un chemin `<scratchpad>\agent-<lot>\` (TF-2437) ;
+- **la raison de l'affectation au modèle**, exigée dès que la consigne nomme `constructeur` ou Opus : complexité manifeste, ou escalade avec l'oracle rouge qui la fonde ;
+- **la version de départ**, écrite « départ <sha> » et relevée par `git log -1 --format=%h` dans la copie avant les commits de l'agent ;
+- **le commit qui la porte** : un commit de la copie, que la version de départ contient. Un départ qui précède ce commit est refusé.
+
+Une consigne qui n'est pas une délégation d'écriture (consigne commune d'une campagne relue une fois, agent en lecture seule) se relit avec `--sans-rubriques "<motif>"` ; le motif s'écrit dans la sortie du contrôle.
