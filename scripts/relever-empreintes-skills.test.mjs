@@ -9,6 +9,7 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync, existsSync, readFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { relever, rendre, empreinteSkill } from "./relever-empreintes-skills.mjs";
+import { retirer } from "../oracles/hook-ecriture.mjs";
 
 const T = mkdtempSync(join(tmpdir(), "empreintes-skills-"));
 const SKILLS = join(T, "skills");
@@ -66,7 +67,7 @@ try {
   });
   check("un skill installé et un skill retiré sont nommés comme tels", () => {
     poser("gamma", "SKILL.md", "# gamma\n");
-    rmSync(join(SKILLS, "beta"), { recursive: true, force: true });
+    retirer(join(SKILLS, "beta")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
     const r = relever({ dossierSkills: SKILLS, journal: JOURNAL, avecSocle: false });
     const quoi = Object.fromEntries(r.changes.map((c) => [c.skill, c.quoi]));
     att(r.verdict === "change" && /installé/.test(quoi.gamma || "") && /retiré/.test(quoi.beta || ""), `changes ${JSON.stringify(r.changes)}`);

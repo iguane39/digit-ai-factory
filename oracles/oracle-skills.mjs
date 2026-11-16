@@ -150,6 +150,7 @@ import { fileURLToPath } from "node:url";
 import { homedir, tmpdir } from "node:os";
 import { racineConfigInstallee, skillsInstalles, hooksInstalles, settingsInstalle as settingsInstalleDe } from "../scripts/lib-config-installee.mjs";
 import { postesParDefaut } from "./oracle-amorcage-poste.mjs";
+import { retirer } from "./hook-ecriture.mjs"; // TF-2597 : `fs.rmSync` ne retire rien, sans erreur, sous un chemin accentué (Node 25.2.1, Windows)
 // TF-0965 — la table des dépôts consommateurs (DONNÉE datée) et le geste avant/après.
 import { encadrer, ecrireTrace, evenementNonRejoue, evenementsDePropagation, executerRejeuHebdomadaire, jouer as jouerConsommateur, lireTable, rougesOuverts, traceRouges } from "./consommateurs-skills.mjs";
 
@@ -1190,8 +1191,8 @@ function selfTest() {
   cas.push(["K11   — copie à jour après propagation : aucun constat",
             !r.findings.some((f) => f.regle === "K11" && f.statut === "FAIL" && f.ou === "zeta")]);
   // Nettoyage : les cas suivants attendent un parc sans K11 en échec.
-  rmSync(join(src, "epsilon"), { recursive: true, force: true });
-  rmSync(join(inst, "epsilon"), { recursive: true, force: true });
+  retirer(join(src, "epsilon"));
+  retirer(join(inst, "epsilon"));
 
   // K11 (TF-1611) — une copie IDENTIQUE à un état antérieur de sa source n'est pas un travail propre :
   // ni relevée par K11, ni épargnée par `--appliquer`. Rouge : une copie qui diffère de TOUS les états
@@ -1229,8 +1230,8 @@ function selfTest() {
   cas.push(["K11   — copie qui diffère de TOUT l'historique : toujours relevée", echoue(r, "K11")]);
   juger(racine, inst, true);
   cas.push(["K11 ter— …et toujours épargnée par --appliquer", readFileSync(cibleI, "utf8").includes("lignes propres")]);
-  rmSync(join(src, "iota"), { recursive: true, force: true });
-  rmSync(join(inst, "iota"), { recursive: true, force: true });
+  retirer(join(src, "iota"));
+  retirer(join(inst, "iota"));
 
   // K11 (TF-1878, 19/10/2026) — LES VARIABLES GIT_* D'UN HAMEÇON NE DOIVENT PAS DÉTOURNER LA CONFRONTATION.
   // Le fait : sous un `GIT_DIR` hérité (hameçon git, session qui l'exporte), les deux cas TF-1611 ci-dessus
@@ -1263,8 +1264,8 @@ function selfTest() {
       if (sauve.dir === undefined) delete process.env.GIT_DIR; else process.env.GIT_DIR = sauve.dir;
       if (sauve.arbre === undefined) delete process.env.GIT_WORK_TREE; else process.env.GIT_WORK_TREE = sauve.arbre;
     }
-    rmSync(join(src, "kappa"), { recursive: true, force: true });
-    rmSync(join(inst, "kappa"), { recursive: true, force: true });
+    retirer(join(src, "kappa"));
+    retirer(join(inst, "kappa"));
   }
 
   // K12 (TF-1099) — une source EN COURS DE MODIFICATION n'est ni comparée ni propagée, et c'est
@@ -1283,8 +1284,8 @@ function selfTest() {
             r.findings.some((f) => f.regle === "K2" && f.statut === "FAIL" && f.ou === "eta")]);
   juger(racine, inst, true);
   cas.push(["K12   — et un état propre se propage", readFileSync(join(inst, "eta", "SKILL.md"), "utf8").includes("intermédiaire")]);
-  rmSync(join(srcDesign, "eta"), { recursive: true, force: true });
-  rmSync(join(inst, "eta"), { recursive: true, force: true });
+  retirer(join(srcDesign, "eta"));
+  retirer(join(inst, "eta"));
 
   // K4 : un skill personnel est déclaré, jamais mis en échec.
   poser(join(inst, "perso", "SKILL.md"), "# perso\n");

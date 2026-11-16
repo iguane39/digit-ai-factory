@@ -28,6 +28,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { retirer } from "../oracles/hook-ecriture.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const OUTIL = join(ICI, "readme-dossiers.mjs");
@@ -135,7 +136,7 @@ check("un fichier AJOUTÉ au dossier reste un défaut", () => {
 check("`--strict` a disparu sans casser l'appel : le drapeau est ignoré, le verdict est le même", () => {
   writeFileSync(README, temoin, "utf8");
   git("rm", "-q", "--cached", "input/c.md");
-  rmSync(join(T, "input", "c.md"), { force: true });
+  retirer(join(T, "input", "c.md")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
   lancer();
   const sans = lancer(["--check"]);
   const avec = lancer(["--check", "--strict"]);
@@ -387,7 +388,7 @@ check("TF-0914 : le MÊME fichier, une fois COMMIS, entre dans l'index sans autr
   check("TF-1576 vert — sas présent : la ligne du dossier ignoré déclaré est écrite", () => {
     if (!present) throw new Error("ligne _arrivee absente alors que le dossier existe");
   });
-  rmSync(join(P, "input", "00-retours", "_arrivee"), { recursive: true, force: true });
+  retirer(join(P, "input", "00-retours", "_arrivee"));
   gen();
   check("TF-1576 rouge → vert — sas absent (worktree, clone frais) : la ligne déclarée n'est PAS retirée", () => {
     if (!/`_arrivee\\` \| dossier ignoré par git/.test(lire())) throw new Error("la ligne du sas absent a disparu de l'index (défaut d'origine)");

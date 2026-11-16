@@ -35,6 +35,7 @@ import { join, dirname, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { retirer } from "../oracles/hook-ecriture.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = resolve(ICI, "..");
@@ -344,7 +345,7 @@ try {
   const mut = (command) => spawnSync(process.execPath, [lanceur, "mutation-en-cours"], { encoding: "utf8", cwd: P, env: { ...env, CLAUDE_PROJECT_DIR: P },
     input: JSON.stringify({ tool_name: "Bash", cwd: P, tool_input: { command } }) });
   const mCommit = mut("git commit -m x"), mLecture = mut("git status");
-  rmSync(verrou17);
+  retirer(verrou17); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
   const mApres = mut("git commit -m x");
   check("17 mutation : `git commit` refusé par le lanceur tant que le verrou existe, fichiers mutés nommés (TF-2126)",
     mCommit.status === 2 && /TF-2126/.test(mCommit.stderr) && /app\/audit\.py, app\/egress\.py/.test(mCommit.stderr), mCommit.stdout + mCommit.stderr);

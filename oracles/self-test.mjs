@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { socleDePage } from "../scripts/lib-socle-page.mjs";
+import { retirer } from "./hook-ecriture.mjs";
 
 const oracle = join(dirname(fileURLToPath(import.meta.url)), "oracle-conformite-projet.mjs");
 // Pas de shell : sous Windows, shell:true re-découpe les arguments contenant des espaces
@@ -341,7 +342,7 @@ check("R-18 bis : forge/QUESTIONS.md présent → constaté PASS (TF-0330)", () 
     const f18 = rapport.findings.filter((f) => f.regle === "R-18" && /QUESTIONS/.test(String(f.ou) + " " + String(f.message)));
     if (!f18.length || f18[0].statut !== "PASS") throw new Error(`statut ${f18[0] && f18[0].statut} — attendu PASS quand le fichier existe`);
   } finally {
-    rmSync(join(verte, "forge", "QUESTIONS.md"), { force: true });
+    retirer(join(verte, "forge", "QUESTIONS.md")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
   }
 });
 
@@ -388,7 +389,7 @@ check("verte : le HTML suit le socle qui bouge entre deux générations (cause d
     writeFileSync(gabarit, readFileSync(gabarit, "utf8").replace("</head>", '<meta name="socle-modifie" content="entre deux generations"></head>'));
     if (jouer() === un) throw new Error("le gabarit du socle a changé et le HTML ne bouge pas : le socle n'est pas lu à chaque génération, ou ce cas ne juge rien");
   } finally {
-    rmSync(gele, { recursive: true, force: true });
+    retirer(gele);
     genere("generer-architecture.mjs", "ARCHITECTURE.md"); // la vue de la fixture revient à l'état du socle réel
   }
 });
@@ -495,7 +496,7 @@ check("TF-1119 ANTÉRIEUR — un second carnet non cité par un carnet revu avan
     const { exit, rapport } = lance(verte);
     if (exit !== 0 || rapport.findings.some((x) => x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error(`exit ${exit} : défaut rétroactif`);
     if (!rapport.non_juge.some((l) => /R-20 \(carnet d'écarts\) non jugé.*CARNET-ECARTS\.md.*verifie_le=2026-09-01/.test(l))) throw new Error("l'antériorité du second carnet n'est pas déclarée");
-  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
+  } finally { retirer(autre); writeFileSync(carnet, avant); }
 });
 check("TF-1119 rouge → vert — un second carnet d'écarts non cité est un FAIL ; cité par le carnet hérité, il passe", () => {
   const autre = join(verte, "docs", "projet", "CARNET-ECARTS.md");
@@ -509,7 +510,7 @@ check("TF-1119 rouge → vert — un second carnet d'écarts non cité est un FA
     writeFileSync(carnet, avant.replace("*Autre carnet d'écarts : aucun.*", "*Autre carnet d'écarts : `docs/projet/CARNET-ECARTS.md` — les écarts au référentiel client y vivent.*"));
     r = lance(verte);
     if (r.rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error("le carnet cité reste en échec — le remède ne passe pas");
-  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
+  } finally { retirer(autre); writeFileSync(carnet, avant); }
 });
 check("TF-1119 BORNE — un carnet hérité instancié, sans second carnet, ne déclenche rien", () => {
   const { rapport } = lance(verte);
@@ -663,8 +664,8 @@ check("R-11 bis : les trois déclarés — dont « absent » motivé — → PAS
       controle({ exit, avert: rapport.non_juge.filter((l) => /^R-11 ter — /.test(l)), pass: rapport.findings.filter((x) => x.regle === "R-11 ter") });
     } finally {
       writeFileSync(chemin, avant);
-      for (const f of posees) rmSync(f, { force: true });
-      rmSync(join(verte, "src"), { recursive: true, force: true });
+      for (const f of posees) retirer(f);
+      retirer(join(verte, "src"));
     }
   };
   check("R-11 ter : une page à tableau et aucune section de règles de socle → la ligne « Page HTML de données » est NOMMÉE, sans échec (TF-2125)", () => {

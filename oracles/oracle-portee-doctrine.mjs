@@ -47,6 +47,7 @@ import { join, dirname, isAbsolute, basename } from "node:path";
 import { tmpdir, homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
+import { retirer } from "./hook-ecriture.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const PILOT = join(ICI, "..");
@@ -343,7 +344,7 @@ if (args[0] === "--self-test") {
     if (forge) mkdirSync(join(d, "forge", "hooks"), { recursive: true });
     if (forge && hook) writeFileSync(join(d, "forge", "hooks", "factory.mjs"), "// hook\n", "utf8");
     if (settings) { mkdirSync(join(d, ".claude"), { recursive: true }); writeFileSync(join(d, ".claude", "settings.json"), '{"hooks":{"Stop":[{"command":"node forge/hooks/factory.mjs"}]}}', "utf8"); }
-    else rmSync(join(d, ".claude"), { recursive: true, force: true });
+    else retirer(join(d, ".claude")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
     if (forge && texte) writeFileSync(join(d, "forge", "RESTITUTION.md"), "# doctrine\n", "utf8");
     if (claude) writeFileSync(join(d, "CLAUDE.md"), "Précédence R-43.\n", "utf8");
   };

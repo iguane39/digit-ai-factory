@@ -250,6 +250,7 @@ if (args.includes("--self-test")) {
   const { mkdtempSync, writeFileSync, mkdirSync, rmSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { execFileSync } = await import("node:child_process");
+  const { retirer } = await import("./hook-ecriture.mjs");
   let pass = 0; const echecs = [];
   const att = (quoi, cond) => { if (cond) { pass++; console.log(`  [OK  ] ${quoi}`); } else { echecs.push(quoi); console.log(`  [ECHEC] ${quoi}`); } };
   const base = mkdtempSync(join(tmpdir(), "secrets-perimetre-"));
@@ -335,7 +336,7 @@ if (args.includes("--self-test")) {
       GRAVITE("publie") > GRAVITE("suivi") && GRAVITE("suivi") > GRAVITE("non_ignore"));
 
     // Le second sens de SP1 : plus de porteur hors dépôt une fois le fichier retiré.
-    rmSync(join(base, ".env"));
+    retirer(join(base, ".env")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
     att("SP1 — le constat DISPARAÎT quand le fichier est retiré (le contrôle n'est pas figé)",
       juger(base).horsDepot.length === 0);
   } finally {

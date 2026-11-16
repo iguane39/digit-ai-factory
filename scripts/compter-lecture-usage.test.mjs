@@ -14,6 +14,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
+import { retirer } from "../oracles/hook-ecriture.mjs";
 import { fileURLToPath } from "node:url";
 import {
   normaliser, blocs, demandeQuelqueChose, extraireConsigne, extraireJson, validerReponse, jugerReponse, compter,
@@ -183,7 +184,7 @@ check("moins de 6 positifs : la mesure est donnée mais NON CONCLUANTE", () => {
 });
 check("réponse manquante : INCOMPLET, jamais un verdict", () => {
   const dossier = repondre(w6, "r-manque", { vus: 6, faux: 0 });
-  rmSync(join(dossier, "LU-09.json"));
+  retirer(join(dossier, "LU-09.json")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
   const r = lanceur(w6, [lireReponses(dossier)]);
   egal(r.verdict, "INCOMPLET", "verdict"); egal(r.reponses_manquantes, 1, "manquantes");
 });

@@ -46,6 +46,7 @@ import { basename, dirname, join, resolve, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { lireVerdict } from "../banc-mutation/banc-mutation.mjs";
+import { retirer } from "../hook-ecriture.mjs";
 
 export const VERSION = "1.0.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -209,7 +210,7 @@ export const cheminCorpusParDefaut = (env = process.env) =>
 /** Écrit le corpus : `corpus.jsonl` (sans les contenus) et, par paire, `fichiers/<n>/avant|apres/<nom>`. */
 export function ecrireCorpus(paires, sortie) {
   mkdirSync(sortie, { recursive: true });
-  rmSync(join(sortie, "fichiers"), { recursive: true, force: true });
+  retirer(join(sortie, "fichiers")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows) : le passage précédent restait
   const lignes = paires.map((p, n) => {
     const { avant, apres, ...reste } = p;
     if (avant && apres) {
