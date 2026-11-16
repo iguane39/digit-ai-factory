@@ -22,6 +22,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
+import { retirer } from "./hook-ecriture.mjs";
 import { RESERVATION_BLOQUANTE_DES, RESERVATION_PILOT_BLOQUANTE_DES, analyserTranscript, comparerAffiche, controlerDetail, controlerReservation, controlerExplication, controlerGeste, controlerPossession, controlerProcedure, demandeProcedure, demandesDetail, syntheseDuTour,
   BLOQUANTES_DATEES, estBloquante, controlerCritique, critiqueDuTour, critiqueCouvre, ciblesDeCritique, fichierServi, verdictDeCritique,
   livrablesEcrits, controlerLivre, cibleDuLivrable, gainsDuTour, gainsSansReleve, avertsDeGains, nombresDuTour, releveRemontee, scellerLivrable, controlerLotDansLeTour } from "./hook-restitution.mjs";
@@ -1243,7 +1244,7 @@ try {
     const objet = produit52(); inscrire(objet, JSON.stringify({ seq: 2, ts: "2026-10-18T10:00:01Z", type: "question_humain", decisions_posees: { "D-61": "publication" } }), null);
     if (cR(D61, objet).verdict !== "PASS") echecs.push("52 septies : l'objet `decisions_posees` {\"D-61\": …} (forme d'un produit du parc) doit réserver D-61");
     // un ledger absent se dit, il ne s'invente pas
-    const sansLedger = produit52(); rmSync(join(sansLedger, "forge", "ledger.jsonl"));
+    const sansLedger = produit52(); retirer(join(sansLedger, "forge", "ledger.jsonl")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
     const rSans = cR(D61, sansLedger);
     if (rSans.verdict !== "FAIL" || !/introuvable/.test((rSans.ecarts || []).join(" ")))
       echecs.push(`52 octies : sans forge/ledger.jsonl, la D-61 est non inscrite et le refus dit que le registre est introuvable, obtenu ${JSON.stringify(rSans).slice(0, 200)}`);

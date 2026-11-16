@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { socleDePage } from "../scripts/lib-socle-page.mjs";
+import { retirer } from "./hook-ecriture.mjs";
 
 const oracle = join(dirname(fileURLToPath(import.meta.url)), "oracle-conformite-projet.mjs");
 // Pas de shell : sous Windows, shell:true re-découpe les arguments contenant des espaces
@@ -455,7 +456,7 @@ check("R-18 bis : forge/QUESTIONS.md présent → constaté PASS (TF-0330)", () 
     const f18 = rapport.findings.filter((f) => f.regle === "R-18" && /QUESTIONS/.test(String(f.ou) + " " + String(f.message)));
     if (!f18.length || f18[0].statut !== "PASS") throw new Error(`statut ${f18[0] && f18[0].statut} — attendu PASS quand le fichier existe`);
   } finally {
-    rmSync(join(verte, "forge", "QUESTIONS.md"), { force: true });
+    retirer(join(verte, "forge", "QUESTIONS.md")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
   }
 });
 
@@ -502,7 +503,7 @@ check("verte : le HTML suit le socle qui bouge entre deux générations (cause d
     writeFileSync(gabarit, readFileSync(gabarit, "utf8").replace("</head>", '<meta name="socle-modifie" content="entre deux generations"></head>'));
     if (jouer() === un) throw new Error("le gabarit du socle a changé et le HTML ne bouge pas : le socle n'est pas lu à chaque génération, ou ce cas ne juge rien");
   } finally {
-    rmSync(gele, { recursive: true, force: true });
+    retirer(gele);
     genere("generer-architecture.mjs", "ARCHITECTURE.md"); // la vue de la fixture revient à l'état du socle réel
   }
 });
@@ -609,7 +610,7 @@ check("TF-1119 ANTÉRIEUR — un second carnet non cité par un carnet revu avan
     const { exit, rapport } = lance(verte);
     if (exit !== 0 || rapport.findings.some((x) => x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error(`exit ${exit} : défaut rétroactif`);
     if (!rapport.non_juge.some((l) => /R-20 \(carnet d'écarts\) non jugé.*CARNET-ECARTS\.md.*verifie_le=2026-09-01/.test(l))) throw new Error("l'antériorité du second carnet n'est pas déclarée");
-  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
+  } finally { retirer(autre); writeFileSync(carnet, avant); }
 });
 check("TF-1119 rouge → vert — un second carnet d'écarts non cité est un FAIL ; cité par le carnet hérité, il passe", () => {
   const autre = join(verte, "docs", "projet", "CARNET-ECARTS.md");
@@ -623,7 +624,7 @@ check("TF-1119 rouge → vert — un second carnet d'écarts non cité est un FA
     writeFileSync(carnet, avant.replace("*Autre carnet d'écarts : aucun.*", "*Autre carnet d'écarts : `docs/projet/CARNET-ECARTS.md` — les écarts au référentiel client y vivent.*"));
     r = lance(verte);
     if (r.rapport.findings.some((x) => x.regle === "R-20" && x.statut === "FAIL" && /carnet/i.test(x.message))) throw new Error("le carnet cité reste en échec — le remède ne passe pas");
-  } finally { rmSync(autre, { force: true }); writeFileSync(carnet, avant); }
+  } finally { retirer(autre); writeFileSync(carnet, avant); }
 });
 check("TF-1119 BORNE — un carnet hérité instancié, sans second carnet, ne déclenche rien", () => {
   const { rapport } = lance(verte);
@@ -777,8 +778,8 @@ check("R-11 bis : les trois déclarés — dont « absent » motivé — → PAS
       controle({ exit, avert: rapport.non_juge.filter((l) => /^R-11 ter — /.test(l)), pass: rapport.findings.filter((x) => x.regle === "R-11 ter") });
     } finally {
       writeFileSync(chemin, avant);
-      for (const f of posees) rmSync(f, { force: true });
-      rmSync(join(verte, "src"), { recursive: true, force: true });
+      for (const f of posees) retirer(f);
+      retirer(join(verte, "src"));
     }
   };
   check("R-11 ter : une page à tableau et aucune section de règles de socle → la ligne « Page HTML de données » est NOMMÉE, sans échec (TF-2125)", () => {
@@ -2136,6 +2137,54 @@ check("TF-2587 rouge : sans le contrôle de l'instant, le témoin voit la chirur
     if ((r.findings || []).some((x) => x.regle === "R-42" && x.statut === "FAIL")) throw new Error("le mutant refuse encore « vers midi » : le rouge n'est pas le défaut du 15/11");
   } finally { rmSync(dirname(copie), { recursive: true, force: true }); }
 });
+// ---- TF-2596 (16/11/2026, campagne « Traite les retours et les TODOs », lot pg) — LE SEQ D'UNE DÉCLARATION EST ANTÉRIEUR À LA RECTIFICATION QUI LE PORTE, ET LE REPÈRE [ANTÉRIEUR].
+// `verify` refuse une déclaration de seq supérieur ou égal à celui de la rectification (« on ne se dédouane pas d'avance ») ; R-42 l'ignorait en silence : la rectification
+// du seq 4 qui déclare aussi le seq 9, ou le seq 4, rendait PASS ici et exit 1 chez `verify` (2 formes mesurées le 15/11/2026 par le lot pc, rejouées le 16/11/2026).
+// Rouge : la déclaration de seq postérieur ou égal est refusée et NOMMÉE, même à côté d'une déclaration valide. Vert : le seq antérieur couvre. Et `verify` imprime
+// `[ANTÉRIEUR] ts_reel_estime` pour une rectification d'avant le 15/11/2026 à valeur illisible : R-42 le dit aussi, jamais pour une valeur lisible ni après la naissance.
+const FORMES_2596 = [
+  // [nom, déclarations de la rectification du seq 4, intègre ?]
+  ["seq antérieur (3) seul", [DECL_2587], true],
+  ["complète, plus une déclaration de seq 9 (postérieur)", [DECL_2587, declarationTs(9, TS_CONSIGNE_2573)], false],
+  ["complète, plus une déclaration de seq 4 (celui de la rectification)", [DECL_2587, declarationTs(4, TS_CONSIGNE_2573)], false],
+  ["complète, plus une déclaration de seq 5 (le suivant)", [DECL_2587, declarationTs(5, TS_CONSIGNE_2573)], false],
+];
+check("TF-2596 rouge : une déclaration de seq supérieur ou égal à celui de la rectification (9, 4, 5 pour la rectification du seq 4) → FAIL, « ne lui est pas ANTÉRIEUR » est NOMMÉ, même à côté d'une déclaration valide", () => {
+  for (const [nom, decls] of FORMES_2596.filter(([, , integre]) => !integre)) {
+    const f = r42De(projetLedger2540("seq-posterieur-rouge", ledger2587(decls))).find((x) => x.statut === "FAIL");
+    if (!f) throw new Error(`${nom} : R-42 n'a pas refusé la déclaration de seq postérieur ou égal`);
+    if (!/ne lui est pas ANTÉRIEUR/.test(f.message)) throw new Error(`${nom} : le défaut n'est pas nommé : ${f.message}`);
+  }
+});
+check("TF-2596 vert : la déclaration de seq antérieur (3) couvre — [RECTIFIÉ] imprimé, aucun FAIL", () => {
+  for (const [nom, decls] of FORMES_2596.filter(([, , integre]) => integre)) {
+    const r42 = r42De(projetLedger2540("seq-posterieur-vert", ledger2587(decls)));
+    if (r42.some((x) => x.statut === "FAIL")) throw new Error(`${nom} : FAIL inattendu ${JSON.stringify(r42.map((x) => x.message))}`);
+    if (!r42.some((x) => /\[RECTIFIÉ\]/.test(x.message))) throw new Error(`${nom} : aucun [RECTIFIÉ] imprimé : ${r42.map((x) => x.message)}`);
+  }
+});
+check("TF-2596 rouge : sans le contrôle de l'antériorité du seq déclaré, le témoin voit la chirurgie — la déclaration de seq 9 passe de nouveau (le défaut du 15/11)", () => {
+  const source = readFileSync(oracle, "utf8");
+  const mutant = source.replace("if (Number.isFinite(Number(e.seq)) && seq >= Number(e.seq)) {", "if (false) {");
+  if (mutant === source) throw new Error("chirurgie sans effet : le témoin est vide");
+  const absolu = mutant.replace(/from "(\.\.?\/[^"]+)"/g, (_m, rel) => `from "${pathToFileURL(resolve(dirname(oracle), rel)).href}"`);
+  const copie = join(mkdtempSync(join(tmpdir(), "conf-mutant-2596-")), "oracle-conformite-projet.mjs");
+  writeFileSync(copie, absolu, "utf8");
+  try {
+    const d = projetLedger2540("seq-posterieur-mutant", ledger2587(FORMES_2596.find(([n]) => /seq 9/.test(n))[1]));
+    let r;
+    try { r = JSON.parse(sh("node", [copie, d])); } catch (e) { r = JSON.parse(String(e.stdout || "{}")); }
+    if (!(r.findings || []).some((x) => x.regle === "R-42")) throw new Error("le mutant ne rend aucun constat R-42 : le témoin est vide");
+    if ((r.findings || []).some((x) => x.regle === "R-42" && x.statut === "FAIL")) throw new Error("le mutant refuse encore le seq postérieur : le rouge n'est pas le défaut du 15/11");
+  } finally { rmSync(dirname(copie), { recursive: true, force: true }); }
+});
+check("TF-2596 : [ANTÉRIEUR] ts_reel_estime est imprimé pour la valeur illisible d'une rectification d'avant le 15/11/2026 (texte, nombre, date sans heure, prose du parc), jamais pour une valeur lisible ni après la naissance", () => {
+  for (const [nom, valeur, tsRectif, integre] of FORMES_TS_INSTANT) {
+    const msg = r42De(projetLedger2540("anterieur-repere", ledgerInstant(valeur, tsRectif))).map((x) => x.message).join(" | ");
+    const attendu = integre && !(typeof valeur === "string" && /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(valeur.trim()) && !Number.isNaN(Date.parse(valeur))) && Date.parse(tsRectif) < Date.parse("2026-11-15T00:00:00Z");
+    if (/\[ANTÉRIEUR\] ts_reel_estime/.test(msg) !== attendu) throw new Error(`${nom} : repère [ANTÉRIEUR] ${attendu ? "attendu, absent" : "inattendu"} — ${msg}`);
+  }
+});
 {
   const LEDGER_MJS_2540 = join("digit-ai-forge-agents", ".claude", "skills", "forge-agents", "scripts", "ledger.mjs");
   const racinesParc = [process.env.FORGE_ROOT, join(dirname(oracle), "..", ".."), "c:\\dev"].filter(Boolean);
@@ -2175,6 +2224,13 @@ check("TF-2587 rouge : sans le contrôle de l'instant, le témoin voit la chirur
     check(`TF-2587 accord : sur ${FORMES_2587.length} formes (cause absente, null, vide, espaces ; seq texte, non entier, 0, -1, absent, non objet ; ts_reel_estime illisible d'une rectification antérieure à la règle), R-42 et \`ledger.mjs verify\` rendent le MÊME verdict`, () => {
       for (const [nom, decls, integre] of FORMES_2587) {
         const d = projetLedger2540("cause-seq-accord", ledger2587(decls));
+        const r42 = r42Integre(d), verify = verifyIntegre(d);
+        if (r42 !== integre || verify !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
+      }
+    });
+    check(`TF-2596 accord : sur ${FORMES_2596.length} formes (seq antérieur ; seq 9, 4, 5 pour une rectification du seq 4), R-42 et \`ledger.mjs verify\` rendent le MÊME verdict`, () => {
+      for (const [nom, decls, integre] of FORMES_2596) {
+        const d = projetLedger2540("seq-posterieur-accord", ledger2587(decls));
         const r42 = r42Integre(d), verify = verifyIntegre(d);
         if (r42 !== integre || verify !== integre) throw new Error(`${nom} : intègre attendu ${integre}, R-42 ${r42}, verify ${verify}`);
       }

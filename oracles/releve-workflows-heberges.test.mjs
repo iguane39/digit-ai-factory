@@ -18,6 +18,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
+import { retirer } from "./hook-ecriture.mjs";
 import {
   SEUIL_ECHECS, seriesEnEchec, slugGithub, aDesWorkflows, releverProduit, decisionReleve, lancerReleve, lignesOuverture, executer, lireTrace,
 } from "./releve-workflows-heberges.mjs";
@@ -148,7 +149,7 @@ try {
     egal(decisionReleve(trace, { maintenant, vivant: () => false }).lancer, true, "processus mort");
     writeFileSync(`${trace}.verrou`, JSON.stringify({ pid: 4242, ts: "2026-11-12T09:00:00Z" }), "utf8");
     egal(decisionReleve(trace, { maintenant, vivant: () => true }).lancer, true, "verrou de plus de 15 min");
-    rmSync(`${trace}.verrou`, { force: true });
+    retirer(`${trace}.verrou`); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
   });
   check(17, "lancerReleve rend la main aussitôt : processus détaché (pid, unref), ou lance:false avec la cause", () => {
     let recu = null, unref = false;
@@ -179,7 +180,7 @@ try {
     vrai(/ANCIEN/.test(l) && /NON relevé \(≠ sain\) : p2 \(gh auth login\)/.test(l), `ligne : ${l}`);
   });
   check(21, "sans trace : le premier relevé est annoncé s'il est lancé ; sans lancement possible (drapeau), rien n'est dit", () => {
-    rmSync(trace, { force: true });
+    retirer(trace);
     const avec = lignesOuverture(trace, { maintenant, lancer: () => ({ lance: true, raison: "jamais", pid: 12, duree_ms: 3 }) }).join("\n");
     vrai(/aucun relevé encore/.test(avec) && /relevé relancé en arrière-plan/.test(avec) && /pid 12/.test(avec), `avec : ${avec}`);
     egal(lignesOuverture(trace, { maintenant }), [], "sans lancement ni trace");

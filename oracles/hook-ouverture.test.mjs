@@ -23,6 +23,7 @@ import { tmpdir, hostname } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
+import { retirer } from "./hook-ecriture.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const hook = join(ICI, "hook-ouverture.mjs");
@@ -266,7 +267,7 @@ if (veut(2563, 219)) {
       env: { ...process.env, FORGE_SANS_OBSERVATION: "1", FORGE_ROOT: racineParcTest, CLAUDE_CONFIG_DIR: profil, USERPROFILE: maisonIndicateurs, HOME: maisonIndicateurs,
         FORGE_FICHES_AGENTS: fichesVides, FORGE_DELAI_RELEVE_FLOTTE_S: String(Math.round(60 * f)), FORGE_DELAI_INDICATEURS_AGENTS_S: String(delaiS ?? Math.round(60 * f)) } });
   };
-  rmSync(PAGE_INDICATEURS_JETABLE, { force: true });
+  retirer(PAGE_INDICATEURS_JETABLE); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows) ; la page restée faisait lire « réécrite » à tort
   const sortieSuivi = ouvrirIndicateurs(profilAgent("suivi", [15.3, 30.4]));
   const pageReecrite = existsSync(PAGE_INDICATEURS_JETABLE);
   const sortieMuet = ouvrirIndicateurs(profilAgent("muet", []));
@@ -1014,7 +1015,7 @@ if (veut(1635)) {
   const traceGestes = join(P, ".git", "digit-ai-gestes-avant-releve.jsonl");
   let decalage = 1200, sortie = "", probant = false, fenetre = "";
   for (let essai = 0; essai < 4 && !probant; essai++) {
-    rmSync(traceGestes, { force: true });
+    retirer(traceGestes);
     const t0 = Date.now();
     writeFileSync(tr, [entree(t0 - 60000, "Read"), entree(t0 + decalage, "Bash")].join(NL) + NL, "utf8");
     sortie = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT, "--contexte-json"],

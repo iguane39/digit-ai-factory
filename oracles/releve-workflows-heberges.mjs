@@ -25,10 +25,11 @@
  *
  * Usage : node oracles/releve-workflows-heberges.mjs --executer [--trace <fichier>] [--racine <dossier du parc>]
  */
-import { existsSync, readFileSync, readdirSync, writeFileSync, renameSync, rmSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { retirer } from "./hook-ecriture.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const SEUIL_ECHECS = 2;
@@ -182,7 +183,7 @@ export async function executer({ trace, base, gh = lanceurGh, git = lanceurGit, 
     const rel = await releverParc(base, { produits, gh, git });
     ecrireAtomique(trace, { format: FORMAT, debut, fin: new Date().toISOString(), seuil: SEUIL_ECHECS, produits: rel });
     return rel;
-  } finally { rmSync(verrou, { force: true }); }
+  } finally { retirer(verrou); } // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows) : le verrou restait posé
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes("--executer")) {

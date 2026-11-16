@@ -37,14 +37,16 @@
  *   · état et infrastructure : `terraform|tofu destroy`, `apply -destroy`, `state rm`, `workspace delete`
  *     (l'état supprimé ne se reconstruit pas, les ressources deviennent orphelines) ;
  *   · droits : `az role assignment|definition create|update`, `az ad app permission add|grant|admin-consent`,
- *     `az ad group|app|sp member|owner add`, `az keyvault set-policy`, `az devops security group
+ *     `az ad group|app|sp member|owner add`, `az ad app|sp credential reset|create|update` et `federated-credential create|update`
+ *     (TF-2600), `az keyvault set-policy`, `az devops security group
  *     membership add|group create|permission update|reset`, `az devops user add|update`, cmdlets
  *     `New-AzRoleAssignment`, `Set-AzRoleAssignment`, `New-Mg…AppRoleAssignment|Oauth2PermissionGrant|
  *     GroupMember|GroupOwner|DirectoryRoleMember` ; et toute requête HTTP qui écrit (POST, PUT, PATCH)
  *     sur un point d'accès de droits : Azure DevOps (accesscontrolentries, accesscontrollists,
  *     securityroles, roleassignments, graph/memberships|groups|users, entitlements), Microsoft Graph
  *     (appRoleAssignments, oauth2PermissionGrants, directoryRoles, roleManagement, members, owners, $ref),
- *     Azure Resource Manager (Microsoft.Authorization/roleAssignments|roleDefinitions|denyAssignments),
+ *     Azure Resource Manager (Microsoft.Authorization/roleAssignments|roleDefinitions|denyAssignments, et les
+ *     `Microsoft.KeyVault/vaults/<coffre>/accessPolicies/` d'un coffre, TF-2653 ; `az rest` sans hôte nommé vise ARM),
  *     GitHub (collaborators, memberships, invitations, protection de branche, rulesets) ; outils :
  *     `az rest`, `az devops invoke`, `gh api`, `curl`, `wget`, `Invoke-RestMethod`, `Invoke-WebRequest`,
  *     `Invoke-AzRestMethod` ;
@@ -596,6 +598,9 @@ const AZ_DROITS = [
   /^ad app permission (add|grant|admin-consent)\b/,
   /^ad (group|app|sp) (member|owner) add\b/,
   /^keyvault set-policy\b/,
+  // TF-2600 (16/11/2026) : un secret d'application qu'on crée ou qu'on remplace ouvre un accès. Le 12/11/2026, `az ad app credential reset --append`
+  // a été glissé dans une commande de relevé, sortie masquée, pour fournir une trace : la garde ne le lisait pas (retrait : `delete`, déjà jugé).
+  /^ad (app|sp) (federated-)?credential (reset|create|update)\b/,
   /^devops security (group membership add|group create|permission (update|reset|reset-all))\b/,
   /^devops user (add|update)\b/,
   // D-196 (b) : les politiques de branche et les politiques Azure, dont l'exemption contourne la règle (retrait : `delete`, déjà jugé).
@@ -648,7 +653,7 @@ const ADO_DROITS = /(accesscontrolentries|accesscontrollists|securityroles|rolea
 const GRAPH_HOTE = /graph\.(microsoft\.com|windows\.net)/i;
 const GRAPH_DROITS = /(approleassignments|approleassignedto|oauth2permissiongrants|directoryroles|rolemanagement|roleassignments|\/members|\/owners|\$ref)/i;
 const ARM_HOTE = /management\.azure\.com/i;
-const ARM_DROITS = /microsoft\.authorization\/(roleassignments|roledefinitions|denyassignments|roleeligibility|roleassignmentschedule|policyassignments|policyexemptions)/i;
+const ARM_DROITS = /microsoft\.authorization\/(roleassignments|roledefinitions|denyassignments|roleeligibility|roleassignmentschedule|policyassignments|policyexemptions)|microsoft\.keyvault\/vaults\/[^\s/]+\/accesspolicies\//i;
 const GITHUB_DROITS = /(\/collaborators|\/memberships|\/invitations|\/branches\/[^\s/]+\/protection|\/rulesets|\/teams\/[^\s/]+\/(repos|memberships))/i;
 
 /** Le texte vise-t-il un point d'accès de droits ? */
@@ -658,6 +663,8 @@ function pointDeDroits(texte, libelle) {
   return (ADO_HOTE.test(texte) && ADO_DROITS.test(texte))
     || (GRAPH_HOTE.test(texte) && GRAPH_DROITS.test(texte))
     || (ARM_HOTE.test(texte) && ARM_DROITS.test(texte))
+    // TF-2653 : `az rest` accepte un chemin relatif (`--url /subscriptions/…`) et vise alors Azure Resource Manager sans nommer l'hôte.
+    || (libelle === "az rest" && !/https?:\/\//i.test(texte) && ARM_DROITS.test(texte))
     || (/api\.github\.com/i.test(texte) && GITHUB_DROITS.test(texte));
 }
 

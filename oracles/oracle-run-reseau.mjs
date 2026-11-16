@@ -61,6 +61,7 @@ import { join, dirname, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { retirer } from "./hook-ecriture.mjs"; // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = process.env.FORGE_ROOT || resolve(ICI, "..", "..");
@@ -468,7 +469,7 @@ if (arg === "--self-test") {
       else if (!message.includes(motif)) casse.push(`${nom} : ${regle} rougit sans nommer « ${motif} » — ${message}`);
     };
     alterer("lot-non-couvert", (d) => writeFileSync(join(d, "accord.json"), JSON.stringify({ accord: true, date: "2026-09-22", par: "émetteur fictif", lot: ["publication-linkedin.md", "publication-instagram.md"], fictif: true })), "RR5", "publication-avis.md");
-    alterer("visuel-absent", (d) => rmSync(join(d, "visuel-terrasse.png")), "RR2", "publication-instagram.md");
+    alterer("visuel-absent", (d) => retirer(join(d, "visuel-terrasse.png")), "RR2", "publication-instagram.md");
     alterer("modele-hors-reseau", (d) => writeFileSync(join(d, "publication-avis.md"), readFileSync(join(d, "publication-avis.md"), "utf8").replace("modele: reponse-avis", "modele: legende-image")), "RR2", "ne sert pas le réseau");
     alterer("reponse-trop-longue", (d) => writeFileSync(join(d, "publication-avis.md"), readFileSync(join(d, "publication-avis.md"), "utf8").replace("Merci pour votre retour sur le repas.", "Merci pour votre retour sur le repas. " + "Nous tenons à vous répondre longuement et en détail. ".repeat(14))), "RR2", "20 à 120 attendus");
     alterer("secret-a-la-fiche", (d) => writeFileSync(join(d, "emetteur.json"), JSON.stringify({ ...FICHE_VERTE, mot_de_passe: "fictif" })), "RR7", "secret");
@@ -488,7 +489,7 @@ if (arg === "--self-test") {
       writeFileSync(join(d, fichier), t.replace(avant, apres));
     };
     const voix = (d, geste) => { const x = JSON.parse(readFileSync(join(d, "voix.json"), "utf8")); geste(x); writeFileSync(join(d, "voix.json"), JSON.stringify(x, null, 1)); };
-    alterer("voix-absente", (d) => rmSync(join(d, "voix.json")), "RR8", "voix.json absent");
+    alterer("voix-absente", (d) => retirer(join(d, "voix.json")), "RR8", "voix.json absent");
     alterer("mot-ecarte", (d) => remplacer(d, "publication-instagram.md", "La terrasse rouvre", "La terrasse incroyable rouvre"), "RR8", "« incroyable »");
     // Sans casse ni accents, apostrophe typographique comprise : la graphie ne fait pas passer un mot écarté.
     alterer("mot-ecarte-sans-accent", (d) => remplacer(d, "publication-instagram.md", "La terrasse rouvre", "La terrasse REVOLUTIONNAIRE rouvre"), "RR8", "« révolutionnaire »");

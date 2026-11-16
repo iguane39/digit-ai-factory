@@ -33,6 +33,8 @@
  * EC-12 énumération numérotée « 1) … 2) … 3) » sur une même ligne, hors restitution (E-11, AVERT seulement,
  * TF-1847, 18/10/2026) ; les restitutions sont jugées par S80 d'oracle-synthese, bloquante chez elles.
  * EC-17 une ligne qui compare deux montants sans rubrique « Compris, non compris » (E-18, AVERT, TF-1971, D-114 (a)).
+ * EC-18 texte corrompu : les séquences « Ã© », « Ã¨ », « â€ », « ðŸ » (UTF-8 relu en Windows-1252) hors bloc de code, code en ligne
+ * et guillemets français (FAIL, TF-2604, 16/11/2026).
  * EC-16 une ligne qui porte deux « $ » non échappés hors code s'affiche en formule mathématique dans l'aperçu :
  * devise en lettres ou signe échappé (AVERT seulement, TF-1977, 29/10/2026, restitution comprise).
  * EC-13 la revue des listes de tournures est datée et n'est pas dépassée : chaque famille de la donnée porte une
@@ -1126,6 +1128,46 @@ export function juger(texte, options = {}) {
       comparatifs[0].ligne);
   }
 
+  // EC-18 (TF-2604, 16/11/2026, retour Produit-79 du 12/11, RP-27) — UN TEXTE DONT LES ACCENTS SONT CORROMPUS EST REFUSÉ.
+  //
+  // LE FAIT. Le 12/11/2026, une fiche générée par script depuis un JSON réécrit en encodage corrompu citait 69 lignes du type
+  // « ðŸŽ„ DÃ‰CEMBRE SE PRÃ‰PARE MAINTENANT. » (UTF-8 relu en Windows-1252). L'oracle l'a jugée PASS (2981 mots) et le hook d'écriture
+  // n'a rien dit : aucune règle ne regardait les caractères, la fiche a été remise à l'exploitant.
+  //
+  // CE QU'ELLE MESURE. Les quatre séquences que cette lecture fautive produit pour les lettres accentuées les plus fréquentes et les
+  // émojis : « Ã© » (é), « Ã¨ » (è), « â€ » (apostrophe, guillemets, tiret typographiques), « ðŸ » (émoji). FAIL : un texte qui en porte
+  // une est illisible pour son lecteur, quel que soit son style. Hors bloc de code et hors code en ligne : un texte qui CITE la séquence
+  // pour parler du défaut la met dans l'un ou l'autre. Une séquence entre guillemets français « … » n'est pas comptée non plus : un
+  // texte corrompu en porte aussi hors guillemets, et un retour qui décrit le défaut, lui, ne la montre qu'entre guillemets.
+  // NON JUGÉ : les autres lettres corrompues (« Ã  », « Ã§ », « Ãª », « Ã´ »…), un texte corrompu de façon que ces quatre séquences ne
+  // montrent pas, et une séquence citée sans guillemets ni code.
+  {
+    const MOJIBAKE = /Ã©|Ã¨|â€|ðŸ/;
+    let dansBloc18 = false;
+    const corrompues = [];
+    let citees = 0;
+    String(texte).split(/\r?\n/).forEach((l, i) => {
+      if (/^\s*(```|~~~)/.test(l)) { dansBloc18 = !dansBloc18; return; }
+      if (dansBloc18) return;
+      const sansCode = l.replace(/`[^`]*`/g, "");
+      const sansCitation = sansCode.replace(/«[^»]*»/g, "");
+      if (MOJIBAKE.test(sansCitation)) corrompues.push({ ligne: i + 1, extrait: sansCitation.trim() });
+      else if (MOJIBAKE.test(sansCode)) citees++;
+    });
+    if (!corrompues.length) {
+      pousser("EC-18", "PASS", citees
+        ? `aucun texte corrompu (UTF-8 relu en Windows-1252) ; ${citees} ligne(s) citent la séquence entre guillemets français, non comptées`
+        : "aucun texte corrompu (UTF-8 relu en Windows-1252) hors code");
+    } else {
+      pousser("EC-18", "FAIL",
+        `${corrompues.length} ligne(s) au texte corrompu (UTF-8 relu en Windows-1252 : « Ã© », « Ã¨ », « â€ », « ðŸ ») : `
+        + corrompues.slice(0, 3).map((c) => `l.${c.ligne} « ${c.extrait.slice(0, 60)} »`).join(" · ")
+        + (corrompues.length > 3 ? ` · et ${corrompues.length - 3} autre(s)` : "")
+        + " — le texte source a été relu avec le mauvais encodage ; regénérer le fichier depuis une source lue en UTF-8 avant de le remettre (TF-2604)",
+        corrompues[0].ligne);
+    }
+  }
+
   // EC-13 (TF-1926, décision D-48 (a) du 19/10/2026, étude style-ecriture O3) — LA REVUE DES LISTES DE TOURNURES A UNE DATE.
   // AVERT SEULEMENT, JAMAIS FAIL, sur tout texte jugé.
   //
@@ -2171,12 +2213,35 @@ function selfTest() {
   writeFileSync(join(dir, "ec10-sidecar-vide.md.lecteur.json"), "{ pas du json", "utf8");
   const e46v = jouer("ec10-sidecar-vide.md", BLOC_AZ);
   verifie(f10(e46v)?.statut === "SKIP", `EC-10 (TF-2346) : un sidecar illisible produit un verdict au lieu de rendre SKIP : ${JSON.stringify(f10(e46v))}`);
+  // TF-2604 (16/11/2026) — EC-18, LE TEXTE CORROMPU (UTF-8 relu en Windows-1252). ROUGE : la fiche de 69 lignes du 12/11, corrompue comme le fait un
+  // JSON réécrit en mauvais encodage, FAIL avec sa ligne ; la MÊME fiche saine PASS ; une citation en bloc de code, en code en ligne ou entre guillemets
+  // français PASS ; un bloc de code qui cite ne couvre pas une ligne corrompue hors bloc ; chacune des quatre séquences accuse seule.
+  const g18 = (x) => (x.j?.findings || []).find((f) => f.regle === "EC-18");
+  const FICHE_18 = [`# Campagnes de novembre à relire\n\nCette fiche liste les campagnes que l'exploitant relit avant l'envoi.\n`,
+    ...Array.from({ length: 69 }, (_v, i) => `- Campagne ${i + 1} : DÉCEMBRE SE PRÉPARE MAINTENANT. L'équipe relit les créations « de fin d'année » avant l'envoi.`)].join("\n") + "\n";
+  const corrompre18 = (s) => new TextDecoder("windows-1252").decode(Buffer.from(s, "utf8"));
+  const r18r = jouer("ec18-rouge.md", corrompre18(FICHE_18));
+  verifie(g18(r18r)?.statut === "FAIL" && r18r.j?.verdict === "FAIL" && /69 ligne\(s\) au texte corrompu/.test(g18(r18r)?.message || "") && g18(r18r)?.ligne === 5,
+    `EC-18 : la fiche de 69 lignes corrompues n'est pas refusée avec son compte et sa première ligne : ${JSON.stringify(g18(r18r))}`);
+  const r18v = jouer("ec18-verte.md", FICHE_18);
+  verifie(g18(r18v)?.statut === "PASS" && r18v.j?.verdict === "PASS", `EC-18 : la MÊME fiche saine est accusée — le remède échoue : ${JSON.stringify(g18(r18v))}`);
+  const CITE_18 = "# Note\n\nLe défaut s'écrit `Ã©` quand l'UTF-8 est relu en Windows-1252.\n\n```\nDÃ‰CEMBRE SE PRÃ‰PARE ðŸŽ„ â€™ Ã¨\n```\n\nUne prose saine suit : été, élève, très.\n";
+  const r18c = jouer("ec18-cite-code.md", CITE_18);
+  verifie(g18(r18c)?.statut === "PASS" && r18c.j?.verdict === "PASS", `EC-18 : un bloc de code et un code en ligne qui citent les séquences sont comptés comme corrompus : ${JSON.stringify(g18(r18c))}`);
+  const r18g = jouer("ec18-cite-guillemets.md", "# Retour\n\nLa fiche cite 69 lignes du type « ðŸŽ„ DÃ‰CEMBRE SE PRÃ‰PARE MAINTENANT. » et les séquences « Ã© » et « â€™ ».\n");
+  verifie(g18(r18g)?.statut === "PASS" && /citent la séquence entre guillemets/.test(g18(r18g)?.message || ""), `EC-18 : des séquences citées entre guillemets français sont comptées comme corrompues, ou la citation n'est pas dite : ${JSON.stringify(g18(r18g))}`);
+  const r18m = jouer("ec18-mixte.md", "# Mixte\n\n```\nÃ©\n```\n\nUne ligne corrompue hors du bloc : l'Ã©quipe.\n");
+  verifie(g18(r18m)?.statut === "FAIL" && g18(r18m)?.ligne === 7, `EC-18 : un bloc de code qui cite couvre une ligne corrompue hors bloc : ${JSON.stringify(g18(r18m))}`);
+  for (const [nom, seq] of [["é", "Ã©"], ["è", "Ã¨"], ["apostrophe et guillemets", "â€™"], ["émoji", "ðŸŽ„"]]) {
+    const r18s = jouer(`ec18-seq-${nom.slice(0, 3)}.md`, `# Titre\n\nUne ligne saine.\n\nUne ligne avec ${seq} dedans.\n`);
+    verifie(g18(r18s)?.statut === "FAIL" && g18(r18s)?.ligne === 5, `EC-18 : la séquence « ${seq} » (${nom}) n'est pas accusée à sa ligne : ${JSON.stringify(g18(r18s))}`);
+  }
   const BILAN_14 = cas14;
 
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : ${58 + BILAN_14} cas, 0 défaut (${58 + BILAN_14}/${58 + BILAN_14} PASS — EC-17 (D-114 (a)) : comparatif sans rubrique AVERT, avec rubrique PASS, sans comparateur PASS ; EC-2 (D-115 (a)) : 15 phrases longues non consécutives AVERT, 14 PASS ; page HTML jugée sur son texte visible (TF-1968) : sept phrases de 40 mots d'affilée refusées par EC-2 à la ligne de la page, les mêmes mots en phrases de 10 mots PASS, <script> et <pre> non comptés, un titre « Ce que » en <h2> refusé par EC-8 à la ligne de la page, source html dite ; EC-8 titre NUMÉROTÉ (TF-2020) : « 7. », « 7) », « 2.1 » et « 3 · » refusés, le même titre qui nomme son contenu PASS, un fichier de la liste d'antériorité admis en le disant, le même texte hors liste ou non numéroté refusé ; EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; le jugement par défaut sous output/ ne vaut que pour les écrits neufs (TF-2259) — le même texte daté d'avant le seuil est écarté, dit au verdict et déclaré au non_juge, daté du seuil il est à rejouer, un en-tête tiers, un type de nom de tiers ou un nom sans date restent jugés, sans seuil dans la donnée tout est jugé ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : ${58 + BILAN_14} cas, 0 défaut (${58 + BILAN_14}/${58 + BILAN_14} PASS — EC-18 en FAIL (TF-2604) : une fiche de 69 lignes dont l'UTF-8 a été relu en Windows-1252 refusée avec son compte et sa première ligne, la MÊME fiche saine PASS, un bloc de code, un code en ligne ou des guillemets français qui citent les séquences PASS, un bloc qui cite ne couvre pas une ligne corrompue hors bloc, chacune des quatre séquences accuse seule ; EC-17 (D-114 (a)) : comparatif sans rubrique AVERT, avec rubrique PASS, sans comparateur PASS ; EC-2 (D-115 (a)) : 15 phrases longues non consécutives AVERT, 14 PASS ; page HTML jugée sur son texte visible (TF-1968) : sept phrases de 40 mots d'affilée refusées par EC-2 à la ligne de la page, les mêmes mots en phrases de 10 mots PASS, <script> et <pre> non comptés, un titre « Ce que » en <h2> refusé par EC-8 à la ligne de la page, source html dite ; EC-8 titre NUMÉROTÉ (TF-2020) : « 7. », « 7) », « 2.1 » et « 3 · » refusés, le même titre qui nomme son contenu PASS, un fichier de la liste d'antériorité admis en le disant, le même texte hors liste ou non numéroté refusé ; EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; le jugement par défaut sous output/ ne vaut que pour les écrits neufs (TF-2259) — le même texte daté d'avant le seuil est écarté, dit au verdict et déclaré au non_juge, daté du seuil il est à rejouer, un en-tête tiers, un type de nom de tiers ou un nom sans date restent jugés, sans seuil dans la donnée tout est jugé ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 

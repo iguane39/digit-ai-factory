@@ -24,6 +24,7 @@ import { join, dirname, basename } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { retirer } from "./oracles/hook-ecriture.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const BOOTSTRAP = join(ICI, "bootstrap.mjs");
@@ -161,7 +162,7 @@ try {
     //     être dans un dépôt, et rien n'y est suivi.
     mkdirSync(join(racine, "digit-ai-forge-fantome"));
     attendre("répertoire non versionné signalé", lancer(), 0, /NON versionné/);
-    rmSync(join(racine, "digit-ai-forge-fantome"), { recursive: true, force: true });
+    retirer(join(racine, "digit-ai-forge-fantome")); // TF-2597 : `rmSync` ne retire rien sous un chemin accentué (Node 25.2.1, Windows)
 
     // (d) LE CAS QUI A ECHAPPE, ET IL A VECU (TF-0533, 23/08/2026) : un clone antérieur à un
     //     RENOMMAGE. Son `origin` porte l'ANCIEN nom du dépôt — « …/digit-ai-forge-seo.git » face à
@@ -264,7 +265,7 @@ try {
       const bruit = (r.stdout + r.stderr).split("\n").filter((l) => l.includes(prive.nom));
       if (bruit.length) echecs.push(`4 bis : le dépôt privé hors d'accès s'affiche encore — ${bruit.join(" | ").slice(0, 300)}`);
       renameSync(join(bare, `${publique.nom}.git`), join(base, "cache-public.git"));
-      rmSync(join(autre, publique.nom), { recursive: true, force: true });
+      retirer(join(autre, publique.nom));
       attendre("4 bis : forge PUBLIQUE introuvable → toujours un défaut", lancerAutre(), 1, new RegExp(`${publique.nom} — clone en échec`));
       renameSync(join(base, "cache-public.git"), join(bare, `${publique.nom}.git`));
       renameSync(cache, join(bare, `${prive.nom}.git`));
