@@ -127,6 +127,17 @@ check("vert — TF-2629 : un fichier non compilé sous forge\\ reste versionnabl
     if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
 });
 
+// TF-2605 (16/11/2026) : la fiche d'accès LOCALE porte des valeurs en clair ; ignorée où qu'elle vive, jamais suivie.
+check("rouge → vert — TF-2605 : le gitignore socle ignore la fiche d'accès locale, le motif est aux exigés de l'héritage, la fiche versionnée reste suivable", () => {
+  for (const rel of ["docs/projet/ACCES-TEST.local.md", "ACCES-TEST.local.md", "app/docs/projet/ACCES-TEST.local.md"])
+    if (!socle.ignore(rel)) throw new Error(`${rel} n'est pas ignoré par gabarits/gitignore-produit`);
+  if (vide.ignore("docs/projet/ACCES-TEST.local.md")) throw new Error("la recette ne distingue pas avec et sans règle");
+  for (const rel of ["docs/projet/ACCES-TEST.md", "docs/projet/COMPOSANTS-OPS.md"])
+    if (socle.ignore(rel)) throw new Error(`${rel} est ignoré à tort`);
+  const exiges = heritage.artefacts.find((a) => a.source === "gabarits/gitignore-produit").motifs_exiges;
+  if (!exiges.includes("**/ACCES-TEST.local.md")) throw new Error("**/ACCES-TEST.local.md n'est pas aux motifs exigés de gabarits/HERITAGE.json : un produit sans lui ne serait pas relevé");
+});
+
 reel.fin();
 vide.fin();
 socle.fin();

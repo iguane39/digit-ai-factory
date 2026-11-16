@@ -2996,6 +2996,26 @@ else {
     }
   }
 
+  // R-23 (suite) · LA FICHE LOCALE QUI PORTE LES VALEURS NE SE VERSIONNE JAMAIS (TF-2605, 16/11/2026). La fiche versionnée n'a aucune valeur
+  // (R-23) ; `forge/generer-acces-local.mjs` écrit `docs/projet/ACCES-TEST.local.md`, qui en porte. Ce fichier ne sert que s'il est ignoré par git
+  // et jamais suivi : l'effet se juge sur git (`ls-files`, `check-ignore`), pas sur le motif du .gitignore. NON JUGÉ : la fraîcheur de ses valeurs.
+  {
+    const REL_LOCALE = "docs/projet/ACCES-TEST.local.md";
+    const presente = existsSync(p("docs", "projet", "ACCES-TEST.local.md"));
+    const suivie = aGit && (git("ls-files", "--", REL_LOCALE).stdout || "").trim() !== "";
+    if (suivie) {
+      ko("R-23", "docs\\projet\\ACCES-TEST.local.md", "la fiche d'accès LOCALE est SUIVIE par git alors qu'elle porte des valeurs (identifiants, mots de passe, clés en clair) — "
+        + "elle ne se versionne jamais (TF-2605). Remède : `git rm --cached docs/projet/ACCES-TEST.local.md`, ajouter `**/ACCES-TEST.local.md` au .gitignore (motif du socle), "
+        + "et faire pivoter les valeurs si l'index a déjà été publié");
+    } else if (presente && !aGit) {
+      so("R-23", "la fiche d'accès locale docs\\projet\\ACCES-TEST.local.md existe mais le dossier n'est pas un dépôt git : son ignorance n'est pas jugeable (TF-2605)");
+    } else if (presente && git("check-ignore", "-q", "--", REL_LOCALE).status !== 0) {
+      ko("R-23", "docs\\projet\\ACCES-TEST.local.md", "la fiche d'accès LOCALE n'est PAS ignorée par git : un `git add .` l'embarquerait avec ses valeurs (TF-2605). "
+        + "Remède : ajouter `**/ACCES-TEST.local.md` au .gitignore (motif du socle, gabarits\\gitignore-produit)");
+    } else if (presente) {
+      ok("R-23", "docs\\projet\\ACCES-TEST.local.md", "fiche d'accès locale présente, ignorée par git et non suivie — les valeurs restent sur le poste (TF-2605)");
+    }
+  }
   // ---- R-23, SECOND VOLET (TF-1088, 17/09/2026) — LA FICHE EST LUE, LA PAGE SERVIE NE L'EST PAS
   //
   // LE FAIT, relevé au banc des défauts échappés (cas E-01, phase MEP) : « des identifiants de
@@ -3328,6 +3348,7 @@ const nonJuge = [
   "R-11 ter (TF-2125) : les types d écrans sont reconnus à des SIGNAUX de fichier (balise <table> ; boutons, formulaires ou champs ; dossier locales ou i18n) dans les .html, .vue, .jsx, .tsx et .svelte hors output, input, docs, forge, old et tests — un écran construit par programme sans ces balises, ou servi par un gabarit hors du dépôt, n est pas vu. La ligne est reconnue à son LIBELLÉ (première colonne de la table), jamais à la pertinence de ses règles ; deux types seulement sont relevés (TYPES_D_ECRAN), les autres lignes du détail restent à la déclaration de la session",
   "R-21 : correspondance nom+version par inclusion textuelle dans les lockfiles — pas de résolution sémantique de graphes de dépendances ; recherche bornée à 2 niveaux de descente (hors sources_de_verite déclarées, lues où qu'elles soient) — un lockfile plus profond que 2 niveaux et non déclaré reste invisible",
   "R-47, copies du socle (TF-2668) : seule une copie dont le NOM est celui d'un gabarit et qui porte les marqueurs déclarés est comparée au fichier du socle ; une page instanciée depuis le gabarit, ou une copie renommée, n'est pas vue. Une copie périmée est signalée (SANS_OBJET), jamais un échec, et le socle introuvable sur le poste se déclare au lieu de passer pour un vert",
+  "R-23, fiche d'accès locale (TF-2605) : seul l'état git du fichier docs/projet/ACCES-TEST.local.md est jugé (suivi ? ignoré ?) — ni la fraîcheur de ses valeurs, ni leur présence au .env, ni le fait qu'une valeur écrite ailleurs que dans ce fichier soit versionnée (R-14 et le motif de secret fort s'en chargent)",
   "R-23 : motifs de secrets forts uniquement — un mot de passe réaliste inventé sans motif connu passe (revue humaine + gitleaks en CI)",
   "R-23, volet « page servie » (TF-1088) : la reconnaissance passe par le NOM du fichier (connexion, login, sign-in, authentification, aide, help) — un identifiant de démonstration affiché depuis un composant dont le nom ne dit rien reste invisible. Le vocabulaire est étroit et fermé par choix : l'élargir à tout le code d'un produit rendrait la règle bavarde là où elle doit être opposable",
   "R-23, volet « page servie » : ni que la page soit réellement SERVIE, ni que le mode démo soit actif hors du poste local. L'oracle lit un gabarit sur le disque ; c'est la conjonction des deux — page publique et mode démo — qui a fait l'incident E-01, et seule la moitié lisible est jugée",

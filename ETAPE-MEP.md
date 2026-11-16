@@ -263,7 +263,12 @@ Dans le projet produit (`forge\etapes\mep\` pour les preuves, racine pour les fi
    « Environnements déployés », UNE ligne par environnement déployé de `COMPOSANTS-OPS.md` (adresse,
    variable de l'identifiant, variable du secret, date). L'étape MEP, et tout déploiement de recette,
    la met à jour dans le même tour que le déploiement. `oracle-conformite-projet` (R-23) compare les
-   environnements des deux fiches : un environnement déployé sans ligne est un FAIL.
+   environnements des deux fiches : un environnement déployé sans ligne est un FAIL. **Les valeurs
+   vivent ailleurs** (TF-2605, le porteur l'exige) : après chaque déploiement, la session exécute
+   `node forge/generer-acces-local.mjs`, qui écrit `docs\projet\ACCES-TEST.local.md`, la même fiche avec
+   les identifiants, mots de passe et clés lus dans le `.env` du poste et une consigne de connexion
+   d'essai par ligne. Ce fichier est ignoré par git et ne se commite jamais ; la fiche versionnée reste
+   sans valeur (R-23), et R-23 refuse une fiche locale suivie ou non ignorée.
 
 ## 2 bis. Un retour arrière ne vit pas dans un journal (TF-0512, 22/08/2026)
 

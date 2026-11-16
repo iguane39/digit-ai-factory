@@ -372,6 +372,37 @@ check("TF-1635 rouge — settings au hook d'ouverture synchrone : R-47 FAIL qui 
   });
 }
 
+// TF-2605 (16/11/2026) — LA FICHE D'ACCÈS LOCALE PORTE DES VALEURS : IGNORÉE ET JAMAIS SUIVIE. Le 12/11/2026 le porteur exige un fichier avec identifiants et
+// mots de passe pour se connecter ; la fiche versionnée reste sans valeur (R-23). Le contrôle juge l'ÉTAT GIT du fichier, dans les trois sens : non ignoré
+// (FAIL), suivi (FAIL), ignoré et non suivi (PASS). Dépôts jetables réels : `git ls-files` et `git check-ignore` jugent l'effet, pas le motif.
+{
+  const projet2605 = ({ gitignore, suivre }) => {
+    const d = mkdtempSync(join(tmpdir(), "conf-r23-locale-"));
+    mkdirSync(join(d, "docs", "projet"), { recursive: true });
+    sh("git", ["init", "-q", "-b", "main"], d);
+    writeFileSync(join(d, "docs", "projet", "ACCES-TEST.md"), "---\nrole: acces\nsources_de_verite: [seed]\nverifie_le: 2026-11-16\n---\n# Accès\n\n> comptes de démonstration locale — jamais valides hors MODE_DEMO\n", "utf8");
+    writeFileSync(join(d, "docs", "projet", "ACCES-TEST.local.md"), "# Fiche locale\n\nliste des comptes, valeurs résolues au poste\n", "utf8");
+    if (gitignore !== undefined) writeFileSync(join(d, ".gitignore"), gitignore, "utf8");
+    if (suivre) sh("git", ["add", "-f", "--", "docs/projet/ACCES-TEST.local.md"], d);
+    return d;
+  };
+  const constatLocale = (d) => { const { rapport } = lance(d); rmSync(d, { recursive: true, force: true }); return rapport.findings.filter((x) => x.regle === "R-23" && /ACCES-TEST\.local\.md/.test(x.ou + " " + x.message)); };
+  check("TF-2605 rouge — la fiche d'accès locale NON IGNORÉE par git : R-23 FAIL qui nomme le motif à ajouter", () => {
+    const f = constatLocale(projet2605({ gitignore: "node_modules/\n" }));
+    if (f.length !== 1 || f[0].statut !== "FAIL" || !/n'est PAS ignorée/.test(f[0].message) || !/\*\*\/ACCES-TEST\.local\.md/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2605 rouge — la fiche d'accès locale SUIVIE par git (même ignorée ensuite) : R-23 FAIL qui nomme `git rm --cached`", () => {
+    const f = constatLocale(projet2605({ gitignore: "**/ACCES-TEST.local.md\n", suivre: true }));
+    if (f.length !== 1 || f[0].statut !== "FAIL" || !/SUIVIE par git/.test(f[0].message) || !/git rm --cached/.test(f[0].message)) throw new Error(JSON.stringify(f));
+  });
+  check("TF-2605 vert — la fiche d'accès locale ignorée et non suivie : R-23 PASS, et le motif du gitignore SOCLE suffit (le remède prescrit joué)", () => {
+    const f = constatLocale(projet2605({ gitignore: "**/ACCES-TEST.local.md\n" }));
+    if (f.length !== 1 || f[0].statut !== "PASS") throw new Error(JSON.stringify(f));
+    const socle = constatLocale(projet2605({ gitignore: readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "gitignore-produit"), "utf8") }));
+    if (socle.length !== 1 || socle[0].statut !== "PASS") throw new Error(`gitignore du socle : ${JSON.stringify(socle)}`);
+  });
+}
+
 // TF-2668 (16/11/2026) — LA COPIE DU BOILERPLATE QU'UN PRODUIT FAIT DE SON CHEF DÉRIVE SANS SIGNAL. Le 16/11, la copie
 // `scripts/apdlb/gabarit.html` d'un produit datait d'avant `color-scheme` (TF-2384) : SC4 a échoué sur une page jugée PASS le 10/11, et R-47
 // ne comparait cette copie à rien. Double sens, sur le VRAI boilerplate du socle : la copie périmée est NOMMÉE par R-47 (constat déclaré,
