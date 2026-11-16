@@ -88,5 +88,28 @@ check("rouge (TF-2625) — le gabarit de rapport d'avant (sans les deux rubrique
   vrai(sansSection !== CONTRAT && !CRITIQUE.critique.test(sansSection), "le contrat privé de la section prescrit encore la critique");
 });
 
+// ---- TF-2663 : les quatre rubriques d'une consigne d'agent ------------------------------------------------------------
+const RUBRIQUES_CONSIGNE = {
+  section: /^## La consigne d'un agent porte ses quatre rubriques \(TF-2663/m,
+  commande: /node scripts\\relecture-intention\.mjs --preparer consigne --fichier <consigne\.md>` contrôle quatre rubriques/,
+  refus: /refuse \(exit 1, rien n'est préparé\)/,
+  dossier: /\*\*le dossier temporaire\*\* de l'agent/,
+  raison: /\*\*la raison de l'affectation au modèle\*\*, exigée dès que la consigne nomme `constructeur` ou Opus/,
+  depart: /\*\*la version de départ\*\*/,
+  commit: /\*\*le commit qui la porte\*\*/,
+  exemption: /--sans-rubriques "<motif>"/,
+};
+check("vert (TF-2663) — le contrat nomme les quatre rubriques, le refus et l'exemption déclarée", () => {
+  for (const [nom, motif] of Object.entries(RUBRIQUES_CONSIGNE)) vrai(motif.test(CONTRAT), `le contrat ne porte plus « ${nom} » (${motif})`);
+});
+check("vert (TF-2663) — le script nommé par le contrat porte l'option et le contrôle (rubriquesDeConsigne, --sans-rubriques)", () => {
+  const src = readFileSync(join(RACINE, "scripts", "relecture-intention.mjs"), "utf8");
+  vrai(/export function rubriquesDeConsigne/.test(src) && /--sans-rubriques/.test(src), "relecture-intention.mjs ne porte plus le contrôle des rubriques");
+});
+check("rouge (TF-2663) — le contrat privé de la section ne nomme plus les rubriques : le contrôle voit la différence", () => {
+  const mutant = sansBloc(CONTRAT, /La consigne d'un agent porte ses quatre rubriques|contrôle quatre rubriques|le dossier temporaire\*\* de l'agent|Une consigne qui n'est pas une délégation d'écriture/);
+  vrai(mutant !== CONTRAT && !RUBRIQUES_CONSIGNE.section.test(mutant) && !RUBRIQUES_CONSIGNE.exemption.test(mutant), "la chirurgie n'a pas retiré la section");
+});
+
 console.log(`\ncontrat-agent-campagne.test : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

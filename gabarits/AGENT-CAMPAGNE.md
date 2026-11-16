@@ -485,3 +485,16 @@ ni Docker.
 
 - **Tout écran écrit passe la critique d'implémentation sur la page telle que l'instance la sert**, avant le commit qui le livre : `node <FORGE_ROOT>\digit-ai-forge-design\oracles\run-oracles-design.mjs <page> --rendu`, lancé après la dernière écriture du fichier (`gabarits\RESTITUTION.md`, contrôle CRITIQUE, TF-1913). Un écran est une page, une feuille de style ou un script livré à un navigateur. Le verdict se cite à la rubrique `critique_rendu` du rapport, écran par écran.
 - **Le rapport déclare la relecture indépendante** par la rubrique `relecture_independante` : « faite » avec son auteur (un autre agent, ou la session, en lecture seule) et ses constats, ou « absente — non jouée par l'agent ». Un agent ne s'attribue pas une relecture indépendante de son propre travail.
+
+## La consigne d'un agent porte ses quatre rubriques (TF-2663, 16/11/2026)
+
+**Le fait, le 13/11/2026.** La consigne d'un agent `constructeur` ne nommait ni dossier temporaire (exigé depuis TF-2437), ni la raison de l'affectation à Opus, et sa version de départ précédait le commit qui la portait. La relecture d'intention jouée avant le lancement ne lisait pas ces rubriques : l'agent les a relevées à son arrivée.
+
+`node scripts\relecture-intention.mjs --preparer consigne --fichier <consigne.md>` contrôle quatre rubriques dans le premier fichier et refuse (exit 1, rien n'est préparé) quand l'une manque :
+
+- **le dossier temporaire** de l'agent, un chemin `<scratchpad>\agent-<lot>\` (TF-2437) ;
+- **la raison de l'affectation au modèle**, exigée dès que la consigne nomme `constructeur` ou Opus : complexité manifeste, ou escalade avec l'oracle rouge qui la fonde ;
+- **la version de départ**, écrite « départ <sha> » et relevée par `git log -1 --format=%h` dans la copie avant les commits de l'agent ;
+- **le commit qui la porte** : un commit de la copie, que la version de départ contient. Un départ qui précède ce commit est refusé.
+
+Une consigne qui n'est pas une délégation d'écriture (consigne commune d'une campagne relue une fois, agent en lecture seule) se relit avec `--sans-rubriques "<motif>"` ; le motif s'écrit dans la sortie du contrôle.

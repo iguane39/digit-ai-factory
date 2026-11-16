@@ -27,6 +27,10 @@
  *   --preparer consigne --fichier <consigne.md> [--fichier <liste-des-sujets.md> …] [--type <type>[,<type>…]]
  *        même demande ; la consigne de délégation est le livrable ; plusieurs `--fichier` se lisent ensemble : une campagne dont
  *        les agents reçoivent le même gabarit se relit en UNE fois, le gabarit et la liste des sujets (A-1 du 19/10/2026) ;
+ *        (TF-2663, 16/11/2026) le premier `--fichier` est la consigne d'UN agent : elle doit porter les quatre rubriques que le contrat d'agent exige (dossier
+ *        temporaire propre à l'agent, raison de l'affectation au modèle quand `constructeur` ou Opus est nommé, version de départ, commit qui la porte, vérifié
+ *        dans git) ; il en manque une, exit 1, rien n'est préparé. `--sans-rubriques "<motif de 20 caractères au moins>"` déclare une consigne qui n'est pas
+ *        une délégation d'écriture (consigne commune d'une campagne, agent en lecture seule) : le motif est écrit dans la sortie ;
  *   --preparer reception --fichier <livrable> [--type <type>]
  *        (D-47 (a) du 19/10/2026) relit UN livrable d'agent dès sa réception, en entier : le livrable `.md` passe d'abord
  *        `oracles/oracle-ecriture.mjs` (A-2) — FAIL : rien n'est préparé, exit 1, la forme se corrige avant de dépenser une relecture ;
@@ -87,7 +91,7 @@ import { decouperCommande } from "../oracles/lib-decoupe-commande.mjs";
 let anonymiserTexte = null;
 try { ({ anonymiser: anonymiserTexte } = await import("../todo/anonymiser-entrant.mjs")); } catch { /* dit au refus de --consigner */ }
 
-export const VERSION = "2.3.0";
+export const VERSION = "2.4.0";
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const REGISTRE_DEFAUT = join(ICI, "..", "todo", "relectures-intention.jsonl");
 export const REGLES_DEFAUT = join(ICI, "..", "references", "RELECTURE-INTENTION-REGLES.json");
@@ -110,8 +114,10 @@ export const STRICTE = "une restriction ou un recadrage que la demande n autoris
 export const AJOUT_CONTENU_VISIBLE = "un contenu visible ajouté sans demande — une source, une mention, une section, une phrase, une colonne, un avertissement, un élément d'interface que la demande ne nommait pas — est un écart majeur, même annoncé, justifié ou validé en bloc ; ce que les règles applicables imposent n'en est pas un";
 export const AJOUT_REGLES = "quand des règles applicables au type de travail sont fournies, sous leur propre titre et distinctes de la demande humaine, ce sont les règles de la Factory que le livrable doit tenir même si la demande ne les nomme pas : un livrable qui en enfreint une est un écart, la règle citée, majeur quand le demandeur devrait redemander ce qu'il croyait acquis";
 export const AJOUT_NATURE = "chaque écart porte sa nature : « hors_demande » quand il sort de la demande (une restriction ou un recadrage non autorisé, une partie oubliée, un contenu visible ajouté sans demande, une règle applicable enfreinte) ; « choix_humain » quand il touche un choix qui revient à l'humain (une dépense, un périmètre à trancher, une publication, ou une décision humaine déjà prise) ; dans le doute, « choix_humain »";
-/** La consigne du relecteur, version 2 : la stricte v1 mot pour mot, puis les trois ajouts. */
-export const CONSIGNE_V2 = `${STRICTE}. ${AJOUT_CONTENU_VISIBLE}. ${AJOUT_REGLES}. ${AJOUT_NATURE}`;
+/** Le quatrième ajout (TF-2659, 16/11/2026) : la recommandation d'une décision se juge contre la phrase du porteur, comme la consigne de construction. */
+export const AJOUT_RECOMMANDATION = "quand le livrable recommande une décision à l'humain (une option à choisir, une voie à suivre), la recommandation se juge aussi contre la phrase du porteur : nommer qui agit et avec quel outil, et vérifier que cette personne dispose de cet outil et du savoir-faire qu'il suppose ; une recommandation qui suppose chez la personne visée un geste que la phrase du porteur ne lui prête pas (écrire du code, tenir une clé d'API personnelle) est un écart majeur de nature « hors_demande », même suivie par le porteur";
+/** La consigne du relecteur, version 2 : la stricte v1 mot pour mot, puis les quatre ajouts. */
+export const CONSIGNE_V2 = `${STRICTE}. ${AJOUT_CONTENU_VISIBLE}. ${AJOUT_REGLES}. ${AJOUT_NATURE}. ${AJOUT_RECOMMANDATION}`;
 /** La forme de sortie JSON de la version 1 (gardée : le référentiel la cite). */
 export const FORME_JSON_V1 = "{\"verdict\": \"sert\" ou \"derive\", \"gravite\": \"bloquante\" | \"majeure\" | \"mineure\" | \"aucune\", \"ecarts\": [{\"la_demande_dit\": \"<citation courte de la demande>\", \"le_livrable_fait\": \"<citation courte ou section du livrable>\", \"pourquoi\": \"<une phrase>\"}], \"confiance\": \"elevee\" | \"moyenne\" | \"faible\"}";
 /** La forme de sortie JSON de la version 2 : chaque écart porte sa nature. */
@@ -1143,13 +1149,74 @@ export function releverRegistre(lignes, depuis = null) {
   return { depuis, lignes: lignesRel, total };
 }
 
+/**
+ * TF-2663 (16/11/2026) — UNE CONSIGNE D'AGENT PART AVEC LES QUATRE RUBRIQUES QUE LE CONTRAT EXIGE.
+ * Le fait (Produit-82, RT-45, ledger seq 290) : la consigne d'un agent `constructeur` ne nommait ni dossier temporaire (exigé par gabarits/AGENT-CAMPAGNE.md depuis TF-2437),
+ * ni la raison de l'affectation à Opus, et sa version de départ précédait le commit qui la portait. La relecture d'intention jouée avant le lancement ne lisait pas ces rubriques :
+ * l'agent les a relevées à son arrivée. `--preparer consigne` REFUSE (exit 1, rien n'est préparé) une consigne à qui l'une manque :
+ *   dossier-temporaire   un chemin dont un segment commence par `agent-` (le dossier propre à l'agent, TF-2437) ;
+ *   raison-affectation   la raison du modèle, exigée quand la consigne nomme `constructeur` ou Opus (complexité manifeste ou escalade, avec l'oracle rouge qui la fonde) ;
+ *   version-depart       le commit ou la version de départ, après le mot « départ » ;
+ *   commit-porteur       un commit nommé (le départ, ou « commit … <sha> ») qui existe dans le dépôt de la copie et que la version de départ contient : un départ
+ *                        qui PRÉCÈDE le commit qui porte ce que l'agent doit lire est refusé.
+ * Le premier `--fichier` est la consigne ; les suivants sont des pièces jointes. Une consigne qui n'est pas une délégation d'agent d'écriture (consigne commune d'une
+ * campagne relue une fois, agent en lecture seule) se déclare par `--sans-rubriques "<motif>"` : le motif est écrit dans la sortie, il ne se tait pas.
+ * NON JUGÉ : la JUSTESSE d'une rubrique (un dossier présent mais mal placé, une raison faible) ; une version de départ qui n'est pas un commit (un numéro de version) n'est lue
+ * dans git que si elle ressemble à un commit ; un dépôt que ni « Arbre : » ni le dossier courant ne désigne (note « non vérifié dans git »).
+ */
+export const MOTIF_SANS_RUBRIQUES_MIN = 20;
+const SHA = "[0-9a-f]{7,40}";
+const RE_DOSSIER = /[\\/]agent-[\w.<>-]+/;
+const RE_MODELE_FORT = /\b(constructeur|Opus)\b/i;
+const RE_RAISON = /\b(raison|motif)\b[^\n]{0,100}\b(affectation|affect\w*|Opus|constructeur|mod[èe]le)\b|\bcomplexit[ée] manifeste\b|\bescalade\b/i;
+const RE_DEPART = new RegExp(`\\bd[ée]part\\b[^\\n]{0,80}?\\b(${SHA})\\b`, "i");
+const RE_COMMIT = new RegExp(`\\b(?:commit|porte|portée?s?|porté\\s+par)\\b[^\\n]{0,80}?\\b(${SHA})\\b`, "ig");
+const RE_ARBRE = /(?:\bArbre\b|arbre de travail|copie de travail|D[ée]p[ôo]t cible)[^\n:]{0,40}:\s*[`"']?([A-Za-z]:[\\/][^\s`"']+|\/[^\s`"']+)/i;
+
+function gitRub(depot, ...args) { return spawnSync("git", ["-C", depot, ...args], { encoding: "utf8", timeout: 15000 }); }
+const estUnCommit = (depot, sha) => gitRub(depot, "cat-file", "-e", `${sha}^{commit}`).status === 0;
+
+/** Le dépôt de la copie que la consigne désigne (« Arbre : <chemin> »), sinon `defaut`. */
+export function depotDeConsigne(texte, defaut) {
+  const m = RE_ARBRE.exec(texte);
+  const chemin = m && m[1].replace(/[.,;)]+$/, "");
+  return chemin && existsSync(chemin) ? chemin : defaut;
+}
+
+/** Les rubriques que la consigne ne porte pas : { manquantes: [{ id, constat, remede }], notes: [string] }. Le texte est celui de la consigne seule. */
+export function rubriquesDeConsigne(texte, { depot = null } = {}) {
+  const manquantes = [], notes = [];
+  const t = String(texte);
+  if (!RE_DOSSIER.test(t))
+    manquantes.push({ id: "dossier-temporaire", constat: "aucun dossier temporaire propre à l'agent n'est nommé", remede: "nommer `<dossier temporaire de la session>\\agent-<lot>\\` (contrat AGENT-CAMPAGNE.md, TF-2437) : un chemin dont un segment commence par `agent-`" });
+  if (RE_MODELE_FORT.test(t) && !RE_RAISON.test(t))
+    manquantes.push({ id: "raison-affectation", constat: "la consigne nomme `constructeur` ou Opus sans dire la raison de l'affectation", remede: "écrire la raison : complexité manifeste, ou escalade avec l'oracle rouge qui la fonde (arbitre de `constructeur`)" });
+  else if (!RE_MODELE_FORT.test(t)) notes.push("raison d'affectation non exigée : ni `constructeur` ni Opus nommés (agent au modèle par défaut)");
+  const depart = RE_DEPART.exec(t);
+  if (!depart)
+    manquantes.push({ id: "version-depart", constat: "aucune version de départ n'est nommée", remede: "écrire « départ <sha> » : la sortie de `git log -1 --format=%h` de la copie, avant les commits de l'agent" });
+  const commits = [...t.matchAll(RE_COMMIT)].map((m) => m[1]);
+  const porteur = commits[0] ?? (depart ? depart[1] : null);
+  if (!porteur)
+    manquantes.push({ id: "commit-porteur", constat: "aucun commit n'est nommé", remede: "nommer le commit qui porte ce que l'agent doit lire (« commit <sha> ») ; le commit de départ vaut quand il le porte" });
+  if (depot && existsSync(depot) && gitRub(depot, "rev-parse", "--git-dir").status === 0) {
+    if (depart && !estUnCommit(depot, depart[1]))
+      manquantes.push({ id: "version-depart", constat: `le départ ${depart[1]} n'est pas un commit de ${depot}`, remede: "relever le commit de départ dans la copie : `git -C <copie> log -1 --format=%h`" });
+    else if (porteur && !estUnCommit(depot, porteur))
+      manquantes.push({ id: "commit-porteur", constat: `le commit ${porteur} n'existe pas dans ${depot}`, remede: "nommer un commit de la copie" });
+    else if (depart && porteur && depart[1] !== porteur && gitRub(depot, "merge-base", "--is-ancestor", porteur, depart[1]).status !== 0)
+      manquantes.push({ id: "commit-porteur", constat: `la version de départ ${depart[1]} ne contient pas le commit ${porteur} qui la porte : le départ le précède`, remede: "partir d'un commit qui contient le commit nommé, ou nommer le bon commit" });
+  } else if (depart || porteur) notes.push("commits non vérifiés dans git : aucun dépôt retrouvé (ni « Arbre : <chemin> » qui existe, ni dossier courant git)");
+  return { manquantes, notes };
+}
+
 // ---------- exécution ----------
 
 export function executer(argv, env = process.env, maintenant = new Date(), contexte = {}) {
   const cwd = contexte.cwd || process.cwd();
   const projetDir = contexte.projet || env.CLAUDE_PROJECT_DIR || cwd;   // le projet dont on lit la transcription
   const maison = contexte.maison || homedir();
-  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null, racine: null, agent: null };
+  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null, racine: null, agent: null, sansRubriques: null };
   const usage = (m) => ({ code: 2, sortie: `relecture-intention : ${m}` });
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
@@ -1172,6 +1239,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       else if (x === "--passe") a.passe = val();
       else if (x === "--suite-de") a.suiteDe = val();
       else if (x === "--agent") a.agent = val();
+      else if (x === "--sans-rubriques") a.sansRubriques = val();
       else if (x === "--session") a.session = val();
       else if (x === "--depuis") a.depuis = val();
       else if (x === "--json") a.json = true;
@@ -1330,6 +1398,23 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       if (interdit) return usage(`--fichier ${f} : ${interdit.replace(/^\[|\]$/g, "")} — il n'est pas embarqué dans la préparation ; rien n'est écrit`);
       try { pieces.push({ chemin: resolve(cwd, f), texte: readFileSync(resolve(cwd, f), "utf8") }); } catch (e) { return usage(`consigne illisible : ${e.message}`); } }
   }
+  // TF-2663 : les quatre rubriques du contrat se lisent dans la consigne (le premier --fichier) AVANT toute préparation ; un manque REFUSE (exit 1).
+  let noteRubriques = null;
+  if (a.sansRubriques !== null && a.preparer !== "consigne") return usage("--sans-rubriques ne vaut que pour --preparer consigne");
+  if (a.preparer === "consigne") {
+    if (a.sansRubriques !== null) {
+      if (a.sansRubriques.trim().length < MOTIF_SANS_RUBRIQUES_MIN) return usage(`--sans-rubriques attend un motif d'au moins ${MOTIF_SANS_RUBRIQUES_MIN} caractères (consigne commune d'une campagne, agent en lecture seule…) : une exemption se dit, elle ne se tait pas`);
+      noteRubriques = `rubriques de consigne NON contrôlées (TF-2663), exemption déclarée : « ${a.sansRubriques.trim()} »`;
+    } else {
+      const r = rubriquesDeConsigne(pieces[0].texte, { depot: depotDeConsigne(pieces[0].texte, cwd) });
+      if (r.manquantes.length) return { code: 1, sortie: [
+        `relecture-intention ${VERSION} — point « consigne » : ${r.manquantes.length} rubrique(s) exigée(s) par le contrat d'agent absente(s) de ${a.fichiers[0]} — rien n'est préparé (TF-2663 : le 13/11/2026, une consigne de constructeur sans dossier temporaire, sans raison d'affectation, au départ antérieur à son commit, a été relevée par l'agent à son arrivée).`,
+        ...r.manquantes.map((m) => `  - ${m.id} : ${m.constat}. Remède : ${m.remede}.`),
+        "Une consigne qui n'est pas une délégation d'agent d'écriture (consigne commune d'une campagne relue une fois, agent en lecture seule) se relit avec --sans-rubriques \"<motif>\" : le motif s'écrit dans la sortie.",
+      ].join("\n"), rubriques: r };
+      noteRubriques = `rubriques de consigne contrôlées (TF-2663) : dossier temporaire, départ et commit présents${r.notes.length ? ` ; ${r.notes.join(" ; ")}` : ""}`;
+    }
+  }
   let forme = null;
   if (a.preparer === "reception") {
     if (a.fichiers.length !== 1) return usage("--preparer reception attend --fichier <livrable rendu par l'agent> (un seul)");
@@ -1432,7 +1517,8 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   const sortie = [
     ...(alerte ? [alerte, ""] : []),
     `relecture-intention ${VERSION} — point « ${a.preparer} » : ${humains.length} message(s) humain(s) cité(s) mot pour mot, ${decisions.length} décision(s) posée(s) retrouvée(s), ${resume}${regles ? `, ${nbRegles} règle(s) applicable(s) au type ${types.join("+")} (référentiel ${regles.ref.version})` : ", aucune règle applicable ajoutée (pas de --type)"}`,
-    `transcription lue : ${transcript} (${origine}) ; ${avisCwd}`,
+    ...(noteRubriques ? [noteRubriques] : []),
+    `transcription lue : ${transcript} (${origine}) ;${avisCwd}`,
     `écrit : ${fDemande} · ${fLivrables}`,
     ...(nbCaviardes ? [`${nbCaviardes} motif(s) de secret caviardé(s) avant l'écriture (demande.txt ${cavDemande.n}, livrables.md ${cavLivrables.n} ; ${nomsCaviardes.join(", ")}) : repéré(s) par leur forme, remplacé(s) par « [CAVIARDÉ … — TF-2160] » dans les deux fichiers (TF-2160)`] : []),
     "",
