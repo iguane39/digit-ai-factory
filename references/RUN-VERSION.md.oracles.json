@@ -1,5 +1,5 @@
 {
-  "cible": "C:\\dev\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+  "cible": "C:\\dev\\digit-ai-factory\\references\\RUN-VERSION.md",
   "date_iso": "2026-11-14T17:25:32.709Z",
   "registre_version": "2.63.0",
   "profil": "digit-ai",
@@ -15,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "..\\_wt-pilot-ph\\references\\RUN-VERSION.md"
+      "references\\RUN-VERSION.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -26,43 +26,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": "aucune table détectée, aucun effectif annoncé ancré, aucun pourcentage ni unité publiés"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+      "file": "references\\RUN-VERSION.md",
       "verdict": "SKIP",
       "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
@@ -70,10 +70,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "..\\_wt-pilot-ph\\references\\RUN-VERSION.md",
+    "release": "references\\RUN-VERSION.md",
     "ts": "2026-11-14T17:25:32.707Z",
     "fichiers": {
-      "..\\_wt-pilot-ph\\references\\RUN-VERSION.md": "e37a9c57aeaaead015f6c1b5344c10ddc7de6ddeb71e51b17e752397426faf62"
+      "references\\RUN-VERSION.md": "e37a9c57aeaaead015f6c1b5344c10ddc7de6ddeb71e51b17e752397426faf62"
     }
   },
   "empreinte_motif": null,
