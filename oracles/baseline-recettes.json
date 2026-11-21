@@ -325,8 +325,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-reprise.mjs": {
-  "cas": 18,
-  "vu_le": "2026-11-16"
+  "cas": 32,
+  "vu_le": "2026-11-21"
  },
  "oracle-run-reseau.mjs": {
   "cas": 54,
@@ -619,8 +619,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/oracle-reprise.test.mjs": {
-  "cas": 18,
-  "vu_le": "2026-11-16"
+  "cas": 32,
+  "vu_le": "2026-11-21"
  },
  "oracles/oracle-source-contenu.test.mjs": {
   "cas": 12,
