@@ -8,15 +8,21 @@
  * dossier renommé gardé dans .gitignore (RP6, TF-2441).
  *
  * Joué par `oracles\self-tests.mjs` (I1 via DEDIES, I2 comme tout `*.test.mjs`).
+ *
+ * D-224 (a) du 21/11/2026 : le coffre de secrets clé par clé et la mémoire Claude du projet. Chaque refus a son
+ * remède joué (le choix --prefere, le motif au .gitignore, la clé rangée puis envoyée, l'exclusion, le feu vert) ;
+ * toutes les valeurs de fixture sont assemblées à l'exécution, et le dernier cas les cherche dans toutes les sorties.
  */
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, utimesSync, readdirSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, utimesSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { verifier, synchroniser, estExclu, goVersDossierSynchronise } from "./oracle-reprise.mjs";
+import { verifier, synchroniser, estExclu, goVersDossierSynchronise, dossierMemoireLocal } from "./oracle-reprise.mjs";
+import { analyser } from "../scripts/fusionner-env.mjs";
 
 const HOOK = join(fileURLToPath(new URL(".", import.meta.url)), "hook-reprise.mjs");
+const ORACLE = join(fileURLToPath(new URL(".", import.meta.url)), "oracle-reprise.mjs");
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -316,5 +322,351 @@ check("TF-2680 — une base ignorée par git que rien ne couvre (ni élément, n
   egal(statut(verifier(sans.produit, sans.opt), "RP8"), undefined, "RP8 sans objet");
 });
 
-console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 9 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7, RP8 et l'envoi refusé), chacun avec son remède vert`);
+// ---- D-224 (a) du 21/11/2026 : le COFFRE DE SECRETS clé par clé et la MÉMOIRE CLAUDE du projet ----------------------
+// Le fait (diagnostic 20261121c) : 4 mécanismes maison chez les produits, 9 fichiers de secrets sur 13 tenus par aucun
+// script, et un coffre à 2 clés de moins que le produit n'en exige dont le juge rendait PASS (M-09). Les valeurs de
+// fixture s'assemblent à l'exécution : aucune n'est écrite en clair dans ce fichier, et le dernier cas les cherche
+// toutes dans tout ce que l'outil a rendu.
+const VALEURS = [], SORTIES = [];
+let nv = 0;
+const valeur = (etiquette) => { const v = ["fx", etiquette, (++nv).toString(36), Math.random().toString(36).slice(2, 8)].join("-"); VALEURS.push(v); return v; };
+const garder = (x) => { SORTIES.push(typeof x === "string" ? x : JSON.stringify(x)); return x; };
+const texteEnv = (paires) => paires.map(([k, v]) => `${k}=${v}`).join("\n") + "\n";
+const valeursDe = (f) => Object.fromEntries([...analyser(existsSync(f) ? readFileSync(f, "utf8") : "").cles].map(([k, l]) => [k, l.valeur]));
+const statutFlux = (r, regle, flux) => (r.findings.find((f) => f.regle === regle && f.flux === flux) || {}).statut;
+const messageFlux = (r, regle, flux) => (r.findings.find((f) => f.regle === regle && f.flux === flux) || {}).message || "";
+const lireBanc = (b) => JSON.parse(readFileSync(join(b.produit, "forge", "REPRISE.json"), "utf8"));
+const sansGit = () => { const e = { ...process.env }; for (const k of ["GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"]) delete e[k]; return e; };
+
+// La disposition du gabarit : trois dossiers voisins sous « <Produit> - Reprise » (canal, coffre SECRETS, MEMOIRE-CLAUDE).
+function bancCoffre({ poste = null, coffre = null, cles = ["A"], gitignore = ".env\n.env.*\n", envoi = GO, fichiers = [".env"], memoire = false, elements = ["input"] } = {}) {
+  const d = join(T, `c${++n}`), produit = join(d, "produit"), reprise = join(d, "Mon Drive", "Produit - Reprise");
+  const canal = join(reprise, "DONNEES-HORS-GIT"), dCoffre = join(reprise, "SECRETS"), dMemoire = join(reprise, "MEMOIRE-CLAUDE");
+  const opt = { etat: join(d, "etat"), profil: join(d, "profil-claude") };
+  for (const x of [join(produit, "forge"), canal, dCoffre, ...(memoire ? [dMemoire] : [])]) mkdirSync(x, { recursive: true });
+  writeFileSync(join(produit, ".gitignore"), gitignore, "utf8");
+  writeFileSync(join(produit, "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { fournisseur: "Google Drive", chemins: [canal] }, elements,
+    secrets: { fichiers, chemins: [join(d, "absent", "SECRETS"), dCoffre], cles_attendues: cles }, ...(memoire ? { memoire: { chemins: [dMemoire] } } : {}), ...(envoi ? { envoi } : {}) }));
+  const envGit = sansGit();
+  const git = (...a) => execFileSync("git", a, { cwd: produit, env: envGit, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  git("init", "-q"); git("config", "user.email", "t@t.t"); git("config", "user.name", "t"); git("add", "-A"); git("commit", "-q", "-m", "socle");
+  if (poste !== null) writeFileSync(join(produit, ".env"), poste, "utf8");
+  if (coffre !== null) writeFileSync(join(dCoffre, ".env"), coffre, "utf8");
+  return { d, produit, canal, coffre: dCoffre, memoire: dMemoire, opt, envPoste: join(produit, ".env"), envCoffre: join(dCoffre, ".env"),
+    visibles: () => git("status", "--porcelain", "-uall").split("\n").filter((l) => l.startsWith("??")).map((l) => l.slice(3)) };
+}
+const hookCoffre = (b, sens, plus = {}) => spawnSync(process.execPath, [HOOK, sens], { cwd: b.produit, input: "", encoding: "utf8", env: { ...process.env, REPRISE_ETAT: b.opt.etat, CLAUDE_CONFIG_DIR: b.opt.profil, ...plus } });
+const cliOracle = (b, ...args) => spawnSync(process.execPath, [ORACLE, "--racine", b.produit, "--etat", b.opt.etat, "--profil", b.opt.profil, ...args], { encoding: "utf8" });
+
+check("D-224 — union sans perte dans les deux sens : l'ouverture porte au poste les clés du coffre, la fin de tour porte au coffre celles du poste ; aucune clé perdue, les deux textes égaux, git ne voit rien", () => {
+  const [a, b2, c, d2] = [valeur("a"), valeur("b"), valeur("c"), valeur("d")];
+  const b = bancCoffre({ poste: texteEnv([["A", a], ["B", b2]]), coffre: texteEnv([["A", a], ["C", c], ["D", d2]]), cles: ["A", "B", "C", "D"] });
+  const r = garder(synchroniser(b.produit, "restaurer", b.opt));
+  egal(r.secrets.fichiers[0].cles_au_coffre_seul.join(","), "C,D", "clés reçues du coffre");
+  egal(JSON.stringify(valeursDe(b.envPoste)), JSON.stringify({ A: a, B: b2, C: c, D: d2 }), "poste après l'ouverture");
+  egal(JSON.stringify(valeursDe(b.envCoffre)), JSON.stringify({ A: a, C: c, D: d2 }), "l'ouverture n'écrit pas le coffre");
+  const p = garder(synchroniser(b.produit, "pousser", b.opt));
+  egal(p.secrets.fichiers[0].cles_au_poste_seul.join(","), "B", "clé envoyée au coffre");
+  egal(readFileSync(b.envCoffre, "utf8"), readFileSync(b.envPoste, "utf8"), "les deux côtés portent le même texte");
+  egal(Object.keys(valeursDe(b.envCoffre)).sort().join(","), "A,B,C,D", "aucune clé perdue");
+  egal(b.visibles().length, 0, "fichiers non suivis visibles à git status");
+});
+
+check("D-224 — conflit tranché par la base : la valeur qui a changé depuis la dernière synchronisation gagne, dans chaque sens, quelle que soit la date des fichiers", () => {
+  const [v1, v2, v3] = [valeur("v1"), valeur("v2"), valeur("v3")];
+  const b = bancCoffre({ poste: texteEnv([["A", v1], ["B", v1]]), coffre: texteEnv([["A", v1], ["B", v1]]), cles: ["A", "B"] });
+  garder(synchroniser(b.produit, "restaurer", b.opt)); // la base : A et B valent v1 des deux côtés
+  ecrire(b.envCoffre, texteEnv([["A", v2], ["B", v1]]), new Date(Date.now() - 3600e3)); // le coffre change A, fichier plus ancien
+  ecrire(b.envPoste, texteEnv([["A", v1], ["B", v3]]), new Date()); // le poste change B, fichier plus récent
+  const r = garder(synchroniser(b.produit, "restaurer", b.opt));
+  egal(r.secrets.fichiers[0].pris_du_coffre.join(","), "A", "A prise du coffre");
+  egal(r.secrets.fichiers[0].pris_du_poste.join(","), "B", "B gardée du poste");
+  egal(r.secrets.fichiers[0].conflits_sans_base.length, 0, "aucun conflit sans base");
+  egal(valeursDe(b.envPoste).A, v2, "le poste reçoit la valeur nouvelle du coffre, d'un fichier plus ancien");
+  egal(valeursDe(b.envPoste).B, v3, "le poste garde sa valeur nouvelle");
+  garder(synchroniser(b.produit, "pousser", b.opt));
+  egal(JSON.stringify(valeursDe(b.envCoffre)), JSON.stringify({ A: v2, B: v3 }), "le coffre reçoit B du poste");
+  egal(statutFlux(garder(verifier(b.produit, b.opt)), "RP4", "coffre"), "PASS", "RP4 coffre à égalité");
+});
+
+check("D-224 rouge — conflit sans base : REFUS qui nomme la clé et la commande du choix, rien n'est écrit d'aucun côté, RP4 FAIL ; remède joué : --prefere par la ligne de commande, dans les deux sens, RP4 PASS", () => {
+  const [x, y, z] = [valeur("x"), valeur("y"), valeur("z")];
+  const b = bancCoffre({ poste: texteEnv([["TOK", x], ["A", z]]), coffre: texteEnv([["TOK", y], ["NEUVE", z]]), cles: ["TOK"] });
+  const avantP = readFileSync(b.envPoste, "utf8"), avantC = readFileSync(b.envCoffre, "utf8");
+  const f = garder(synchroniser(b.produit, "restaurer", b.opt)).secrets.fichiers[0];
+  if (!/TOK/.test(f.refus || "") || !/--prefere TOK:poste/.test(f.refus) || !/D-208/.test(f.refus)) throw new Error("le refus ne nomme pas la clé, la commande du choix ou la garde : " + f.refus);
+  egal(f.conflits_sans_base.join(","), "TOK", "clé en conflit");
+  garder(synchroniser(b.produit, "pousser", b.opt));
+  egal(readFileSync(b.envPoste, "utf8"), avantP, "poste intact, pas même la clé NEUVE");
+  egal(readFileSync(b.envCoffre, "utf8"), avantC, "coffre intact, pas même la clé A");
+  const v = garder(verifier(b.produit, b.opt));
+  egal(statutFlux(v, "RP4", "coffre"), "FAIL", "RP4 coffre");
+  if (!/--prefere/.test(messageFlux(v, "RP4", "coffre"))) throw new Error("RP4 ne donne pas le remède");
+  const cli = cliOracle(b, "--restaurer", "--prefere", "TOK:coffre");
+  garder(cli.stdout + cli.stderr);
+  egal(cli.status, 0, "ligne de commande du choix");
+  egal(valeursDe(b.envPoste).TOK, y, "TOK : la valeur du coffre, choisie");
+  egal(valeursDe(b.envPoste).NEUVE, z, "la clé NEUVE arrive avec le choix");
+  egal(statutFlux(verifier(b.produit, b.opt), "RP4", "coffre"), "PASS", "RP4 après le choix");
+  // l'autre côté du choix : la valeur du poste gagne, et l'envoi de fin de tour (le hook, sans choix) la porte au coffre
+  const b2 = bancCoffre({ poste: texteEnv([["TOK", x]]), coffre: texteEnv([["TOK", y]]), cles: ["TOK"] });
+  const cli2 = cliOracle(b2, "--restaurer", "--prefere", "TOK:poste");
+  garder(cli2.stdout + cli2.stderr);
+  egal(cli2.status, 0, "choix du poste");
+  egal(valeursDe(b2.envPoste).TOK, x, "le poste garde sa valeur");
+  const h = hookCoffre(b2, "--pousser");
+  garder(h.stdout + h.stderr);
+  egal(valeursDe(b2.envCoffre).TOK, x, "le choix, consigné comme base, fait partir la valeur du poste à l'envoi");
+  egal(statutFlux(verifier(b2.produit, b2.opt), "RP4", "coffre"), "PASS", "RP4 après l'envoi");
+  egal(cliOracle(b2, "--restaurer", "--prefere", "TOK=poste").status, 2, "une forme de choix fausse est un usage refusé");
+});
+
+check("D-224 rouge — un fichier du poste que git n'ignore pas est refusé dans les deux sens, RP6 FAIL ; un .env qui naîtrait non ignoré dans un dossier absent aussi ; remède joué : le motif au .gitignore, RP6 PASS", () => {
+  const k = valeur("k");
+  const b = bancCoffre({ poste: texteEnv([["A", k]]), coffre: texteEnv([["A", k], ["B", k]]), cles: ["A"], gitignore: "node_modules/\n" });
+  const avant = readFileSync(b.envPoste, "utf8");
+  const r = garder(synchroniser(b.produit, "restaurer", b.opt));
+  if (!/n'est PAS ignoré par git/.test(r.secrets.fichiers[0].refus || "")) throw new Error("refus non nommé : " + JSON.stringify(r.secrets));
+  egal(readFileSync(b.envPoste, "utf8"), avant, "poste intact");
+  garder(synchroniser(b.produit, "pousser", b.opt));
+  egal(JSON.stringify(valeursDe(b.envCoffre)), JSON.stringify({ A: k, B: k }), "coffre intact");
+  egal(statutFlux(garder(verifier(b.produit, b.opt)), "RP6", "coffre"), "FAIL", "RP6 coffre");
+  writeFileSync(join(b.produit, ".gitignore"), "node_modules/\n.env\n", "utf8");
+  egal(statutFlux(verifier(b.produit, b.opt), "RP6", "coffre"), "PASS", "RP6 après le remède");
+  garder(synchroniser(b.produit, "restaurer", b.opt));
+  egal(valeursDe(b.envPoste).B, k, "la clé B arrive une fois le fichier ignoré");
+  // `stats/.env` : le .gitignore ne couvre qu'un .env à la racine, et le dossier stats/ n'existe pas sur ce poste
+  const s = bancCoffre({ cles: ["S"], gitignore: "/.env\n", fichiers: ["stats/.env"] });
+  ecrire(join(s.coffre, "stats", ".env"), texteEnv([["S", k]]));
+  const rs = garder(synchroniser(s.produit, "restaurer", s.opt));
+  if (!/n'est PAS ignoré par git/.test(rs.secrets.fichiers[0].refus || "")) throw new Error("le fichier qui naîtrait non ignoré n'est pas refusé : " + JSON.stringify(rs.secrets));
+  if (existsSync(join(s.produit, "stats"))) throw new Error("un dossier est né pour un fichier refusé");
+  writeFileSync(join(s.produit, ".gitignore"), "/.env\nstats/.env\n", "utf8");
+  garder(synchroniser(s.produit, "restaurer", s.opt));
+  egal(valeursDe(join(s.produit, "stats", ".env")).S, k, "stats/.env naît du coffre une fois couvert");
+  egal(s.visibles().filter((x) => x !== ".gitignore").length, 0, "git ne voit pas stats/.env");
+});
+
+check("D-224 rouge — RP9, le cas mesuré du 20/11 (M-09) : poste et coffre égaux à 2 clés, 2 clés exigées manquent ; l'égalité (RP4) passe et RP9 FAIL les nomme ; remède joué : les clés rangées sur le poste, puis l'envoi de fin de tour, RP9 PASS", () => {
+  const texte = texteEnv([["BASE_URL", valeur("u")], ["DEPLOI_TOKEN", valeur("w")]]);
+  const b = bancCoffre({ poste: texte, coffre: texte, cles: ["BASE_URL", "DEPLOI_TOKEN", "PAGE_ID", "PUBLICATION_TOKEN"] });
+  const v = garder(verifier(b.produit, b.opt));
+  egal(statutFlux(v, "RP4", "coffre"), "PASS", "RP4 : les deux copies sont égales");
+  egal(statut(v, "RP9"), "FAIL", "RP9");
+  if (!/PAGE_ID, PUBLICATION_TOKEN/.test(message(v, "RP9")) || !/ni au poste ni au coffre/.test(message(v, "RP9"))) throw new Error("RP9 ne nomme pas les 2 clés manquantes : " + message(v, "RP9"));
+  egal(v.verdict, "FAIL", "verdict");
+  ecrire(b.envPoste, texte + "PAGE_ID=\n");
+  if (!/PAGE_ID \(vide\)/.test(message(verifier(b.produit, b.opt), "RP9"))) throw new Error("une clé vide n'est pas dite vide");
+  // le remède : les clés rangées sur ce poste (le geste de forge/ranger-secret.mjs), puis l'envoi de fin de tour
+  ecrire(b.envPoste, texte + texteEnv([["PAGE_ID", valeur("m")], ["PUBLICATION_TOKEN", valeur("p")]]));
+  const avantEnvoi = garder(verifier(b.produit, b.opt));
+  egal(statut(avantEnvoi, "RP9"), "FAIL", "RP9 tant que le coffre ne les a pas");
+  if (!/au coffre, présentes au poste : PAGE_ID, PUBLICATION_TOKEN/.test(message(avantEnvoi, "RP9"))) throw new Error("RP9 ne dit pas que le coffre attend l'envoi : " + message(avantEnvoi, "RP9"));
+  garder(synchroniser(b.produit, "pousser", b.opt));
+  const apres = garder(verifier(b.produit, b.opt));
+  egal(statut(apres, "RP9"), "PASS", "RP9 après l'envoi");
+  egal(apres.verdict, "PASS", "verdict");
+});
+
+check("D-224 rouge — RP10 : une mémoire et un coffre au nom neutre DANS le canal, sous un élément copié, FAIL, et le canal copie vraiment la mémoire ; le coffre SECRETS exclu par son nom et l'exclusion déclarée lèvent le rouge ; coffre égal au canal, coffre dans la mémoire : FAIL", () => {
+  const b = bancCoffre({ poste: texteEnv([["A", valeur("p")]]), cles: ["A"], memoire: true, elements: ["partage"], gitignore: ".env\n.env.*\npartage/\n" });
+  const memDansCanal = join(b.canal, "partage", "MEMOIRE-CLAUDE"), coffreNeutre = join(b.canal, "partage", "COFFRE");
+  ecrire(join(memDansCanal, "MEMORY.md"), "- note\n");
+  mkdirSync(coffreNeutre, { recursive: true });
+  const s = lireBanc(b).secrets;
+  manifeste(b, { secrets: { ...s, chemins: [coffreNeutre] }, memoire: { chemins: [memDansCanal] } });
+  const v = garder(verifier(b.produit, b.opt));
+  egal(statut(v, "RP10"), "FAIL", "RP10");
+  if (!/la mémoire \(« partage\/MEMOIRE-CLAUDE »/.test(message(v, "RP10")) || !/le coffre \(« partage\/COFFRE »/.test(message(v, "RP10"))) throw new Error("RP10 ne nomme pas les deux dossiers : " + message(v, "RP10"));
+  garder(synchroniser(b.produit, "restaurer", b.opt));
+  if (!existsSync(join(b.produit, "partage", "MEMOIRE-CLAUDE", "MEMORY.md"))) throw new Error("le canal n'a pas copié la mémoire : le rouge ne prouverait rien");
+  const coffreSecrets = join(b.canal, "partage", "SECRETS");
+  mkdirSync(coffreSecrets, { recursive: true });
+  manifeste(b, { secrets: { ...s, chemins: [coffreSecrets] }, exclusions: ["MEMOIRE-CLAUDE"] });
+  egal(statut(verifier(b.produit, b.opt), "RP10"), "PASS", "RP10 : SECRETS exclu par son nom, la mémoire par « exclusions »");
+  manifeste(b, { secrets: s, memoire: { chemins: [b.memoire] }, exclusions: [] });
+  egal(statut(verifier(b.produit, b.opt), "RP10"), "PASS", "RP10 : la disposition du gabarit, trois dossiers voisins");
+  manifeste(b, { secrets: { ...s, chemins: [b.canal] } });
+  if (!/le canal lui-même/.test(message(verifier(b.produit, b.opt), "RP10"))) throw new Error("le coffre posé sur le canal n'est pas refusé");
+  manifeste(b, { secrets: { ...s, chemins: [join(b.memoire, "SECRETS")] } });
+  if (!/se contiennent/.test(message(verifier(b.produit, b.opt), "RP10"))) throw new Error("le coffre logé dans la mémoire n'est pas refusé");
+});
+
+check("D-224 — un manifeste sans « secrets » ni « memoire » se comporte comme avant : ni coffre ni mémoire au compte rendu, aucun constat de flux, ni RP9 ni RP10, aucun état neuf, la ligne du hook inchangée", () => {
+  const b = banc({ envoi: GO, elements: ["input"] });
+  ecrire(join(b.canal, "input", "a.txt"), "donnée du canal");
+  const v = verifier(b.produit, b.opt);
+  if (v.findings.some((f) => f.flux || f.regle === "RP9" || f.regle === "RP10")) throw new Error("un constat de flux est apparu : " + JSON.stringify(v.findings));
+  egal(v.findings.map((f) => f.regle).join(","), "RP1,RP2,RP3,RP4,RP6,RP5", "règles jugées");
+  const h = spawnSync(process.execPath, [HOOK, "--restaurer"], { cwd: b.produit, input: "", encoding: "utf8", env: { ...process.env, REPRISE_ETAT: b.opt.etat } });
+  egal(h.status, 0, "hook");
+  egal(h.stdout.trim().split("\n").length, 1, "une seule ligne, celle du canal");
+  if (!/^\[reprise — R-64\] restauration depuis le canal : 1 fichier\(s\) restauré\(s\) — canal /.test(h.stdout)) throw new Error("ligne du hook changée : " + h.stdout);
+  const r = synchroniser(b.produit, "pousser", b.opt);
+  for (const k of ["secrets", "memoire"]) if (k in r) throw new Error(`le compte rendu porte « ${k} »`);
+  egal(readdirSync(b.opt.etat).filter((x) => /-(secrets|memoire)\.json$/.test(x)).length, 0, "aucun état de flux écrit");
+});
+
+check("D-224 — mémoire Claude : la note d'un poste passe à l'autre, l'index MEMORY.md en conflit prend l'union de ses lignes, une note au nom de secret reste au poste ; le profil de la session (CLAUDE_CONFIG_DIR) est celui qu'on synchronise ; RP4 mémoire rouge puis vert", () => {
+  const a = valeur("ma");
+  const b = bancCoffre({ poste: texteEnv([["A", a]]), coffre: texteEnv([["A", a]]), cles: ["A"], memoire: true });
+  const local = dossierMemoireLocal(b.produit, b.opt.profil);
+  if (!local.startsWith(join(b.opt.profil, "projects"))) throw new Error("la mémoire jugée n'est pas celle du profil de la recette : " + local);
+  ecrire(join(local, "MEMORY.md"), "- [Note A](note-a.md) — de ce poste\n", new Date(Date.now() - 3600e3));
+  ecrire(join(local, "note-a.md"), "contenu A\n");
+  ecrire(join(local, "mot-de-passe-du-poste.md"), "note locale\n");
+  ecrire(join(b.memoire, "MEMORY.md"), "- [Note B](note-b.md) — de l'autre poste\n", new Date());
+  ecrire(join(b.memoire, "note-b.md"), "contenu B\n");
+  egal(statutFlux(garder(verifier(b.produit, b.opt)), "RP4", "memoire"), "FAIL", "RP4 mémoire avant l'ouverture");
+  const r = garder(synchroniser(b.produit, "restaurer", b.opt));
+  egal(readFileSync(join(local, "note-b.md"), "utf8"), "contenu B\n", "la note de l'autre poste arrive");
+  const index = readFileSync(join(local, "MEMORY.md"), "utf8");
+  if (!index.includes("(note-a.md)") || !index.includes("(note-b.md)")) throw new Error("l'index n'a pas l'union des deux côtés : " + index);
+  egal(r.memoire.unions.join(","), "MEMORY.md", "union déclarée");
+  if (!r.memoire.exclus.includes("mot-de-passe-du-poste.md")) throw new Error("la note au nom de secret n'est pas déclarée écartée : " + JSON.stringify(r.memoire.exclus));
+  egal(statutFlux(verifier(b.produit, b.opt), "RP4", "memoire"), "PASS", "RP4 mémoire après l'ouverture");
+  garder(synchroniser(b.produit, "pousser", b.opt));
+  egal(readFileSync(join(b.memoire, "note-a.md"), "utf8"), "contenu A\n", "la note du poste part");
+  if (!readFileSync(join(b.memoire, "MEMORY.md"), "utf8").includes("(note-a.md)")) throw new Error("l'index fusionné n'est pas parti");
+  if (existsSync(join(b.memoire, "mot-de-passe-du-poste.md"))) throw new Error("une note au nom de secret est partie");
+  // un second profil, désigné par CLAUDE_CONFIG_DIR comme le fait la session qui le charge : le hook restaure dans le sien
+  const profilB = join(b.d, "profil-b");
+  const h = hookCoffre(b, "--restaurer", { CLAUDE_CONFIG_DIR: profilB });
+  garder(h.stdout + h.stderr);
+  const localB = dossierMemoireLocal(b.produit, profilB);
+  egal(readFileSync(join(localB, "note-a.md"), "utf8"), "contenu A\n", "profil B : note A");
+  egal(readFileSync(join(localB, "note-b.md"), "utf8"), "contenu B\n", "profil B : note B");
+  if (!/mémoire Claude : 3 fichier\(s\) restauré\(s\)/.test(h.stdout) || !h.stdout.includes("CLAUDE_CONFIG_DIR=")) throw new Error("la ligne du hook ne dit pas la restauration ni le profil : " + h.stdout);
+});
+
+check("D-224 rouge — RP1 : sections « secrets » et « memoire » mal formées ; une entrée de « cles_attendues » qui n'est pas un nom est désignée par son rang, jamais recopiée ; remède : la forme du gabarit, RP1 PASS", () => {
+  const b = bancCoffre({ cles: ["A"], memoire: true });
+  const s = lireBanc(b).secrets;
+  manifeste(b, { secrets: { ...s, cles_attendues: ["API_KEY", `TOKEN=${valeur("collee")}`] } });
+  const v = garder(verifier(b.produit, b.opt));
+  egal(statut(v, "RP1"), "FAIL", "RP1 entrée qui n'est pas un nom");
+  if (!/l'entrée n° 2/.test(message(v, "RP1"))) throw new Error("l'entrée fautive n'est pas désignée par son rang");
+  for (const [quoi, secrets, memoire] of [
+    ["fichier qui n'est pas d'environnement", { ...s, fichiers: ["config/credentials.json"] }],
+    ["modèle versionné", { ...s, fichiers: [".env.example"] }],
+    ["chemin absolu", { ...s, fichiers: ["C:/ailleurs/.env"] }],
+    ["sans clé attendue", { ...s, cles_attendues: [] }],
+    ["sans emplacement du coffre", { ...s, chemins: [] }],
+    ["mémoire sans emplacement", s, {}],
+  ]) {
+    manifeste(b, { secrets, memoire });
+    egal(statut(verifier(b.produit, b.opt), "RP1"), "FAIL", `RP1 ${quoi}`);
+    if (!garder(synchroniser(b.produit, "restaurer", b.opt)).erreur) throw new Error(`la synchronisation accepte un manifeste mal formé (${quoi})`);
+  }
+  manifeste(b, { secrets: s, memoire: { chemins: [b.memoire] } });
+  egal(statut(verifier(b.produit, b.opt), "RP1"), "PASS", "RP1 au gabarit");
+});
+
+check("D-224 rouge — le coffre sous le pilot, dans le produit ou dans un dépôt git est refusé, rien n'est écrit, RP6 FAIL ; un produit logé sous le pilot voit son fichier refusé (dansLePilot) ; remède : un dossier du Drive, RP6 PASS", () => {
+  const k = valeur("garde");
+  const b = bancCoffre({ poste: texteEnv([["A", k]]), cles: ["A"] });
+  const s = lireBanc(b).secrets;
+  const piloteFaux = join(b.d, "pilot");
+  ecrire(join(piloteFaux, "gabarits", "HERITAGE.json"), "{}");
+  const depot = join(b.d, "depot-tiers");
+  mkdirSync(depot, { recursive: true });
+  execFileSync("git", ["init", "-q"], { cwd: depot, env: sansGit() });
+  for (const [quoi, chemin, motif] of [
+    ["sous le pilot", join(piloteFaux, "SECRETS"), /sous le pilot/],
+    ["dans le produit", join(b.produit, "forge", "SECRETS"), /dans le produit/],
+    ["dans un dépôt git", join(depot, "SECRETS"), /dépôt git/],
+  ]) {
+    manifeste(b, { secrets: { ...s, chemins: [chemin] } });
+    const r = garder(synchroniser(b.produit, "pousser", b.opt));
+    if (!motif.test(r.secrets.refus || "")) throw new Error(`${quoi} : ${JSON.stringify(r.secrets)}`);
+    if (existsSync(join(chemin, ".env"))) throw new Error(`${quoi} : un secret a été écrit`);
+    egal(statutFlux(verifier(b.produit, b.opt), "RP6", "coffre"), "FAIL", `RP6 ${quoi}`);
+  }
+  manifeste(b, { secrets: s });
+  egal(statutFlux(verifier(b.produit, b.opt), "RP6", "coffre"), "PASS", "RP6 sur le Drive");
+  const sous = join(piloteFaux, "produit-sous-le-pilot");
+  ecrire(join(sous, "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { chemins: [b.canal] }, elements: ["input"], secrets: { fichiers: [".env"], chemins: [b.coffre], cles_attendues: ["A"] } }));
+  ecrire(join(sous, ".env"), texteEnv([["A", k]]));
+  const rs = garder(synchroniser(sous, "restaurer", { etat: join(b.d, "etat-sous"), profil: b.opt.profil }));
+  if (!/sous le pilot/.test(rs.secrets.fichiers[0].refus || "")) throw new Error("le fichier d'un produit sous le pilot n'est pas refusé : " + JSON.stringify(rs.secrets));
+});
+
+check("D-224 rouge — sans feu vert de publication, rien ne part au coffre ni à la mémoire, et l'ouverture n'écrit que le poste ; remède : le feu vert consigné, l'envoi passe", () => {
+  const [a, c] = [valeur("a"), valeur("c")];
+  const b = bancCoffre({ poste: texteEnv([["A", a]]), coffre: texteEnv([["C", c]]), cles: ["A", "C"], envoi: { actif: false }, memoire: true });
+  ecrire(join(dossierMemoireLocal(b.produit, b.opt.profil), "note.md"), "note du poste\n");
+  if (!garder(synchroniser(b.produit, "pousser", b.opt)).refuse) throw new Error("l'envoi sans feu vert est parti");
+  egal(JSON.stringify(valeursDe(b.envCoffre)), JSON.stringify({ C: c }), "coffre intact");
+  if (existsSync(join(b.memoire, "note.md"))) throw new Error("une note est partie sans feu vert");
+  garder(synchroniser(b.produit, "restaurer", b.opt));
+  egal(JSON.stringify(valeursDe(b.envPoste)), JSON.stringify({ A: a, C: c }), "le poste reçoit C");
+  egal(JSON.stringify(valeursDe(b.envCoffre)), JSON.stringify({ C: c }), "l'ouverture n'écrit pas le coffre");
+  if (!/le coffre et la mémoire ne reçoivent rien/.test(message(verifier(b.produit, b.opt), "RP5"))) throw new Error("RP5 ne dit pas que le coffre et la mémoire attendent");
+  manifeste(b, { envoi: GO });
+  garder(synchroniser(b.produit, "pousser", b.opt));
+  egal(readFileSync(b.envCoffre, "utf8"), readFileSync(b.envPoste, "utf8"), "le coffre reçoit A sous le feu vert");
+  egal(readFileSync(join(b.memoire, "note.md"), "utf8"), "note du poste\n", "la note part sous le feu vert");
+});
+
+check("D-224 rouge — poste neuf : le fichier d'environnement naît du coffre, git ne le voit pas ; un coffre absent dont le parent existe naît au premier envoi (RP3 PASS, RP9 rouge puis vert) ; un coffre introuvable : RP3 FAIL nomme les emplacements", () => {
+  const [a, b2] = [valeur("a"), valeur("b")];
+  const b = bancCoffre({ coffre: texteEnv([["A", a], ["B", b2]]), cles: ["A", "B"] });
+  garder(synchroniser(b.produit, "restaurer", b.opt));
+  egal(JSON.stringify(valeursDe(b.envPoste)), JSON.stringify({ A: a, B: b2 }), "le .env du poste naît du coffre");
+  egal(b.visibles().length, 0, "fichiers non suivis visibles à git status");
+  const c = bancCoffre({ poste: texteEnv([["A", a]]), cles: ["A"] });
+  rmSync(c.coffre, { recursive: true, force: true });
+  const v = garder(verifier(c.produit, c.opt));
+  egal(statutFlux(v, "RP3", "coffre"), "PASS", "RP3 coffre à naître");
+  if (!/naît au premier envoi/.test(messageFlux(v, "RP3", "coffre"))) throw new Error("RP3 ne dit pas que le coffre naît au premier envoi");
+  egal(statut(v, "RP9"), "FAIL", "RP9 : le coffre n'a pas la clé");
+  garder(synchroniser(c.produit, "pousser", c.opt));
+  egal(valeursDe(c.envCoffre).A, a, "le coffre est né avec la clé");
+  egal(statut(verifier(c.produit, c.opt), "RP9"), "PASS", "RP9 après l'envoi");
+  manifeste(c, { secrets: { ...lireBanc(c).secrets, chemins: [join(c.d, "nulle-part", "x", "SECRETS")] } });
+  const v2 = verifier(c.produit, c.opt);
+  egal(statutFlux(v2, "RP3", "coffre"), "FAIL", "RP3 coffre introuvable");
+  if (!/nulle-part/.test(messageFlux(v2, "RP3", "coffre"))) throw new Error("RP3 ne nomme pas l'emplacement essayé");
+});
+
+check("D-224 — un fichier d'environnement écrit avec un BOM (éditeur Windows) se fusionne : sa première clé n'est pas prise pour une ligne mal formée", () => {
+  const [a, c] = [valeur("bom-a"), valeur("bom-c")];
+  const b = bancCoffre({ poste: String.fromCharCode(0xfeff) + texteEnv([["A", a]]), coffre: texteEnv([["C", c]]), cles: ["A", "C"] });
+  const f = garder(synchroniser(b.produit, "restaurer", b.opt)).secrets.fichiers[0];
+  egal(f.refus, undefined, "aucun refus");
+  egal(JSON.stringify(valeursDe(b.envPoste)), JSON.stringify({ A: a, C: c }), "la première clé et la clé du coffre");
+});
+
+check("D-224 — JAMAIS UNE VALEUR : aucune valeur de fixture n'apparaît dans ce que l'outil a rendu (comptes rendus, constats, lignes du hook à l'ouverture et en fin de tour, ligne de commande, refus d'une valeur sur plusieurs lignes, états)", () => {
+  const [s1, s2, s3] = [valeur("s1"), valeur("s2"), valeur("s3")];
+  const b = bancCoffre({ poste: texteEnv([["SECRET_X", s1], ["COMMUN", s3]]), coffre: texteEnv([["SECRET_Y", s2], ["COMMUN", s3]]), cles: ["SECRET_X", "SECRET_Y", "ABSENTE"] });
+  const h1 = hookCoffre(b, "--restaurer");
+  garder(h1.stdout + h1.stderr);
+  if (!/coffre de secrets : \.env : 1 clé\(s\) reçue\(s\) du coffre \(SECRET_Y\)/.test(h1.stdout)) throw new Error("la ligne d'ouverture ne nomme pas la clé reçue : " + h1.stdout);
+  const h2 = hookCoffre(b, "--pousser");
+  garder(h2.stdout + h2.stderr);
+  if (!/1 clé\(s\) envoyée\(s\) au coffre \(SECRET_X\)/.test(h2.stderr)) throw new Error("la ligne de fin de tour ne nomme pas la clé envoyée : " + h2.stderr);
+  const cli = cliOracle(b);
+  garder(cli.stdout + cli.stderr);
+  if (!/ABSENTE/.test(cli.stdout)) throw new Error("le juge en ligne de commande ne nomme pas la clé attendue absente");
+  const suite = valeur("suite");
+  ecrire(b.envPoste, readFileSync(b.envPoste, "utf8") + `MULTI="${valeur("debut")}\n${suite}"\n`);
+  const rm = garder(synchroniser(b.produit, "restaurer", b.opt));
+  if (!/ligne\(s\) \d/.test(rm.secrets.fichiers[0].refus || "")) throw new Error("la valeur sur plusieurs lignes n'est pas refusée par numéro de ligne");
+  garder(verifier(b.produit, b.opt));
+  garder(cliOracle(b, "--restaurer").stdout);
+  for (const nom of readdirSync(b.opt.etat)) if (statSync(join(b.opt.etat, nom)).isFile()) garder(readFileSync(join(b.opt.etat, nom), "utf8"));
+  // la ligne de REFUS du hook sur un conflit sans base : elle nomme la clé et la commande du choix, jamais les deux valeurs
+  const k = bancCoffre({ poste: texteEnv([["JETON", valeur("poste")]]), coffre: texteEnv([["JETON", valeur("coffre")]]), cles: ["JETON"] });
+  const h3 = hookCoffre(k, "--restaurer");
+  garder(h3.stdout + h3.stderr);
+  if (!/\.env : REFUS — .*JETON.*--prefere JETON:poste/.test(h3.stdout)) throw new Error("la ligne d'ouverture ne dit pas le refus du conflit : " + h3.stdout);
+  if (VALEURS.length < 30 || SORTIES.length < 40) throw new Error(`banc trop maigre pour prouver une absence : ${VALEURS.length} valeurs, ${SORTIES.length} sorties`);
+  const fuitesDans = (sorties) => VALEURS.filter((v) => sorties.some((x) => x.includes(v)));
+  // le témoin rouge : une fuite plantée dans une copie des sorties est vue, sans quoi l'absence ne prouverait rien
+  egal(fuitesDans([...SORTIES, `compte rendu ${VALEURS[VALEURS.length - 1]}`]).length, 1, "fuite plantée vue par le détecteur");
+  egal(fuitesDans(SORTIES).length, 0, `valeurs de fixture retrouvées dans les sorties (sur ${VALEURS.length} valeurs et ${SORTIES.length} sorties)`);
+});
+
+console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 9 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7, RP8 et l'envoi refusé), chacun avec son remède vert ; D-224 (a), coffre et mémoire : 9 cas rouges de plus (conflit sans base, fichier non ignoré par git, RP9, RP10, RP1 des sections, garde du coffre, envoi sans feu vert, RP3 et RP4 du coffre et de la mémoire), chacun avec son remède joué, et aucune valeur de fixture dans aucune sortie`);
 process.exit(fail ? 1 : 0);

@@ -12,9 +12,44 @@
  * Il ne porte aucune règle : `oracle-reprise.mjs` décide fichier par fichier. Il ne bloque JAMAIS un
  * tour (exit 0) : un canal absent se dit, il n'empêche pas de travailler. Sans `forge/REPRISE.json`,
  * il se tait — un produit qui n'a pas déclaré de canal n'a rien à reprendre.
+ *
+ * Depuis D-224 (a) du 21/11/2026, il porte aussi les deux autres flux que le manifeste déclare : le coffre de
+ * secrets (`secrets`, clé par clé) et la mémoire Claude du projet (`memoire`). Chaque flux dit sa ligne, par des
+ * NOMS de clés et de fichiers et des comptes, jamais une valeur ; un conflit de valeur sans base se dit avec la
+ * commande du choix, que le hook ne joue jamais à la place de l'humain (garde D-208).
  */
 import { resolve } from "node:path";
 import { synchroniser } from "./oracle-reprise.mjs";
+
+/** La ligne du coffre : noms de clés et comptes seulement. */
+function ligneCoffre(s, sens) {
+  const tete = "[reprise — R-64] coffre de secrets";
+  if (s.erreur) return `${tete} : ${s.erreur}`;
+  if (s.refus) return `${tete} : ${s.refus}`;
+  const parts = [];
+  for (const f of s.fichiers || []) {
+    if (f.absent) continue;
+    if (f.refus) { parts.push(`${f.fichier} : REFUS — ${f.refus}`); continue; }
+    const portees = sens === "restaurer" ? [...f.cles_au_coffre_seul, ...f.pris_du_coffre] : [...f.cles_au_poste_seul, ...f.pris_du_poste];
+    if (f.ecrit && portees.length) parts.push(`${f.fichier} : ${portees.length} clé(s) ${sens === "restaurer" ? "reçue(s) du coffre" : "envoyée(s) au coffre"} (${portees.join(", ")})`);
+    if (f.choix?.length) parts.push(`${f.fichier} : choix explicite appliqué pour ${f.choix.join(", ")}`);
+  }
+  return parts.length ? `${tete} : ${parts.join(" ; ")} — coffre ${s.coffre}` : null;
+}
+
+/** La ligne de la mémoire Claude du projet. */
+function ligneMemoire(x, sens) {
+  const tete = "[reprise — R-64] mémoire Claude";
+  if (x.erreur) return `${tete} : ${x.erreur}`;
+  if (x.refus) return `${tete} : ${x.refus}`;
+  if (!(x.fait.length || x.conflits.length || x.reste || x.exclus.length)) return null;
+  return `${tete} : ${x.fait.length} fichier(s) ${sens === "restaurer" ? "restauré(s)" : "envoyé(s)"}`
+    + (x.unions.length ? `, dont l'index ${x.unions.join(", ")} fusionné ligne à ligne` : "")
+    + (x.conflits.length ? `, ${x.conflits.length} conflit(s), version précédente sauvegardée (${x.conflits[0].sauvegarde})` : "")
+    + (x.reste ? `, ${x.reste} reporté(s) au prochain passage (budget de temps atteint)` : "")
+    + (x.exclus.length ? `, ${x.exclus.length} écarté(s) par les exclusions dures, qui restent sur leur poste (${x.exclus.slice(0, 3).join(", ")})` : "")
+    + ` — ${x.local} (${x.profil}) et ${x.dossier}`;
+}
 
 try { (await import("node:fs")).readFileSync(0, "utf8"); } catch { /* stdin du hook, inutilisé */ }
 const sens = process.argv.includes("--pousser") ? "pousser" : "restaurer";
@@ -44,5 +79,6 @@ else if (r.fait.length || r.conflits.length || r.reste || r.refuses.length || r.
     + (r.regenere?.some((x) => x.ok) ? `, ${r.regenere.filter((x) => x.ok).length} base(s) régénérée(s) (${r.regenere.filter((x) => x.ok).map((x) => x.produit).join(", ")})` : "")
     + (r.regenere?.some((x) => !x.ok) ? `, régénération en échec : ${r.regenere.filter((x) => !x.ok).map((x) => `« ${x.commande} » (${x.detail})`).join(" ; ")}` : "")
     + ` — canal ${r.canal}`;
-if (ligne) (sens === "restaurer" ? process.stdout : process.stderr).write(ligne + "\n");
+const lignes = [ligne, r.secrets ? ligneCoffre(r.secrets, sens) : null, r.memoire ? ligneMemoire(r.memoire, sens) : null].filter(Boolean);
+if (lignes.length) (sens === "restaurer" ? process.stdout : process.stderr).write(lignes.join("\n") + "\n");
 process.exit(0);

@@ -96,9 +96,10 @@ try {
   // TF-2483 : le hook des gestes distants résout la racine de configuration par `scripts/lib-config-installee.mjs`, comme le pilot réel.
   // TF-2410 : le juge de restitution (S145) lit le relevé des personnes de l'accueil des lots, `todo/noms-de-personnes.mjs`.
   // D-219 (e) : le hook des fiches pseudonymise le projet par `todo/anonymiser-entrant.mjs`, qui importe `scripts/lib-confidentiel.mjs` et `scripts/lib-parc.mjs`.
+  // D-224 (a) : le hook de reprise fusionne le coffre de secrets par `scripts/fusionner-env.mjs`, et résout le profil Claude de la mémoire par `scripts/lib-config-installee.mjs`.
   for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs",
     "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs", "scripts/lib-config-installee.mjs", "todo/noms-de-personnes.mjs",
-    "todo/anonymiser-entrant.mjs", "scripts/lib-confidentiel.mjs", "scripts/lib-parc.mjs"]) {
+    "todo/anonymiser-entrant.mjs", "scripts/lib-confidentiel.mjs", "scripts/lib-parc.mjs", "scripts/fusionner-env.mjs"]) {
     mkdirSync(join(copie, dirname(f)), { recursive: true });
     copyFileSync(join(PILOT, f), join(copie, f));
   }
