@@ -264,9 +264,9 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md | 20261110c | 12.7 Ko | `03-etudes/Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
-| Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121d.md | 20261121d | 17.4 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121d.md` |
 | Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121g.md | 20261121g | 15.6 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121g.md` |
 | Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md | 20261121h | 12.7 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md` |
+| Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121k.md | 20261121k | 17.4 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121k.md` |
 | Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md | 20261121b | 13.9 Ko | `03-etudes/Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md` |
 | Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md | 20261115a | 11.7 Ko | `03-etudes/Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
@@ -289,12 +289,12 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md | 20261103b | 6.3 Ko | `03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` |
 | Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
-| Digit-AI - Proposition - Lots du parcours d accueil - 20261121e.md | 20261121e | 6.4 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121e.md` |
 | Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md | 20261121i | 8.1 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` |
+| Digit-AI - Proposition - Lots du parcours d accueil - 20261121l.md | 20261121l | 6.4 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121l.md` |
 | Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md | 20261121j | 6 Ko | `03-etudes/Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md` |
 | Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md | 20261102k | 5.9 Ko | `03-etudes/Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` |
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
-| Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121c.md | 20261121c | 26.1 Ko | `03-etudes/Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121c.md` |
+| Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121m.md | 20261121m | 26.1 Ko | `03-etudes/Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121m.md` |
 | Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md | 20261104a | 53.5 Ko | `03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md` |
 | Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json | — | 10.7 Ko | `03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json` |
 | Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md | 20261103c | 20.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` |
