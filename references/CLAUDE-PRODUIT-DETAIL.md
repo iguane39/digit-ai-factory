@@ -299,11 +299,13 @@ un geste laissé à l'humain : ce qui lui revient, c'est le feu vert, une fois p
 Ensuite, rien ne se copie à la main : le hook `reprise` restaure à l'ouverture ce que le canal
 porte et que ce poste n'a pas, ou a plus ancien, et envoie en fin de tour ce qui a changé hors de
 git. Une action de transport entre postes laissée en `manuelle_utilisateur` alors que ce canal est
-déclaré est refusée à la restitution (S77). Les secrets ne transitent jamais par le canal : ils se
-ressaisissent sur chaque poste. Une base dérivée ignorée par git (`data\*.db`) se déclare à `regenerer`
+déclaré est refusée à la restitution (S77). Les secrets ne transitent jamais par le canal. Ils voyagent
+par le coffre de la section `secrets` du manifeste, fusionnés clé par clé, avec les noms des clés que le
+produit exige (D-224 (a) du 21/11/2026). La section `memoire` porte de même la mémoire Claude du projet.
+Une base dérivée ignorée par git (`data\*.db`) se déclare à `regenerer`
 (`{ commande, produit }`) : la restauration rejoue la commande quand la base manque ou est vide (TF-2680).
 Un `go_publication` du ledger qui nomme un dossier synchronisé alors que le manifeste manque est signalé
-à l'ouverture : la session l'écrit dans le tour (TF-2623). Juge : `node <PILOT_ROOT>\oracles\oracle-reprise.mjs` (RP1 à RP8).
+à l'ouverture : la session l'écrit dans le tour (TF-2623). Juge : `node <PILOT_ROOT>\oracles\oracle-reprise.mjs` (RP1 à RP10).
 
 *Pourquoi cette section existe* : le 14/10/2026, un produit avait déclaré un dossier Google Drive
 de reprise qui contenait les 58 générateurs de ses pages ; une session de l'autre poste les a

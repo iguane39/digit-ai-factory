@@ -91,4 +91,4 @@ jamais en silence. Référence : `<PILOT_ROOT>\oracles\resoudre-pilot.mjs`.
 ## Reprise sur un autre poste (R-64)
 
 **Canal de reprise** : `forge\REPRISE.json` ou `absent — un seul poste`. Plusieurs postes : la session l'écrit d'après
-`<PILOT_ROOT>\gabarits\REPRISE.json` ; le hook `reprise` restaure et envoie ; les secrets ne transitent jamais par lui.
+`<PILOT_ROOT>\gabarits\REPRISE.json` ; le hook `reprise` restaure et envoie ; les secrets ne passent jamais que par son coffre.

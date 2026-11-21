@@ -1,5 +1,5 @@
 {
-  "_commentaire": "Gabarit du pilot (gabarits/REPRISE.json, R-64, TF-1736) : copié en forge/REPRISE.json par la session du produit dès que le développeur dit travailler sur plusieurs postes, ou nomme un dossier synchronisé (Google Drive, OneDrive, Dropbox…) pour reprendre ailleurs. Le hook `reprise` restaure à l'ouverture ce que le canal porte et que ce poste n'a pas, et envoie en fin de tour ce qui a changé hors de git, sous le feu vert consigné. Juge : node <PILOT_ROOT>/oracles/oracle-reprise.mjs (RP1 à RP8). Les secrets ne transitent jamais, quelle que soit la liste.",
+  "_commentaire": "Gabarit du pilot (gabarits/REPRISE.json, R-64, TF-1736) : copié en forge/REPRISE.json par la session du produit dès que le développeur dit travailler sur plusieurs postes, ou nomme un dossier synchronisé (Google Drive, OneDrive, Dropbox…) pour reprendre ailleurs. Le hook `reprise` restaure à l'ouverture ce que le canal porte et que ce poste n'a pas, et envoie en fin de tour ce qui a changé hors de git, sous le feu vert consigné. Juge : node <PILOT_ROOT>/oracles/oracle-reprise.mjs (RP1 à RP10). Les secrets ne transitent jamais par le canal, quelle que soit la liste « elements » : ils voyagent par le coffre de la section « secrets », et la mémoire Claude du projet par la section « memoire » (D-224 (a) du 21/11/2026).",
   "_regle_renommage": "Un dossier IGNORÉ par git qui change de nom GARDE son ancien chemin dans .gitignore (TF-2441, RT-150) : le canal le porte encore sous l'ancien nom, et une restauration le poserait là, commitable. Le hook de restauration refuse de poser un fichier que git ni n'ignore ni ne suit ; RP6 le dit et nomme les dossiers à couvrir. Retirer l'orphelin du canal reste un geste humain consigné.",
   "schema": "factory/reprise@1",
   "canal": {
@@ -16,6 +16,22 @@
   "exclusions": [],
   "_regenerer": "Une base dérivée, ignorée par git et absente du canal (data/catalogue.db, *.sqlite) ne voyage nulle part : la restauration rejoue sa commande, depuis la racine du produit, quand le fichier manque ou est vide (TF-2680). RP8 la juge et signale toute base ignorée que rien ne couvre : elle se copie (« elements »), se régénère (ici) ou s'écarte à dessein (« exclusions »).",
   "regenerer": [],
+  "_secrets": "Le COFFRE de secrets (D-224 (a) du 21/11/2026, R-64 point 4) : chaque fichier d'environnement de « fichiers » se fusionne clé par clé avec sa copie du coffre, vers ce poste à l'ouverture, vers le coffre en fin de tour sous le feu vert d'« envoi ». « chemins » : l'emplacement du coffre sur chaque poste, à côté du canal ; le nom SECRETS l'exclut du canal, et RP10 le juge. « cles_attendues » : les NOMS des clés que le produit exige, jamais une valeur ; RP9 rend FAIL dès qu'une manque au poste ou au coffre. Deux valeurs différentes se tranchent par la dernière synchronisation de ce poste ; sans elle, le fichier est refusé jusqu'au choix explicite : node <PILOT_ROOT>/oracles/oracle-reprise.mjs --restaurer --prefere CLE:poste (ou CLE:coffre). Le fichier du poste doit être ignoré par git. Un produit sans fichier d'environnement retire la section.",
+  "secrets": {
+    "fichiers": [".env"],
+    "chemins": [
+      "<emplacement du coffre sur le premier poste, ex. G:/Mon Drive/<Produit> - Reprise/SECRETS>",
+      "<emplacement sur l'autre poste, ex. ~/Google Drive/<Produit> - Reprise/SECRETS>"
+    ],
+    "cles_attendues": ["<NOM d'une clé que le produit exige, ex. API_TOKEN>"]
+  },
+  "_memoire": "La mémoire Claude du projet (D-224 (a)) : <profil>/projects/<racine du produit, non alphanumériques en « - »>/memory, le profil étant celui de la session (CLAUDE_CONFIG_DIR, sinon ~/.claude). Elle se synchronise fichier par fichier avec ce dossier, par la règle du canal et sous le même feu vert ; l'index MEMORY.md en conflit prend l'union de ses lignes. Un poste à deux profils : chacun se synchronise quand une de ses sessions s'ouvre ou finit un tour. Retirer la section pour garder la mémoire propre à chaque poste.",
+  "memoire": {
+    "chemins": [
+      "<emplacement sur le premier poste, ex. G:/Mon Drive/<Produit> - Reprise/MEMOIRE-CLAUDE>",
+      "<emplacement sur l'autre poste, ex. ~/Google Drive/<Produit> - Reprise/MEMOIRE-CLAUDE>"
+    ]
+  },
   "envoi": {
     "actif": false,
     "go_publication": {

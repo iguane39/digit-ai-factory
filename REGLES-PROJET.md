@@ -1917,25 +1917,42 @@ critique pour le travail des développeurs, leur efficacité, résilience. »
    le feu vert humain consigné au manifeste (`envoi.go_publication` : décision, date, auteur), donné
    une fois par produit. Sans lui, la restauration joue seule.
 4. **Un secret ne transite jamais par le canal**, dans aucun sens et quelle que soit la liste du
-   manifeste (garde-fou « les .env ne transitent jamais ») : il se ressaisit sur chaque poste.
-   **Exception écrite (D-208 (a) du porteur, 12/11/2026, TF-2440)** : la sauvegarde qu'un développeur
-   fait de SES PROPRES fichiers de secrets, hors du canal de reprise, est permise. Elle passe par
-   `forge\fusionner-env.mjs` (copie conforme de `scripts\fusionner-env.mjs`), qui fusionne clé par clé,
-   refuse toute copie qui perdrait une clé, refuse un conflit de valeur sans choix explicite, exige un
-   fichier de poste ignoré par git et n'imprime jamais une valeur. Le canal de reprise lui-même reste
-   fermé aux secrets : RP2 d'`oracle-reprise` les refuse toujours au manifeste.
+   manifeste (garde-fou « les .env ne transitent jamais ») : RP2 d'`oracle-reprise` refuse toujours un
+   secret dans `elements`. **Il voyage par le coffre du pilot (D-224 (a) du porteur, 21/11/2026).** La
+   section `secrets` du manifeste nomme les fichiers d'environnement du produit, l'emplacement du coffre
+   sur chaque poste (`<Produit> - Reprise\SECRETS`, à côté du canal et jamais dans ce qu'il copie : RP10)
+   et les NOMS des clés que le produit exige (`cles_attendues`), jamais une valeur. Le hook `reprise`
+   fusionne chaque fichier clé par clé avec sa copie du coffre, par `fusionner()` de
+   `scripts\fusionner-env.mjs`. L'ouverture écrit le poste ; la fin de tour écrit le coffre, sous le feu
+   vert du point 3. Aucune clé ne se perd. Deux valeurs différentes se tranchent par l'empreinte de
+   chaque valeur à la dernière synchronisation de ce poste. Sans base qui tranche, le fichier est refusé
+   et ses clés nommées, jusqu'au choix explicite (`--prefere`), car aucun conflit ne se tranche sans
+   choix. Le fichier du poste est ignoré par git et ne vit jamais sous le pilot ; aucune sortie ne porte
+   une valeur. RP9 rend FAIL dès qu'une clé attendue manque au poste ou au coffre, même quand les deux
+   copies sont égales. Une section `memoire` porte de même la mémoire Claude du projet (dossier
+   `MEMOIRE-CLAUDE`, fichier par fichier, règle du point 2).
+   **Cette voie remplace l'exception D-208 (a) du 12/11/2026 (TF-2440)**, qui laissait chaque produit
+   sauvegarder lui-même ses fichiers de secrets par `forge\fusionner-env.mjs`. Le diagnostic 20261121c,
+   rangé sous `output\03-etudes\`, en a mesuré l'effet, 4 mécanismes maison, 9 fichiers de secrets sur 13
+   tenus par aucun script, et un coffre incomplet dont le contrôle rendait PASS. Les produits migrent un
+   par un vers la section `secrets` ; `forge\fusionner-env.mjs` reste leur geste à la main, et leurs
+   scripts maison se retirent à la migration.
 5. **Une action de transport entre postes ne se laisse pas à l'humain** quand un canal est déclaré :
-   ce qui lui reste, c'est le feu vert, pas la copie.
+   ce qui lui reste, c'est le feu vert, et pour un secret le choix d'une valeur en conflit sans base,
+   jamais la copie.
 
 Contrôles exécutables : `oracles\oracle-reprise.mjs` (RP1 manifeste valide, RP2 aucun secret déclaré,
 RP3 canal joignable sur ce poste, RP4 aucun écart non restauré, RP5 envoi actif sous feu vert
 consigné, RP6 rien de ce que le canal poserait n'est commitable : un dossier ignoré puis renommé garde son
-ancien chemin dans `.gitignore`, TF-2441 ; RP7 un feu vert de publication au ledger qui vise un dossier synchronisé a son manifeste, TF-2623 ; RP8 une base dérivée ignorée par git est copiée, régénérée ou écartée à dessein, TF-2680 ; recette `oracle-reprise.test.mjs`, 18 cas, dont le cas du 14/10 rejoué, celui du 12/11 et celui du 15/11) ; `oracles\hook-reprise.mjs`,
+ancien chemin dans `.gitignore`, TF-2441 ; RP7 un feu vert de publication au ledger qui vise un dossier synchronisé a son manifeste, TF-2623 ; RP8 une base dérivée ignorée par git est copiée, régénérée ou écartée à dessein, TF-2680 ; RP9 chaque clé attendue est présente et non vide au poste et au coffre, et RP10 le coffre et la mémoire sont hors du périmètre que le canal copie, D-224 (a) ; avec un coffre ou une mémoire déclarés, RP3, RP4 et RP6 les jugent aussi ; recette `oracle-reprise.test.mjs`, 32 cas, dont le cas du 14/10 rejoué, celui du 12/11, celui du 15/11 et celui du coffre incomplet du 20/11) ; `oracles\hook-reprise.mjs`,
 câblé par `gabarits\settings-produit.json` et exigé par `gabarits\HERITAGE.json` 1.26.0, et ajouté par le hook d'ouverture du produit depuis le gabarit (recette
 `gabarits\hooks-factory.test.mjs`, cas 12) ; la règle S77 d'`oracles\oracle-synthese.mjs` (point 5).
-Non jugé : une suppression ne se propage pas ; deux écritures du même fichier entre deux
-synchronisations ne se fusionnent pas, l'une reste en sauvegarde ; le pilot lui-même, dont la reprise
-passe par git et `scripts\rebatir-clone.mjs`, n'est pas concerné.
+Non jugé : une suppression ne se propage pas, une clé de secret comprise ; deux écritures du même
+fichier entre deux synchronisations ne se fusionnent pas, l'une reste en sauvegarde, sauf l'index
+`MEMORY.md` de la mémoire, qui prend l'union de ses lignes ; la validité d'un secret, que seule l'API
+qui le reçoit juge ; un fichier d'identifiants désigné par une variable d'environnement, qui n'est pas un
+fichier d'environnement et ne voyage pas par le coffre ; le pilot lui-même, dont la reprise passe par git
+et `scripts\rebatir-clone.mjs`, n'est pas concerné.
 
 ## AT. R-65 — une base hors production peut recevoir un extrait de production, s'il est anonymisé et jugé (TF-2011 — 29/10/2026)
 
