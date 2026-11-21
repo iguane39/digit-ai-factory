@@ -1,179 +1,159 @@
 {
  "outil": "generer-recidives",
- "etat_au": "2026-10-30T17:13:35.004Z",
- "items": 2033,
- "items_classes": 1049,
- "recidives": 517,
- "classes": 186,
+ "etat_au": "2026-11-16T21:24:38.037Z",
+ "items": 2692,
+ "items_classes": 1663,
+ "recidives": 694,
+ "classes": 329,
  "familles": 18,
  "classes_sans_fondateur": 23,
- "retours_classe_suspecte": 88,
- "releves": 247,
+ "retours_classe_suspecte": 89,
+ "releves": 295,
  "produits_releves": 0,
  "produits_non_equipes": 0,
  "manques_heritage": 0,
- "couples_non_atteints": 508,
- "produits_en_retard": 19,
- "stock_candidats": 11,
- "stock_decides_non_clos": 62,
- "items_ouverts_vieux": 56,
- "sources_silencieuses": 39,
+ "couples_non_atteints": 660,
+ "produits_en_retard": 23,
+ "stock_candidats": 18,
+ "stock_decides_non_clos": 85,
+ "items_ouverts_vieux": 73,
+ "sources_silencieuses": 34,
  "sources_muettes": [
   {
    "source": "pilot-campagne-fiches-html",
-   "silence": 82
+   "silence": 99
   },
   {
    "source": "COMPTA - Ventilation de facture Fournisseur-A",
-   "silence": 77
+   "silence": 94
   },
   {
    "source": "BdL",
-   "silence": 76
+   "silence": 93
   },
   {
    "source": "digit-desk.fr",
-   "silence": 76
+   "silence": 93
   },
   {
    "source": "forge-digit-ai-fr",
-   "silence": 76
+   "silence": 93
   },
   {
    "source": "Produit-09",
-   "silence": 71
+   "silence": 88
   },
   {
    "source": "digit-ai-fr",
-   "silence": 69
+   "silence": 86
   },
   {
    "source": "Produit-10",
-   "silence": 67
-  },
-  {
-   "source": "factory-digit-ai-fr",
-   "silence": 66
+   "silence": 84
   },
   {
    "source": "Produit-01",
-   "silence": 64
+   "silence": 81
   },
   {
    "source": "Produit-04",
-   "silence": 64
+   "silence": 81
   },
   {
    "source": "Produit-05",
-   "silence": 60
+   "silence": 77
   },
   {
    "source": "Produit-65",
-   "silence": 57
+   "silence": 74
   },
   {
    "source": "digit-ai-forge-tests",
-   "silence": 55
+   "silence": 72
   },
   {
    "source": "digit-ai-forge-conception",
-   "silence": 54
+   "silence": 71
   },
   {
    "source": "produits-anciens",
-   "silence": 54
+   "silence": 71
   },
   {
    "source": "Produit-61",
-   "silence": 51
+   "silence": 68
   },
   {
    "source": "digit-ai-forge-agents",
-   "silence": 48
+   "silence": 65
   },
   {
    "source": "digit-ai-forge-design",
-   "silence": 48
+   "silence": 65
   },
   {
    "source": "digit-ai-forge-development",
-   "silence": 48
+   "silence": 65
   },
   {
    "source": "Produit-11",
-   "silence": 46
+   "silence": 63
   },
   {
    "source": "Produit-62",
-   "silence": 39
+   "silence": 56
   },
   {
    "source": "Produit-67",
-   "silence": 38
+   "silence": 55
   },
   {
    "source": "Produit-70",
-   "silence": 36
+   "silence": 53
   },
   {
    "source": "Produit-72",
-   "silence": 36
+   "silence": 53
   },
   {
    "source": "Produit-77",
-   "silence": 35
+   "silence": 52
   },
   {
    "source": "Produit-68",
-   "silence": 33
+   "silence": 50
   },
   {
    "source": "digit-ai-prospection",
-   "silence": 32
+   "silence": 49
   },
   {
    "source": "Produit-76",
-   "silence": 32
+   "silence": 49
   },
   {
    "source": "Produit-78",
-   "silence": 32
-  },
-  {
-   "source": "digit-ai-marketing",
-   "silence": 30
+   "silence": 49
   },
   {
    "source": "Produit-80",
-   "silence": 18
-  },
-  {
-   "source": "Produit-81",
-   "silence": 17
-  },
-  {
-   "source": "Produit-82",
-   "silence": 15
+   "silence": 35
   },
   {
    "source": "Produit-83",
-   "silence": 15
+   "silence": 32
   },
   {
    "source": "Produit-12",
-   "silence": 12
-  },
-  {
-   "source": "Produit-02",
-   "silence": 11
+   "silence": 29
   },
   {
    "source": "Produit-03",
-   "silence": 10
+   "silence": 27
   },
   {
-   "source": "Produit-79",
-   "silence": 10
+   "source": "Produit-73",
+   "silence": 21
   }
  ],
  "seuil_jours": 7,
