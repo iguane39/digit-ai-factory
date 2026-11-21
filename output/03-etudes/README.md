@@ -114,6 +114,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note - Essais de Codex et Gemini en ligne de commande - 20261121e.md` | fichier | 5,4 Ko | Essais de Codex et Gemini en ligne de commande |
 | `Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` | fichier | 8,3 Ko | Note — Harvey comparé à digit-ai-prospection |
 | `Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` | fichier | 9,1 Ko | Refine de Prime Agent contre oeil-critique — 20261102r |
+| `Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121o.md` | fichier | 4,9 Ko | Relais de Claude, Codex et Antigravity |
 | `Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` | fichier | 8,1 Ko | Démarche ROI — Parcours d'accueil des nouveaux utilisateurs, version intégrée — 20261121i |
 | `Digit-AI - Proposition - Lots du parcours d accueil - 20261121l.md` | fichier | 6,4 Ko | Démarche ROI — Parcours d'accueil des nouveaux utilisateurs — 20261121e |
 | `Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md` | fichier | 6,0 Ko | Banc du Plan Mode dans ce harnais — 20261121j |
@@ -139,4 +140,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_119 fichier(s), 3 sous-dossier(s)_
+_120 fichier(s), 3 sous-dossier(s)_
