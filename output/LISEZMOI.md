@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 742 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 743 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -289,6 +289,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md | 20261103a | 6 Ko | `03-etudes/Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md` |
 | Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md | 20261102g | 3.9 Ko | `03-etudes/Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` |
 | Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md | 20261103b | 6.3 Ko | `03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` |
+| Digit-AI - Note - Essais d Antigravity en ligne de commande - 20261121f.md | 20261121f | 4.5 Ko | `03-etudes/Digit-AI - Note - Essais d Antigravity en ligne de commande - 20261121f.md` |
 | Digit-AI - Note - Essais de Codex et Gemini en ligne de commande - 20261121e.md | 20261121e | 5.4 Ko | `03-etudes/Digit-AI - Note - Essais de Codex et Gemini en ligne de commande - 20261121e.md` |
 | Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
