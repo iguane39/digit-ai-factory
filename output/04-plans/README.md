@@ -178,6 +178,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Ouverture session correctif arrete - 20261013a.md` | fichier | 9,9 Ko | Synthèse Mandat — correctif d'ouverture arrêté sur une base qui a bougé, 2 candidatures in |
 | `Digit-AI - Synthese Mandat - Ouverture session reparee chez 19 produits - 20261013c.md` | fichier | 9,3 Ko | Synthèse Mandat — ouverture de session VS Code : correctif repris, propagé aux 19 produits |
 | `Digit-AI - Synthese Mandat - Parc et Drive synchronises - 20261115e.md` | fichier | 5,7 Ko | Synthèse Mandat — parc aligné sur GitHub, sauvegardes Drive vérifiées (15/11/2026) |
+| `Digit-AI - Synthese Mandat - Parc et Drive synchronises - 20261121b.md` | fichier | 7,5 Ko | Synthèse Mandat — parc aligné sur GitHub, miroir Drive du pilot à jour (21/11/2026) |
 | `Digit-AI - Synthese Mandat - Pilot pousse sur GitHub - 20261026u.md` | fichier | 2,5 Ko | Synthèse Mandat — pilot poussé sur GitHub, aligné à 17:15 (26/10/2026) |
 | `Digit-AI - Synthese Mandat - Pilot publie apres reconstruction - 20261016k.md` | fichier | 5,6 Ko | Synthèse Mandat — pilot publié après reconstruction sur le distant, décision « 2a » exécut |
 | `Digit-AI - Synthese Mandat - Pilot publie T2 en cours - 20261026p.md` | fichier | 3,6 Ko | Synthèse Mandat — A-1 en partie, A-2 en attente : pilot publié avec trois chantiers, T2 en |
@@ -256,4 +257,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_235 fichier(s), 4 sous-dossier(s)_
+_236 fichier(s), 4 sous-dossier(s)_
