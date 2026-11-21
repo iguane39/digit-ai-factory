@@ -224,3 +224,5 @@
 {"type":"reponse","n":224,"lettres":["a"],"date":"2026-11-21","ts":"2026-11-21T11:20:56.064Z","session":"c45421a3","session_source":"heritee_possible","origine":"hook-lexique"}
 {"type":"reponse","n":225,"lettres":["a"],"date":"2026-11-21","ts":"2026-11-21T11:20:56.068Z","session":"c45421a3","session_source":"heritee_possible","origine":"hook-lexique"}
 {"type":"decision","n":226,"question":"Pendant les essais de Codex et Gemini, la session peut-elle lancer elle-même codex exec et gemini -p sur vos abonnements ?","date":"2026-11-21","ts":"2026-11-21T11:42:39.948Z","session":"6582337c","session_source":"session_start","origine":"reservation"}
+{"type":"reponse","n":226,"lettres":["a"],"date":"2026-11-21","ts":"2026-11-21T11:50:31.018Z","session":"6582337c","session_source":"heritee_possible","origine":"hook-lexique"}
+{"type":"decision","n":227,"question":"Google refusant Gemini CLI pour un compte personnel, faut-il installer à sa place Antigravity CLI (agy.exe) sur ce poste ?","date":"2026-11-21","ts":"2026-11-21T12:11:38.756Z","session":"6582337c","session_source":"session_start","origine":"reservation"}
