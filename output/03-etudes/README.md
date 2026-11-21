@@ -66,6 +66,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` | fichier | 31,8 Ko | Diagnostic de la Factory — œil critique, proposition révisée (20/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
+| `Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md` | fichier | 12,7 Ko | Diagnostic d'exploitation — sauvegardes Drive des produits — 20261121c |
 | `Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md` | fichier | 8,9 Ko | Diagnostic Factory — Sessions concurrentes sur forge-digit-ai-fr — 20261114b |
 | `Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md` | fichier | 31,5 Ko | Étude d'opportunité — Amélioration continue des agents par leurs leçons — 20261114d |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 7,7 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
@@ -126,4 +127,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_106 fichier(s), 3 sous-dossier(s)_
+_107 fichier(s), 3 sous-dossier(s)_
