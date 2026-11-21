@@ -173,6 +173,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` | fichier | 10,8 Ko | Synthèse Mandat — prompt « retravaille la cible » analysé : contrôles par forge et par cap |
 | `Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` | fichier | 5,0 Ko | Synthèse Mandat — les 18 gabarits de lecture tiennent la règle de largeur, D-154 exécutée  |
 | `Digit-AI - Synthese Mandat - Lot de retours Produit-86 du 12-11 traite - 20261113f.md` | fichier | 7,8 Ko | Synthèse Mandat — lot de retours Produit-86 du 12/11 traité, oracle-dast 0.3.0, 13/11/2026 |
+| `Digit-AI - Synthese Mandat - Lots refuses remontes et fusion des postes - 20261121p.md` | fichier | 7,1 Ko | Synthèse Mandat — A3 (lots refusés remontés au producteur) et A4 (publication après fusion |
 | `Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` | fichier | 7,4 Ko | Synthèse Mandat — votre décision D-57 (a) est exécutée : les 2 lots de Produit-02 sont ent |
 | `Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` | fichier | 6,5 Ko | Synthèse Mandat — mode « L99 boucle » construit, publié et exercé une première fois (16/10 |
 | `Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md` | fichier | 3,2 Ko | Synthèse Mandat — moment de la revue de code dans la mise en production (03/11/2026) |
@@ -269,4 +270,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_248 fichier(s), 4 sous-dossier(s)_
+_249 fichier(s), 4 sous-dossier(s)_
