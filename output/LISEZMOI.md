@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 726 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 727 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -528,6 +528,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte - 20260910h.md | 20260910h | 20 Ko | `04-plans/2026-09/Digit-AI - Synthese Mandat - Vos deux decisions executees clone rebati porte - 20260910h.md` |
 | Digit-AI - Synthese Mandat - Vues sorties du suivi et regle ecriture nombres - 20260916d.md | 20260916d | 11.9 Ko | `04-plans/2026-09/Digit-AI - Synthese Mandat - Vues sorties du suivi et regle ecriture nombres - 20260916d.md` |
 | Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md | 20260919f | 17.7 Ko | `04-plans/2026-09/Digit-AI - Synthese Video - Film de 25 secondes sur depot factory rendu local - 20260919f.md` |
+| Digit-AI - Dossier - Mise a jour des competences - 20261121l.md | 20261121l | 72.4 Ko | `04-plans/Digit-AI - Dossier - Mise a jour des competences - 20261121l.md` |
 | Digit-AI - Fiche - Produit plateforme de pentest autorise a construire pour Client-A - 20261103a.md | 20261103a | 14.6 Ko | `04-plans/Digit-AI - Fiche - Produit plateforme de pentest autorise a construire pour Client-A - 20261103a.md` |
 | Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md | 20261020l | 14.7 Ko | `04-plans/Digit-AI - Note - Oeil critique des process a travailler - 20261020l.md` |
 | Digit-AI - Prompt - Activation du releve des couts chez un produit - 20261105h.md | 20261105h | 2 Ko | `04-plans/Digit-AI - Prompt - Activation du releve des couts chez un produit - 20261105h.md` |
