@@ -246,7 +246,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md | 20261020c | 31.8 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md | 20261021a | 48.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
-| Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md | 20261121c | 12.7 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md` |
+| Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md | 20261121c | 12.8 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md` |
 | Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md | 20261114b | 8.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md` |
 | Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md | 20261114d | 31.5 Ko | `03-etudes/Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md | 20261029f | 7.7 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` |
