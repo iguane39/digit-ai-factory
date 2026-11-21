@@ -4270,6 +4270,28 @@
    ],
    "regle": "Retour de produit du 15/11/2026 : Le 28e lot d'un jour n'a aucun nom que l'allocateur et le juge de lot acceptent.",
    "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — porteur à outiller"
+  },
+  {
+   "cle": "competence-non-mise-a-jour-par-retours-ni-veille",
+   "famille": "donnees-perissables-en-dur",
+   "libelle": "Une compétence (corpus d'expert, référentiel, skill) ne reçoit ni les constats des produits ni la veille de sa source d'autorité : elle se périme sans signal.",
+   "creee_le": "2026-11-21",
+   "fondee_par": [
+    "TF-2743"
+   ],
+   "regle": "Plan de mise à jour des compétences du 21/11/2026 : 121 constats réutilisables de 10 produits absents des compétences, corpus AWS périmé depuis la fermeture d'App Runner aux nouveaux clients, 4 corpus sans source.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — oracle-peremption-competences, à créer au lot L-01"
+  },
+  {
+   "cle": "lot-remis-sans-sections-exigees",
+   "famille": "lot-forme",
+   "libelle": "Un lot de retours est remis sans les sections que la porte du pilot exige (« Remarques restées au produit », « Retours sur les documents produits »), et la porte le refuse en bloc.",
+   "creee_le": "2026-11-21",
+   "fondee_par": [
+    "TF-2762"
+   ],
+   "regle": "Ingestion du 21/11/2026 : 2 lots (Produit-02, Produit-85) refusés au motif de ces 2 sections absentes, en attente depuis 19 et 24 jours.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — oracle-lot côté produit, avant la remise"
   }
  ],
  "cliquet_porteur": {
