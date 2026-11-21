@@ -29,7 +29,7 @@ Aucune décision nouvelle : le lancement de chaque lot reste le GO prévu par le
 - D-221 : rouvrir l'exclusion « Pas de vidéo » du run d'animation de réseau pour les clips jugés, posée le 16/11 à 15:06, inchangée.
 - D-222 : enchaîner sans les reposer les étapes d'un plan déjà validé, posée le 16/11 à 15:06, inchangée.
 - D-223 : fusionner les fichiers .env d'un produit avec un coffre sur Drive, posée le 16/11 à 15:06, inchangée.
-- D-227 : suivre la veille des notes de version des éditeurs dans le plan de mise à jour des compétences, posée le 21/11 à 11:23 par une autre session, inchangée.
+- D-228 : suivre la veille des notes de version des éditeurs dans le plan de mise à jour des compétences, posée le 21/11 à 11:23 par une autre session, inchangée.
 
 ## 4. Traité
 

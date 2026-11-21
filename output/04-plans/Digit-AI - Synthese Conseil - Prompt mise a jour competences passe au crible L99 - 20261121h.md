@@ -20,7 +20,7 @@ Prompt d'origine : 24/100 (4 bloquants, 11 majeurs). Prompt retenu : 82/100 mesu
 
 ## 3. Décisions attendues
 
-> **D-227 — Le plan de mise à jour des compétences doit-il aussi suivre la veille des notes de version des éditeurs, en plus des retours des produits ?**
+> **D-228 — Le plan de mise à jour des compétences doit-il aussi suivre la veille des notes de version des éditeurs, en plus des retours des produits ?**
 > - **De quoi s'agit-il** : la source des nouveautés que le plan fera entrer dans les compétences. Votre demande vise les informations reçues des projets ; un éditeur (Cloudflare, Beds24) change pourtant sa plateforme avant qu'un produit le voie.
 > - **Le problème** : sans veille, une compétence technique n'est révisée qu'après qu'un produit a buté sur le changement ; avec elle, le plan ajoute une source et un coût de relecture que vous n'avez pas demandés.
 > - **Pourquoi vous** : c'est un contenu ajouté au livrable, hors de la lettre de la demande, et un arbitrage de périmètre.
@@ -47,7 +47,7 @@ Rappel des trois questions déjà posées au registre et toujours sans réponse,
 - Journal de boucle écrit à côté de la revue ; `oracle-boucle-l99.mjs` PASS.
 - Conformité R-4 et R-25 rejouée : 0 constat sur la revue. Un indice partagé avec un livrable d'une autre session, déposé avant, a été levé en prenant l'indice « g » alloué par `allouer-indice.mjs --dossier output/04-plans`.
 - Index d'`output/` régénéré par `readme-dossiers.mjs` (exit 0).
-- D-227 réservée au registre par `reserver-decision.mjs` (PASS).
+- D-228 réservée au registre par `reserver-decision.mjs` (PASS).
 
 Relecture d'intention : sert — les trois exigences de la demande (générique sur les trois types, rattrapage de chaque produit, plan) sont chacune portée par une étape du prompt, vérifiée par la relecture aveugle.
 
@@ -73,8 +73,8 @@ Trois actions restent, et seule la première vous revient. Le tableau se lit dan
 
 | Sélecteur | Action | Identifiant | Acteur | Motif de non-exécution | Chemin ou commande | Coût de ne pas la faire |
 |---|---|---|---|---|---|---|
-| A-1 | Répondre à D-227 par sa lettre (« 227b », par exemple) | neuve | manuelle_utilisateur | decision : arbitrage de périmètre, qui vous revient | `decisions/REGISTRE.jsonl`, entrée D-227 ; répondre dans cette session « 227a », « 227b » ou « 227c » | si rien n'est fait, le plan ne lira que les retours des produits |
-| A-2 | Jouer le prompt livré dans une session ouverte au pilot | neuve | auto_ia | dependance_bloc_3 : attend la réponse à D-227, puis votre GO | section « Prompt réécrit » de la revue | si on ne le fait pas, les compétences restent sans circuit de mise à jour |
+| A-1 | Répondre à D-228 par sa lettre (« 228b », par exemple) | neuve | manuelle_utilisateur | decision : arbitrage de périmètre, qui vous revient | `decisions/REGISTRE.jsonl`, entrée D-228 ; répondre dans cette session « 228a », « 228b » ou « 228c » | si rien n'est fait, le plan ne lira que les retours des produits |
+| A-2 | Jouer le prompt livré dans une session ouverte au pilot | neuve | auto_ia | dependance_bloc_3 : attend la réponse à D-228, puis votre GO | section « Prompt réécrit » de la revue | si on ne le fait pas, les compétences restent sans circuit de mise à jour |
 | A-3 | Enregistrer la revue et son journal dans git | neuve | auto_ia | gate_gouvernance : aucun enregistrement demandé dans ce tour | `git commit --only -- "output/04-plans/Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md"*` | à défaut, la revue reste locale et l'ouverture suivante la signalera non enregistrée |
 
 Ordre : A-1 d'abord, parce qu'elle fixe une ligne du prompt ; A-2 ensuite ; A-3 indépendante.
@@ -83,6 +83,6 @@ Ordre : A-1 d'abord, parce qu'elle fixe une ligne du prompt ; A-2 ensuite ; A-3 
 
 - `output/04-plans/Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md`
 - `output/04-plans/Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md.boucle.json`
-- `decisions/REGISTRE.jsonl` (D-227)
+- `decisions/REGISTRE.jsonl` (D-228)
 - `output/04-plans/Digit-AI - Synthese Conseil - Prompt mise a jour competences passe au crible L99 - 20261121h.md` (cette synthèse, déposée)
 - passes, différences et jugements dans le dossier temporaire de la session, sous `l99/`

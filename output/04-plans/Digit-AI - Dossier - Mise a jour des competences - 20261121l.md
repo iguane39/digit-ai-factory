@@ -10,7 +10,7 @@ Les compétences de la Factory ne suivent pas ce que les produits apprennent, et
 - **Une compétence est périmée.** AWS ne prend plus de nouveaux clients sur App Runner, que notre corpus présente comme le service canonique (page lue le 21/11/2026).
 - **Une trentaine de compétences manquent.** Les plus récurrentes : le poste Windows et Git Bash (4 sources), Beds24 et Stripe, Google Ads et la mesure, le courriel, l'API Claude.
 - **Le circuit n'existe pas.** Aucun retour ne nomme la compétence qu'il touche, et aucune source n'a de date de péremption. La surveillance est 1 oracle avertissant.
-- **Le plan propose 4 mécanismes contrôlés, dont 3 contrôles à créer, et 18 lots.** Une décision vous revient : D-228, péremption bloquante ou avertissante.
+- **Le plan propose 4 mécanismes contrôlés, dont 3 contrôles à créer, et 18 lots.** Une décision vous revient : D-229, péremption bloquante ou avertissante.
 - **14 produits restent à collecter sur l'autre poste.**
 
 ## 2. Prérequis mesurés
@@ -144,7 +144,7 @@ Le circuit tient en quatre temps, et chacun nomme le contrôle qui le fait tenir
 
 1. **Capter.**
    - Retours des produits : une classe `competence-a-mettre-a-jour` à créer au registre des classes (`todo/CLASSES.json`), et un champ `competence` du sidecar de lot (étiquette du registre des compétences, ou « absente : <domaine> ») à créer. **Contrôle à créer** : l'oracle de lot refuse un constat de classe `competence-a-mettre-a-jour` sans ce champ.
-   - Veille de la source d'autorité, décidée par D-227 (a) pour les trois types : une sonde de forge-observability (`node scripts/observer.mjs <plan.json>`, sonde `commande`, contrôle **existant**) joue chaque semaine le contrôle de péremption, et sa dérive (`scripts/derive.mjs`, **existant**) signale toute compétence qui passe au-delà de sa durée.
+   - Veille de la source d'autorité, décidée par D-228 (a) pour les trois types : une sonde de forge-observability (`node scripts/observer.mjs <plan.json>`, sonde `commande`, contrôle **existant**) joue chaque semaine le contrôle de péremption, et sa dérive (`scripts/derive.mjs`, **existant**) signale toute compétence qui passe au-delà de sa durée.
 2. **Router.** Le constat entre au registre en candidat par l'ingestion (`todo/ingerer-lot.mjs`, **existant**), sous le mode opératoire de `references/TODO-FORGE.md`. La forge porteuse se lit au registre des compétences, une donnée datée au sens de la loi 4 (une donnée volatile vit éditable, datée, sourcée) : `references/COMPETENCES.json` au pilot, à créer, une entrée par ligne de la section 3 (type, artefacts, forges, durée, `verifie_le`). **Contrôle à créer** : chaque entrée nomme des artefacts qui existent et une forge porteuse connue de `bootstrap`.
 3. **Mettre à jour**, un geste par événement :
    - complément : ajout daté, avec sa source ;
@@ -153,7 +153,7 @@ Le circuit tient en quatre temps, et chacun nomme le contrôle qui le fait tenir
    - création : admission `experts-forge` par la comparaison avec et sans l'expert (**existant**, `references/schema-fiche-expert.md`).
 
    Un identifiant qui bouge embarque sa table de correspondance (`CONTRAT-INTERFACE.md` §3 bis, **existant**). **Contrôle à créer** : chaque corpus porte une date `verifie_le`, au moins une adresse de source datée, et chaque entrée dépréciée sa date et son remplaçant. Le contrôle des réglages de plateforme (`scripts/oracle-reglages-corpus.mjs`, **existant**) et le test de dates du référentiel Cloudflare de forge-seo-geo (**existant**) en sont les modèles.
-4. **Surveiller.** **Contrôle à créer** : `oracle-peremption-competences`, qui lit le registre des compétences et rend rouge, ou seulement averti selon D-228, chaque compétence dont `verifie_le` dépasse la durée de son type. **Existant**, il le complète : la dormance de `oracle-etat-forge` (F5, avertissement après 6 mois sans usage) et les statuts `dormant` et `broken` du registre des experts.
+4. **Surveiller.** **Contrôle à créer** : `oracle-peremption-competences`, qui lit le registre des compétences et rend rouge, ou seulement averti selon D-229, chaque compétence dont `verifie_le` dépasse la durée de son type. **Existant**, il le complète : la dormance de `oracle-etat-forge` (F5, avertissement après 6 mois sans usage) et les statuts `dormant` et `broken` du registre des experts.
 
 ## 7. Lots
 
@@ -184,7 +184,7 @@ Chaque lot regroupe une compétence et un événement, et sa clôture se juge pa
 
 Une seule question relève de vous : la doctrine du contrôle de péremption. Le reste se range en candidats.
 
-> **D-228 — Quand la source d'une compétence n'a pas été revérifiée dans sa durée de validité, faut-il que le contrôle de péremption bloque l'usage de cette compétence, ou seulement qu'il avertisse ?**
+> **D-229 — Quand la source d'une compétence n'a pas été revérifiée dans sa durée de validité, faut-il que le contrôle de péremption bloque l'usage de cette compétence, ou seulement qu'il avertisse ?**
 > - **De quoi s'agit-il** : le contrôle qui surveille les compétences, `oracle-peremption-competences`, à créer au lot L-01.
 > - **Le problème** : s'il bloque, un expert périmé cesse d'être routé jusqu'à sa relecture, ce qui est sûr mais peut priver une mission d'un savoir encore juste ; s'il avertit, la dérive reste visible mais rien ne l'arrête, comme aujourd'hui pour la dormance.
 > - **Pourquoi vous** : c'est une règle de doctrine, qui change ce qu'une session a le droit d'utiliser.
@@ -336,7 +336,7 @@ Ces candidats ne sont pas journalisés : ils sont prêts pour `node todo/journal
 
 ```json
 [
- {"ev":"creation","demandeur":"pilot, plan de mise à jour des compétences du 21/11/2026","date_demande":"2026-11-21","statut":"candidat","titre":"pilot : registre des compétences et contrôle de péremption (L-01)","contenu":"CONSTAT du 21/11/2026 : aucune compétence ne porte de durée de validité, 27 skills et 4 corpus n'ont aucune date ni source. PROPOSITION : references/COMPETENCES.json (24 entrées, type, artefacts, forges, durée, verifie_le) et oracle-peremption-competences, en avertissement ou en blocage selon D-228 ; sonde hebdomadaire forge-observability. CLÔTURE : 24 entrées et un verdict par entrée."},
+ {"ev":"creation","demandeur":"pilot, plan de mise à jour des compétences du 21/11/2026","date_demande":"2026-11-21","statut":"candidat","titre":"pilot : registre des compétences et contrôle de péremption (L-01)","contenu":"CONSTAT du 21/11/2026 : aucune compétence ne porte de durée de validité, 27 skills et 4 corpus n'ont aucune date ni source. PROPOSITION : references/COMPETENCES.json (24 entrées, type, artefacts, forges, durée, verifie_le) et oracle-peremption-competences, en avertissement ou en blocage selon D-229 ; sonde hebdomadaire forge-observability. CLÔTURE : 24 entrées et un verdict par entrée."},
  {"ev":"creation","demandeur":"pilot, plan de mise à jour des compétences du 21/11/2026","date_demande":"2026-11-21","statut":"candidat","titre":"forge-agents : corpus Railway à compléter de 23 constats de 6 produits (L-02)","contenu":"CONSTAT : corpus vérifié le 11/08/2026, aucune page de documentation citée ; 23 constats retenus (startCommand sans shell, IPv4, volumes, domaines et retour arrière par GraphQL, en-tête User-Agent, Wait for CI). CLÔTURE : sources datées citées, constats intégrés, contradiction sur l'adresse d'écoute mesurée."},
  {"ev":"creation","demandeur":"pilot, plan de mise à jour des compétences du 21/11/2026","date_demande":"2026-11-21","statut":"candidat","titre":"forge-agents et forge-ops : App Runner fermé aux nouveaux clients, corpus AWS à déprécier (L-03)","contenu":"CONSTAT de veille du 21/11/2026 : la page AWS manage-deploy porte « AWS App Runner is no longer open to new customers » et recommande Amazon ECS Express Mode ; le corpus AWS en fait le service canonique. CLÔTURE : entrée dépréciée datée avec son remplaçant, cible forge-ops revue."},
  {"ev":"creation","demandeur":"pilot, plan de mise à jour des compétences du 21/11/2026","date_demande":"2026-11-21","statut":"candidat","titre":"forge-agents : compétences Beds24 et Stripe à créer, hébergement touristique à compléter (L-04 à L-06)","contenu":"CONSTAT : une vingtaine de constats Beds24 et Stripe d'un produit, aucun dans le corpus d'hébergement touristique (13 lignes, sans adresse de source). Règle Stripe vérifiée le 21/11/2026 : 7 jours par défaut, jusqu'à 30 jours selon réseau et catégorie. CLÔTURE : fiches admises par comparaison avec et sans l'expert."},
