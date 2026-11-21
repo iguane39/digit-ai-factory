@@ -1,0 +1,160 @@
+{
+  "schema": "l99-boucle@1",
+  "prompt": "Plan multi-agents Claude, Codex, Gemini (message du porteur du 21/11/2026 à 16:23)",
+  "arbitre": {
+    "rubrique": "couches.md Ch1, 6 dimensions /100, plafond de 40 pour tout bloquant",
+    "arret": "0 bloquant et 0 majeur",
+    "seuil_score": null,
+    "gain_min": 3,
+    "borne": 3,
+    "garde_longueur": 0.15,
+    "retenue": "union_recomptee",
+    "verification_cloture": true,
+    "rejet_regression": true,
+    "recompte_notes": true,
+    "reprise_unique": true,
+    "score_de_passe": "moyenne",
+    "bruit_tolere": "mesure",
+    "arret_atteignable": true,
+    "garde_cumulee": 0.30,
+    "jugement_apparie": true,
+    "fiche_premisses": true,
+    "type_relecteur": "relecteur",
+    "verification_diff": true,
+    "ouverture": "d'office (TF-2022) : le prompt réécrit lance un banc où des agents écrivent ; prompt de run, donc 2 relecteurs par passe"
+  },
+  "fiche_premisses": [
+    {"premisse": "poste", "commande": "hostname", "sortie": "Dell-XPS-16", "heure": "2026-11-21T16:27:00+01:00"},
+    {"premisse": "Claude Code installé", "commande": "claude --version", "sortie": "2.1.318 (Claude Code)", "heure": "2026-11-21T16:24:00+01:00"},
+    {"premisse": "Codex connecté", "commande": "codex login status", "sortie": "Logged in using ChatGPT (code 0)", "heure": "2026-11-21T16:24:00+01:00"},
+    {"premisse": "Codex installé", "commande": "codex --version", "sortie": "codex-cli 0.171.0", "heure": "2026-11-21T16:27:00+01:00"},
+    {"premisse": "modèle de Codex", "commande": "grep -E '^model|effort' ~/.codex/config.toml", "sortie": "model = \"gpt-5.6-sol\" ; model_reasoning_effort = \"low\"", "heure": "2026-11-21T16:25:00+01:00"},
+    {"premisse": "Antigravity installé", "commande": "agy --version", "sortie": "1.5.14", "heure": "2026-11-21T16:27:00+01:00"},
+    {"premisse": "modèles d'Antigravity", "commande": "agy models", "sortie": "23 modèles : 16 gemini-*, 3 claude-opus-5-5-*, 3 claude-sonnet-5-5-*, 1 gpt-oss-120b-medium", "heure": "2026-11-21T16:25:00+01:00"},
+    {"premisse": "modèle par défaut d'Antigravity", "commande": "grep 'selected model' ~/.gemini/antigravity-cli/cli.log", "sortie": "label=\"Gemini 4 Neon (High)\"", "heure": "2026-11-21T16:25:00+01:00"},
+    {"premisse": "Gemini CLI", "commande": "gemini --version", "sortie": "0.70.0 ; refus serveur consigné dans la note 20261121e", "heure": "2026-11-21T16:24:00+01:00"},
+    {"premisse": "fichiers du pilot cités", "commande": "test -e (8 fichiers)", "sortie": "les 8 existent", "heure": "2026-11-21T16:27:00+01:00"},
+    {"premisse": "registre des types", "commande": "lecture de registre-types.json", "sortie": "41 types, « Plan » absent", "heure": "2026-11-21T16:27:00+01:00"},
+    {"premisse": "fichiers de Produit-79", "commande": "test -e et grep -c 'assigne: codex'", "sortie": "routage.md, config.env, AGENTS.md existent ; 6 tickets assignés à codex", "heure": "2026-11-21T16:27:00+01:00"},
+    {"premisse": "INSTANCES.md", "commande": "sed -n 25,30p INSTANCES.md", "sortie": "codex exec non câblé, parce qu'il consomme l'abonnement", "heure": "2026-11-21T16:27:00+01:00"}
+  ],
+  "passes": [
+    {
+      "n": 1, "fichier": "prompt-p1.md", "mots": 1214,
+      "relecteur": {"agent": "relecteurs A et B (agents neufs)", "aveugle": true, "interdits": ["analyse", "passes précédentes", "journal"], "type": "relecteur", "fiche_remise": true, "appels_outil": [24, 16]},
+      "scores_relecteurs": [73, 74],
+      "score_mesure": 73.5,
+      "defauts": [
+        {"severite": "majeur", "citation": "Joue un banc borné de 3 tâches, chacune confiée aux 3 agents, soit 9 appels", "vu_par": ["A", "B"], "recompte": {"commande": "grep -n 226 decisions/REGISTRE.jsonl ; sed -n 26,30p INSTANCES.md", "resultat": "D-226 : « Pendant les essais de Codex et Gemini… » ; codex exec non câblé parce qu'il consomme l'abonnement"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "le même énoncé pour les 3 agents, le modèle et l'effort déclarés à chaque appel", "vu_par": ["A", "B"], "recompte": {"commande": "sed -n 1,8p .claude/agents/campagne.md ; grep effort ~/.codex/config.toml", "resultat": "campagne : effort high ; Codex : effort low"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "réussite au contrat du premier coup (code de retour de l'oracle), durée murale, consommation du quota Claude, défauts trouvés à la revue croisée", "vu_par": ["A"], "recompte": {"commande": "lecture de prompt-p1.md, section « Règles du banc »", "resultat": "le relevé ne nomme ni la mesure du quota Claude ni l'auteur de la revue croisée"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "Chaque ligne de la matrice porte un agent, un modèle, un effort et une preuve.", "vu_par": ["B"], "recompte": {"commande": "lecture de prompt-p1.md, sections « Livrable » et « Mesurer »", "resultat": "3 types mesurés, la matrice en exige davantage, « non mesuré » non admis en ligne"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "Aucun fichier modifié hors de l'étude, de son journal, du ledger et du registre des décisions.", "vu_par": ["A", "B"], "recompte": {"commande": "git status --short (ouverture de session)", "resultat": "caches .oracles/ et index d'output/ modifiés par les oracles et les hooks"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "Tu exécutes un run de conseil au pilot `digit-ai-factory` (`references/RUN-CONSEIL.md`)", "vu_par": ["A"], "recompte": {"commande": "sed -n 15,19p ; sed -n 115,120p ; sed -n 143,147p references/RUN-CONSEIL.md", "resultat": "ledger run_open, page HTML ou écart au ledger, gates humains exigés"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "L'indice vient de `node scripts/allouer-indice.mjs`.", "vu_par": ["A"], "recompte": {"commande": "sed -n 270,273p scripts/allouer-indice.mjs", "resultat": "const dossier = valeurs.dossier ?? pDossier ?? process.cwd()"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "Antigravity par `agy -p … --model <modèle gemini> --mode accept-edits --sandbox --settings <réglages> --output-format json`", "vu_par": ["A"], "recompte": {"commande": "agy --help | grep -E 'model|print-timeout' ; grep '< NUL' note 20261121o", "resultat": "--model existe (partie démentie) ; -o, fermeture de l'entrée et --print-timeout absents du prompt (partie retenue)"}, "statut": "retenu"}
+      ],
+      "majeurs_clos": 0, "rejetee": false, "decision": "continuer"
+    },
+    {
+      "n": 2, "fichier": "prompt-p2.md", "mots": 1622,
+      "motif_depassement": "la correction ajoute l'autorisation du banc, les préambules d'outil, les appels complets et le protocole des 4 mesures, que les 2 relecteurs de la passe 1 ont exigés",
+      "relecteur": {"agent": "relecteurs C et D (agents neufs)", "aveugle": true, "interdits": ["analyse", "passes précédentes", "journal"], "type": "relecteur", "fiche_remise": true, "appels_outil": [14, 26]},
+      "verification_cloture": {
+        "agent": "vérificateur de clôture de la passe 2 (agent neuf, avec contexte)", "note": false, "clotures": 9, "defauts_crees": 3,
+        "defauts_crees_detail": [
+          {"severite": "majeur", "citation": "Codex `-C <dossier>` avec `exclude_tmpdir_env_var=true`", "recompte": {"commande": "grep 'processed 1 write roots' ~/.codex/.sandbox/sandbox.2026-11-21.log ; cat sonde-codex.txt", "resultat": "15:10:37 UTC : processed 1 write roots, errors=[] ; sonde-codex.txt = ok"}, "dementi": true},
+          {"severite": "mineur", "citation": "Les appels, recopiés des notes 20261121f et 20261121o", "corrige": "reformulé en « reprennent… avec 3 ajouts »"},
+          {"severite": "mineur", "citation": "pose-la, et attends la réponse", "corrige": "« pose la question au bloc 3 de la restitution du tour »"}
+        ],
+        "ajouts": [
+          {"phrase": "Tu écris une étude au pilot … comme l'étude 20261103l", "etat": "verifiee", "premisse": "l'étude 20261103l existe", "commande": "ls output/03-etudes | grep 20261103l", "resultat": "fichier présent"},
+          {"phrase": "`agy --help`, où l'option `--model` doit figurer", "etat": "verifiee", "premisse": "--model figure dans l'aide d'agy", "commande": "agy --help | grep model", "resultat": "--model  Model for the current CLI session"},
+          {"phrase": "7. Autorisation du banc : la décision D-226 (a) ne couvrait que les essais du 21/11", "etat": "verifiee", "premisse": "portée de D-226 et option --question", "commande": "sed -n 229p decisions/REGISTRE.jsonl ; grep -- --question scripts/reserver-decision.mjs", "resultat": "« Pendant les essais de Codex et Gemini… » ; option présente"},
+          {"phrase": "Si le banc est refusé, seuls les 3 essais de Claude se jouent", "etat": "sans_premisse", "motif": "prescrit une branche d'échec du banc"},
+          {"phrase": "Effort : low à xhigh chez Codex et Antigravity", "etat": "non_verifiable", "sort": "reformule", "reformulation": "`minimal` à `xhigh` chez Codex, recompté sur les chaînes du binaire codex.exe (minimal low medium high xhigh)"},
+          {"phrase": "Optimal : une répartition se juge sur 4 mesures, définies au relevé du banc", "etat": "sans_premisse", "motif": "définition d'un terme du prompt"},
+          {"phrase": "Claude est l'unique orchestrateur… tient la restitution et les décisions", "etat": "sans_premisse", "motif": "prescription du rôle de Claude"},
+          {"phrase": "Un travail ne quitte Claude que si… au moins 30 %", "etat": "sans_premisse", "motif": "règle de décision posée par le prompt"},
+          {"phrase": "§4 et §4 bis : … relevé scripts/relever-flotte.mjs", "etat": "verifiee", "premisse": "le script existe et le §4 bis le cite", "commande": "ls scripts/relever-flotte.mjs ; grep -n relever-flotte CONTRAT-INTERFACE.md", "resultat": "présent ; lignes 466 et 548"},
+          {"phrase": "Chaque consigne d'appel se compose de 2 parties… préambule d'outil", "etat": "verifiee", "premisse": "contraintes tirées des notes f et o", "commande": "grep Set-Content et « une seule commande git » dans les notes", "resultat": "o:36,56,60 ; f:42"},
+          {"phrase": "Les appels, recopiés des notes, se lancent depuis Bash, où < /dev/null ferme l'entrée", "etat": "non_verifiable", "sort": "reformule", "reformulation": "« reprennent… avec 3 ajouts », PowerShell refusant `<` (rejoué par ScriptBlock::Create)"},
+          {"phrase": "Claude : un agent campagne (Sonnet, effort high)", "etat": "verifiee", "premisse": "définition de campagne", "commande": "sed -n 1,12p .claude/agents/campagne.md", "resultat": "model: sonnet ; effort: high"},
+          {"phrase": "Codex : codex exec … -o … < /dev/null", "etat": "verifiee", "premisse": "options de codex exec", "commande": "codex exec --help", "resultat": "-C, -c, --ephemeral, --json, -o présents"},
+          {"phrase": "Antigravity : agy -p … --model gemini-4-neon-high … --print-timeout 290s", "etat": "verifiee", "premisse": "options et modèle", "commande": "agy --help ; agy models | grep gemini-4-neon", "resultat": "options présentes ; gemini-4-neon-high listé"},
+          {"phrase": "quota Claude : jetons… relevés par scripts/relever-flotte.mjs", "etat": "non_verifiable", "sort": "reformule", "reformulation": "jetons lus dans les transcriptions entre l'heure de début et de fin de l'appel"},
+          {"phrase": "un agent relecteur juge chaque livrable du banc à l'aveugle", "etat": "verifiee", "premisse": "l'agent relecteur existe", "commande": "ls .claude/agents/relecteur.md", "resultat": "« Relecture aveugle en lecture seule »"},
+          {"phrase": "Écritures permises, et aucune autre", "etat": "sans_premisse", "motif": "prescrit une liste d'écritures permises"},
+          {"phrase": "node scripts/allouer-indice.mjs --dossier output/03-etudes …", "etat": "verifiee", "premisse": "options du script", "commande": "grep -n allouer-indice scripts/allouer-indice.mjs", "resultat": "ligne 239 : --dossier --prefixe --jour --extension"}
+        ]
+      },
+      "notes_reprises": [
+        {"note": "D-226 (a) ne couvre que les essais du 21/11", "recompte": {"commande": "sed -n 229p decisions/REGISTRE.jsonl", "resultat": "« Pendant les essais de Codex et Gemini, la session peut-elle lancer… »"}},
+        {"note": "campagne tourne à effort high", "recompte": {"commande": "sed -n 1,8p .claude/agents/campagne.md", "resultat": "effort: high"}},
+        {"note": "allouer-indice prend le répertoire courant sans --dossier", "recompte": {"commande": "sed -n 270,273p scripts/allouer-indice.mjs", "resultat": "process.cwd()"}},
+        {"note": "agy porte --print-timeout", "recompte": {"commande": "agy --help | grep print-timeout", "resultat": "--print-timeout  Optional time limit for print mode"}},
+        {"note": "l'échelle d'effort de Claude va jusqu'à max", "recompte": {"commande": "grep -n 'Opus à max' CONTRAT-INTERFACE.md", "resultat": "constructeur (construction complexe, Opus à max)"}}
+      ],
+      "jugement_apparie": {
+        "presentation": "sans_etiquette",
+        "relecteurs": [
+          {"agent": "relecteur C", "ordre": "gardee_en_premier", "prefere": "corrigee", "note_gardee": 64, "note_corrigee": 86},
+          {"agent": "relecteur D", "ordre": "corrigee_en_premier", "prefere": "corrigee", "note_gardee": 68, "note_corrigee": 85}
+        ],
+        "verdict": "corrigee"
+      },
+      "scores_relecteurs": [86, 85],
+      "score_mesure": 85.5,
+      "defauts": [
+        {"severite": "majeur", "citation": "avec 3 ajouts : le modèle, l'effort, et la fermeture de l'entrée standard par `< /dev/null`", "vu_par": ["C"], "origine": "correction", "recompte": {"commande": "grep -n '< NUL' note 20261121o ; codex exec --help | grep -- '-m, --model'", "resultat": "la note ferme déjà l'entrée (ligne 24) ; l'appel du prompt ne porte pas -m"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "Écritures permises, et aucune autre : … et ce qu'apporte `bootstrap.mjs --pull`.", "vu_par": ["C", "D"], "origine": "correction", "recompte": {"commande": "git status --short todo/ ; git log --since=2026-11-03 --until=2026-11-04T06:00 --name-only | grep ledger", "resultat": "journaux todo/relectures-intention.jsonl et fiches-agents.jsonl écrits (partie retenue) ; aucun ledger de run le 03/11, seul gabarits/ledger.py modifié (partie ledger démentie)"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "--model gemini-4-neon-high", "vu_par": ["C"], "origine": "correction", "recompte": {"commande": "agy models | grep -c '^gemini-4-neon-high'", "resultat": "1"}, "statut": "ecarte", "dementi": true},
+        {"severite": "majeur", "citation": "Un travail ne quitte Claude que si la délégation réussit au contrat aussi bien que Claude, et gagne au moins 30 % sur la durée ou sur le quota Claude, ou rend moins de défauts.", "vu_par": ["D"], "origine": "correction", "recompte": {"commande": "lecture de prompt-p2.md, section « Claude principal »", "resultat": "portée du « ou » ambiguë ; seuil sans source ; délégation possible sur un essai"}, "statut": "retenu"}
+      ],
+      "majeurs_clos": 8, "rejetee": false, "decision": "continuer"
+    },
+    {
+      "n": 3, "fichier": "prompt-p3.md", "mots": 1688,
+      "motif_depassement": "la correction précise l'appel de Codex, la liste des écritures et la règle de délégation, demandés par les jurys de la passe 2 ; elle ajoute 66 mots à la passe 2",
+      "relecteur": {"agent": "relecteurs E et F (agents neufs)", "aveugle": true, "interdits": ["analyse", "passes précédentes", "journal"], "type": "relecteur", "fiche_remise": true, "appels_outil": [19, 17]},
+      "verification_cloture": {
+        "agent": "vérificateur de clôture de la passe 3 (agent neuf, avec contexte)", "note": false, "clotures": 3, "defauts_crees": 2,
+        "defauts_crees_detail": [
+          {"severite": "mineur", "citation": "Ils se lancent depuis le shell Bash de la session… `< NUL`, que PowerShell refuse.", "recompte": {"commande": "powershell.exe -NoProfile -Command \"[ScriptBlock]::Create('codex --version < NUL')\"", "resultat": "refus : L'opérateur « < » est réservé à une utilisation future"}, "dementi": true},
+          {"severite": "mineur", "citation": "Comme l'étude 20261103l, l'étude n'ouvre pas de ledger de run.", "recompte": {"commande": "git log --since=2026-11-03T00:00 --until=2026-11-04T06:00 --name-only | grep -i ledger", "resultat": "2 lignes : gabarits/ledger.py et gabarits/ledger.test.mjs, code seulement ; aucun ledger de run écrit"}, "dementi": true}
+        ],
+        "ajouts": [
+          {"phrase": "Un travail ne quitte Claude qu'à 2 conditions réunies…", "etat": "sans_premisse", "motif": "règle prescriptive sans fait affirmé"},
+          {"phrase": "Le seuil de 30 % est fixé par ce prompt, sans mesure qui le fonde…", "etat": "sans_premisse", "motif": "définition et prescription, aucun fait extérieur"},
+          {"phrase": "Les appels reprennent ceux des notes 20261121f et 20261121o, avec le modèle et l'effort en plus.", "etat": "verifiee", "premisse": "l'appel de la note o ne porte ni modèle ni effort", "commande": "grep -n '< NUL' note 20261121o", "resultat": "ligne 24, sans -m ni effort"},
+          {"phrase": "Ils se lancent depuis le shell Bash… `< NUL`, que PowerShell refuse.", "etat": "verifiee", "premisse": "PowerShell refuse l'opérateur < ; les essais du 21/11 ont tourné sous Bash", "commande": "powershell.exe [ScriptBlock]::Create('codex --version < NUL') ; outil Bash de la session pour tous les codex exec du 21/11", "resultat": "refus de PowerShell ; codex exec joués par l'outil Bash (E6 à E9, relais), code 0", "verifie_par": "orchestrateur, au recompte"},
+          {"phrase": "Codex : `codex exec … -m <modèle lu dans ~/.codex/config.toml à l'étape 0>`", "etat": "verifiee", "premisse": "option -m de codex exec", "commande": "codex exec --help | grep -- '-m, --model' ; grep ^model ~/.codex/config.toml", "resultat": "-m, --model <MODEL> ; model = \"gpt-5.6-sol\""},
+          {"phrase": "les journaux que les hooks et les relectures d'intention écrivent d'eux-mêmes", "etat": "verifiee", "premisse": "des journaux s'écrivent sans geste de l'exécutant", "commande": "git status --short todo/ ; tail -1 todo/relectures-intention.jsonl", "resultat": "todo/relectures-intention.jsonl (2 lignes du 21/11, écrites par relecture-intention.mjs) et todo/observabilite/fiches-agents.jsonl modifiés", "verifie_par": "orchestrateur, au recompte"},
+          {"phrase": "Comme l'étude 20261103l, l'étude n'ouvre pas de ledger de run.", "etat": "verifiee", "premisse": "aucun ledger de run écrit le 03/11", "commande": "git log --since=2026-11-03T00:00 --until=2026-11-04T06:00 --name-only | grep -i ledger", "resultat": "seuls gabarits/ledger.py et ledger.test.mjs, du code", "verifie_par": "orchestrateur, au recompte"}
+        ]
+      },
+      "notes_reprises": [
+        {"note": "codex exec porte l'option -m", "recompte": {"commande": "codex exec --help | grep -- '-m, --model'", "resultat": "-m, --model <MODEL>"}},
+        {"note": "la note o ferme déjà l'entrée par < NUL", "recompte": {"commande": "grep -n '< NUL' note 20261121o", "resultat": "ligne 24"}},
+        {"note": "todo/relectures-intention.jsonl et fiches-agents.jsonl sont écrits d'eux-mêmes", "recompte": {"commande": "git status --short todo/", "resultat": "M todo/observabilite/fiches-agents.jsonl ; M todo/relectures-intention.jsonl"}}
+      ],
+      "jugement_apparie": {
+        "presentation": "sans_etiquette",
+        "relecteurs": [
+          {"agent": "relecteur E", "ordre": "gardee_en_premier", "prefere": "corrigee", "note_gardee": 82, "note_corrigee": 88},
+          {"agent": "relecteur F", "ordre": "corrigee_en_premier", "prefere": "corrigee", "note_gardee": 76, "note_corrigee": 84}
+        ],
+        "verdict": "corrigee"
+      },
+      "scores_relecteurs": [88, 84],
+      "score_mesure": 86,
+      "defauts": [
+        {"severite": "majeur", "citation": "chaque appel borné à 300 s ; 3 reprises au plus sur tout le banc", "vu_par": ["E", "F"], "origine": "anterieur", "recompte": {"commande": "grep -n '3 reprises au plus sur tout le banc\\|3 appels de Codex et 3 d' prompt-p2.md prompt-p3.md", "resultat": "présent en passe 2 (lignes 15 et 65) et en passe 3 ; la question de l'étape 0 n'autorise que 3 appels par outil, sans les reprises"}, "statut": "retenu"},
+        {"severite": "majeur", "citation": "Les appels reprennent ceux des notes 20261121f et 20261121o", "vu_par": ["F"], "origine": "anterieur", "recompte": {"commande": "grep -c 'Les appels reprennent ceux des notes 20261121f et 20261121o' prompt-p2.md prompt-p3.md ; ls output/03-etudes | grep 20261121q", "resultat": "1 et 1 ; la note corrigée 20261121q existe et n'est pas citée"}, "statut": "retenu"}
+      ],
+      "majeurs_clos": 3, "rejetee": false, "decision": "arreter"
+    }
+  ],
+  "arret": {"passe": 3, "raison": "zero_majeur_texte_corrige", "majeurs_restants": 2, "liste_au_ch8": true},
+  "score_affiche": {"valeur": 86, "nature": "mesure"}
+}

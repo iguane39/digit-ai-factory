@@ -115,6 +115,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` | fichier | 8,3 Ko | Note — Harvey comparé à digit-ai-prospection |
 | `Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` | fichier | 9,1 Ko | Refine de Prime Agent contre oeil-critique — 20261102r |
 | `Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121o.md` | fichier | 4,9 Ko | Relais de Claude, Codex et Antigravity |
+| `Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121q.md` | fichier | 5,2 Ko | Relais de Claude, Codex et Antigravity |
 | `Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` | fichier | 8,1 Ko | Démarche ROI — Parcours d'accueil des nouveaux utilisateurs, version intégrée — 20261121i |
 | `Digit-AI - Proposition - Lots du parcours d accueil - 20261121l.md` | fichier | 6,4 Ko | Démarche ROI — Parcours d'accueil des nouveaux utilisateurs — 20261121e |
 | `Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md` | fichier | 6,0 Ko | Banc du Plan Mode dans ce harnais — 20261121j |
@@ -128,6 +129,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` | fichier | 56,1 Ko | Digit-AI — Revue L99 — Prompt « pentest automatisé de bout en bout » (Claude + LLM local) |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json` | fichier | 6,9 Ko | JSON |
 | `Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` | fichier | 6,9 Ko | JSON |
+| `Digit-AI - Revue - Prompt plan multi-agents passe au crible L99 - 20261121p.md` | fichier | 29,7 Ko | Revue — Prompt « plan multi-agents Claude, Codex, Gemini » passé au crible L99 |
+| `Digit-AI - Revue - Prompt plan multi-agents passe au crible L99 - 20261121p.md.boucle.json` | fichier | 20,7 Ko | JSON |
 | `Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md` | fichier | 36,6 Ko | Revue L99 — « Une série d'animations pour vendre la Factory et ses forges » |
 | `Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json` | fichier | 19,1 Ko | JSON |
 | `Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` | fichier | 19,1 Ko | Revue — prompt du skill make-it-better et de sa page de versions, passé au crible L99 — 02 |
@@ -140,4 +143,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_120 fichier(s), 3 sous-dossier(s)_
+_123 fichier(s), 3 sous-dossier(s)_

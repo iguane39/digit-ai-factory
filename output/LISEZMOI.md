@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 745 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 748 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -295,6 +295,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
 | Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121o.md | 20261121o | 4.9 Ko | `03-etudes/Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121o.md` |
+| Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121q.md | 20261121q | 5.2 Ko | `03-etudes/Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121q.md` |
 | Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md | 20261121i | 8.1 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` |
 | Digit-AI - Proposition - Lots du parcours d accueil - 20261121l.md | 20261121l | 6.4 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121l.md` |
 | Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md | 20261121j | 6 Ko | `03-etudes/Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md` |
@@ -308,6 +309,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md | 20261102j | 56.1 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle-cdc.json` |
 | Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json | — | 6.9 Ko | `03-etudes/Digit-AI - Revue - Prompt pentest automatise de bout en bout passe au crible L99 - 20261102j.md.boucle.json` |
+| Digit-AI - Revue - Prompt plan multi-agents passe au crible L99 - 20261121p.md | 20261121p | 29.7 Ko | `03-etudes/Digit-AI - Revue - Prompt plan multi-agents passe au crible L99 - 20261121p.md` |
+| Digit-AI - Revue - Prompt plan multi-agents passe au crible L99 - 20261121p.md.boucle.json | — | 20.7 Ko | `03-etudes/Digit-AI - Revue - Prompt plan multi-agents passe au crible L99 - 20261121p.md.boucle.json` |
 | Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md | 20261109b | 36.6 Ko | `03-etudes/Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md` |
 | Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json | — | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt série d'animations de la Factory passé au crible L99 - 20261109b.md.boucle.json` |
 | Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md | 20261102d | 19.1 Ko | `03-etudes/Digit-AI - Revue - Prompt skill make-it-better passe au crible L99 - 20261102d.md` |
