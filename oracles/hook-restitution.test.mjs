@@ -18,7 +18,7 @@
  */
 import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync, utimesSync, appendFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { tmpdir } from "node:os";
+import { tmpdir, homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
@@ -1615,6 +1615,19 @@ try {
       echecs.push(`57 quinquies : \`git log -1 > rapport.txt\` est une écriture par commande, obtenu ${redir.ecrituresDuTour.join(" ; ") || "aucune"}`);
     const temp = analyserTranscript(tour57(QUESTION, [bash(`git log -1 > ${join(tmpdir(), "rapport.txt").replace(/\\/g, "/")}`)], COURTE));
     if (temp.travail) echecs.push(`57 sexies : une redirection vers le dossier temporaire n'est pas une écriture du tour (NIVEAUX.md 1.3.0), obtenu ${temp.ecrituresDuTour.join(" ; ")}`);
+    // TF-2740 (21/11/2026) : le fichier de plan du Plan Mode, `~/.claude/plans/<nom>.md`, est un brouillon d'outil, dans ses deux sens.
+    const PLANS57 = join(homedir(), ".claude", "plans");
+    const ecrire57 = (p) => ({ name: "Write", input: { file_path: p } });
+    const planSeul = analyserTranscript(tour57(QUESTION, [...LECTURES.slice(0, 2).map(bash), ecrire57(join(PLANS57, "plan-essai.md"))], COURTE));
+    const planTilde = analyserTranscript(tour57(QUESTION, [{ name: "Edit", input: { file_path: "~/.claude/plans/plan-essai.md" } }], COURTE));
+    if (planSeul.travail || planSeul.ecrituresDuTour.length || planTilde.travail)
+      echecs.push(`57 sexdecies : un tour qui n'écrit que le fichier de plan du Plan Mode → attendu sans écriture, obtenu ${[...planSeul.ecrituresDuTour, ...planTilde.ecrituresDuTour].join(" ; ")}`);
+    const planEtAutre = analyserTranscript(tour57(QUESTION, [ecrire57(join(PLANS57, "plan-essai.md")), ecrire57("C:/dev/produit-fictif/note.md")], COURTE));
+    if (!planEtAutre.travail || planEtAutre.ecrituresDuTour.length !== 1 || !/note\.md/.test(planEtAutre.ecrituresDuTour[0]))
+      echecs.push(`57 septdecies : le plan ET une autre écriture → attendu jugé sur la seule autre écriture, obtenu ${planEtAutre.ecrituresDuTour.join(" ; ") || "aucune"}`);
+    const horsBorne = [join(PLANS57, "sous", "plan.md"), join(PLANS57, "plan.json"), join(homedir(), ".claude", "plans-bis", "plan.md"), "C:/dev/produit-fictif/forge/plans/plan.md"]
+      .filter((p) => !analyserTranscript(tour57(QUESTION, [ecrire57(p)], COURTE)).travail);
+    if (horsBorne.length) echecs.push(`57 octodecies : un sous-dossier, une autre extension, un dossier voisin ou un plan dans un dépôt restent des écritures, épargnés à tort : ${horsBorne.join(" ; ")}`);
     const COMPLETUDE57 = "Est-ce que le reste du site a été mis à jour ?";
     const oui = jouer57("oui-completude", COMPLETUDE57, LECTURES.slice(0, 4).map(bash), "Oui, tout le site est à jour.");
     if (oui.o?.decision !== "block" || !/réponse courte/.test(oui.o.reason || "") || !/COMPLÉTUDE — /.test(oui.o.reason || "") || /S1 —/.test(oui.o.reason || ""))

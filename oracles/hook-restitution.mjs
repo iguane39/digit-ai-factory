@@ -237,6 +237,19 @@ const TEMPORAIRE = (p) => {
 // le même dossier que son chemin écrit en entier (TF-1418).
 const TEMPORAIRE_NOMME = (p) => TEMPORAIRE(p)
   || /^(?:\$\{?(?:env:)?(?:TEMP|TMP|TMPDIR)\}?|%(?:TEMP|TMP)%)(?:[\\/]|$)/i.test(String(p || ""));
+// TF-2740 (21/11/2026, étude 20261121b, mesure M-05) — LE FICHIER DE PLAN DU PLAN MODE EST UN BROUILLON, PAS UNE ÉCRITURE DU TOUR.
+// En mode plan, Claude Code fait écrire au modèle son plan dans `~/.claude/plans/<nom>.md` (page officielle « Choose a permission mode »,
+// consultée le 21/11/2026) : c'est la seule écriture que le mode permet avant l'approbation. Comptée comme une écriture, elle faisait
+// juger chaque tour de planification comme un tour de travail et exigeait une restitution complète pour un plan que l'humain n'a pas
+// encore approuvé. LA BORNE : un appel d'outil d'écriture (Write, Edit…) vers un fichier `.md` posé DIRECTEMENT sous `~/.claude/plans/`,
+// rien d'autre. Un sous-dossier, une autre extension, un dossier voisin, une écriture par commande, et un `plansDirectory` placé dans un
+// dépôt (un fichier versionné est un livrable) restent des écritures. Un tour qui écrit le plan ET autre chose reste jugé sur l'autre chose.
+const PLAN_DE_SESSION = (p) => {
+  const n = String(p || "").replace(/\\/g, "/").replace(/^~(?=\/)/, homedir().replace(/\\/g, "/")).toLowerCase();
+  const racine = `${homedir().replace(/\\/g, "/").toLowerCase()}/.claude/plans/`;
+  return n.startsWith(racine) && /^[^/]+\.md$/.test(n.slice(racine.length));
+};
+const BROUILLON_D_OUTIL = (p) => TEMPORAIRE(p) || PLAN_DE_SESSION(p);
 // Une commande simple dont le verbe écrit des FICHIERS, et dont toutes les cibles sont temporaires :
 // pour une copie, la seule destination (le dernier argument) ; pour les autres verbes, chaque
 // argument. Une option ou une valeur non temporaire laisse l'effet relevé : l'erreur tombe du côté sûr.
@@ -301,7 +314,7 @@ export function detecterEffets(segment) {
       const nom = String(b.name || "");
       if (ECRITURES.has(nom)) {
         const p = b.input?.file_path || b.input?.notebook_path;
-        if (!TEMPORAIRE(p)) effets.push(`écriture de ${p || "chemin inconnu"}`);
+        if (!BROUILLON_D_OUTIL(p)) effets.push(`écriture de ${p || "chemin inconnu"}`);   // TF-2740 : le fichier de plan du Plan Mode compris
       } else if (COMMANDES.has(nom)) {
         const cmd = String(b.input?.command || "");
         // 12/10/2026 (TF-1418) : un `cp` vers le dossier temporaire de la session faisait juger
@@ -382,7 +395,8 @@ export function ecrituresDuTour(segment) {
       if (b.type !== "tool_use") continue;
       // D-101 (b) du 29/10/2026 : un brouillon écrit dans le dossier temporaire n'est pas une écriture du tour ; 2 écritures de
       // travail y ont fait refuser un message d'attente de 12 mots, le 29/10, pendant que des agents tournaient.
-      if (ECRITURES.has(b.name)) { const p = b.input?.file_path || b.input?.notebook_path; if (!TEMPORAIRE(p)) ajouter(`${b.name} de ${p || "chemin inconnu"}`); }
+      // TF-2740 (21/11/2026) : le fichier de plan du Plan Mode (`~/.claude/plans/<nom>.md`) non plus — voir `PLAN_DE_SESSION`.
+      if (ECRITURES.has(b.name)) { const p = b.input?.file_path || b.input?.notebook_path; if (!BROUILLON_D_OUTIL(p)) ajouter(`${b.name} de ${p || "chemin inconnu"}`); }
       else if (COMMANDES.has(b.name)) {
         const cmd = String(b.input?.command || "");
         if (cmd.trim()) commandes.push(cmd);
