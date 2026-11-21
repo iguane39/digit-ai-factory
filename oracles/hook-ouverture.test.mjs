@@ -33,6 +33,8 @@ const hook = join(ICI, "hook-ouverture.mjs");
 // manquant, le hook ne journalise pas le relevé des produits jouets dans `todo/HERITAGE-RELEVES.jsonl`,
 // qui est suivi (il le dit : « relevé NON journalisé »). Des tables vides l'y faisaient écrire.
 const TABLES = mkdtempSync(join(tmpdir(), "hook-ouverture-tables-"));
+// Boussole (21/11/2026) : la progression de l'utilisateur ne s'écrit jamais dans le vrai `~/.digit-ai` sous recette.
+process.env.FORGE_UTILISATEUR_DIR = mkdtempSync(join(tmpdir(), "hook-ouverture-utilisateur-"));
 process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
 process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
 const PILOT = join(ICI, "..");

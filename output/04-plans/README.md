@@ -57,7 +57,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` | fichier | 10,4 Ko | Synthèse Conseil — trois formats pour qu'une décision se comprenne et se tranche sans rien |
 | `Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md` | fichier | 6,3 Ko | Synthèse Conseil — Intégration des compétences de clip vidéo dans la Factory (10/11/2026,  |
 | `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
+| `Digit-AI - Synthese Conseil - Parcours d accueil complete par des exemples - 20261121f.md` | fichier | 5,0 Ko | Synthèse Conseil — parcours d'accueil des nouveaux utilisateurs, étude complétée par des e |
+| `Digit-AI - Synthese Conseil - Parcours d accueil des nouveaux utilisateurs - 20261121d.md` | fichier | 7,4 Ko | Synthèse Conseil — parcours d'accueil des nouveaux utilisateurs de la Factory, 21/11/2026 |
+| `Digit-AI - Synthese Conseil - Parcours d accueil niveau suivi et note sur 100 - 20261121i.md` | fichier | 6,1 Ko | Synthèse Conseil — parcours d'accueil : niveau qui suit l'utilisateur, niveau annoncé ou r |
 | `Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md` | fichier | 7,5 Ko | Synthèse Conseil — étude d'opportunité du Plan Mode pour organiser les chantiers, 21/11/20 |
+| `Digit-AI - Synthese Conseil - Prompt aide aux nouveaux venus passe au crible L99 - 20261121a.md` | fichier | 5,9 Ko | Synthèse Conseil — prompt « aide aux nouveaux utilisateurs de la Factory » passé au crible |
 | `Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md` | fichier | 6,1 Ko | Synthèse Conseil — prompt d'étude « Claude Code apprend de ses erreurs » passé au crible L |
 | `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
@@ -96,6 +100,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md` | fichier | 8,9 Ko | Synthèse Mandat — bases de développement et de qualification : 3 compétences construites,  |
 | `Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` | fichier | 9,6 Ko | Synthèse Mandat — seuil relevé à 4 millions, boucle de correction et relecteur renforcé en |
 | `Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` | fichier | 6,1 Ko | Synthèse Mandat — boucle de correction, relecteur renforcé et seuil de 4 millions enregist |
+| `Digit-AI - Synthese Mandat - Boussole construite lots L01 a L06 - 20261121m.md` | fichier | 9,5 Ko | Synthèse Mandat — boussole de l'utilisateur construite, les 6 lots, 21/11/2026 |
 | `Digit-AI - Synthese Mandat - Campagne A1 et tri A2 du 12-11 - 20261112c.md` | fichier | 7,8 Ko | markdown |
 | `Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md` | fichier | 13,6 Ko | markdown |
 | `Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md` | fichier | 20,8 Ko | Synthèse Mandat — 21 candidats instruits, 14 corrigés et publiés, 6 décisions pour vous (0 |
@@ -264,4 +269,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_243 fichier(s), 4 sous-dossier(s)_
+_248 fichier(s), 4 sous-dossier(s)_

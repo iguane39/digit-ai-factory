@@ -944,5 +944,34 @@ try {
 } catch (e) { fail++; console.error(`  [FAIL] harnais — ${e.message}`); }
 finally { for (const d of dossiers) if (existsSync(d)) rmSync(d, { recursive: true, force: true }); }
 
+// L-03 de la boussole (21/11/2026, references/BOUSSOLE.md) : le type de run et l'étape normalisée, dans les deux sens.
+{
+  const { d, script } = produit(GABARIT);
+  const py = (...a) => spawnSync(PYTHON, [script, ...a], { encoding: "utf8", env: CONSOLE });
+  check("L-03 vert — run_open sans type_run est écrit, avec l'avertissement « [À PORTER] run_open sans type_run »", () => {
+    const r = py("run_open", "--run", "b-1", "--versions_forges", "{}");
+    att(r.status === 0 && /run_open sans type_run/.test(r.stderr), `exit ${r.status} : ${r.stderr}`);
+  });
+  check("L-03 vert — run_open --type_run version est écrit sans avertissement de type", () => {
+    const r = py("run_open", "--run", "b-2", "--type_run", "version", "--versions_forges", "{}");
+    att(r.status === 0 && !/sans type_run/.test(r.stderr) && entrees(d).at(-1).type_run === "version", `exit ${r.status} : ${r.stderr}`);
+  });
+  check("L-03 rouge — un type_run hors liste est refusé et rien n'est écrit", () => {
+    const n = entrees(d).length;
+    const r = py("run_open", "--run", "b-3", "--type_run", "grand");
+    att(r.status !== 0 && /hors liste/.test(r.stderr + r.stdout) && entrees(d).length === n, `exit ${r.status}`);
+  });
+  check("L-03 vert — « Développement / socle » compte comme étape normalisée ; un intitulé libre avertit", () => {
+    const a = py("etape_close", "--etape", "Développement / socle");
+    const b = py("etape_close", "--etape", "revision e du barometre");
+    att(a.status === 0 && !/sans étape normalisée/.test(a.stderr) && b.status === 0 && /sans étape normalisée/.test(b.stderr), `${a.stderr} | ${b.stderr}`);
+  });
+  check("L-03 rouge — un etape_norme hors liste est refusé", () => {
+    const r = py("etape_close", "--etape", "x", "--etape_norme", "recette");
+    att(r.status !== 0 && /hors liste/.test(r.stderr + r.stdout), `exit ${r.status}`);
+  });
+  rmSync(d, { recursive: true, force: true });
+}
+
 console.log(`\nledger.py (gabarit) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

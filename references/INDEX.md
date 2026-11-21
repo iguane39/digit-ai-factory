@@ -11,6 +11,7 @@ l'oracle refuse l'orphelin dans les deux sens (référence sans entrée ici, ent
 |---|---|
 | `references\ACCUEIL.md` | Protocole d'accueil : de l'intention de l'utilisateur au run |
 | `references\BEST-PRACTICES-HTML.md` | Référentiel de best practices HTML, forge Digit-AI |
+| `references\BOUSSOLE.md` | Boussole de l'utilisateur : niveau sur tous ses projets, note sur 100, niveau annoncé, progression synchronisée, préférences par utilisateur (lots L-01 à L-06 du 21/11/2026) |
 | `references\CARTE-FORGES.json` | Donnée datée et sourcée de la carte des forges : 7 types de demande, leurs forges privilégiées parmi les 13 et les livrables exigés de chaque forge mobilisée ; la carte privilégie, elle ne fige pas (T4, TF-1949, D-69 (a) et D-79 (c) du 26/10/2026) ; jugée par `scripts\verifier-carte-forges.mjs`, lue par `scripts\mobiliser.mjs`, qui écrit chez le produit les 13 verdicts motivés de chaque demande (`forge\mobilisation.jsonl`) |
 | `references\CHAINE-TRADUCTION.md` | Traduire, auditer : deux chaînes déclarées |
 | `references\CLAUDE-PRODUIT-DETAIL.md` | Le détail de l'héritage d'un produit : le texte de `gabarits\CLAUDE-PRODUIT.md` d'avant sa réduction à 6 Ko au plus, mot pour mot (T4, TF-1949, D-69 (a) et D-79 (c) du 26/10/2026) ; ne se charge pas à l'ouverture d'un produit, le gabarit réduit y renvoie |

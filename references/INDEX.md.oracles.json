@@ -1,7 +1,7 @@
 {
   "cible": "c:\\dev\\digit-ai-factory\\references\\INDEX.md",
-  "date_iso": "2026-11-15T12:47:05.038Z",
-  "registre_version": "2.64.0",
+  "date_iso": "2026-11-21T11:50:18.362Z",
+  "registre_version": "2.66.0",
   "profil": "digit-ai",
   "niveau": "note",
   "verdict": "PASS",
@@ -15,7 +15,7 @@
   },
   "bilan_fichiers": {
     "jugé": [
-      "..\\digit-ai-factory\\references\\INDEX.md"
+      "references\\INDEX.md"
     ],
     "exempté": [],
     "délégué": [],
@@ -26,43 +26,43 @@
   "resultats": [
     {
       "domaine": "Lisibilité d'un document (Markdown)",
-      "file": "..\\digit-ai-factory\\references\\INDEX.md",
+      "file": "references\\INDEX.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Format / livraison / versioning",
-      "file": "..\\digit-ai-factory\\references\\INDEX.md",
+      "file": "references\\INDEX.md",
       "verdict": "PASS",
       "detail": ""
     },
     {
       "domaine": "Sécurité / secrets",
-      "file": "..\\digit-ai-factory\\references\\INDEX.md",
+      "file": "references\\INDEX.md",
       "verdict": "PASS",
       "detail": "1 constat(s) · aucun secret détecté"
     },
     {
       "domaine": "Calculs / chiffres",
-      "file": "..\\digit-ai-factory\\references\\INDEX.md",
+      "file": "references\\INDEX.md",
       "verdict": "SKIP",
       "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
     },
     {
       "domaine": "Traçabilité des affirmations chiffrées",
-      "file": "..\\digit-ai-factory\\references\\INDEX.md",
+      "file": "references\\INDEX.md",
       "verdict": "SKIP",
       "detail": "aucune affirmation chiffrée hors table détectée"
     },
     {
       "domaine": "Nommage / convention de livraison",
-      "file": "..\\digit-ai-factory\\references\\INDEX.md",
+      "file": "references\\INDEX.md",
       "verdict": "SKIP",
       "detail": "nom ne se réclamant pas de la convention"
     },
     {
       "domaine": "Cohérence inter-documents",
-      "file": "..\\digit-ai-factory\\references\\INDEX.md",
+      "file": "references\\INDEX.md",
       "verdict": "SKIP",
       "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
     }
@@ -70,10 +70,10 @@
   "actions_couverture": [],
   "empreinte": {
     "format": "forge-ops/empreinte@1",
-    "release": "..\\digit-ai-factory\\references\\INDEX.md",
-    "ts": "2026-11-15T12:47:05.037Z",
+    "release": "references\\INDEX.md",
+    "ts": "2026-11-21T11:50:18.362Z",
     "fichiers": {
-      "..\\digit-ai-factory\\references\\INDEX.md": "d65ba6708a1755ebd363f2490309dfe7edcef54e01318ee2e1d114a2c2828fdb"
+      "references\\INDEX.md": "25e45bd281f45cd228448e03a7b7186ac20af8c6dd80cb54f5395562c365eab5"
     }
   },
   "empreinte_motif": null,

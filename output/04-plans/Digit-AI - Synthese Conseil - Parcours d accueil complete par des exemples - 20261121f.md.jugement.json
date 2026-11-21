@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Conseil - Parcours d accueil complete par des exemples - 20261121f.md",
+ "empreinte": "caf3dee6f94195ec3d3ede273ba2974cd47d527a7c8f284b2f1492fbb33648e9",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-21T10:25:25.941Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

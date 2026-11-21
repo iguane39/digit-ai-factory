@@ -1033,6 +1033,14 @@ function ligneCrochetReadme() {
 // TF-1636 (invariant 3, 14/10/2026) — LES RÈGLES QUI CONDITIONNENT LE PREMIER GESTE PASSENT EN TÊTE.
 // Elles fermaient le relevé, après dix sections de taille variable : quand le harnais coupe une sortie
 // trop longue, c'est la fin qui se perd, et le 13/10 c'était elles.
+// L-01 à L-06 (GO du porteur « Go L01 à L06 » du 21/11/2026, references/BOUSSOLE.md) — LA BOUSSOLE DE L'UTILISATEUR va dans la tête
+// gardée du relevé, juste après les gates : son niveau calculé sur TOUS les projets du poste, sa note sur 100, l'état du projet ouvert.
+// Elle n'est jamais un refus : un calcul en échec se dit en une ligne. Le même module choisit le fichier de préférences (L-06).
+var BOUSSOLE = [], MODULE_BOUSSOLE = null; // var : lignesGates() sert aussi avant cette ligne (passage en async, TF-1635)
+try {
+  MODULE_BOUSSOLE = await import(pathToFileURL(join(PILOT, "scripts", "boussole.mjs")).href);
+  BOUSSOLE = MODULE_BOUSSOLE.lignesReleve(MODULE_BOUSSOLE.calculer({ pilot: PILOT, cwd: process.cwd() }));
+} catch (e) { BOUSSOLE = ["", `- boussole de l'utilisateur : non calculée (${String(e?.message || e).slice(0, 160)})`]; }
 const GATES = lignesGates().slice(1);
 lignes.unshift(...GATES, "");
 function lignesGates() { return ["",
@@ -1041,6 +1049,7 @@ function lignesGates() { return ["",
   ligneCrochetReadme(),
   "- Quand la factory est impliquée, ses règles priment sur celles du projet (R-43).",
   ...lignesRacineMinuscule(),
+  ...(BOUSSOLE || []),
   ...lignesPreferences()]; }
 
 // TF-2547 (14/11/2026, décidé après le retour 20261114f) — L'OUVERTURE DIT QU'UNE RACINE DE SESSION EN MINUSCULE INTERDIT L'ISOLATION DES AGENTS.
@@ -1073,9 +1082,15 @@ export function dossierClient(cwd, racine) {
 }
 function lignesPreferences() {
   const out = [];
-  const pref = join(PILOT, "references", "PREFERENCES-PORTEUR.md");
-  if (existsSync(pref)) {
-    try { out.push("", "## Préférences du porteur (T1, TF-1946 — references\\PREFERENCES-PORTEUR.md)", ...corpsPlafonne(pref)); } catch { /* illisible : rien d'injecté */ }
+  // L-06 (21/11/2026) : les préférences de l'utilisateur du poste, quand il en a écrit, remplacent celles du porteur.
+  let choix = null;
+  try { choix = MODULE_BOUSSOLE ? MODULE_BOUSSOLE.fichierPreferences(PILOT) : null; } catch { choix = null; }
+  if (!choix) {
+    const pref = join(PILOT, "references", "PREFERENCES-PORTEUR.md");
+    if (existsSync(pref)) choix = { chemin: pref, titre: "Préférences du porteur (T1, TF-1946 — references\\PREFERENCES-PORTEUR.md)" };
+  }
+  if (choix) {
+    try { out.push("", `## ${choix.titre}`, ...corpsPlafonne(choix.chemin)); } catch { /* illisible : rien d'injecté */ }
   }
   const client = dossierClient(process.cwd(), dirname(PILOT));
   if (!client) return out;

@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Mandat - Boussole construite lots L01 a L06 - 20261121m.md",
+ "empreinte": "c5e26561375f91c0508dc2501301a309f85b396c8621134df673e8af7d52a61e",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-21T11:55:30.843Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

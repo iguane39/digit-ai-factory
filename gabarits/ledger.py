@@ -110,6 +110,26 @@ TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_mo
          "anteriorite_ledger", "rectification_doublon", "decision_retiree", "lot_remis", "secret_range"}
 
 
+# L-03 de la boussole (GO du porteur du 21/11/2026, references/BOUSSOLE.md). Le fait, mesuré sur les 15 journaux de run de la racine :
+# 8 ouvertures de run sur 29 disaient leur type, et 30 étapes closes sur 1 382 portaient un nom d'étape normalisé ; la boussole de
+# l'utilisateur sous-comptait donc ses jalons. Le type se déclare à `run_open` (`--type_run`), l'étape normalisée à `etape_close`
+# (`--etape_norme`, quand le premier mot de `--etape` n'en est pas une).
+TYPES_RUN = {"complet", "version", "mandat", "conseil", "ao", "reseau"}
+ETAPES_NORMEES = ("conception", "design", "development", "tests", "mep")
+
+
+def etape_normee(champs: dict) -> bool:
+    """Vrai si `etape_norme` est donné, ou si le premier mot de `etape` est une étape normalisée (« Development / socle » compte)."""
+    if champs.get("etape_norme") in ETAPES_NORMEES:
+        return True
+    import re
+    import unicodedata
+    brut = unicodedata.normalize("NFD", str(champs.get("etape") or "")).encode("ascii", "ignore").decode().lower()
+    mots = [m for m in re.split(r"[^a-z-]+", brut) if m]
+    tete = "development" if mots and mots[0] == "developpement" else (mots[0] if mots else "")
+    return tete in ETAPES_NORMEES
+
+
 # TF-2223 (RP-2, 06/11/2026) : hors run, ces types s'écrivent à `forge/hors-run.jsonl`, jamais au ledger du run, dont R-42
 # exige qu'il s'ouvre par `run_open`. Le journal garde la même discipline de `seq` et de `ts` ; le prochain lot de retours le compile.
 HORS_RUN = {"retour", "question_humain", "reponse_humain", "demande_humain"}
@@ -169,6 +189,12 @@ def controler_forme(type_: str, champs: dict) -> None:
     if "champ" in champs:
         raise SystemExit("`--champ` n'est pas un nom de champ : le nom du champ s'écrit dans l'option elle-même (`--oracle oracle-x`, une option par champ), "
                          f"jamais `--champ clé=valeur` ; exemple : `{EXEMPLE_VERDICT}` — rien n'est écrit")
+    # L-03 de la boussole (21/11/2026, references/BOUSSOLE.md) : une valeur donnée hors de sa liste fermée est refusée avant
+    # d'écrire ; son absence n'est qu'un avertissement, porté après l'écriture (les journaux passés restent valides).
+    if type_ == "run_open" and "type_run" in champs and champs["type_run"] not in TYPES_RUN:
+        raise SystemExit(f"`type_run` « {champs['type_run']} » hors liste ({', '.join(sorted(TYPES_RUN))}) — rien n'est écrit")
+    if type_ == "etape_close" and "etape_norme" in champs and champs["etape_norme"] not in ETAPES_NORMEES:
+        raise SystemExit(f"`etape_norme` « {champs['etape_norme']} » hors liste ({', '.join(ETAPES_NORMEES)}) — rien n'est écrit")
     if type_ != "oracles_verdict":
         return
     manquants = [c for c in CHAMPS_VERDICT if not isinstance(champs.get(c), str) or not champs[c].strip()]
@@ -474,6 +500,13 @@ if __name__ == "__main__":
               "'[{\"artefact\": \"…\", \"sort\": \"retire|conserve|a_decider\"}]'", file=sys.stderr)
     # R-19 exige `versions_forges` au `run_open` ; l'entrée est écrite, l'oubli se dit tout de suite,
     # avec la voie par ajout, plutôt qu'au premier relevé de conformité (TF-2018).
+    # L-03 : le type du run et le nom normalisé de l'étape, que la boussole de l'utilisateur lit pour compter ses jalons.
+    if type_ == "run_open" and "type_run" not in champs:
+        print("[À PORTER] run_open sans type_run (L-03, references/BOUSSOLE.md) : la prochaine fois, "
+              f"--type_run <{'|'.join(sorted(TYPES_RUN))}>", file=sys.stderr)
+    if type_ == "etape_close" and not etape_normee(champs):
+        print("[À PORTER] etape_close sans étape normalisée (L-03) : si cette étape est l'une de "
+              f"{', '.join(ETAPES_NORMEES)}, ajouter --etape_norme <étape>", file=sys.stderr)
     if type_ == "run_open" and "versions_forges" not in champs:
         print("[À PORTER] run_open sans versions_forges (R-19) : la prochaine fois, "
               "--versions_forges '{\"<forge>\": \"<sha court>\"}' ; pour celui-ci, ajouter "

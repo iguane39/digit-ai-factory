@@ -84,6 +84,9 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md` | fichier | 12,7 Ko | Étude d'opportunité — Intégration des compétences de clip vidéo dans la Factory — 20261110 |
 | `Digit-AI - Étude - Oeil critique global des process - 20261020a.md` | fichier | 30,6 Ko | Étude — un œil critique global sur les process de la Factory, des forges et des produits ( |
 | `Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` | fichier | 36,8 Ko | Étude d'opportunité — Plateforme de pentest autorisé automatisé (CDC v1.1) : adoption par  |
+| `Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121d.md` | fichier | 17,4 Ko | Étude — Parcours d'accueil des nouveaux utilisateurs de la Factory, 21/11/2026 |
+| `Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121g.md` | fichier | 15,6 Ko | Étude — Parcours d'accueil des nouveaux utilisateurs de la Factory, version complétée, 21/ |
+| `Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md` | fichier | 12,7 Ko | Étude — Parcours d'accueil des nouveaux utilisateurs de la Factory, version intégrée, 21/1 |
 | `Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md` | fichier | 13,9 Ko | Étude d'opportunité — Plan Mode pour organiser les chantiers — 20261121b |
 | `Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` | fichier | 11,7 Ko | Étude d'opportunité — Preuve de chaque affirmation ajoutée par une correction — 20261115a |
 | `Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` | fichier | 19,2 Ko | JSON |
@@ -106,9 +109,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` | fichier | 6,3 Ko | Digit-AI - Note : essai du skill logo-design-skill sur un produit en construction |
 | `Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` | fichier | 8,3 Ko | Note — Harvey comparé à digit-ai-prospection |
 | `Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` | fichier | 9,1 Ko | Refine de Prime Agent contre oeil-critique — 20261102r |
+| `Digit-AI - Proposition - Lots du parcours d accueil - 20261121e.md` | fichier | 6,4 Ko | Démarche ROI — Parcours d'accueil des nouveaux utilisateurs — 20261121e |
+| `Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` | fichier | 8,1 Ko | Démarche ROI — Parcours d'accueil des nouveaux utilisateurs, version intégrée — 20261121i |
 | `Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md` | fichier | 6,0 Ko | Banc du Plan Mode dans ce harnais — 20261121j |
 | `Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` | fichier | 5,9 Ko | Essai borné de l'audit de sécurité de Cloudflare — 20261102k |
 | `Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` | fichier | 15,2 Ko | Analyse L99 — transformer en actions les sujets laissés de côté par l'œil critique (29/10/ |
+| `Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121c.md` | fichier | 26,1 Ko | Revue — prompt « aide aux nouveaux utilisateurs de la Factory » passé au crible L99, 21/11 |
 | `Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md` | fichier | 53,5 Ko | Revue L99 — « Étude d'opportunités : Claude Code apprend de ses erreurs » |
 | `Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json` | fichier | 10,7 Ko | JSON |
 | `Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` | fichier | 20,6 Ko | Revue L99 — prompt « compétences OpenAI et Gemini dans la Factory » |
@@ -128,4 +134,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_108 fichier(s), 3 sous-dossier(s)_
+_114 fichier(s), 3 sous-dossier(s)_

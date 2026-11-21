@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121a.md",
+ "empreinte": "5774d687cd0796491878419882b266a09ae8886b1e49e466338eebc2710970d1",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-21T10:02:57.931Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

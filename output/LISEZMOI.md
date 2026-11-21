@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 728 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 739 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -264,6 +264,9 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md | 20261110c | 12.7 Ko | `03-etudes/Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
+| Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121d.md | 20261121d | 17.4 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121d.md` |
+| Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121g.md | 20261121g | 15.6 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121g.md` |
+| Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md | 20261121h | 12.7 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md` |
 | Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md | 20261121b | 13.9 Ko | `03-etudes/Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md` |
 | Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md | 20261115a | 11.7 Ko | `03-etudes/Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
@@ -286,9 +289,12 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md | 20261103b | 6.3 Ko | `03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` |
 | Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
+| Digit-AI - Proposition - Lots du parcours d accueil - 20261121e.md | 20261121e | 6.4 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121e.md` |
+| Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md | 20261121i | 8.1 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` |
 | Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md | 20261121j | 6 Ko | `03-etudes/Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md` |
 | Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md | 20261102k | 5.9 Ko | `03-etudes/Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` |
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
+| Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121c.md | 20261121c | 26.1 Ko | `03-etudes/Digit-AI - Revue - Prompt aide aux nouveaux utilisateurs passe au crible L99 - 20261121c.md` |
 | Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md | 20261104a | 53.5 Ko | `03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md` |
 | Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json | — | 10.7 Ko | `03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md.boucle.json` |
 | Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md | 20261103c | 20.6 Ko | `03-etudes/Digit-AI - Revue - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103c.md` |
@@ -565,7 +571,11 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md | 20261017b | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` |
 | Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md | 20261110c | 6.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md` |
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
+| Digit-AI - Synthese Conseil - Parcours d accueil complete par des exemples - 20261121f.md | 20261121f | 5 Ko | `04-plans/Digit-AI - Synthese Conseil - Parcours d accueil complete par des exemples - 20261121f.md` |
+| Digit-AI - Synthese Conseil - Parcours d accueil des nouveaux utilisateurs - 20261121d.md | 20261121d | 7.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Parcours d accueil des nouveaux utilisateurs - 20261121d.md` |
+| Digit-AI - Synthese Conseil - Parcours d accueil niveau suivi et note sur 100 - 20261121i.md | 20261121i | 6.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Parcours d accueil niveau suivi et note sur 100 - 20261121i.md` |
 | Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md | 20261121c | 7.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md` |
+| Digit-AI - Synthese Conseil - Prompt aide aux nouveaux venus passe au crible L99 - 20261121a.md | 20261121a | 5.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt aide aux nouveaux venus passe au crible L99 - 20261121a.md` |
 | Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md | 20261104f | 6.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md` |
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
@@ -604,6 +614,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md | 20261029e | 8.9 Ko | `04-plans/Digit-AI - Synthese Mandat - Bases de donnees de dev et qualification construites - 20261029e.md` |
 | Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md | 20261018n | 9.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Boucle de correction en place - 20261018n.md` |
 | Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md | 20261018o | 6.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Boucle de correction publiee - 20261018o.md` |
+| Digit-AI - Synthese Mandat - Boussole construite lots L01 a L06 - 20261121m.md | 20261121m | 9.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Boussole construite lots L01 a L06 - 20261121m.md` |
 | Digit-AI - Synthese Mandat - Campagne A1 et tri A2 du 12-11 - 20261112c.md | 20261112c | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A1 et tri A2 du 12-11 - 20261112c.md` |
 | Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md | 20261110b | 13.6 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A2 du 10-11 - 20261110b.md` |
 | Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md | 20261102n | 20.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Campagne A2 sur les 21 candidats - 20261102n.md` |

@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121d.md",
+ "empreinte": "2d84f7a9bceb781b1ce0875d71e5c36ba236beb588654c90b77153385c229a1d",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-21T10:17:25.219Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

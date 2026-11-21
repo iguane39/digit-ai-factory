@@ -38,6 +38,8 @@ export const LEXIQUE = [
   // n'est pas un appel. Le 14/09, deux notifications de fin de tâche l'ont déclenché ainsi.
   { skill: "prompt-analyzer-l99", motif: /(?<![\p{L}\p{N}_\-./\\])l99(?![\p{L}\p{N}_\-./\\])/u, forme: "« l99 » dans le message", secondaire: true, horsCode: true },
   { skill: "la-barre", motif: /^\s*\/?barre\b/iu, forme: "« barre… » en tête de message" },
+  // Boussole de l'utilisateur (L-02 et L-04, 21/11/2026, references/BOUSSOLE.md) : le détail de sa progression, et sa reprise d'un autre poste.
+  { skill: "ou-en-suis-je", motif: /^\s*(?:\/?o[ùu]\s+en\s+(?:suis[- ]?je|j['’]en\s+suis)|r[ée]cup[èe]re[rz]?\s+ma\s+progression)\b/iu, forme: "« où en suis-je ? » / « récupère ma progression »" },
   { skill: "ameliore-un-skill", motif: /^\s*(?:am[ée]liore[rz]?|audite[rz]?|durcis|fiabilise[rz]?|score[rz]?|r[ée]vise[rz]?|optimise[rz]?)\s+(?:ce|le|mon|ton|un|une|cette|la)?\s*skill\b/iu, forme: "« améliore/audite ce skill »" },
 ];
 
@@ -273,6 +275,41 @@ export function contexte(message, standardAudit = null) {
     `Ne pas l'invoquer est un défaut de classe « skill-non-invoque-lexique » (todo/CLASSES.json).`);
   const consignes = reconnaitreConsignes(message).map((c) => `[${c.regle} — hook-lexique] ${c.texte}${c.regle === "audit" ? ajoutStandardClient(standardAudit) : ""}`);
   return [...appels, ...consignes].join("\n");
+}
+
+/**
+ * L-05 — LA PREMIÈRE RÉPONSE D'UNE SESSION SE PRÉJUGE AVANT D'ÊTRE AFFICHÉE (GO « Go L01 à L06 » du 21/11/2026, references/BOUSSOLE.md).
+ * Le fait : du 22/10 au 21/11/2026, 50 sessions de produit sur 76 ont vu leur premier tour refusé par le hook de fin de tour, puis
+ * réécrit, 1,0 minute en médiane et 344 minutes au total (journal des hooks du pilot) ; la consigne de préjuger vivait dans le relevé
+ * d'ouverture, asynchrone, qui arrive parfois après le premier échange. Elle s'injecte donc au premier message humain de la session.
+ * Premier tour : la transcription existe et n'a encore aucune réponse de l'assistant. Une transcription absente ou illisible
+ * n'injecte rien (règle de la recette : « transcript absent, illisible ou sans champ → rien »).
+ */
+export function estPremierTour(transcriptPath) {
+  if (!transcriptPath || !existsSync(transcriptPath)) return false;
+  try {
+    // Mesuré le 21/11/2026 : au premier message, la transcription porte déjà des entrées de service (session-owner,
+    // queue-operation, hook_success…) ; la ligne `user` peut manquer encore. Lisible = au moins une ligne JSON typée.
+    const t = readFileSync(transcriptPath, "utf8");
+    const lisible = t.split(/\r?\n/).some((l) => { try { return typeof JSON.parse(l).type === "string"; } catch { return false; } });
+    return lisible && !/"type"\s*:\s*"assistant"/.test(t);
+  } catch { return false; }
+}
+export function consignePremierTour(auPilot) {
+  const cmd = auPilot ? "node oracles/hook-restitution.mjs" : "node forge/hooks/factory.mjs restitution";
+  return `[PREMIER TOUR — hook-lexique, L-05] Premier message de cette session : du 22/10 au 21/11/2026, 50 sessions de produit sur 76 ont vu leur première réponse refusée par le hook de fin de tour, puis réécrite. ` +
+    `Avant d'afficher ta réponse, écris-la dans un fichier du dossier temporaire et juge-la : \`${cmd} --prejuger <fichier>\` (réponse courte, sans écriture : \`${cmd} --pre-vol < <fichier>\`), ` +
+    `corrige jusqu'à l'exit 0, puis affiche-la telle quelle. Reprends en tête les lignes « Boussole — … » du relevé d'ouverture s'il les porte.`;
+}
+
+/** La boussole de l'utilisateur prévenue d'un geste vu par ce hook (J-07 : skill appelé par sa formule ; annonce contredite). Jamais bloquant. */
+async function prevenirBoussole(geste) {
+  try {
+    const b = await import("../scripts/boussole.mjs");
+    const dir = b.dossierUtilisateur();
+    if (geste === "skill") b.noter(dir, "J-07", "hook-lexique");
+    if (geste === "contredire") { const e = b.calculer({ ecrire: false, dir }); b.contredire(dir, e.prouve); }
+  } catch { /* la boussole se tait, le tour continue */ }
 }
 
 /** Le standard d'audit du client du dossier de session, lu SEULEMENT si le message est une demande d'audit du produit ; null sinon (import paresseux, jamais bloquant). */
@@ -724,6 +761,24 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     for (const [ok, glose] of cas) { console.log(`  [${ok ? "PASS" : "FAIL"}] TF-2144 — ${glose}`); ok ? pass++ : fail++; }
   }
 
+  // Boussole (L-02, L-04, L-05 du 21/11/2026) : la formule « où en suis-je ? », et la consigne du premier tour.
+  {
+    const dt = mkdtempSync(join(tmpdir(), "lexique-boussole-"));
+    const tAssistant = join(dt, "a.jsonl"), tHumain = join(dt, "h.jsonl");
+    writeFileSync(tAssistant, JSON.stringify({ type: "user" }) + "\n" + JSON.stringify({ type: "assistant" }) + "\n", "utf8");
+    writeFileSync(tHumain, JSON.stringify({ type: "user" }) + "\n", "utf8");
+    const cas = [
+      [reconnaitre("où en suis-je ?").some((a) => a.skill === "ou-en-suis-je") && reconnaitre("Récupère ma progression depuis G:/Mon Drive").some((a) => a.skill === "ou-en-suis-je"),
+        "« où en suis-je ? » et « récupère ma progression » appellent le skill ou-en-suis-je"],
+      [!reconnaitre("je me demande où en suis-je").some((a) => a.skill === "ou-en-suis-je"), "rouge — la formule au milieu d'une phrase n'appelle rien"],
+      [estPremierTour(tHumain) && !estPremierTour(tAssistant) && !estPremierTour(join(dt, "absent.jsonl")) && !estPremierTour(""),
+        "L-05 — premier tour : transcription sans réponse de l'assistant ; rouge : une réponse déjà rendue, une transcription absente, aucun chemin"],
+      [/node oracles\/hook-restitution\.mjs --prejuger/.test(consignePremierTour(true)) && /node forge\/hooks\/factory\.mjs restitution --prejuger/.test(consignePremierTour(false)),
+        "L-05 — la consigne nomme la commande de préjugement du lieu : pilot ou produit"],
+    ];
+    for (const [ok, glose] of cas) { console.log(`  [${ok ? "PASS" : "FAIL"}] boussole — ${glose}`); ok ? pass++ : fail++; }
+  }
+
   console.log(`\nhook-lexique : ${pass} PASS, ${fail} FAIL`);
   process.exit(fail ? 1 : 0);
 }
@@ -744,6 +799,7 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
   dossier = racineDuProjet(dossier || process.cwd());
   const lignes = [];
   const humain = estMessageHumain(message);
+  let noteSkill = Promise.resolve();
   // TF-2144 : le standard d'audit du client, lu dans son projet commun, SEULEMENT pour une demande d'audit ; asynchrone (import paresseux).
   (humain ? standardPourLeMessage(message, dossier) : Promise.resolve(null))
     .catch(() => null)
@@ -751,6 +807,7 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
       if (humain) {
         const appels = contexte(message, standard);
         if (appels) lignes.push(appels);
+        if (reconnaitre(message).length && process.env.FORGE_SANS_OBSERVATION !== "1") noteSkill = prevenirBoussole("skill");
         const ref = referentielNiveaux(dossier);
         const niveau = ref ? contexteNiveau(message, ref) : "";
         if (niveau) lignes.push(niveau);
@@ -762,6 +819,15 @@ if (process.argv[1] && /hook-lexique\.mjs$/.test(process.argv[1]) && !process.ar
     .then(async (lettre) => {
       // TF-2214 : la lettre du porteur s'écrit au registre des décisions du pilot, avant que le tour ne l'oublie.
       if (humain) await consignerReponsesPilot(message, dossier);
+      await noteSkill;
+      // L-02 : une décision ouverte tranchée sans sa lettre contredit un niveau annoncé, qui redescend d'un cran.
+      if (humain && lettre && process.env.FORGE_SANS_OBSERVATION !== "1") await prevenirBoussole("contredire");
+      // L-05 : au premier message humain de la session, la consigne de préjuger la réponse avant de l'afficher.
+      if (humain && estPremierTour(transcript)) {
+        let auPilot = false;
+        try { auPilot = (await import("./lib-decisions.mjs")).estAuPilot(dossier); } catch { auPilot = false; }
+        lignes.push(consignePremierTour(auPilot));
+      }
       return lettre;
     })
     .then((lettre) => {

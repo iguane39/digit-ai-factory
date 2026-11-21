@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Proposition - Lots du parcours d accueil - 20261121e.md",
+ "empreinte": "fcae0454e447faea48fe8bd0b9010739afedd005c2e3f2931345f09315c0f4ce",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-21T10:17:25.268Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

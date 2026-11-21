@@ -33,11 +33,12 @@ const jouer = (prompt) => spawnSync(process.execPath, [HOOK], { encoding: "utf8"
 // 2 cas fondateurs (prompt collé, formule du lexique qui prime) et 6 cas voisins dans les deux sens ;
 // puis de 74 à 81 le 05/11 (TF-2144) : le standard d'audit du client lu avant le routage, 7 cas dans les deux sens ;
 // puis de 81 à 93 le 09/11 (TF-2301) : le verbe de la demande porte l'audit, 7 mentions épargnées (identifiant,
-// énumération d'idées, citation, constat) et 5 demandes reconnues dont celles qui portent des mots voisins.
-check("self-test du hook : 93 cas verts", () => {
+// énumération d'idées, citation, constat) et 5 demandes reconnues dont celles qui portent des mots voisins ;
+// puis de 93 à 97 le 21/11 (boussole, L-02 et L-05) : la formule « où en suis-je ? » dans les deux sens, et la consigne du premier tour.
+check("self-test du hook : 97 cas verts", () => {
   const r = spawnSync(process.execPath, [HOOK, "--self-test"], { encoding: "utf8" });
   if (r.status !== 0) throw new Error(`exit ${r.status} : ${r.stdout}`);
-  if (!/93 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
+  if (!/97 PASS, 0 FAIL/.test(r.stdout)) throw new Error(`compte inattendu : ${r.stdout.split("\n").pop()}`);
 });
 // TF-2301 — la consigne d'une série d'animations qui cite `forge-audit` dans une liste d'idées ne reçoit plus la route d'audit ;
 // la même liste suivie d'une demande portée par un verbe la reçoit. Joué au point d'entrée réel.
