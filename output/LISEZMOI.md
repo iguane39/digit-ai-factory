@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 719 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 723 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -534,11 +534,14 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md | 20261103i | 16.5 Ko | `04-plans/Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md | 20261016b | 10 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` |
 | Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json | — | 3.2 Ko | `04-plans/Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` |
+| Digit-AI - Prompt - Plan de mise a jour des competences - 20261121j.md | 20261121j | 14.5 Ko | `04-plans/Digit-AI - Prompt - Plan de mise a jour des competences - 20261121j.md` |
 | Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md | 20261109g | 15 Ko | `04-plans/Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` |
 | Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md | 20261102g | 22.1 Ko | `04-plans/Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` |
 | Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md | 20261112e | 15.2 Ko | `04-plans/Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` |
 | Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md | 20261112g | 15.3 Ko | `04-plans/Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md` |
 | Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md | 20261102c | 14.5 Ko | `04-plans/Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` |
+| Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md | 20261121g | 39.7 Ko | `04-plans/Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md` |
+| Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md.boucle.json | — | 15.7 Ko | `04-plans/Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md.boucle.json` |
 | Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md | 20261102a | 11.1 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md | 20261026r | 8.9 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` |
 | Digit-AI - Revue hebdomadaire - Propositions D-91 et bases de donnees - 20261029d.md | 20261029d | 3.6 Ko | `04-plans/Digit-AI - Revue hebdomadaire - Propositions D-91 et bases de donnees - 20261029d.md` |
@@ -564,6 +567,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |
 | Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md | 20261103j | 7.9 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` |
 | Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md | 20261102h | 7.8 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` |
+| Digit-AI - Synthese Conseil - Prompt mise a jour competences passe au crible L99 - 20261121h.md | 20261121h | 8.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt mise a jour competences passe au crible L99 - 20261121h.md` |
 | Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md | 20261109f | 7.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md` |
 | Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md | 20261102f | 10.6 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` |
 | Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md | 20261112f | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md` |

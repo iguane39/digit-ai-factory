@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Conseil - Prompt mise a jour competences passe au crible L99 - 20261121h.md",
+ "empreinte": "0010678ce7436abd0bae8a7b47ace21b294d207ea53f370b354258a54a570fa2",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-21T10:36:07.083Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

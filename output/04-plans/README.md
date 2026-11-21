@@ -28,11 +28,14 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Prompt - Competences OpenAI et Gemini dans la Factory - 20261103i.md` | fichier | 16,5 Ko | Prompt — Décider s'il faut des compétences OpenAI et Gemini dans la Factory, et lesquelles |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md` | fichier | 10,0 Ko | Prompt — Ajouter les compétences Supabase aux forges, sur le modèle d'Azure et de Databric |
 | `Digit-AI - Prompt - Competences Supabase dans les forges - 20261016b.md.boucle.json` | fichier | 3,2 Ko | JSON |
+| `Digit-AI - Prompt - Plan de mise a jour des competences - 20261121j.md` | fichier | 14,5 Ko | Plan de mise à jour des compétences de la Factory, rattrapage des produits compris |
 | `Digit-AI - Prompt - Serie d animations de la Factory - 20261109g.md` | fichier | 15,0 Ko | Série d'animations « La Factory Digit-AI en action » : cadrage et cinq épisodes |
 | `Digit-AI - Prompt - Skill make-it-better et page de versions - 20261102g.md` | fichier | 22,1 Ko | Prompt — construire le skill make-it-better et sa page de versions |
 | `Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112e.md` | fichier | 15,2 Ko | Prompt — Suivi des agents toutes les 15 minutes |
 | `Digit-AI - Prompt - Suivi des agents toutes les 15 minutes - 20261112g.md` | fichier | 15,3 Ko | Prompt — Suivi des agents toutes les 15 minutes |
 | `Digit-AI - Prompt - Tri des sujets Claude et IA des favoris TikTok et skill - 20261102c.md` | fichier | 14,5 Ko | markdown |
+| `Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md` | fichier | 39,7 Ko | Prompt « plan de mise à jour des compétences » passé au crible L99 |
+| `Digit-AI - Revue - Prompt mise a jour competences passé au crible L99 - 20261121g.md.boucle.json` | fichier | 15,7 Ko | JSON |
 | `Digit-AI - Revue hebdomadaire - Propositions D-114 a D-119 - 20261102a.md` | fichier | 11,1 Ko | Revue hebdomadaire des propositions — 2026-11-02 |
 | `Digit-AI - Revue hebdomadaire - Propositions D-81 a D-84 - 20261026r.md` | fichier | 8,9 Ko | Revue hebdomadaire des propositions — 2026-10-26 |
 | `Digit-AI - Revue hebdomadaire - Propositions D-91 et bases de donnees - 20261029d.md` | fichier | 3,6 Ko | Revue hebdomadaire des propositions — 2026-10-29 |
@@ -58,6 +61,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
 | `Digit-AI - Synthese Conseil - Prompt competences OpenAI et Gemini passe au crible L99 - 20261103j.md` | fichier | 7,9 Ko | Synthèse Conseil — prompt « compétences OpenAI et Gemini » passé au crible L99, aucune déc |
 | `Digit-AI - Synthese Conseil - Prompt make-it-better avec Word et PDF - 20261102h.md` | fichier | 7,8 Ko | Synthèse Conseil — prompt make-it-better avec Word et PDF, 1 décision attendue (02/11/2026 |
+| `Digit-AI - Synthese Conseil - Prompt mise a jour competences passe au crible L99 - 20261121h.md` | fichier | 8,6 Ko | Synthèse Conseil — prompt du plan de mise à jour des compétences passé au crible L99 (21/1 |
 | `Digit-AI - Synthese Conseil - Prompt serie d animations passe au crible L99 - 20261109f.md` | fichier | 7,5 Ko | markdown |
 | `Digit-AI - Synthese Conseil - Prompt skill make-it-better passe au crible L99 - 20261102f.md` | fichier | 10,6 Ko | Synthèse Conseil — prompt du skill make-it-better passé au crible L99, 2 décisions attendu |
 | `Digit-AI - Synthese Conseil - Prompt suivi d avancement des agents passe au crible L99 - 20261112f.md` | fichier | 10,4 Ko | Synthèse Conseil — prompt « suivi d'avancement des agents » passé au crible L99 (analyse d |
@@ -257,4 +261,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_236 fichier(s), 4 sous-dossier(s)_
+_240 fichier(s), 4 sous-dossier(s)_
