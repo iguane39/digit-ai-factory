@@ -56,6 +56,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` | fichier | 10,4 Ko | Synthèse Conseil — trois formats pour qu'une décision se comprenne et se tranche sans rien |
 | `Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md` | fichier | 6,3 Ko | Synthèse Conseil — Intégration des compétences de clip vidéo dans la Factory (10/11/2026,  |
 | `Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` | fichier | 9,1 Ko | Synthèse Conseil — 41 sujets ouverts au registre publié, aucun retour en attente (15/10/20 |
+| `Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md` | fichier | 7,5 Ko | Synthèse Conseil — étude d'opportunité du Plan Mode pour organiser les chantiers, 21/11/20 |
 | `Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md` | fichier | 6,1 Ko | Synthèse Conseil — prompt d'étude « Claude Code apprend de ses erreurs » passé au crible L |
 | `Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` | fichier | 10,3 Ko | Synthèse Conseil — prompt sur les bases de développement et de qualification passé au crib |
 | `Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` | fichier | 8,3 Ko | Synthèse Conseil — prompt Cloudflare, GitHub et Supabase passé au crible L99, version a dé |
@@ -261,4 +262,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_240 fichier(s), 4 sous-dossier(s)_
+_241 fichier(s), 4 sous-dossier(s)_

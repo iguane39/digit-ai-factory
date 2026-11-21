@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 723 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 726 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -264,6 +264,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md | 20261110c | 12.7 Ko | `03-etudes/Digit-AI - Étude - Intégration des compétences de clip vidéo dans la Factory - 20261110c.md` |
 | Digit-AI - Étude - Oeil critique global des process - 20261020a.md | 20261020a | 30.6 Ko | `03-etudes/Digit-AI - Étude - Oeil critique global des process - 20261020a.md` |
 | Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md | 20261102p | 36.8 Ko | `03-etudes/Digit-AI - Etude - Opportunite plateforme pentest autorise automatise - 20261102p.md` |
+| Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md | 20261121b | 13.9 Ko | `03-etudes/Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md` |
 | Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md | 20261115a | 11.7 Ko | `03-etudes/Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md | 20261106a | 98.4 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` |
@@ -285,6 +286,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md | 20261103b | 6.3 Ko | `03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` |
 | Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
+| Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md | 20261121j | 6 Ko | `03-etudes/Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md` |
 | Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md | 20261102k | 5.9 Ko | `03-etudes/Digit-AI - Rapport - Essai borne de l audit de securite de Cloudflare - 20261102k.md` |
 | Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md | 20261029d | 15.2 Ko | `03-etudes/Digit-AI - Revue - Prompt actions code mort et sujets oeil critique passe au crible L99 - 20261029d.md` |
 | Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md | 20261104a | 53.5 Ko | `03-etudes/Digit-AI - Revue - Prompt apprentissage des erreurs passe au crible L99 - 20261104a.md` |
@@ -562,6 +564,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md | 20261017b | 10.4 Ko | `04-plans/Digit-AI - Synthese Conseil - Format des decisions auto-portantes - 20261017b.md` |
 | Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md | 20261110c | 6.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Integration des competences de clip video - 20261110c.md` |
 | Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md | 20261015h | 9.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Liste des TODOs et retours ouverts - 20261015h.md` |
+| Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md | 20261121c | 7.5 Ko | `04-plans/Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md` |
 | Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md | 20261104f | 6.1 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt apprentissage des erreurs passe au crible L99 - 20261104f.md` |
 | Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md | 20261029b | 10.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt bases de donnees passe au crible L99 - 20261029b.md` |
 | Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md | 20261028a | 8.3 Ko | `04-plans/Digit-AI - Synthese Conseil - Prompt Cloudflare GitHub Supabase passe au crible L99 - 20261028a.md` |

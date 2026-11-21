@@ -1,0 +1,81 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+  "date_iso": "2026-11-21T11:25:05.346Z",
+  "registre_version": "2.66.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · 7 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md",
+    "ts": "2026-11-21T11:25:05.345Z",
+    "fichiers": {
+      "output\\03-etudes\\Digit-AI - Rapport - Banc du Plan Mode dans ce harnais - 20261121j.md": "09e9f15640d8bea9c055aa4d98ecb174c5cf8d997267f4e2e1042ba059cde1ff"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

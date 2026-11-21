@@ -1,0 +1,8 @@
+{
+ "format": "pilot/jugement@1",
+ "fichier": "Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+ "empreinte": "99d6272d9007f08ad7288b42617402f6a6259004cf55127149a26bb3c55fe385",
+ "methode": "sha256/lf",
+ "scelle_le": "2026-11-21T10:10:17.468Z",
+ "regle": "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)"
+}

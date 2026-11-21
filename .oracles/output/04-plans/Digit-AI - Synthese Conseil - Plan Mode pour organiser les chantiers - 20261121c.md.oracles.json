@@ -1,0 +1,81 @@
+{
+  "cible": "c:\\dev\\digit-ai-factory\\output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+  "date_iso": "2026-11-21T10:09:35.891Z",
+  "registre_version": "2.66.0",
+  "profil": "digit-ai",
+  "niveau": "note",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 5,
+    "fail": 0,
+    "skip": 2,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+      "verdict": "PASS",
+      "detail": "3 constat(s) · 2 affirmation(s) chiffrée(s) contrôlée(s) — toutes sourcées/cohérentes (2 avertissement(s)) ; pourcentage « 20% » non sourcé"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md",
+    "ts": "2026-11-21T10:09:35.890Z",
+    "fichiers": {
+      "output\\04-plans\\Digit-AI - Synthese Conseil - Plan Mode pour organiser les chantiers - 20261121c.md": "99d6272d9007f08ad7288b42617402f6a6259004cf55127149a26bb3c55fe385"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
