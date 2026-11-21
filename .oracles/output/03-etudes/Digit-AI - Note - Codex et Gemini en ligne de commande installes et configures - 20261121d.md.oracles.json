@@ -1,0 +1,81 @@
+{
+  "cible": "output/03-etudes/Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+  "date_iso": "2026-11-21T11:43:01.410Z",
+  "registre_version": "2.66.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+      "verdict": "SKIP",
+      "detail": "aucune affirmation chiffrée hors table détectée"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md",
+    "ts": "2026-11-21T11:43:01.410Z",
+    "fichiers": {
+      "output\\03-etudes\\Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md": "dbaed764a0973331f966569d49f5018627f63f558ab3317f491521b0a2f86c7c"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}

@@ -66,6 +66,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` | fichier | 31,8 Ko | Diagnostic de la Factory — œil critique, proposition révisée (20/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` | fichier | 48,9 Ko | Diagnostic de la Factory — œil critique, proposition révisée (21/10/2026) |
 | `Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` | fichier | 23,1 Ko | Diagnostic de la Factory — œil critique, cible retravaillée (26/10/2026) |
+| `Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md` | fichier | 12,7 Ko | Diagnostic d'exploitation — sauvegardes Drive des produits — 20261121c |
 | `Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md` | fichier | 8,9 Ko | Diagnostic Factory — Sessions concurrentes sur forge-digit-ai-fr — 20261114b |
 | `Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md` | fichier | 31,5 Ko | Étude d'opportunité — Amélioration continue des agents par leurs leçons — 20261114d |
 | `Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` | fichier | 7,7 Ko | Amélioration de la boucle de relecture L99 : ce que l'expérience du 29/10/2026 a mesuré |
@@ -104,9 +105,11 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` | fichier | 514,7 Ko | JSON |
 | `Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` | fichier | 190,2 Ko | Inventaire — fonctionnalités de Cloudflare, GitHub et Supabase (28/10/2026) |
 | `Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` | fichier | 5,1 Ko | Inventaire — protections GitHub des 14 dépôts publics de la Factory (28/10/2026) |
+| `Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md` | fichier | 11,0 Ko | Codex et Gemini en ligne de commande : installés et configurés |
 | `Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md` | fichier | 6,0 Ko | Digit-AI - Note : essai de MarkItDown sur 3 entrants bureautiques |
 | `Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` | fichier | 3,9 Ko | Essai — les 10 règles du skill i-have-adhd contre nos règles d'écriture — 20261102g |
 | `Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` | fichier | 6,3 Ko | Digit-AI - Note : essai du skill logo-design-skill sur un produit en construction |
+| `Digit-AI - Note - Essais de Codex et Gemini en ligne de commande - 20261121e.md` | fichier | 5,4 Ko | Essais de Codex et Gemini en ligne de commande |
 | `Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` | fichier | 8,3 Ko | Note — Harvey comparé à digit-ai-prospection |
 | `Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` | fichier | 9,1 Ko | Refine de Prime Agent contre oeil-critique — 20261102r |
 | `Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` | fichier | 8,1 Ko | Démarche ROI — Parcours d'accueil des nouveaux utilisateurs, version intégrée — 20261121i |
@@ -134,4 +137,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_114 fichier(s), 3 sous-dossier(s)_
+_117 fichier(s), 3 sous-dossier(s)_

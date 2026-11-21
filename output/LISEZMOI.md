@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 739 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 742 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -246,6 +246,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md | 20261020c | 31.8 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261020c.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md | 20261021a | 48.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261021a.md` |
 | Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md | 20261026a | 23.1 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Oeil critique - 20261026a.md` |
+| Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md | 20261121c | 12.7 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Sauvegardes Drive des produits - 20261121c.md` |
 | Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md | 20261114b | 8.9 Ko | `03-etudes/Digit-AI - Diagnostic Factory - Sessions concurrentes sur forge-digit-ai-fr - 20261114b.md` |
 | Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md | 20261114d | 31.5 Ko | `03-etudes/Digit-AI - Étude - Amelioration continue des agents par leurs lecons - 20261114d.md` |
 | Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md | 20261029f | 7.7 Ko | `03-etudes/Digit-AI - Étude - Amelioration de la boucle de relecture L99 - 20261029f.md` |
@@ -284,9 +285,11 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json | 20261028a | 514.7 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.json` |
 | Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md | 20261028a | 190.2 Ko | `03-etudes/Digit-AI - Inventaire - Fonctionnalites Cloudflare GitHub Supabase - 20261028a.md` |
 | Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md | 20261028a | 5.1 Ko | `03-etudes/Digit-AI - Inventaire - Protections GitHub des depots publics - 20261028a.md` |
+| Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md | 20261121d | 11 Ko | `03-etudes/Digit-AI - Note - Codex et Gemini en ligne de commande installes et configures - 20261121d.md` |
 | Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md | 20261103a | 6 Ko | `03-etudes/Digit-AI - Note - Essai de MarkItDown sur 3 entrants bureautiques - 20261103a.md` |
 | Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md | 20261102g | 3.9 Ko | `03-etudes/Digit-AI - Note - Essai des regles i-have-adhd contre nos regles d ecriture - 20261102g.md` |
 | Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md | 20261103b | 6.3 Ko | `03-etudes/Digit-AI - Note - Essai du skill logo-design-skill sur un produit en construction - 20261103b.md` |
+| Digit-AI - Note - Essais de Codex et Gemini en ligne de commande - 20261121e.md | 20261121e | 5.4 Ko | `03-etudes/Digit-AI - Note - Essais de Codex et Gemini en ligne de commande - 20261121e.md` |
 | Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
 | Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md | 20261121i | 8.1 Ko | `03-etudes/Digit-AI - Proposition - Lots du parcours d accueil - 20261121i.md` |
