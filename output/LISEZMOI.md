@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 748 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 750 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -270,6 +270,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md | 20261121h | 12.7 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md` |
 | Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121k.md | 20261121k | 17.4 Ko | `03-etudes/Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121k.md` |
 | Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md | 20261121b | 13.9 Ko | `03-etudes/Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md` |
+| Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md | 20261121r | 10.8 Ko | `03-etudes/Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md` |
+| Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md.banc.json | — | 6.4 Ko | `03-etudes/Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md.banc.json` |
 | Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md | 20261115a | 11.7 Ko | `03-etudes/Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md | 20261106a | 98.4 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` |

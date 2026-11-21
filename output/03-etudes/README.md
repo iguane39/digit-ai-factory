@@ -90,6 +90,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121h.md` | fichier | 12,7 Ko | Étude — Parcours d'accueil des nouveaux utilisateurs de la Factory, version intégrée, 21/1 |
 | `Digit-AI - Étude - Parcours d accueil des nouveaux utilisateurs - 20261121k.md` | fichier | 17,4 Ko | Étude — Parcours d'accueil des nouveaux utilisateurs de la Factory, 21/11/2026 |
 | `Digit-AI - Étude - Plan Mode pour organiser les chantiers - 20261121b.md` | fichier | 13,9 Ko | Étude d'opportunité — Plan Mode pour organiser les chantiers — 20261121b |
+| `Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md` | fichier | 10,8 Ko | Étude — Plan de répartition du travail entre Claude, Codex et Antigravity |
+| `Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md.banc.json` | fichier | 6,4 Ko | JSON |
 | `Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` | fichier | 11,7 Ko | Étude d'opportunité — Preuve de chaque affirmation ajoutée par une correction — 20261115a |
 | `Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` | fichier | 19,2 Ko | JSON |
 | `Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` | fichier | 98,4 Ko | Étude — Sécurité par défaut de bout en bout — 20261106a |
@@ -143,4 +145,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_123 fichier(s), 3 sous-dossier(s)_
+_125 fichier(s), 3 sous-dossier(s)_

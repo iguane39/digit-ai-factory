@@ -1,0 +1,47 @@
+{
+  "schema": "banc-multi-agents@1",
+  "prompt": "revue 20261121p, chapitre 8, passe 3, avec ses 2 corrections",
+  "poste": "Dell-XPS-16",
+  "autorisation": "D-230 (a), réponse du 21/11/2026 à 17:23, avec la consigne permanente « ne demande plus pour utiliser le multi-agent »",
+  "etape0": {
+    "heure": "2026-11-21T17:10:53+01:00",
+    "bootstrap_pull": "exit 1 : 2 défauts du poste hors de ce travail (57 modifications locales d'autres sessions ; règle K2 des skills) ; écart avec origin/main 0 et 0",
+    "claude": "2.1.318 (Claude Code)",
+    "codex": "codex-cli 0.171.0 ; Logged in using ChatGPT ; model = gpt-5.6-sol, model_reasoning_effort = low dans config.toml, high passé à l'appel",
+    "antigravity": "1.5.14 ; 23 modèles ; option --model présente",
+    "gemini_cli": "0.70.0, non retesté (refus consigné dans la note 20261121e)"
+  },
+  "oracles_prouves": {
+    "T1": "node --test oracle-T1.test.mjs (10 cas cachés) : référence exit 0, fausse exit 1",
+    "T2": "oracle-T2.mjs : référence exit 0, sortie vide exit 1",
+    "T3": "oracle-T3.mjs (forme + oracle-ecriture) : référence exit 0, fausse exit 1"
+  },
+  "appels": [
+    {"agent": "claude", "tache": "T1", "outil": "agent campagne", "modele": "sonnet", "effort": "high", "depart": "a525858", "duree_s": 29.3, "jetons_claude": 61372, "jetons_outil": null, "oracle_exit": 0, "detail": "10 cas cachés sur 10 ; 8 tests de l'agent", "reprises": 0, "ecarts_consigne": []},
+    {"agent": "claude", "tache": "T2", "outil": "agent campagne", "modele": "sonnet", "effort": "high", "depart": "f030733", "duree_s": 34.7, "jetons_claude": 61687, "jetons_outil": null, "oracle_exit": 0, "detail": "20 sur 20", "reprises": 0, "ecarts_consigne": ["un git status lancé malgré « aucune commande git »"]},
+    {"agent": "claude", "tache": "T3", "outil": "agent campagne", "modele": "sonnet", "effort": "high", "depart": "833ccde", "duree_s": 38.4, "jetons_claude": 43609, "jetons_outil": null, "oracle_exit": 0, "detail": "155 mots ; oracle-ecriture PASS", "reprises": 0, "ecarts_consigne": ["script verif_t3.py écrit hors de son dossier"]},
+    {"agent": "codex", "tache": "T1", "outil": "codex exec", "modele": "gpt-5.6-sol", "effort": "high", "depart": "4019223", "duree_s": 36, "jetons_claude": "orchestration seule", "jetons_outil": {"entree": 76259, "dont_cache": 68480, "sortie": 1245}, "oracle_exit": 0, "detail": "10 cas cachés sur 10 ; 7 tests de l'agent", "reprises": 0, "ecarts_consigne": []},
+    {"agent": "codex", "tache": "T2", "outil": "codex exec", "modele": "gpt-5.6-sol", "effort": "high", "depart": "01551ea", "duree_s": 99, "jetons_claude": "orchestration seule", "jetons_outil": {"entree": 143363, "dont_cache": 134528, "sortie": 4273}, "oracle_exit": 1, "detail": "16 sur 20 : 4 noms accentués corrompus (lecture en Windows-1252) ; marque d'ordre d'octets en tête des 20 fichiers", "reprises": 1, "ecarts_consigne": ["sortie/.gitkeep supprimé"]},
+    {"agent": "codex", "tache": "T2-reprise", "outil": "codex exec", "modele": "gpt-5.6-sol", "effort": "high", "depart": "01551ea", "duree_s": 121, "jetons_claude": "orchestration seule", "jetons_outil": {"entree": 172108, "sortie": 5555}, "oracle_exit": 0, "detail": "20 sur 20 avec un préambule qui précise l'encodage UTF-8 sans marque d'ordre d'octets", "reprises": 0, "ecarts_consigne": ["sortie/.gitkeep supprimé"]},
+    {"agent": "codex", "tache": "T3", "outil": "codex exec", "modele": "gpt-5.6-sol", "effort": "high", "depart": "ea41699", "duree_s": 43, "jetons_claude": "orchestration seule", "jetons_outil": {"entree": 77190, "dont_cache": 69248, "sortie": 1701}, "oracle_exit": 0, "detail": "150 mots ; oracle-ecriture PASS", "reprises": 0, "ecarts_consigne": []},
+    {"agent": "antigravity", "tache": "T1", "outil": "agy -p --sandbox", "modele": "gemini-4-neon-high", "effort": "high", "depart": "c44a3ca", "duree_s": 63, "jetons_claude": "orchestration seule", "jetons_outil": {"total": 22872, "entree": 18706, "sortie": 4166, "reflexion": 2936, "cache_lu": 30469}, "oracle_exit": 0, "detail": "10 cas cachés sur 10 ; 7 tests de l'agent", "reprises": 0, "ecarts_consigne": []},
+    {"agent": "antigravity", "tache": "T2", "outil": "agy -p --sandbox", "modele": "gemini-4-neon-high", "effort": "high", "depart": "37b8648", "duree_s": 135, "jetons_claude": "orchestration seule", "jetons_outil": {"total": 39170, "entree": 28011, "sortie": 11159, "reflexion": 5368, "cache_lu": 66884}, "oracle_exit": 0, "detail": "20 sur 20", "reprises": 0, "ecarts_consigne": []},
+    {"agent": "antigravity", "tache": "T3", "outil": "agy -p --sandbox", "modele": "gemini-4-neon-high", "effort": "high", "depart": "983aff2", "duree_s": 124, "jetons_claude": "orchestration seule", "jetons_outil": {"total": 41945, "entree": 29037, "sortie": 12908, "reflexion": 9987, "cache_lu": 79711}, "oracle_exit": 0, "detail": "151 mots ; oracle-ecriture PASS", "reprises": 0, "ecarts_consigne": []}
+  ],
+  "quota_claude_orchestration": {"fenetre": "2026-11-21T17:23:30 à 17:29:30 heure de Paris, pendant les 6 premiers appels de Codex et d'Antigravity", "requetes": 8, "entree": 20, "sortie": 5566, "cache_ecrit": 12387, "cache_lu": 3561470, "lecture": "le cache lu vient du long contexte de la session, pas des appels ; un appel externe n'ajoute que sa ligne de commande et la lecture de son résultat"},
+  "relecture_aveugle": {
+    "agent": "relecteur (type dédié, lecture seule)", "livrables": 9, "anonymisation": "L1 à L9 dans un ordre mélangé, table tenue hors du dossier remis", "jetons": 113265, "duree_s": 168.6,
+    "par_livrable": {
+      "claude-T1": {"note": 9, "bloquants": 0, "majeurs": 0, "mineurs": 2},
+      "claude-T2": {"note": 10, "bloquants": 0, "majeurs": 0, "mineurs": 0},
+      "claude-T3": {"note": 8, "bloquants": 0, "majeurs": 0, "mineurs": 4},
+      "codex-T1": {"note": 9, "bloquants": 0, "majeurs": 0, "mineurs": 2},
+      "codex-T2": {"note": 5, "bloquants": 4, "majeurs": 0, "mineurs": 2},
+      "codex-T3": {"note": 7, "bloquants": 0, "majeurs": 0, "mineurs": 3},
+      "antigravity-T1": {"note": 9, "bloquants": 0, "majeurs": 0, "mineurs": 2},
+      "antigravity-T2": {"note": 10, "bloquants": 0, "majeurs": 0, "mineurs": 0},
+      "antigravity-T3": {"note": 7, "bloquants": 0, "majeurs": 1, "mineurs": 4, "majeur": "« vous montrez immédiatement que votre site propose le meilleur prix » : publier un tarif ne prouve pas qu'il est le moins cher"}
+    }
+  },
+  "temoin": "intact, relu après la série de Claude, après celle de Codex, après celle d'Antigravity et après la reprise"
+}
