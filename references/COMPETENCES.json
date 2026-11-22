@@ -1,0 +1,355 @@
+{
+  "schema": "pilot/competences@1",
+  "version": "1.0.0",
+  "date": "2026-11-22",
+  "pourquoi": "Loi transverse n° 4 : une compétence de la Factory (corpus d'expert, référentiel, fichier de gestes) est une donnée volatile, et aucune ne portait de durée de validité. Plan de mise à jour des compétences du 21/11/2026 (TF-2743, lot L-01) : 27 skills et 4 corpus n'avaient aucune date ni source, le corpus AWS présentait App Runner comme le service canonique alors qu'AWS ne le propose plus aux nouveaux clients (page lue le 21/11/2026, rapporté par le plan, non relu ici). Ce registre dit, pour chaque compétence de domaine, son type, où elle vit, quelle forge la porte, combien de temps sa source reste valide et quand elle a été relue. oracle-peremption-competences en rend un verdict par entrée.",
+  "decision": "D-229 (c) du 21/11/2026 : le contrôle de péremption avertit, il ne bloque rien. Le régime se règle ICI, par type, sans toucher au code : « avertissement » (défaut) ou « bloquant » (l'oracle rend alors FAIL pour une compétence périmée de ce type). Retour arrière = repasser le type en « avertissement ».",
+  "regime": {
+    "technique": "avertissement",
+    "sectorielle": "avertissement",
+    "fonctionnelle": "avertissement"
+  },
+  "types": {
+    "technique": {
+      "duree_jours": 60,
+      "source_autorite": "documentation et notes de version de l'éditeur",
+      "motif": "les notes de version lues changent à la semaine : Railway publie les 05, 13 et 20/11/2026, et App Runner s'est fermé aux nouveaux clients entre deux relectures (plan du 21/11/2026, section 5)"
+    },
+    "sectorielle": {
+      "duree_jours": 180,
+      "source_autorite": "textes officiels datés (BOFiP, service-public, Légifrance, arrêtés)",
+      "motif": "les textes changent au plus 2 fois par an (loi de finances, arrêtés annuels)"
+    },
+    "fonctionnelle": {
+      "duree_jours": 120,
+      "source_autorite": "référentiels de la pratique (WCAG, documentation Google Search Central, normes)",
+      "motif": "les référentiels publient trimestriellement ou moins (mises à jour de Google, versions de WCAG)"
+    }
+  },
+  "lecture_de_verifie_le": "verifie_le est la date de la dernière relecture de la SOURCE d'autorité de la compétence, la plus ancienne des dates de ses artefacts (une compétence vaut ce que vaut son artefact le plus ancien). null = aucune date lisible : l'oracle le rend « sans date », jamais « à jour ». Le registre déclare, il ne constate pas : relire la source est le geste qui remet verifie_le à la date du jour.",
+  "competences": [
+    {
+      "id": "hebergement-touristique",
+      "nom": "hébergement touristique",
+      "type": "sectorielle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-hebergement-touristique.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-hebergement-touristique.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 180,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "acquisition-fonds-immobilier",
+      "nom": "acquisition de fonds immobilier",
+      "type": "sectorielle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-acquisition-fonds-immobilier.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-acquisition-fonds-immobilier.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 180,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "marches-publics-ao",
+      "nom": "marchés publics et appels d'offres",
+      "type": "sectorielle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-marches-publics-ao.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-marches-publics-ao.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 180,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "photovoltaique-residentiel",
+      "nom": "photovoltaïque résidentiel",
+      "type": "sectorielle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-photovoltaique-residentiel.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-photovoltaique-residentiel.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 180,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "conformite-rgpd-ia",
+      "nom": "conformité RGPD et IA",
+      "type": "sectorielle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-conformite-rgpd-ia.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-conformite-rgpd-ia.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 180,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "accessibilite",
+      "nom": "accessibilité",
+      "type": "fonctionnelle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-accessibilite.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 120,
+      "verifie_le": "2026-07-23",
+      "verifie_le_origine": "date d'admission au registre des experts (pas de corpus) ; le plan du 21/11/2026 disait 21/07/2026",
+      "sources_citees": "dans la fiche"
+    },
+    {
+      "id": "data",
+      "nom": "data",
+      "type": "fonctionnelle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-data.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 120,
+      "verifie_le": "2026-07-21",
+      "verifie_le_origine": "date d'admission au registre des experts (pas de corpus)",
+      "sources_citees": "dans la fiche"
+    },
+    {
+      "id": "interop-archi",
+      "nom": "interopérabilité et architecture",
+      "type": "fonctionnelle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-interop-archi.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 120,
+      "verifie_le": "2026-07-21",
+      "verifie_le_origine": "date d'admission au registre des experts (pas de corpus)",
+      "sources_citees": "dans la fiche"
+    },
+    {
+      "id": "ingenierie-pedagogique",
+      "nom": "ingénierie pédagogique",
+      "type": "fonctionnelle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ingenierie-pedagogique.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ingenierie-pedagogique.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 120,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "seo-geo",
+      "nom": "SEO et GEO",
+      "type": "fonctionnelle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-seo-web.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-seo-web.md" },
+        { "forge": "digit-ai-forge-seo-geo", "chemin": "referentiel" }
+      ],
+      "forges": ["digit-ai-forge-agents", "digit-ai-forge-seo-geo"],
+      "duree_jours": 120,
+      "verifie_le": "2026-07-23",
+      "verifie_le_origine": "le corpus experts-forge (23/07/2026) ; les référentiels de forge-seo-geo sont datés du 12/08 au 29/10/2026 (plan du 21/11/2026)",
+      "sources_citees": "corpus : aucune adresse ; référentiels : datés et cités"
+    },
+    {
+      "id": "migration-plateforme-brownfield",
+      "nom": "migration de plateforme existante",
+      "type": "fonctionnelle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-migration-plateforme-brownfield.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-migration-plateforme-brownfield.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 120,
+      "verifie_le": "2026-09-02",
+      "sources_citees": "oui"
+    },
+    {
+      "id": "securite-offensive",
+      "nom": "sécurité offensive",
+      "type": "fonctionnelle",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-securite-offensive.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-securite-offensive.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 120,
+      "verifie_le": "2026-11-03",
+      "verifie_le_origine": "date du corpus ; l'admission a été refusée au registre des experts le 03/11/2026 (statut refuse)",
+      "sources_citees": "oui"
+    },
+    {
+      "id": "copilot-m365",
+      "nom": "Copilot M365",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-copilot-m365.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-copilot-m365.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 60,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "data-platform-cloud",
+      "nom": "plateforme de données cloud",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-data-platform-cloud.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-data-platform-cloud.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 60,
+      "verifie_le": "2026-07-23",
+      "sources_citees": "aucune adresse"
+    },
+    {
+      "id": "ops-aws",
+      "nom": "exploitation AWS",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ops-aws.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ops-aws.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 60,
+      "verifie_le": "2026-08-11",
+      "sources_citees": "oui, App Runner",
+      "constat": "le plan du 21/11/2026 relève qu'AWS ne prend plus de nouveaux clients sur App Runner, que ce corpus présente comme le service canonique (rapporté, non relu ici ; lot L-03)"
+    },
+    {
+      "id": "ops-azure",
+      "nom": "exploitation Azure",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ops-azure.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ops-azure.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 60,
+      "verifie_le": "2026-08-11",
+      "sources_citees": "oui"
+    },
+    {
+      "id": "ops-gcp",
+      "nom": "exploitation GCP",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ops-gcp.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ops-gcp.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 60,
+      "verifie_le": "2026-08-11",
+      "sources_citees": "oui"
+    },
+    {
+      "id": "ops-railway",
+      "nom": "exploitation Railway",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ops-railway.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ops-railway.md" },
+        { "forge": "digit-ai-forge-ops", "chemin": "references/WORKFLOW-DEPLOIEMENT.md" }
+      ],
+      "forges": ["digit-ai-forge-agents", "digit-ai-forge-ops"],
+      "duree_jours": 60,
+      "verifie_le": "2026-08-11",
+      "sources_citees": "point d'API seul, aucune page de documentation"
+    },
+    {
+      "id": "ops-supabase",
+      "nom": "exploitation Supabase",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ops-supabase.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ops-supabase.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 60,
+      "verifie_le": "2026-10-16",
+      "sources_citees": "oui"
+    },
+    {
+      "id": "ops-cloudflare",
+      "nom": "exploitation Cloudflare",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ops-cloudflare.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ops-cloudflare.md" },
+        { "forge": "digit-ai-forge-seo-geo", "chemin": "referentiel/cloudflare.json" },
+        { "forge": "digit-ai-forge-ops", "chemin": "references/GESTES-EXPLOITATION.md" }
+      ],
+      "forges": ["digit-ai-forge-agents", "digit-ai-forge-seo-geo", "digit-ai-forge-ops", "digit-ai-forge-audit"],
+      "duree_jours": 60,
+      "verifie_le": "2026-10-28",
+      "verifie_le_origine": "le corpus experts-forge (28/10/2026) ; le référentiel de forge-seo-geo porte date_verification 2026-10-29 (mesuré) ; l'ADR de chiffrement de forge-audit n'est pas listé ici (chemin à nommer au lot L-11)",
+      "sources_citees": "36 pages datées"
+    },
+    {
+      "id": "ops-github",
+      "nom": "exploitation GitHub",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/fiches/expert-ops-github.md" },
+        { "forge": "digit-ai-forge-agents", "chemin": ".claude/skills/experts-forge/references/corpus-ops-github.md" }
+      ],
+      "forges": ["digit-ai-forge-agents"],
+      "duree_jours": 60,
+      "verifie_le": "2026-11-09",
+      "sources_citees": "oui"
+    },
+    {
+      "id": "conteneurs-et-frontal",
+      "nom": "conteneurs et frontal",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-forge-ops", "chemin": "references/CONTENEURS-A-ETAT.json" },
+        { "forge": "digit-ai-forge-ops", "chemin": "references/RESEAU-ET-FRONTAL-DOCKER.md" },
+        { "forge": "digit-ai-forge-ops", "chemin": "references/IDENTIFIANTS-DE-TEST.md" },
+        { "forge": "digit-ai-forge-ops", "chemin": "references/ENCHAINEMENT-PLANS.md" }
+      ],
+      "forges": ["digit-ai-forge-ops"],
+      "duree_jours": 60,
+      "verifie_le": "2026-10-28",
+      "verifie_le_origine": "la plus ancienne des lectures citées : ENCHAINEMENT-PLANS.md « lu le 28/10/2026 » (CONTENEURS-A-ETAT.json : verifie_le 2026-10-29 ; les deux autres fichiers : 04 et 05/11/2026)",
+      "sources_citees": "partielles"
+    },
+    {
+      "id": "reglages-surs-plateformes",
+      "nom": "réglages sûrs des plateformes",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-factory", "chemin": "references/REGLAGES-SURS-PAR-DEFAUT.json" }
+      ],
+      "forges": ["digit-ai-factory"],
+      "duree_jours": 60,
+      "verifie_le": "2026-11-06",
+      "verifie_le_origine": "le plus ancien des 9 champs source_lue_le du fichier, mesuré le 22/11/2026 (le plan du 21/11/2026 disait « aucune date » : le fichier date chaque réglage, pas le fichier)",
+      "sources_citees": "oui"
+    },
+    {
+      "id": "modeles-claude-en-service",
+      "nom": "modèles Claude en service",
+      "type": "technique",
+      "artefacts": [
+        { "forge": "digit-ai-factory", "chemin": "references/MODELES-EN-SERVICE.json" }
+      ],
+      "forges": ["digit-ai-factory"],
+      "duree_jours": 60,
+      "verifie_le": "2026-09-24",
+      "verifie_le_origine": "le plus ancien des 4 champs lu_le du fichier, mesuré le 22/11/2026 (le plan du 21/11/2026 disait « aucune date » ; la date du fichier est 2026-10-18)",
+      "sources_citees": "oui"
+    }
+  ]
+}

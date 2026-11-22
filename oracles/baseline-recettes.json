@@ -265,6 +265,10 @@
   "cas": 18,
   "vu_le": "2026-08-26"
  },
+ "oracle-peremption-competences.mjs": {
+  "cas": 22,
+  "vu_le": "2026-11-22"
+ },
  "oracle-pieges-regex.mjs": {
   "cas": 30,
   "vu_le": "2026-11-13"
