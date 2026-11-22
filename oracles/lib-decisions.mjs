@@ -253,6 +253,31 @@ export function decisionsRetirees(e) {
 }
 
 /**
+ * TF-2779 (RS-52 de Produit-12, 22/11/2026) : les numéros de décision DÉJÀ RÉPONDUS dans les écrits d'un projet, ceux que le porteur a tranchés par un message qui ne
+ * nomme pas la lettre à la session : D-83, répondue au ledger du produit (seq 417), a été réclamée à chaque restitution de la session. Rend un Set de numéros
+ * (chaînes, « 83 »). Au ledger d'un produit : une entrée `reponse_humain` qui nomme D-N, POSTÉRIEURE à la dernière entrée `question_humain` qui la nomme (une décision
+ * reposée après sa réponse est de nouveau ouverte). Au pilot : une entrée `reponse` du registre `decisions\REGISTRE.jsonl`. Un dossier sans l'un ni l'autre : Set vide.
+ */
+export function numerosRepondus(racine, { registre = REGISTRE_PILOT } = {}) {
+  const repondus = new Set();
+  const ledger = join(racine, "forge", "ledger.jsonl");
+  if (existsSync(ledger)) {
+    const entrees = [];
+    for (const l of readFileSync(ledger, "utf8").split(/\r?\n/)) { if (!l.trim()) continue; try { entrees.push(JSON.parse(l)); } catch { /* ligne illisible : ignorée */ } }
+    const derniereQuestion = new Map();
+    entrees.forEach((e, i) => {
+      if (e?.type === "question_humain") for (const m of JSON.stringify(e).matchAll(D_NUMERO)) derniereQuestion.set(String(Number(m[1])), i);
+    });
+    entrees.forEach((e, i) => {
+      if (e?.type !== "reponse_humain") return;
+      for (const m of JSON.stringify(e).matchAll(D_NUMERO)) { const n = String(Number(m[1])); if (i > (derniereQuestion.get(n) ?? -1)) repondus.add(n); }
+    });
+  }
+  if (estAuPilot(racine)) for (const r of reponsesDuRegistre(registre)) repondus.add(String(r.n));
+  return repondus;
+}
+
+/**
  * Les décisions POSÉES au ledger d'un produit et SANS RÉPONSE NOMMÉE (TF-2214, 06/11/2026). Le 03/11/2026, D-48 (« Supprime-t-on le réseau vide créé en Europe du Nord ?
  * ») a été posée, n'a reçu ni réponse ni rappel, et les ressources qu'elle visait sont restées facturées deux jours. Une décision est POSÉE par une entrée `question_humain`
  * (`decisions_posees` : { "D-N": question }, ou `decision` : "D-N") ; elle est RÉPONDUE quand une entrée `reponse_humain` POSTÉRIEURE la nomme, où que ce soit dans l'entrée.
@@ -372,19 +397,92 @@ export function lireRegistreCommun(produit) {
   return { disponible: true, raison: null, ...lireRegistrePilot(join(g.dossier, REGISTRE_COMMUN_NOM)) };
 }
 
-/** Le prochain numéro libre chez un produit : l'UNION du registre commun, du ledger du produit (toute entrée qui nomme D-N) et du plancher. Lecture seule. */
-export function prochainChezProduit({ produit, plancher = 0 }) {
+/**
+ * TF-2694 (RP-224 de Produit-79, 20/11/2026) : LE LEDGER DE L'ORIGINE COMPTE POUR LE PROCHAIN NUMÉRO. Le 20/11/2026, un arbre en retard de 387 commits sur `origin/main` (avance rapide bloquée par les
+ * recopies d'héritage) a proposé D-990 en lisant son seul ledger local (seq 1181) alors que l'origine portait D-997 et la seq 1242. Le relevé : la branche amont de l'arbre (`@{u}`), un `git fetch` de son
+ * dépôt distant (lecture seule ; il échoue sans bloquer, et la sortie le dit), le nombre de commits d'origine que l'arbre n'a pas, et les numéros D-N que `forge/ledger.jsonl` et `forge/hors-run.jsonl`
+ * y portent (`git show <amont>:<fichier>`, sans toucher à l'arbre). `fetch: false` (ou FORGE_SANS_FETCH=1) lit l'état local de la branche amont sans l'actualiser : il peut dater.
+ * Rend { disponible, raison?, ref, fetch, retard, max, numeros }. Sans branche amont (dépôt sans origine, branche locale) : disponible false, max 0 — le calcul reste celui d'avant.
+ */
+export function numerosDeLOrigine(produit, { fetch = process.env.FORGE_SANS_FETCH !== "1", delaiMs = 20_000 } = {}) {
+  const env = { ...process.env, GIT_TERMINAL_PROMPT: "0" }; for (const k of ["GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"]) delete env[k];
+  const git = (...args) => spawnSync("git", args, { encoding: "utf8", cwd: produit, env, timeout: delaiMs });
+  const vide = (raison) => ({ disponible: false, raison, ref: null, fetch: null, retard: null, max: 0, numeros: new Set() });
+  const amont = git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}");
+  if (amont.error) return vide(`git introuvable ou illisible (${amont.error.code || amont.error.message})`);
+  if (amont.status !== 0) return vide("aucune branche amont (dépôt sans origine, ou branche locale) : le numéro ne tient compte que de l'arbre");
+  const ref = String(amont.stdout).trim();
+  let fetchDit = fetch ? null : "non joué (FORGE_SANS_FETCH ou --sans-fetch) : l'état de la branche amont peut dater";
+  if (fetch) {
+    const f = git("fetch", "--quiet", ref.split("/")[0]);
+    fetchDit = f.status === 0 ? "fait" : `ÉCHOUÉ (${String(f.stderr || f.error?.message || `sortie ${f.status}`).trim().slice(0, 120)}) : l'état de la branche amont peut dater`;
+  }
+  const retard = Number(String(git("rev-list", "--count", `HEAD..${ref}`).stdout).trim());
+  const numeros = new Set();
+  for (const f of ["forge/ledger.jsonl", HORS_RUN_FICHIER]) {
+    const s = git("show", `${ref}:${f}`);
+    if (s.status !== 0) continue;
+    for (const l of String(s.stdout).split(/\r?\n/)) {
+      if (!l.trim()) continue;
+      let e; try { e = JSON.parse(l); } catch { continue; }
+      for (const m of JSON.stringify(e).matchAll(D_NUMERO)) numeros.add(String(Number(m[1])));
+    }
+  }
+  return { disponible: true, ref, fetch: fetchDit, retard: Number.isFinite(retard) ? retard : null, max: [...numeros].reduce((m, n) => Math.max(m, Number(n)), 0), numeros };
+}
+const HORS_RUN_FICHIER = "forge/hors-run.jsonl";
+
+/**
+ * TF-2704 (RETOUR du porteur du 15/11/2026, factory-digit-ai-fr, seq 326) : « on a déjà dit qu'il n'y avait pas besoin de clé API pour le mode --bare de b ». L'option (b) de D-227 proposait une clé
+ * d'API que D-73 (a) avait retirée. LES DÉCISIONS DÉJÀ TRANCHÉES DU MÊME OBJET SE RELISENT AVANT QUE LES OPTIONS S'ÉCRIVENT : cette lecture rend, pour une question à réserver, les décisions déjà
+ * répondues dont le libellé lui ressemble (la part des mots du plus court retrouvée dans l'autre, `SEUIL_VOISINE`) avec leur réponse. Au pilot : les `decision` du registre qui portent une entrée `reponse`
+ * (lettres). Chez un produit : les `decisions_posees` d'une entrée `question_humain` que suit une `reponse_humain` qui les nomme (le texte du champ `reponse`, `choix` ou `resume` quand il existe).
+ * LIMITE DITE : ni le registre ni le ledger ne consignent les options ni celle que la réponse retire ; la lecture rend la décision tranchée et sa réponse, c'est à la session de relire et de ne pas
+ * reproposer une option retirée sans motif écrit. Rien n'est refusé : aucune donnée structurée ne dit quelle option est retirée.
+ * Rend [{ id: "D-73", question, reponse, ressemblance }], les plus proches d'abord, `max` au plus.
+ */
+export const SEUIL_VOISINE = 0.34;
+export function decisionsVoisinesTranchees({ question, produit = null, registre = REGISTRE_PILOT, max = 5, seuil = SEUIL_VOISINE }) {
+  const candidates = [];
+  if (produit) {
+    const fichier = join(produit, "forge", "ledger.jsonl");
+    const entrees = [];
+    if (existsSync(fichier)) for (const l of readFileSync(fichier, "utf8").split(/\r?\n/)) { if (!l.trim()) continue; try { entrees.push(JSON.parse(l)); } catch { /* illisible : ignorée */ } }
+    entrees.forEach((e, i) => {
+      if (e?.type !== "question_humain" || !e.decisions_posees || typeof e.decisions_posees !== "object" || Array.isArray(e.decisions_posees)) return;
+      for (const [k, q] of Object.entries(e.decisions_posees)) {
+        const m = /^D-(\d{1,4})$/.exec(String(k).trim()); if (!m) continue;
+        const id = `D-${Number(m[1])}`, re = new RegExp(`(?<![\\p{L}\\p{N}_])D-?\\s*${Number(m[1])}(?![\\p{N}])`, "iu");
+        const rep = entrees.find((x, j) => j > i && x?.type === "reponse_humain" && re.test(JSON.stringify(x)));
+        if (rep) candidates.push({ id, question: String(q), reponse: String(rep.reponse ?? rep.choix ?? rep.resume ?? "répondue, texte de la réponse non consigné").replace(/\s+/g, " ").slice(0, 160) });
+      }
+    });
+  } else {
+    const reg = lireRegistrePilot(registre);
+    const derniere = new Map(); for (const e of reg.entrees) derniere.set(e.n, e);
+    for (const r of reponsesDuRegistre(registre)) { const d = derniere.get(r.n); if (d) candidates.push({ id: `D-${r.n}`, question: String(d.question), reponse: r.lettres.length ? `lettre(s) ${r.lettres.join(", ")}` : "répondue, lettre non consignée" }); }
+  }
+  const vus = new Set();
+  return candidates.map((c) => ({ ...c, ressemblance: Number(ressemblance(question, c.question).toFixed(2)) }))
+    .filter((c) => c.ressemblance >= seuil && !vus.has(c.id) && vus.add(c.id))
+    .sort((a, b) => b.ressemblance - a.ressemblance).slice(0, max);
+}
+
+/** Le prochain numéro libre chez un produit : l'UNION du registre commun, du ledger du produit (toute entrée qui nomme D-N), de celui de l'ORIGINE (TF-2694) et du plancher. Lecture seule hors `git fetch`. */
+export function prochainChezProduit({ produit, plancher = 0, origine = numerosDeLOrigine(produit) }) {
   const ledger = numerosDuLedger(produit);
   const commun = lireRegistreCommun(produit);
   const affiches = numerosAffiches(produit);
-  return { n: Math.max(ledger.max, commun.max, affiches.max, plancher) + 1, ledger, commun, affiches };
+  return { n: Math.max(ledger.max, commun.max, affiches.max, origine.max, plancher) + 1, ledger, commun, affiches, origine };
 }
 
 /** Réserve le prochain numéro libre chez un produit et l'inscrit à son `forge\ledger.jsonl`, par l'écrivain du produit, sous un verrou propre à la réservation.
  *  Depuis TF-1911 : le numéro se calcule aussi sur le registre commun du poste, où la réservation s'inscrit AVANT le ledger, sous le verrou de ce registre. */
-export function reserverChezProduit({ produit, question, plancher = 0, racineParc, ecrivain = null }) {
+export function reserverChezProduit({ produit, question, plancher = 0, racineParc, ecrivain = null, fetch }) {
   const q = controlerQuestion(question);
   if (!q.ok) throw new Error(q.raison);
+  // TF-2694 : le ledger de l'origine relève le plancher (relevé avant les verrous : un `git fetch` ne se joue pas verrou pris).
+  const origine = numerosDeLOrigine(produit, fetch === undefined ? {} : { fetch });
   const ledger = join(produit, "forge", "ledger.jsonl");
   // TF-2223 : hors run (aucun ledger de run), la réservation s'inscrit au journal hors run, sans écrivain de ledger — ledger.mjs refuse
   // d'ouvrir un journal autrement que par run_open. Le prochain lot de retours le compile.
@@ -393,10 +491,11 @@ export function reserverChezProduit({ produit, question, plancher = 0, racinePar
   if (!horsRun && !w) throw new Error("écrivain du ledger introuvable : ni forge/ledger.py chez le produit, ni ledger.mjs de forge-agents sous la racine du parc (node bootstrap.mjs --pull dans le pilot)");
   const g = dossierGitCommun(produit);
   const fichierCommun = g.ok ? join(g.dossier, REGISTRE_COMMUN_NOM) : null;
-  const section = () => reserverSousVerrous({ produit, q, plancher, w, ledger, fichierCommun, horsRun });
+  const section = () => reserverSousVerrous({ produit, q, plancher: Math.max(plancher, origine.max), w, ledger, fichierCommun, horsRun });
   // Le verrou du registre commun est pris EN PREMIER, celui du produit ensuite : toujours dans cet ordre, donc sans interblocage.
   const r = fichierCommun ? sousVerrou(fichierCommun + ".lock", section, VERROU_COMMUN) : section();
-  return fichierCommun ? { ...r, registre_commun: fichierCommun } : { ...r, registre_commun: null, registre_commun_indisponible: g.raison };
+  const resume = { ref: origine.ref, fetch: origine.fetch, retard: origine.retard, plus_grand: origine.max, ...(origine.raison ? { raison: origine.raison } : {}) };
+  return fichierCommun ? { ...r, registre_commun: fichierCommun, origine: resume } : { ...r, registre_commun: null, registre_commun_indisponible: g.raison, origine: resume };
 }
 
 /** Une entrée au journal hors run, sous le verrou de `forge/ledger.py` (`<journal>.lock`) : seq après le plus grand déjà pris, ts non décroissant. */

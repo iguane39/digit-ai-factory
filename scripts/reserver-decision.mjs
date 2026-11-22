@@ -16,10 +16,15 @@
  *       HORS RUN (TF-2223, 06/11/2026) : sans `forge/ledger.jsonl`, la réservation s'inscrit à `forge/hors-run.jsonl` (même entrée
  *       `question_humain`, champ `hors_run: true`) au lieu d'échouer ; le journal compte pour le numéro suivant, avant comme après l'ouverture
  *       d'un run, et le prochain lot de retours le compile (`python forge/ledger.py --hors-run` le liste).
+ *       TF-2704 : la sortie porte aussi `decisions_voisines_tranchees` — les décisions DÉJÀ RÉPONDUES dont le libellé ressemble à la question réservée, avec leur réponse — et `a_relire` : une option qu'une
+ *       réponse a retirée ne se repropose pas, sauf motif écrit. Rien n'est refusé : ni le registre ni le ledger ne consignent l'option retirée.
  *   node scripts/reserver-decision.mjs --prochain          lecture seule : le prochain numéro libre, sans rien inscrire.
  *   node scripts/reserver-decision.mjs --verifier          lecture seule : les numéros pris deux fois pour des questions différentes.
  *   node scripts/reserver-decision.mjs --reformuler D-N --question "<la question réécrite ?>"   (pilot) la MÊME décision, reposée avec un libellé réécrit : elle garde son numéro.
- *   Options : --produit <dossier> (désigne le produit sans y être), --depuis <N> (le prochain numéro dépasse N : plancher quand le produit
+ *       TF-2694 (RP-224 de Produit-79, 20/11/2026) : chez un produit, le prochain numéro compte AUSSI le ledger de l'ORIGINE (branche amont, `git fetch` joué, `git show <amont>:forge/ledger.jsonl`) :
+ *       un arbre en retard de 387 commits proposait D-990 quand l'origine portait D-997. La sortie dit l'origine lue (`origine`), le retard, et avertit que le seq de l'entrée vient de l'arbre local ;
+ *       `--sans-fetch` lit la branche amont sans l'actualiser (hors ligne) ; sans branche amont, le calcul reste celui d'avant et la sortie le dit.
+ *   Options : --produit <dossier> (désigne le produit sans y être), --sans-fetch, --depuis <N> (le prochain numéro dépasse N : plancher quand le produit
  *   a déjà affiché des numéros que son ledger ne nomme pas), --registre-pilot <fichier> (essais).
  *
  * Sortie : une ligne JSON { reserve: "D-34", question, registre, ... } ; exit 0 = numéro inscrit, 1 = refus (message), 2 = usage.
@@ -37,7 +42,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   REGISTRE_PILOT, lireRegistrePilot, reserverAuPilot, reformulerAuPilot, reserverChezProduit, estAuPilot, numerosDuLedger, doublonsDuRegistre,
-  lireRegistreCommun, prochainChezProduit,
+  lireRegistreCommun, prochainChezProduit, numerosDeLOrigine, decisionsVoisinesTranchees,
 } from "../oracles/lib-decisions.mjs";
 import { produitDe } from "../oracles/hook-restitution.mjs";
 
@@ -57,6 +62,9 @@ if (produitDemande && !existsSync(resolve(produitDemande, "forge")))
 if (!produit && !estAuPilot(cwd) && !valeur("--registre-pilot"))
   sortie({ outil: "reserver-decision", verdict: "ERREUR", message: "le dossier de travail n'est ni le pilot ni un produit (aucun forge/retours/ en remontant) : désigne le produit avec --produit <dossier>" }, 2);
 const plancher = Number(valeur("--depuis")) || 0;
+// TF-2694 : chez un produit, le ledger de l'ORIGINE compte pour le prochain numéro ; `--sans-fetch` lit la branche amont sans l'actualiser.
+const sansFetch = args.includes("--sans-fetch");
+const avertissementRetard = (o) => (o && o.retard > 0 ? { avertissement: `l'arbre est en retard de ${o.retard} commit(s) sur ${o.ref} : le numéro tient compte du ledger de l'origine (D-${o.plus_grand} au plus haut), mais le seq de l'entrée vient de l'arbre local et peut se heurter à celui de l'origine à la fusion` } : {});
 
 try {
   if (args.includes("--verifier")) {
@@ -78,7 +86,11 @@ try {
       message: doublons.length ? "des numéros sont pris pour des questions différentes : renuméroter la plus récente AVANT la réponse humaine, et le dire" : "aucun numéro pris deux fois" }, doublons.length || reg.illisibles ? 1 : 0);
   }
   if (args.includes("--prochain")) {
-    if (produit) { const p = prochainChezProduit({ produit, plancher }); sortie({ outil: "reserver-decision --prochain", cible: "produit", prochain: "D-" + p.n, ledger: p.ledger.fichier, registre_commun: p.commun.fichier, ecrit: false }, 0); }
+    if (produit) {
+      const p = prochainChezProduit({ produit, plancher, origine: numerosDeLOrigine(produit, sansFetch ? { fetch: false } : {}) });
+      const origine = { ref: p.origine.ref, fetch: p.origine.fetch, retard: p.origine.retard, plus_grand: p.origine.max, ...(p.origine.raison ? { raison: p.origine.raison } : {}) };
+      sortie({ outil: "reserver-decision --prochain", cible: "produit", prochain: "D-" + p.n, ledger: p.ledger.fichier, registre_commun: p.commun.fichier, origine, ...avertissementRetard(origine), ecrit: false }, 0);
+    }
     const reg = lireRegistrePilot(registrePilot);
     sortie({ outil: "reserver-decision --prochain", cible: "pilot", prochain: "D-" + (Math.max(reg.max, plancher) + 1), registre: reg.fichier, existe: reg.existe, ecrit: false }, 0);
   }
@@ -92,10 +104,13 @@ try {
   }
   if (!question) sortie({ outil: "reserver-decision", verdict: "ERREUR", message: "--question \"<la question posée ?>\" est exigée" }, 2);
   const r = produit
-    ? reserverChezProduit({ produit, question, plancher })
+    ? reserverChezProduit({ produit, question, plancher, ...(sansFetch ? { fetch: false } : {}) })
     : reserverAuPilot({ question, fichier: registrePilot, plancher });
+  // TF-2704 : les décisions déjà tranchées du même objet se relisent avant d'écrire les options ; une option qu'une réponse a retirée ne se repropose pas sans motif écrit.
+  const voisines = decisionsVoisinesTranchees({ question: r.question, produit, registre: registrePilot }).filter((v) => v.id !== r.id);
   sortie({ outil: "reserver-decision", verdict: "PASS", reserve: r.id, n: r.n, cible: produit ? "produit" : "pilot", question: r.question, registre: r.registre, ecrit_par: r.ecrit_par,
-    ...(produit ? { registre_commun: r.registre_commun, ...(r.registre_commun_indisponible ? { registre_commun_indisponible: r.registre_commun_indisponible } : {}) } : {}),
+    ...(produit ? { registre_commun: r.registre_commun, origine: r.origine, ...avertissementRetard(r.origine), ...(r.registre_commun_indisponible ? { registre_commun_indisponible: r.registre_commun_indisponible } : {}) } : {}),
+    ...(voisines.length ? { decisions_voisines_tranchees: voisines, a_relire: `relire ${voisines.map((v) => v.id).join(", ")} AVANT d'écrire les options : une option qu'une de ces réponses a retirée ne se repropose pas, sauf motif écrit (TF-2704 : D-227 reproposait une clé d'API que D-73 (a) avait retirée)` } : {}),
     a_faire: `afficher « > **${r.id} — ${r.question}** » tel quel (le libellé réservé est celui qu'on affiche)` }, 0);
 } catch (e) {
   sortie({ outil: "reserver-decision", verdict: "FAIL", message: e.message }, 1);
