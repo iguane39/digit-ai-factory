@@ -26,6 +26,13 @@
  *         tranche), que la vérification a été jouée DANS UN NAVIGATEUR à une date, et sur l'ÉTAT
  *         EXÉCUTÉ (DOM après chargement) et non sur le HTML servi.
  *
+ *   PT-3  (TF-2696, 20/11/2026) un RÉGLAGE DE PAIEMENT chez un tiers PRESCRIT dans un document du produit (guide, paramétrage : renouvellement
+ *         d'une empreinte de carte, durée d'une caution, délai d'un acompte, d'une pré-autorisation…) porte, à la section « Réglages de paiement
+ *         chez un tiers » du dossier de MEP, la RÉSERVATION TEST jouée à une date et la RELECTURE MESURÉE de son effet chez le tiers (la valeur
+ *         lue, une date, avant la mise en service). Le fait : un guide du 14/10 prescrivait des empreintes renouvelées à J+3, J+7, J+11 sur une
+ *         validité supposée de 7 jours ; la mesure du 20/11 lit 4 empreintes sur 6 valables 30 jours, aucune libération, 2 600 EUR bloqués
+ *         sur 3 cartes de voyageurs, une plainte de l'exploitant. Aucun réglage prescrit n'avait été relu chez le tiers.
+ *
  * Usage : node scripts/verifier-parcours-tiers.mjs <produit> [--document <dossier.md>]
  * Sortie : JSON · exit 0 = conforme · 1 = au moins un refus · 2 = rien à juger.
  */
@@ -36,6 +43,8 @@ import { fileURLToPath } from "node:url";
 const ICI = dirname(fileURLToPath(import.meta.url));
 
 const NON_JUGE = [
+  "PT-3 : qu'un réglage de paiement prescrit ait réellement été relu chez le tiers, et que la valeur déclarée soit celle que le tiers rend : le contrôle exige la réservation test et la relecture mesurée DATÉES, avec une valeur chiffrée, il ne les rejoue pas (TF-2696)",
+  "PT-3 : une prescription en PROSE qui ne nomme ni un tiers de `references/PASSERELLES-ENCAISSEMENT.json` ni un objet de paiement (empreinte, caution, pré-autorisation, acompte, capture, prélèvement, dépôt de garantie) autour d'un verbe de réglage ; seuls les documents `.md` de `docs/` et de la racine du produit sont lus (jamais forge/, output/, input/)",
   "que le parcours déclaré ait REELLEMENT atteint l'étape qui encaisse : le contrôle exige la déclaration, sa date, son lieu (un navigateur) et son objet (l'état exécuté), il ne rejoue pas le clic. La preuve est le banc du produit, que le dossier cite",
   "un cadre dont l'adresse se construit à l'exécution (variable, concaténation, configuration chargée à distance) : seuls les littéraux `https://…` du produit sont lus",
   "une navigation vers une passerelle par un lien ordinaire ou une redirection serveur : relevée seulement si l'adresse figure en clair dans un fichier du produit et reconnue par `PASSERELLES-ENCAISSEMENT.json`",
@@ -111,6 +120,73 @@ export function releverParcours(texte, rel, donnees = charger()) {
     .map((t) => ({ ...t, ou: `${rel}:${t.ligne}` }));
 }
 
+/**
+ * PT-3 (TF-2696) — les réglages de paiement chez un tiers que le texte d'un document PRESCRIT : un paragraphe qui nomme un tiers de la donnée
+ * datée (par son nom : « stripe », « beds24 »), un verbe de réglage (régler, paramétrer, configurer, activer, renouveler, délai, durée,
+ * validité, expiration, libération) et un objet de paiement (empreinte, caution, pré-autorisation, acompte, capture, prélèvement, dépôt de
+ * garantie). Les trois ensemble, jamais l'un seul : un tiers cité, un acompte mentionné ne sont pas un réglage prescrit.
+ */
+export function releverReglagesDePaiement(texte, rel, donnees = charger()) {
+  const noms = [...new Set(donnees.passerelles.map((p) => String(p).toLowerCase().split(".")[0]).filter((n) => n && n !== "checkout"))];
+  if (!noms.length) return [];
+  const reTiers = new RegExp(`\\b(${noms.map(echapper).join("|")})\\b`, "i");
+  const reReglage = /\b(r[ée]gl|param[ée]tr|configur|activ|d[ée]sactiv|renouvel|d[ée]lai|dur[ée]e|validit|expir|lib[ée]r)\w*/i;
+  const reObjet = /(empreinte|caution|pr[ée]-?autorisation|acompte|capture|pr[ée]l[èe]vement|d[ée]p[ôo]t de garantie|garantie bancaire)/i;
+  const trouves = [];
+  let debut = 0, paragraphe = [];
+  const clore = () => {
+    const bloc = paragraphe.join("\n");
+    const tiers = reTiers.exec(bloc);
+    // « rien à régler », « aucun réglage », « sans paramétrer » : le paragraphe dit qu'il n'y a RIEN à prescrire, il n'est pas une prescription.
+    const nie = /\b(rien|aucune?|sans|pas\s+de)\b[^.\n]{0,40}\b(r[ée]gl|param[ée]tr|configur)/i.test(bloc);
+    if (!nie && tiers && reReglage.test(bloc) && reObjet.test(bloc)) trouves.push({ tiers: tiers[1].toLowerCase(), objet: (reObjet.exec(bloc) || [])[1].toLowerCase(), ou: `${rel}:${debut}` });
+    paragraphe = [];
+  };
+  let code = false;
+  texte.split(/\r?\n/).forEach((l, i) => {
+    if (/^\s*```/.test(l)) { code = !code; return; }
+    if (code) return;
+    if (!l.trim()) { clore(); return; }
+    if (!paragraphe.length) debut = i + 1;
+    paragraphe.push(l);
+  });
+  clore();
+  return trouves;
+}
+
+/** Les documents `.md` où un réglage se prescrit : `docs/` et la racine du produit — jamais forge/, output/, input/ (livrables et entrants datés). */
+function documentsDeReglage(racine) {
+  const out = [];
+  const marcher = (dir, reste, racineDocs) => {
+    let entrees; try { entrees = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of entrees) {
+      const p = join(dir, e.name);
+      if (e.isDirectory()) { if (racineDocs && !IGNORES.has(e.name) && reste > 0) marcher(p, reste - 1, true); }
+      else if (e.isFile() && /\.md$/i.test(e.name) && !/^DOSSIER-MEP/i.test(e.name)) out.push({ chemin: p, rel: relative(racine, p).split("\\").join("/") });
+    }
+  };
+  marcher(racine, 0, false);               // la racine, sans descendre
+  marcher(join(racine, "docs"), 5, true);  // docs/, en profondeur
+  return out;
+}
+
+/** Les sections « Réglages de paiement chez un tiers » d'un dossier de MEP. */
+function sectionsReglagesDePaiement(texte) {
+  const lignes = texte.split(/\r?\n/);
+  const titres = [];
+  let code = false;
+  lignes.forEach((l, i) => {
+    if (/^\s*```/.test(l)) { code = !code; return; }
+    if (code) return;
+    const m = /^(#{1,6})\s+(.*\S)\s*$/.exec(l);
+    if (m) titres.push({ i, niveau: m[1].length, texte: m[2] });
+  });
+  return titres.filter((s) => /r[ée]glages?\s+(?:de\s+)?paiement/i.test(s.texte)).map((s) => {
+    const fin = titres.find((u) => u.i > s.i && u.niveau <= s.niveau);
+    return { titre: s.texte, lignes: lignes.slice(s.i + 1, fin ? fin.i : lignes.length) };
+  });
+}
+
 function sectionsParcoursTiers(texte) {
   const lignes = texte.split(/\r?\n/);
   const titres = [];
@@ -130,7 +206,7 @@ function sectionsParcoursTiers(texte) {
 export function jugerProduit(racine, { document = null } = {}) {
   const donnees = charger();
   const findings = [];
-  const mesure = { fichiers: 0, parcours: 0, tiers: 0, dossiers: 0, refus: 0 };
+  const mesure = { fichiers: 0, parcours: 0, tiers: 0, dossiers: 0, refus: 0, reglages: 0 };
   const parcours = [];
   for (const { chemin, rel } of parcourir(racine, 6)) {
     const texte = lire(chemin);
@@ -141,7 +217,14 @@ export function jugerProduit(racine, { document = null } = {}) {
   mesure.parcours = parcours.length;
   const tiers = [...new Set(parcours.map((p) => p.hote))].sort();
   mesure.tiers = tiers.length;
-  if (!parcours.length) {
+  // PT-3 (TF-2696) : les réglages de paiement que les documents du produit prescrivent chez un tiers.
+  const reglages = [];
+  for (const { chemin, rel } of documentsDeReglage(racine)) {
+    const texte = lire(chemin);
+    if (texte && texte.length <= 2_000_000) reglages.push(...releverReglagesDePaiement(texte, rel, donnees));
+  }
+  mesure.reglages = reglages.length;
+  if (!parcours.length && !reglages.length) {
     return { findings, mesure, rienAJuger: true, motif: "M-14 sans objet : aucun parcours tiers embarqué qui engage l'utilisateur (cadre intégré, directive frame-src/child-src/form-action ou adresse de passerelle) n'est relevé dans les fichiers du produit" };
   }
   const dossiers = document ? [document] : (() => {
@@ -158,14 +241,37 @@ export function jugerProduit(racine, { document = null } = {}) {
     return out;
   })();
   mesure.dossiers = dossiers.length;
-  const ref = "ETAPE-MEP.md § 3 undecies (M-14, TF-1583)";
+  const ref = "ETAPE-MEP.md § 3 undecies (M-14, TF-1583 ; PT-3, TF-2696)";
+  const tiersDeReglage = [...new Set(reglages.map((r) => r.tiers))].sort();
   const releve = `${parcours.length} parcours relevé(s) chez ${tiers.length} tiers (${tiers.slice(0, 4).join(", ")}${tiers.length > 4 ? ", …" : ""}) : ${parcours.slice(0, 3).map((p) => `${p.forme} ${p.ou}`).join(" ; ")}`;
   if (!dossiers.length) {
-    return { findings, mesure, rienAJuger: true, motif: `parcours tiers embarqué relevé (${releve}) mais aucun dossier de MEP : l'étape n'a pas été atteinte, rien à juger encore` };
+    return { findings, mesure, rienAJuger: true, motif: parcours.length ? `parcours tiers embarqué relevé (${releve}) mais aucun dossier de MEP : l'étape n'a pas été atteinte, rien à juger encore`
+      : `réglage de paiement prescrit chez un tiers (${tiersDeReglage.join(", ")}) mais aucun dossier de MEP : l'étape n'a pas été atteinte, rien à juger encore` };
   }
   for (const chemin of dossiers) {
     const nom = relative(racine, chemin).split("\\").join("/") || chemin;
-    const sections = sectionsParcoursTiers(lire(chemin));
+    const texteDossier = lire(chemin);
+    // PT-3 : le dossier porte la section des réglages de paiement quand un document du produit en prescrit un.
+    if (reglages.length) {
+      const ko3 = (message) => findings.push({ regle: "PT-3", statut: "FAIL", ou: nom, message: `${message} — ${ref}` });
+      const prescrit = `${reglages.length} réglage(s) de paiement prescrit(s) chez ${tiersDeReglage.join(", ")} : ${reglages.slice(0, 3).map((r) => `${r.objet} ${r.ou}`).join(" ; ")}`;
+      const s3 = sectionsReglagesDePaiement(texteDossier);
+      if (!s3.length) {
+        ko3(`un document du produit prescrit un réglage de paiement chez un tiers (${prescrit}) et le dossier ne porte aucune section « Réglages de paiement chez un tiers ». Le 14/10/2026 un guide a prescrit des empreintes renouvelées à J+3, J+7 et J+11 sur une validité supposée de 7 jours ; la mesure du 20/11 a lu 4 empreintes sur 6 valables 30 jours, aucune libération par le tiers et 2 600 EUR bloqués sur 3 cartes : le réglage n'avait jamais été relu chez le tiers. La section nomme chaque tiers, la réservation test jouée à une date et la relecture mesurée de son effet (la valeur lue, une date), avant la mise en service`);
+      } else {
+        const c3 = s3.flatMap((s) => [s.titre, ...s.lignes]).join("\n");
+        const bas = c3.toLowerCase();
+        const manque3 = tiersDeReglage.filter((x) => !bas.includes(x));
+        if (manque3.length) ko3(`la section des réglages de paiement ne nomme pas ${manque3.length === 1 ? "le tiers" : "les tiers"} : ${manque3.join(", ")}`);
+        if (!c3.split("\n").some((l) => /r[ée]servation\s+(?:de\s+)?test/i.test(l) && /\b20\d{2}-\d{2}-\d{2}\b/.test(l)))
+          ko3("la section ne dit pas que la RÉSERVATION TEST a été jouée, ni quand : une ligne « Réservation test jouée le AAAA-MM-JJ : <ce qui a été réservé, chez quel tiers> » est attendue");
+        if (!c3.split("\n").some((l) => /relecture|relu/i.test(l) && /mesur/i.test(l) && /\d/.test(l.replace(/\b20\d{2}-\d{2}-\d{2}\b/g, "")) && /\b20\d{2}-\d{2}-\d{2}\b/.test(l)))
+          ko3("la section ne porte pas la RELECTURE MESURÉE de l'effet du réglage chez le tiers : une ligne « Relecture mesurée le AAAA-MM-JJ : <la valeur lue chez le tiers, chiffrée, face à la valeur supposée> » est attendue");
+        if (!/avant\s+(?:la\s+)?mise\s+en\s+service/i.test(c3)) ko3("la section ne dit pas que la réservation test et la relecture précèdent la MISE EN SERVICE : « avant mise en service » est la porte, pas un constat d'après coup");
+      }
+    }
+    if (!parcours.length) continue;
+    const sections = sectionsParcoursTiers(texteDossier);
     const ko = (message) => findings.push({ regle: "PT-2", statut: "FAIL", ou: nom, message: `${message} — ${ref}` });
     if (!sections.length) {
       ko(`le produit embarque un parcours tiers (${releve}) et le dossier ne porte aucune section « Parcours tiers embarqués ». Le 29/09/2026, un paiement d'acompte impossible depuis 35 jours a été signalé par l'exploitant : le correctif vérifié sur le mécanisme n'avait jamais été rejoué jusqu'à l'étape qui encaisse`);
@@ -190,7 +296,7 @@ const lanceEnDirect = process.argv[1]
 if (lanceEnDirect) {
   const args = process.argv.slice(2);
   const valeur = (nom) => { const i = args.indexOf(nom); return i >= 0 ? args[i + 1] : null; };
-  const sortir = (corps, code) => { process.stdout.write(JSON.stringify({ outil: "verifier-parcours-tiers", version: "1.0.0", regle: "M-14 (ETAPE-MEP.md § 3 undecies)", ...corps, non_juge: NON_JUGE }, null, 1) + "\n"); process.exit(code); };
+  const sortir = (corps, code) => { process.stdout.write(JSON.stringify({ outil: "verifier-parcours-tiers", version: "1.1.0", regle: "M-14 (ETAPE-MEP.md § 3 undecies)", ...corps, non_juge: NON_JUGE }, null, 1) + "\n"); process.exit(code); };
   const cible = args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--document")[0] || process.cwd();
   if (!existsSync(cible) || !statSync(cible).isDirectory()) sortir({ verdict: "NON_JUGEABLE", message: `produit introuvable : ${cible}` }, 2);
   const r = jugerProduit(cible, { document: valeur("--document") });

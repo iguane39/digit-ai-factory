@@ -285,7 +285,8 @@ const confronterEtapeChaine = (racine) => confronterVerbe(racine, "verifier-etap
  */
 function confronterParcoursTiers(racine) {
   const r = confronterVerbe(racine, "verifier-parcours-tiers.mjs", "M-14",
-    (j) => `${(j.mesure || {}).parcours || 0} parcours tiers embarqué(s) chez ${(j.mesure || {}).tiers || 0} tiers, joué(s) dans un navigateur sur l'état exécuté et déclaré(s) au dossier`);
+    (j) => `${(j.mesure || {}).parcours || 0} parcours tiers embarqué(s) chez ${(j.mesure || {}).tiers || 0} tiers, joué(s) dans un navigateur sur l'état exécuté et déclaré(s) au dossier`
+      + ((j.mesure || {}).reglages ? ` ; ${j.mesure.reglages} réglage(s) de paiement prescrit(s) chez un tiers, réservation test et relecture mesurée déclarées au dossier (PT-3, TF-2696)` : ""));
   if (r.statut !== "FAIL") return r;
   return { statut: "AVERTISSEMENT", message: "règle neuve du 13/10/2026, non bloquante (précédent D-70 (b)) — " + r.message };
 }
