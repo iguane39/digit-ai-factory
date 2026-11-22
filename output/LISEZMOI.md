@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 752 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 753 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -273,6 +273,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md | 20261121r | 10.8 Ko | `03-etudes/Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md` |
 | Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md.banc.json | — | 6.4 Ko | `03-etudes/Digit-AI - Étude - Plan multi-agents Claude Codex Antigravity - 20261121r.md.banc.json` |
 | Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md | 20261115a | 11.7 Ko | `03-etudes/Digit-AI - Étude - Preuve de chaque affirmation ajoutée par une correction - 20261115a.md` |
+| Digit-AI - Étude - Relecteurs a angle distinct - 20261122b.md | 20261122b | 31.7 Ko | `03-etudes/Digit-AI - Étude - Relecteurs a angle distinct - 20261122b.md` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json | 20261106a | 19.2 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.json` |
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md | 20261106a | 98.4 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` |
 | Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
