@@ -980,6 +980,50 @@ for (const [nom, valeur] of [["clé à tirets internes", "sk-" + "ant-api03-" + 
   });
 }
 
+// R-26 (TF-2709, 15/11/2026) — LA CONSIGNE DU GABARIT N'EST PAS L'EXEMPTION. La phrase d'instruction de `gabarits/docs-projet/MODELE-DONNEES.md`
+// (« remplacer le corps par « sans objet — aucune persistance » ») porte la formule d'exemption : un produit qui garde ce bandeau et
+// déclare 4 tables voyait R-26 rendre SANS_OBJET, et ses tables n'étaient pas jugées. Le banc part du bandeau RÉEL du gabarit.
+{
+  const gabarit26 = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "gabarits", "docs-projet", "MODELE-DONNEES.md"), "utf8");
+  const bandeau26 = gabarit26.split(/\r?\n/).filter((l) => l.startsWith(">")).join("\n");
+  if (!/sans objet — aucune persistance/i.test(bandeau26)) throw new Error("le bandeau du gabarit ne porte plus la formule : le cas TF-2709 ne prouve plus rien");
+  const modele26 = (corps) => `---\nrole: modèle\nsources_de_verite: [migrations/001_init.sql]\nverifie_le: 2026-11-22\n---\n# Modèle — Test\n\n${bandeau26}\n\n${corps}`;
+  const tableau26 = "| Colonne | Type | Nullable | Clé |\n|---|---|---|---|\n| id | uuid | non | PK |\n";
+  const jouer26 = (corps, migration) => {
+    const d = mkdtempSync(join(tmpdir(), "conf-r26-"));
+    mkdirSync(join(d, "docs", "projet"), { recursive: true });
+    mkdirSync(join(d, "migrations"), { recursive: true });
+    writeFileSync(join(d, "migrations", "001_init.sql"), migration);
+    writeFileSync(join(d, "docs", "projet", "MODELE-DONNEES.md"), modele26(corps));
+    const { rapport } = lance(d);
+    rmSync(d, { recursive: true, force: true });
+    return rapport.findings.filter((f) => f.regle === "R-26");
+  };
+
+  check("rouge R-26 (TF-2709) : le bandeau du gabarit gardé, 2 tables déclarées dont une fantôme → R-26 FAIL la nomme, pas SANS_OBJET", () => {
+    const f26 = jouer26(`## Table : annonces\n\n- role: un local\n- provenance: migrations/001_init.sql\n\n${tableau26}\n## Table : fantome\n\n- role: nulle part\n- provenance: migrations/001_init.sql\n\n${tableau26}`,
+      "CREATE TABLE annonces (id uuid PRIMARY KEY);\n");
+    if (f26.some((f) => f.statut === "SANS_OBJET")) throw new Error("R-26 rend SANS_OBJET sur un modèle de 2 tables : " + JSON.stringify(f26.map((f) => f.message)));
+    if (!f26.some((f) => f.statut === "FAIL" && /fantome/.test(f.ou))) throw new Error("la table fantôme n'est pas jugée : " + JSON.stringify(f26.map((f) => [f.statut, f.ou])));
+  });
+
+  check("vert R-26 (TF-2709) : le bandeau gardé, 2 tables ancrées à leur schéma → R-26 PASS (les tables sont jugées)", () => {
+    const f26 = jouer26(`## Table : annonces\n\n- role: un local\n- provenance: migrations/001_init.sql\n\n${tableau26}\n## Table : utilisateurs\n\n- role: un compte\n- provenance: migrations/001_init.sql\n\n${tableau26}`,
+      "CREATE TABLE annonces (id uuid PRIMARY KEY);\nCREATE TABLE utilisateurs (id uuid PRIMARY KEY);\n");
+    if (!f26.some((f) => f.statut === "PASS" && /2 table\(s\) ancrée\(s\)/.test(f.message))) throw new Error("les 2 tables ne sont pas jugées ancrées : " + JSON.stringify(f26.map((f) => [f.statut, f.message])));
+  });
+
+  check("vert R-26 (TF-2709) : l'exemption écrite dans le CORPS reste reconnue (« sans objet — aucune persistance »), le bandeau gardé", () => {
+    const f26 = jouer26("Produit sans persistance : sans objet — aucune persistance (aucune base, tout vit en mémoire).\n", "-- rien\n");
+    if (!f26.some((f) => f.statut === "SANS_OBJET" && /exemption explicite/.test(f.message))) throw new Error("l'exemption du corps n'est plus reconnue : " + JSON.stringify(f26.map((f) => [f.statut, f.message])));
+  });
+
+  check("rouge R-26 (TF-2709) : le bandeau seul, ni table ni exemption dans le corps → R-26 FAIL (« ni table déclarée ni exemption »)", () => {
+    const f26 = jouer26("(corps vide)\n", "-- rien\n");
+    if (!f26.some((f) => f.statut === "FAIL" && /ni table déclarée/.test(f.message))) throw new Error("le bandeau seul passe pour une exemption : " + JSON.stringify(f26.map((f) => [f.statut, f.message])));
+  });
+}
+
 // ---- R-23, SECOND VOLET (TF-1088) — LA PAGE SERVIE, PAS SEULEMENT LA FICHE ----------------
 //
 // La paire sort du banc des défauts échappés, cas E-01 (phase MEP) : « des identifiants de

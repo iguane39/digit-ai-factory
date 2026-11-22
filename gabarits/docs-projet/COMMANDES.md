@@ -43,8 +43,14 @@ Le chargement du `.env` n'est pas implicite — la commande le nomme :
 
 ```bash
 {npm test}
+{uv run python -m pytest}                 # Python : la forme module, jamais `uv run pytest` (TF-2792)
 {uv run python -m forge_tests . --json}   # audit forge-tests
 ```
+
+`uv run pytest` lance l'exécutable `pytest.exe` : un poste dont la stratégie de contrôle d'application
+le bloque rend l'erreur 4551, alors que `uv run python -m pytest` lance `python.exe` et joue les mêmes
+tests (338 réussis sur le poste mesuré le 16/11/2026). Même règle pour tout outil Python installé sous
+forme d'exécutable : `uv run python -m <module>`.
 
 ## Builder
 

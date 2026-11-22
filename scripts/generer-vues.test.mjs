@@ -219,6 +219,27 @@ try {
         const r = checkHtml(sans, "rouge-sans-legende.html");
         ok(r.verdict === "FAIL" && r.bloquants.some((x) => /L3 jeton codé sans légende : « mise_en_service »/.test(x)), `verdict ${r.verdict} — ${r.bloquants.slice(0, 2).join(" | ").slice(0, 200)}`);
       });
+      // Sens rouge puis vert L10 (TF-2692, lot pv de la campagne du 16/11/2026) : un chapitre de données (tableau de huit lignes ou plus) exige un
+      // exemple de lecture ÉCRIT ; la convention « Exemple de lecture : … » le donne à la vue, et son absence se voit.
+      {
+        const STATUTS = ["ouverte", "confirmée", "payée", "préparée", "expédiée", "livrée", "annulée", "remboursée"];
+        const chapitreHuit = (avecExemple) => `\n## Statuts de commande\n\n> Ce chapitre liste les huit statuts qu'une commande traverse, dans l'ordre de son cycle.\n\n| Valeur | Moment |\n|---|---|\n`
+          + STATUTS.map((s) => `| ${s} | étape ${STATUTS.indexOf(s) + 1} du cycle |`).join("\n") + "\n"
+          + (avecExemple ? "\nExemple de lecture : la ligne « confirmée » dit qu'une commande est acceptée et pas encore payée.\n" : "");
+        const huit = (avecExemple, nom) => generer("generer-modele-donnees.mjs", SOURCE_MODELE + chapitreHuit(avecExemple), "MODELE-DONNEES.md", "MODELE-DONNEES.html");
+        cas("ROUGE — un tableau de huit lignes sans exemple de lecture échoue L10 (le chapitre est nommé)", () => {
+          const v = huit(false);
+          const r = checkHtml(v.html, "rouge-sans-exemple.html");
+          ok(r.verdict === "FAIL" && r.bloquants.some((x) => /L10 chapitre de données #statuts-de-commande sans exemple de lecture/.test(x)), `verdict ${r.verdict} — ${r.bloquants.slice(0, 3).map((x) => x.trim().slice(0, 140)).join(" | ")}`);
+        });
+        cas("VERT — le remède : « Exemple de lecture : … » sous le tableau devient `.exemple-lecture`, L10 ne refuse plus", () => {
+          const v = huit(true);
+          ok(/<p class="exemple-lecture">Exemple de lecture :/.test(v.html), "la vue ne donne pas la classe exemple-lecture au paragraphe écrit");
+          const r = checkHtml(v.html, "vert-avec-exemple.html");
+          ok(!r.bloquants.some((x) => /L10 /.test(x)), `L10 refuse encore : ${r.bloquants.filter((x) => /L10 /.test(x)).join(" | ").slice(0, 200)}`);
+          ok(r.verdict === "PASS", `verdict ${r.verdict} — ${r.bloquants.slice(0, 3).map((x) => x.trim().slice(0, 140)).join(" | ")}`);
+        });
+      }
     }
 
     // ── le schéma : aucune exemption en bloc, aucune flèche à travers une boîte ───────────────────
@@ -227,6 +248,12 @@ try {
       const rects = [...arch.html.matchAll(/<rect id="(boite-\d+)"/g)].map((m) => m[1]);
       const etiquettes = [...arch.html.matchAll(/data-etiquette-de="(boite-\d+)"/g)].map((m) => m[1]);
       ok(rects.length === 3 && etiquettes.length === 6 && etiquettes.every((e) => rects.includes(e)), `${rects.length} boîtes, ${etiquettes.length} étiquettes`);
+    });
+    // TF-2692 : le chapeau du chapitre (citation sous le titre) s'intercale avant la liste d'attributs d'un composant ; la techno du composant doit
+    // toujours sortir sous sa boîte (avant : « React 18 », « FastAPI » devenaient des étiquettes vides dès qu'un chapeau s'écrivait).
+    cas("un composant dont le chapitre porte son chapeau garde sa techno sous sa boîte", () => {
+      const etiquettes = [...arch.html.matchAll(/data-etiquette-de="[^"]+"[^>]*>([^<]*)</g)].map((m) => m[1]);
+      ok(etiquettes.includes("React 18") && etiquettes.includes("FastAPI") && etiquettes.includes("PostgreSQL 16"), `étiquettes : ${JSON.stringify(etiquettes)}`);
     });
     cas("la flèche front → bdd, qui traversait la boîte api en ligne droite, est routée par un couloir", () => {
       const noeuds = [{ id: "front" }, { id: "api" }, { id: "bdd" }];
@@ -316,7 +343,7 @@ if (casse.length) {
 // (TF-0681) lit « N PASS » et verrait une baisse. Le résumé nomme alors l'absence et ne porte aucun compte,
 // comme le banc de coquille sans forge-design — la recette est rendue NON JUGÉE, jamais un échec ni un vert.
 const preuve = "vues d'architecture et de modèle de données générées depuis des sources conformes, jugées par check_html.py "
-  + "(L25 sommaire, L3 légende des jetons) et la vue d'architecture par render_page.py aux deux thèmes (V1, V4) ; chaque règle prouvée dans ses deux sens";
+  + "(L25 sommaire, L3 légende des jetons, L10 exemple de lecture sous un tableau de huit lignes — TF-2692) et la vue d'architecture par render_page.py aux deux thèmes (V1, V4) ; chaque règle prouvée dans ses deux sens";
 console.log(nonJoue.length
   ? `generer-vues (TF-2665, TF-2626) : ${nbCas} cas jugés verts sur ce poste, 0 échec — NON JOUÉ : ${nonJoue.join(" ; ")}`
   : `generer-vues (TF-2665, TF-2626) : ${nbCas} PASS, 0 FAIL — ${preuve}`);

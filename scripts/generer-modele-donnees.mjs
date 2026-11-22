@@ -63,7 +63,8 @@ blocs.forEach((m, i) => {
   }
 });
 
-const sansObjet = /sans objet — aucune persistance/i.test(corps);
+// TF-2709 : la phrase d'instruction du gabarit (citation « > ») contient la formule d'exemption ; seul le CORPS la porte pour de bon.
+const sansObjet = /sans objet — aucune persistance/i.test(corps.split(/\r?\n/).filter((l) => !/^\s*>/.test(l)).join("\n"));
 const titre = (corps.match(/^# (.+)$/m) || [null, "Modèle de données"])[1].trim();
 const svg = !sansObjet && tables.length >= 2 ? {
   label: `Diagramme du modèle : ${tables.length} tables, ${liens.length} lien(s)`,

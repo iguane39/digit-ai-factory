@@ -51,6 +51,10 @@
  * G6 EST LA SEULE CONTRADICTION INTERNE QU'UN ORACLE PUISSE VOIR : un mot proscrit et retenu dans
  * la même locale est faux quel que soit le sens des mots.
  *
+ * LA CONTRAINTE DE FORME D'UN TABLEAU (TF-2787) : un terme est une section `##` qui porte `categorie`, et SON tableau a 6 colonnes
+ * (locale, retenu, proscrits, portee, preuve, verifie_le), ou 7 avec `genre`. Une autre largeur rend G0 FAIL — dans un terme seulement :
+ * un tableau de présentation sous une section sans `categorie` n'est pas lu. La contrainte est écrite aussi au gabarit (GLOSSAIRE.md).
+ *
  * LA BORNE : un fichier dont le frontmatter ne déclare pas `role:` … glossaire n'est PAS concerné.
  * Sans elle, la règle s'inventerait une cible — et une règle qui crie sur ce qui ne la regarde pas
  * s'apprend à être ignorée.
@@ -80,7 +84,14 @@ const COLONNES = ["locale", "retenu", "proscrits", "portee", "preuve", "verifie_
 const COLONNE_GENRE = "genre";
 const GENRES = ["m", "f", "n", "invariable"];
 
-/** Découpe un texte en TERMES : une section `##` qui porte un champ `categorie`. */
+/**
+ * Découpe un texte en TERMES : une section `##` qui porte un champ `categorie`.
+ *
+ * TF-2787 (16/11/2026) — LE TABLEAU N'EST LU QUE DANS UN TERME. `termesDe` lisait toute ligne de tableau sous un titre de niveau 2 et
+ * rendait « tableau illisible » dès qu'elle n'avait pas 6 ou 7 colonnes, même dans une section qui n'est pas un terme : un tableau de
+ * présentation à 3 colonnes faisait rendre G0 FAIL et aucune ligne n'était jugée (1 aller-retour de l'agent rédacteur, 16/11/2026). La
+ * largeur d'un tableau se juge désormais dans les seules sections qui portent `categorie` ; celle des autres n'est pas lue.
+ */
 export function termesDe(texte) {
   const lignes = texte.split(/\r?\n/);
   const termes = [];
@@ -101,8 +112,10 @@ export function termesDe(texte) {
       const cellules = brute.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
       // SIX colonnes, ou SEPT avec `genre`. Toute autre largeur rend le tableau illisible et
       // AUCUNE ligne n'est jugee — on ne devine pas quelle colonne manque.
-      if (cellules.length !== COLONNES.length && cellules.length !== COLONNES.length + 1)
-        return { erreurColonnes: { terme: courant.nom, vu: cellules.length, brute } };
+      if (cellules.length !== COLONNES.length && cellules.length !== COLONNES.length + 1) {
+        if (!courant.erreurColonnes) courant.erreurColonnes = { terme: courant.nom, vu: cellules.length, brute };
+        continue;
+      }
       if (cellules[0].toLowerCase() === "locale") continue;             // en-tête
       if (/^-{2,}$/.test(cellules[0].replace(/[:\s]/g, ""))) continue;  // séparateur
       const ligne = Object.fromEntries(COLONNES.map((c, i) => [c, cellules[i]]));
@@ -113,8 +126,11 @@ export function termesDe(texte) {
   if (courant) termes.push(courant);
   // Seules les sections qui portent une `categorie` sont des TERMES : les sections de doctrine
   // du gabarit (« Pourquoi ce fichier existe », « La forme ») n'en sont pas, et les juger
-  // reviendrait à accuser le mode d'emploi.
-  return { termes: termes.filter((t) => t.categorie !== null) };
+  // reviendrait à accuser le mode d'emploi. Leurs tableaux non plus (TF-2787).
+  const termesLus = termes.filter((t) => t.categorie !== null);
+  const illisible = termesLus.find((t) => t.erreurColonnes);
+  if (illisible) return { erreurColonnes: illisible.erreurColonnes };
+  return { termes: termesLus };
 }
 
 export function juger(texte) {
@@ -364,22 +380,30 @@ verifie_le: 2026-08-26
     .replace("| es | piscina cubierta | aucun | partout | catalogue servi | 2026-08-26 | f |",
              "| es | piscina cubierta | aucun | partout | catalogue servi | 2026-08-26 | feminin |");  // G8
   const horsChamp = "---\nrole: une note quelconque\n---\n\n## un titre\n\ndu texte.\n";
+  // TF-2787 : la présentation d'un glossaire (tableau à 3 colonnes sous une section SANS `categorie`) ne se juge pas ; le même tableau
+  // posé dans un TERME rend G0 FAIL. Les deux moitiés d'une même règle de bornage.
+  const presentation = verte.replace("## logement de vacances", "## Présentation\n\n| langue | rôle | statut |\n|---|---|---|\n| fr | source | stable |\n\n## logement de vacances");
+  const termeEtroit = verte.replace("| en | security deposit |", "| en | security deposit | colonne en trop | aucun | partout | catalogue servi | 2026-08-26 | m | encore une |");
   writeFileSync(join(dir, "verte.md"), verte, "utf8");
   writeFileSync(join(dir, "rouge.md"), rouge, "utf8");
   writeFileSync(join(dir, "hors-champ.md"), horsChamp, "utf8");
+  writeFileSync(join(dir, "presentation.md"), presentation, "utf8");
+  writeFileSync(join(dir, "terme-etroit.md"), termeEtroit, "utf8");
   const moi = fileURLToPath(import.meta.url);
   const jouer = (f) => spawnSync(process.execPath, [moi, join(dir, f)], { encoding: "utf8" });
-  const rv = jouer("verte.md"), rr = jouer("rouge.md"), rh = jouer("hors-champ.md");
+  const rv = jouer("verte.md"), rr = jouer("rouge.md"), rh = jouer("hors-champ.md"), rp = jouer("presentation.md"), rt = jouer("terme-etroit.md");
   const casse = [];
   if (rv.status !== 0) casse.push("la fixture VERTE ne passe pas : " + rv.stdout.slice(0, 400));
   if (rr.status !== 1) casse.push("la fixture ROUGE ne FAIL pas");
   else for (const regle of ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]) {
     if (!new RegExp(`"${regle}"[^}]*FAIL`).test(rr.stdout)) casse.push(`la rouge échoue mais pas sur ${regle}`);
   }
+  if (rp.status !== 0 || /"G0"/.test(rp.stdout)) casse.push("un tableau de présentation hors terme fait rougir le glossaire (TF-2787) : " + rp.stdout.slice(0, 300));
+  if (rt.status !== 1 || !/"G0"[^}]*FAIL/.test(rt.stdout)) casse.push("un tableau de TERME à la mauvaise largeur n'est pas refusé par G0 (TF-2787)");
   // LA BORNE A SON PROPRE CAS : sans elle, l'oracle accuserait tout document du dépôt.
   if (!/"SANS_OBJET"/.test(rh.stdout)) casse.push("un fichier hors champ n'est pas déclaré SANS_OBJET — la règle s'invente une cible");
   console.log(casse.length ? "SELF-TEST FAIL : " + casse.join(" · ")
-    : "Self-test glossaire : 9/9 PASS (verte PASS ; rouge FAIL sur G1 catégorie hors jeu, G2 retenu vide, G3 aveu absent, G4 date non ISO, G5 sonde unique, G6 retenu proscrit, G7 preuve non rejouable, G8 genre hors jeu ferme ; hors champ SANS_OBJET)");
+    : "Self-test glossaire : 11/11 PASS (verte PASS ; rouge FAIL sur G1 catégorie hors jeu, G2 retenu vide, G3 aveu absent, G4 date non ISO, G5 sonde unique, G6 retenu proscrit, G7 preuve non rejouable, G8 genre hors jeu ferme ; hors champ SANS_OBJET ; tableau de présentation hors terme non lu, tableau de terme mal dimensionné G0 FAIL)");
   process.exit(casse.length ? 1 : 0);
 }
 

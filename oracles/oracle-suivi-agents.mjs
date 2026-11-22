@@ -132,6 +132,7 @@ export function juger(transcripts, maintenant = Date.now(), { depuis = 0, lireEt
     depuis: depuis ? new Date(depuis).toISOString() : null, sessions,
     non_juge: ["le contenu des points (justesse des tâches)", "un agent dont la session s'est fermée (SANS_OBJET, S67)", "les commandes d'arrière-plan de la session",
       "dans une session VS Code, que le point demandé par le hook a bien été AFFICHÉ : le transcript n'en garde pas le texte (TF-2472), la demande tient lieu de point",
+      "dans une session VS Code, un point que l'assistant a ÉCRIT sans que le hook l'ait demandé n'est pas vu : le transcript n'en garde que le résumé de pensée (TF-2472, mesuré le 12/11/2026, harnais 2.1.322 — 2 points et au moins 6 autres textes d'un même tour sans entrée de texte). Le sous-comptage possible est de ce côté, et l'endroit où le harnais garde ces textes reste INCONNU : seuls les points demandés par le hook sont comptés",
       "le fichier d'état du hook vit dans le dossier temporaire du poste : un nettoyage du dossier fait passer une session équipée en « hook_absent »"] };
 }
 
@@ -182,8 +183,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       console.log(`${bon ? "ok  " : "ÉCHEC"} ${nom} → ${r.verdict}${bon ? "" : ` (attendu ${attendu}) ${JSON.stringify(r.sessions)}`}`);
     }
     rmSync(racine, { recursive: true, force: true });
-    console.log(`oracle-suivi-agents --self-test : ${ok}/${cas.length} PASS`);
-    process.exit(ok === cas.length ? 0 : 1);
+    // TF-2472 : la limite du harnais est CONSIGNÉE là où le contrôle la lit — dans le non_juge que chaque verdict rend, dans les deux sens (point demandé non affiché, point écrit non demandé).
+    const njVsCode = juger([], Date.now()).non_juge.filter((l) => /TF-2472/.test(l));
+    const limites = njVsCode.length === 2 && njVsCode.some((l) => /AFFICHÉ/.test(l)) && njVsCode.some((l) => /ÉCRIT sans que le hook/.test(l) && /INCONNU/.test(l));
+    if (!limites) console.log("ÉCHEC la limite VS Code du harnais n'est pas déclarée des deux côtés au non_juge (TF-2472)");
+    else ok++;
+    console.log(`oracle-suivi-agents --self-test : ${ok}/${cas.length + 1} PASS`);
+    process.exit(ok === cas.length + 1 ? 0 : 1);
   }
   const transcripts = [];
   for (let i = 0; i < args.length; i++) if (args[i] === "--transcript") transcripts.push(args[++i]);

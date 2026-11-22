@@ -2728,7 +2728,11 @@ else {
   const mdp = join(dp, "MODELE-DONNEES.md");
   if (existsSync(mdp)) {
     const t = readFileSync(mdp, "utf8");
-    if (/sans objet — aucune persistance/i.test(t)) so("R-26", "MODELE-DONNEES.md : « sans objet — aucune persistance » (exemption explicite)");
+    // TF-2709 (15/11/2026) : la phrase d'instruction du gabarit (« remplacer le corps par « sans objet — aucune persistance » ») est une
+    // citation, elle contient la formule d'exemption, et R-26 rendait SANS_OBJET sur un modèle de 4 tables, qu'il ne jugeait donc pas.
+    // L'exemption se lit hors des lignes citées (`>`) : c'est le CORPS que le gabarit demande de remplacer, pas son bandeau.
+    const horsConsigne = t.split(/\r?\n/).filter((l) => !/^\s*>/.test(l)).join("\n");
+    if (/sans objet — aucune persistance/i.test(horsConsigne)) so("R-26", "MODELE-DONNEES.md : « sans objet — aucune persistance » (exemption explicite)");
     else {
       const blocs = [...t.matchAll(/^## Table : (.+)$/gm)];
       const reels = blocs.filter((m) => !/[{}]/.test(m[1]));

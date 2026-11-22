@@ -352,7 +352,12 @@ export function jouerControleMaison(fichier, oracle = ORACLE_CONTROLE, registre 
 }
 
 /** Joue l'oracle d'écriture sur un fichier ; rend les lignes à imprimer. */
-export function jouer(fichier, oracle = ORACLE) {
+/**
+ * `jour` (AAAA-MM-JJ, facultatif) fixe le jour que l'oracle lit pour EC-13, la revue datée des listes de tournures : sans lui l'oracle lit
+ * l'horloge du poste. Le banc du hook le fixe (TF-2723) : une revue de la donnée réelle arrivée à échéance (16/11/2026) faisait rougir deux
+ * cas « style PASS » sans lien avec le hook, et un rouge qui ne dit rien du code n'est plus un signal.
+ */
+export function jouer(fichier, oracle = ORACLE, jour = null) {
   const lignes = [];
   if (!fichier || !existsSync(fichier)) return lignes;
   const nom = basename(fichier);
@@ -363,7 +368,7 @@ export function jouer(fichier, oracle = ORACLE) {
   // Le chemin RELATIF AU DÉPÔT COURANT : c'est lui que la table d'antériorité nomme
   // (`REGLES-PROJET.md`, `gabarits/RESTITUTION.md`…). Sans lui, un texte exempté serait jugé.
   const rel = relative(process.cwd(), resolve(fichier)).replace(/\\/g, "/");
-  const r = spawnSync(process.execPath, [oracle, fichier, "--chemin-relatif", rel], { encoding: "utf8", timeout: 60000 });
+  const r = spawnSync(process.execPath, [oracle, fichier, "--chemin-relatif", rel, ...(jour ? ["--aujourd-hui", jour] : [])], { encoding: "utf8", timeout: 60000 });
   let j = null;
   try { j = JSON.parse((r.stdout || "").slice((r.stdout || "").indexOf("{"))); } catch { /* illisible */ }
   if (!j || !Array.isArray(j.findings)) {
@@ -432,6 +437,9 @@ export function retirer(chemin) {
 
 function selfTest() {
   const dir = mkdtempSync(join(tmpdir(), "hook-ecriture-"));
+  // Le jour du banc : dans la fenêtre de revue de la donnée réelle (EC-13, TF-1926), jamais l'horloge du poste (TF-2723).
+  const JOUR_BANC = "2026-10-19";
+  const jouerBanc = (fichier) => jouer(fichier, ORACLE, JOUR_BANC);
   const casse = [];
   const entree = (p) => JSON.stringify({ tool_name: "Write", tool_input: { file_path: p } });
 
@@ -443,7 +451,7 @@ function selfTest() {
 
   const rouge = join(dir, "rouge.md"); writeFileSync(rouge, ROUGE, "utf8");
   const verte = join(dir, "verte.md"); writeFileSync(verte, VERTE, "utf8");
-  const lignesRouges = jouer(rouge);
+  const lignesRouges = jouerBanc(rouge);
   if (!lignesRouges.some((l) => /style FAIL/.test(l))) casse.push(`un texte fautif n'est pas signalé FAIL (${lignesRouges.join(" | ") || "aucune ligne"})`);
   // G8 (TF-1076) : la famille n'est demandée QU'aux livrables, et elle se résout ou se nomme.
   if (jouerFamille(join(dir, "note.md")).length)
@@ -478,8 +486,11 @@ function selfTest() {
   if (jouerControleMaison(ordinaire, ORACLE_CONTROLE, registreJetable).length)
     casse.push("un fichier qui n'annonce aucun contrôle fait parler le hook — un hook bavard se désactive");
 
-  const lignesVertes = jouer(verte);
+  const lignesVertes = jouerBanc(verte);
   if (!lignesVertes.some((l) => /style PASS/.test(l))) casse.push(`un texte sobre n'est pas déclaré PASS (${lignesVertes.join(" | ") || "aucune ligne"})`);
+  // TF-2723, sens rouge du jour fixé : le même texte lu à une date où les revues sont échues n'est plus « style PASS » — le jour du banc est donc
+  // bien transmis à l'oracle, et le vert ci-dessus ne dépend plus de l'horloge du poste.
+  if (jouer(verte, ORACLE, "2099-01-01").some((l) => /style PASS/.test(l))) casse.push("le jour transmis à l'oracle n'est pas lu : un texte sobre reste PASS à une date où la revue des listes est échue (EC-13)");
   // À REJOUER (TF-1960) : un courriel à un tiers dont un paragraphe fait 90 mots rend un RAPPEL qui nomme le passage, jamais « style FAIL » ;
   // le même réécrit rend PASS ; un courriel anglais sans déclaration de langue est rappelé, le même avec `langue: en` en en-tête PASS.
   const courrielRouge = join(dir, "Client-A - Courriel - Relance livraison - 20261026a.md");
@@ -487,20 +498,20 @@ function selfTest() {
     + "Cette livraison conditionne le démarrage du développement prévu la semaine prochaine, et sans elle nous ne pouvons pas engager les équipes. "
     + "Nous avons relancé votre service par téléphone le 15 et le 19 octobre, sans obtenir de réponse écrite de sa part. "
     + "Nous vous demandons donc de nous confirmer une date ferme avant vendredi, faute de quoi nous reporterons le démarrage à la fin du mois.\n\nCordialement,\nPaul Martin\n", "utf8");
-  const lignesRejeu = jouer(courrielRouge);
+  const lignesRejeu = jouerBanc(courrielRouge);
   if (!lignesRejeu.some((l) => /À REJOUER \(non bloquant\) — 1 passage\(s\) à réécrire \(EC-14-paragraphe\).*--passe 2.*3 passes au plus/.test(l)) || !lignesRejeu.some((l) => /EC-14-paragraphe \(ligne 3\) 90 mots/.test(l)))
     casse.push(`un courriel à un tiers dont un paragraphe fait 90 mots n'est pas rappelé À REJOUER avec son passage (${lignesRejeu.join(" | ") || "aucune ligne"})`);
   if (lignesRejeu.some((l) => /style FAIL|style PASS/.test(l))) casse.push(`un texte à rejouer est déclaré FAIL ou PASS au lieu d'être rappelé (${lignesRejeu.join(" | ")})`);
   const courrielVert = join(dir, "Client-A - Courriel - Relance livraison v2 - 20261026b.md");
   writeFileSync(courrielVert, "Bonjour Madame Durand,\n\nLes maquettes devaient nous parvenir le 12 octobre. Nous ne les avons toujours pas reçues.\n\nSans elles, nous ne pouvons pas engager les équipes ni démarrer le développement prévu la semaine prochaine.\n\nPouvez-vous nous confirmer une date ferme avant vendredi ?\n\nCordialement,\nPaul Martin\n", "utf8");
-  const lignesRejeuVert = jouer(courrielVert);
+  const lignesRejeuVert = jouerBanc(courrielVert);
   if (!lignesRejeuVert.some((l) => /style PASS/.test(l)) || lignesRejeuVert.some((l) => /À REJOUER/.test(l))) casse.push(`le même courriel réécrit n'est pas PASS sans rappel (${lignesRejeuVert.join(" | ") || "aucune ligne"})`);
   const courrielEn = join(dir, "Client-B - Courriel - Delivery follow-up - 20261026a.md");
   const corpsEn = "Dear Ms Durand,\n\nThe mockups were due on 12 October and we have not received them yet.\n\nWithout them, we cannot start the development phase next week. The teams and the test environments are still to be booked.\n\nWe called your department twice, without a written answer. Could you confirm a firm date before Friday?\n\nKind regards,\nPaul Martin\n";
   writeFileSync(courrielEn, corpsEn, "utf8");
-  if (!jouer(courrielEn).some((l) => /À REJOUER \(non bloquant\) — 3 passage\(s\) à réécrire \(EC-15\)/.test(l))) casse.push("un courriel anglais sans déclaration de langue n'est pas rappelé À REJOUER (EC-15)");
+  if (!jouerBanc(courrielEn).some((l) => /À REJOUER \(non bloquant\) — 3 passage\(s\) à réécrire \(EC-15\)/.test(l))) casse.push("un courriel anglais sans déclaration de langue n'est pas rappelé À REJOUER (EC-15)");
   writeFileSync(courrielEn, "---\nlangue: en\n---\n\n" + corpsEn, "utf8");
-  if (jouer(courrielEn).some((l) => /À REJOUER|FAIL/.test(l))) casse.push("un courriel anglais déclaré `langue: en` est encore rappelé — l'anglais ne doit pas être un critère de blocage (D-78)");
+  if (jouerBanc(courrielEn).some((l) => /À REJOUER|FAIL/.test(l))) casse.push("un courriel anglais déclaré `langue: en` est encore rappelé — l'anglais ne doit pas être un critère de blocage (D-78)");
   if (jouer(join(dir, "absent.md")).length) casse.push("un fichier absent produit une sortie");
   if (!jouer(rouge, join(dir, "nulle-part.mjs")).some((l) => /NON jouée/.test(l))) casse.push("un oracle absent du poste est tu au lieu d'être dit");
 

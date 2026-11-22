@@ -42,6 +42,8 @@ function banc({ envoi, elements = ["scripts/generateurs", "input"] } = {}) {
   writeFileSync(join(produit, "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { fournisseur: "Google Drive", chemins: [join(d, "absent"), canal] }, elements, ...(envoi ? { envoi } : {}) }));
   return { produit, canal, opt: { etat } };
 }
+// Le `.gitattributes` du socle (TF-2697, gabarits/gitattributes-produit) : un produit conforme le porte, et RP11 le suppose.
+const SOCLE_ATTRIBUTS = readFileSync(join(fileURLToPath(new URL("..", import.meta.url)), "gabarits", "gitattributes-produit"), "utf8");
 // Un banc dont le produit est un dépôt git : le .gitignore dit ce que git ignore (TF-2441).
 function bancGit(gitignore, suivis = {}) {
   const b = banc({ elements: ["input"] });
@@ -49,6 +51,7 @@ function bancGit(gitignore, suivis = {}) {
   const git = (...a) => execFileSync("git", a, { cwd: b.produit, env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   git("init", "-q"); git("config", "user.email", "t@t.t"); git("config", "user.name", "t");
   writeFileSync(join(b.produit, ".gitignore"), gitignore, "utf8");
+  writeFileSync(join(b.produit, ".gitattributes"), SOCLE_ATTRIBUTS, "utf8");
   for (const [rel, contenu] of Object.entries(suivis)) ecrire(join(b.produit, rel), contenu);
   git("add", "-A"); git("commit", "-q", "-m", "socle");
   b.visibles = () => git("status", "--porcelain", "-uall").split("\n").filter((l) => l.startsWith("??")).map((l) => l.slice(3));
@@ -345,6 +348,7 @@ function bancCoffre({ poste = null, coffre = null, cles = ["A"], gitignore = ".e
   const opt = { etat: join(d, "etat"), profil: join(d, "profil-claude") };
   for (const x of [join(produit, "forge"), canal, dCoffre, ...(memoire ? [dMemoire] : [])]) mkdirSync(x, { recursive: true });
   writeFileSync(join(produit, ".gitignore"), gitignore, "utf8");
+  writeFileSync(join(produit, ".gitattributes"), SOCLE_ATTRIBUTS, "utf8");
   writeFileSync(join(produit, "forge", "REPRISE.json"), JSON.stringify({ schema: "factory/reprise@1", canal: { fournisseur: "Google Drive", chemins: [canal] }, elements,
     secrets: { fichiers, chemins: [join(d, "absent", "SECRETS"), dCoffre], cles_attendues: cles }, ...(memoire ? { memoire: { chemins: [dMemoire] } } : {}), ...(envoi ? { envoi } : {}) }));
   const envGit = sansGit();
@@ -466,6 +470,42 @@ check("D-224 rouge — RP9, le cas mesuré du 20/11 (M-09) : poste et coffre ég
   const apres = garder(verifier(b.produit, b.opt));
   egal(statut(apres, "RP9"), "PASS", "RP9 après l'envoi");
   egal(apres.verdict, "PASS", "verdict");
+});
+
+check("TF-2793 rouge — RP12, le cas du 20/11 : le produit déclare 2 variables « à fournir » que le coffre n'exige pas ; RP9 reste vert, RP12 AVERT les nomme, sans valeur ; remède joué : cles_attendues, puis cles_hors_coffre", () => {
+  const texte = texteEnv([["BASE_URL", valeur("u")], ["DEPLOI_TOKEN", valeur("w")]]);
+  const b = bancCoffre({ poste: texte, coffre: texte, cles: ["BASE_URL", "DEPLOI_TOKEN"] });
+  // le produit déclare ses variables : .env.example (lignes « # à fournir ») et le tableau de PARAMETRAGE.md (cellule « Qui la fournit »)
+  ecrire(join(b.produit, ".env.example"), "BASE_URL=   # à fournir : l'adresse\nDEPLOI_TOKEN=   # à fournir : le jeton\nRENOUVELLEMENT_TOKEN=   # à fournir : le jeton de renouvellement\nPORT=8080\n");
+  ecrire(join(b.produit, "docs", "projet", "PARAMETRAGE.md"), "---\nrole: parametrage\n---\n\n| Variable | Rôle | Format | Qui la fournit |\n|---|---|---|---|\n| `PAIEMENT_KEY` | clé du service de paiement | `<jamais ici>` | `# à fournir :` |\n| `PORT` | port | 8080 | défaut |\n");
+  const v = garder(verifier(b.produit, b.opt));
+  egal(statut(v, "RP9"), "PASS", "RP9 : les clés exigées sont au poste et au coffre");
+  egal(statut(v, "RP12"), "AVERT", "RP12 : deux variables déclarées à fournir ne sont exigées par rien");
+  if (!/2 variable\(s\)/.test(message(v, "RP12")) || !/RENOUVELLEMENT_TOKEN/.test(message(v, "RP12")) || !/PAIEMENT_KEY/.test(message(v, "RP12"))) throw new Error("RP12 ne nomme pas les 2 variables : " + message(v, "RP12"));
+  if (/\bPORT\b|BASE_URL|DEPLOI_TOKEN/.test(message(v, "RP12"))) throw new Error("RP12 accuse une variable déjà exigée ou fournie par défaut : " + message(v, "RP12"));
+  egal(v.verdict, "PASS", "un avertissement ne bloque pas");
+  // remède 1 : la clé que le coffre doit porter est exigée ; remède 2 : la clé fournie par la plateforme est écartée à dessein
+  manifeste(b, { secrets: { ...lireBanc(b).secrets, cles_attendues: ["BASE_URL", "DEPLOI_TOKEN", "RENOUVELLEMENT_TOKEN"], cles_hors_coffre: ["PAIEMENT_KEY"] } });
+  const apres = garder(verifier(b.produit, b.opt));
+  egal(statut(apres, "RP12"), "PASS", "RP12 après le remède");
+  egal(statut(apres, "RP9"), "FAIL", "RP9 : la clé nouvellement exigée manque au poste et au coffre, ce que RP12 voulait rendre visible");
+  if (!/RENOUVELLEMENT_TOKEN/.test(message(apres, "RP9"))) throw new Error("RP9 ne nomme pas la clé désormais exigée : " + message(apres, "RP9"));
+  // la liste des clés écartées est une liste de NOMS : une valeur collée est refusée sans être recopiée
+  const piege = valeur("piege") + " avec espaces";
+  manifeste(b, { secrets: { ...lireBanc(b).secrets, cles_hors_coffre: [piege] } });
+  const refus = garder(verifier(b.produit, b.opt));
+  egal(statut(refus, "RP1"), "FAIL", "RP1 : cles_hors_coffre n'est pas une liste de noms");
+  if (message(refus, "RP1").includes(piege)) throw new Error("le refus recopie l'entrée fautive");
+});
+
+check("TF-2793 — RP12 : un produit sans coffre déclaré qui annonce des variables « à fournir » reçoit l'avertissement et la section à ajouter ; rien déclaré, rien dit", () => {
+  const b = banc({ elements: ["input"] });
+  ecrire(join(b.produit, ".env.example"), "AUTRE_TOKEN=   # à fournir : jeton\n");
+  const v = verifier(b.produit, b.opt);
+  egal(statut(v, "RP12"), "AVERT", "RP12 sans section secrets");
+  if (!/ne déclare pas de coffre/.test(message(v, "RP12")) || !/AUTRE_TOKEN/.test(message(v, "RP12"))) throw new Error("RP12 ne dit pas l'absence de coffre : " + message(v, "RP12"));
+  const rien = banc({ elements: ["input"] });
+  egal(statut(verifier(rien.produit, rien.opt), "RP12"), undefined, "RP12 sans déclaration du produit");
 });
 
 check("D-224 rouge — RP10 : une mémoire et un coffre au nom neutre DANS le canal, sous un élément copié, FAIL, et le canal copie vraiment la mémoire ; le coffre SECRETS exclu par son nom et l'exclusion déclarée lèvent le rouge ; coffre égal au canal, coffre dans la mémoire : FAIL", () => {
@@ -668,5 +708,70 @@ check("D-224 — JAMAIS UNE VALEUR : aucune valeur de fixture n'apparaît dans c
   egal(fuitesDans(SORTIES).length, 0, `valeurs de fixture retrouvées dans les sorties (sur ${VALEURS.length} valeurs et ${SORTIES.length} sorties)`);
 });
 
-console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 9 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7, RP8 et l'envoi refusé), chacun avec son remède vert ; D-224 (a), coffre et mémoire : 9 cas rouges de plus (conflit sans base, fichier non ignoré par git, RP9, RP10, RP1 des sections, garde du coffre, envoi sans feu vert, RP3 et RP4 du coffre et de la mémoire), chacun avec son remède joué, et aucune valeur de fixture dans aucune sortie`);
+// ---- TF-2697 (lot de retours 20261115za) : RP11, l'essai du clone neuf. Le fait : sans `.gitattributes`, `core.autocrlf=true` fait
+// extraire les fins de ligne selon le poste, et un même commit se sert différemment. Le banc ne dépend pas du réglage du poste qui le
+// joue : la configuration de l'extraction est posée par l'environnement (GIT_CONFIG_*), le temps du seul appel du juge.
+const sousAutocrlf = (valeur, fn) => {
+  const avant = ["GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0", "GIT_CONFIG_VALUE_0"].map((k) => [k, process.env[k]]);
+  Object.assign(process.env, { GIT_CONFIG_COUNT: "1", GIT_CONFIG_KEY_0: "core.autocrlf", GIT_CONFIG_VALUE_0: valeur });
+  try { return fn(); } finally { for (const [k, v] of avant) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } }
+};
+function bancSansAttributs(suivis) {
+  const b = bancGit("", suivis);
+  const env = sansGit();
+  const git = (...a) => execFileSync("git", a, { cwd: b.produit, env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  git("rm", "-q", "--cached", ".gitattributes"); rmSync(join(b.produit, ".gitattributes"));
+  git("commit", "-q", "-m", "sans .gitattributes");
+  b.git = git;
+  return b;
+}
+
+check("TF-2697 rouge — sans .gitattributes, un clone neuf extrait d'autres octets que le poste : RP11 FAIL nomme le fichier, la nature et le remède", () => {
+  const b = bancSansAttributs({ "pages/index.html": "<p>un</p>\n<p>deux</p>\n" });
+  const v = sousAutocrlf("true", () => verifier(b.produit, b.opt));
+  egal(statut(v, "RP11"), "FAIL", "RP11 sans .gitattributes sous core.autocrlf=true");
+  egal(v.verdict, "FAIL", "verdict");
+  const m = v.findings.find((f) => f.regle === "RP11").message;
+  for (const attendu of [/pages\/index\.html/, /fins de ligne/, /text=auto eol=lf/, /--renormalize/, /ne suit aucun `\.gitattributes`/])
+    if (!attendu.test(m)) throw new Error(`le constat ne dit pas ${attendu} : ${m}`);
+});
+
+check("TF-2697 vert — remède joué : le .gitattributes du socle posé, renormalisé et commis, le même essai rend RP11 PASS", () => {
+  const b = bancSansAttributs({ "pages/index.html": "<p>un</p>\n<p>deux</p>\n" });
+  egal(statut(sousAutocrlf("true", () => verifier(b.produit, b.opt)), "RP11"), "FAIL", "RP11 avant remède");
+  writeFileSync(join(b.produit, ".gitattributes"), SOCLE_ATTRIBUTS, "utf8");
+  b.git("add", ".gitattributes"); b.git("add", "--renormalize", "."); b.git("commit", "-q", "-m", "socle des fins de ligne");
+  const v = sousAutocrlf("true", () => verifier(b.produit, b.opt));
+  egal(statut(v, "RP11"), "PASS", "RP11 après le remède");
+  if (!/mêmes octets/.test(v.findings.find((f) => f.regle === "RP11").message)) throw new Error("le constat PASS ne dit pas ce qui est comparé");
+  egal(statut(sousAutocrlf("false", () => verifier(b.produit, b.opt)), "RP11"), "PASS", "RP11 reste PASS quand le poste n'a pas core.autocrlf");
+});
+
+check("TF-2697 — un .gitattributes suivi qui ne fixe pas les fins de ligne : RP11 FAIL le dit ; le socle posé à côté des lignes du produit, RP11 PASS", () => {
+  const b = bancSansAttributs({ "pages/a.html": "<p>a</p>\n" });
+  writeFileSync(join(b.produit, ".gitattributes"), "*.png binary\n", "utf8");
+  b.git("add", ".gitattributes"); b.git("commit", "-q", "-m", "attributs sans fins de ligne");
+  const v = sousAutocrlf("true", () => verifier(b.produit, b.opt));
+  egal(statut(v, "RP11"), "FAIL", "RP11 avec un .gitattributes qui ne fixe rien");
+  const m = v.findings.find((f) => f.regle === "RP11").message;
+  if (!/pages\/a\.html/.test(m) || !/suivi ne fixe pas ces fins de ligne/.test(m)) throw new Error("constat : " + m);
+  writeFileSync(join(b.produit, ".gitattributes"), "*.png binary\n" + SOCLE_ATTRIBUTS, "utf8");
+  b.git("add", ".gitattributes"); b.git("commit", "-q", "-m", "socle des fins de ligne");
+  egal(statut(sousAutocrlf("true", () => verifier(b.produit, b.opt)), "RP11"), "PASS", "RP11 après le socle posé à côté des lignes du produit");
+});
+
+check("TF-2697 — un fichier que git tient pour modifié (travail en cours) n'est pas compté ; hors dépôt git aucun constat RP11 ; dépôt sans commit : non jugé, AVERT", () => {
+  const b = bancGit("", { "src/x.txt": "v1\n" });
+  writeFileSync(join(b.produit, "src", "x.txt"), "v2 en cours\n", "utf8");
+  egal(statut(verifier(b.produit, b.opt), "RP11"), "PASS", "RP11 avec un fichier modifié non commis");
+  const h = banc({ elements: ["input"] });
+  egal(statut(verifier(h.produit, h.opt), "RP11"), undefined, "RP11 hors dépôt git");
+  const v = banc({ elements: ["input"] });
+  execFileSync("git", ["init", "-q"], { cwd: v.produit, env: sansGit() });
+  const r = verifier(v.produit, v.opt);
+  egal(statut(r, "RP11"), "AVERT", "RP11 sur un dépôt sans commit");
+  egal(r.verdict, "PASS", "un essai non joué ne bloque pas");
+});
+
+console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 9 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7, RP8 et l'envoi refusé), chacun avec son remède vert ; D-224 (a), coffre et mémoire : 9 cas rouges de plus (conflit sans base, fichier non ignoré par git, RP9, RP10, RP1 des sections, garde du coffre, envoi sans feu vert, RP3 et RP4 du coffre et de la mémoire), chacun avec son remède joué, et aucune valeur de fixture dans aucune sortie ; TF-2697, l'essai du clone neuf : RP11 rouge sans .gitattributes puis vert après le socle, rouge avec un .gitattributes qui ne fixe rien, et les bornes (fichier modifié, hors git, sans commit)`);
 process.exit(fail ? 1 : 0);

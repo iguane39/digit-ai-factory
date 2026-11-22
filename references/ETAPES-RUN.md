@@ -370,6 +370,18 @@ est celle qui la juge. Le journal de tours est tenu par le pilot chez le PRODUIT
 de DÉPENSE (loi 5), jamais un critère de fin : on peut s'arrêter avant la fin, on ne peut pas
 décider que c'est fini.
 
+**Le journal de tours se tient dès le premier audit, et son absence se signale (TF-2727, 22/11/2026).** Le
+15/11/2026, 31 rapports d'audit de 6 produits (du 01/09 au 09/11) étaient tous PARTIEL, boucle `en_cours`, 30 à
+zéro tour : aucune campagne ne se prouvait menée à son terme depuis le 17/08, et la vitrine de la Factory n'en
+pouvait citer aucune. À l'étape tests d'un run, le tour d'un audit s'écrit au journal du produit
+(`forge\journal-boucle.jsonl`, `outillage-tests-e2e\appels-reels.mjs`) dès le premier rapport, jamais « au premier
+cycle de correction ». Le relevé, lu chez les produits sans rien y écrire :
+`node scripts\relever-campagnes-tests.mjs --parc <racine> [--depuis AAAA-MM-JJ]` rend, par produit, les rapports PARTIEL ou
+FAIL dont le journal n'a AUCUN tour (exit 1 : le signalement) et les campagnes dont le dernier rapport porte une boucle
+`terminee`, comptées sur la semaine écoulée. Il se joue à la demande, avant toute citation d'une campagne terminée ;
+aucune routine hebdomadaire n'est installée (une planification est une décision, pas un effet de bord). Mesuré le 22/11/2026 sur les dossiers de `C:\dev` : 10 produits portant `forge\etapes\tests\`, 69 rapports,
+53 PARTIEL ou FAIL sans tour, 2 produits avec un journal, 0 campagne terminée.
+
 **Boucle de fermeture bornée** : chaque item `actions[]` du rapport porte son `etape_cible` ;
 router les `auto_ia` — `development` (code, câblage), `tests-suite` (cas générés À ADOPTER
 ET EXÉCUTER — R-40 : trois états seulement, adopté/`non_testable` motivé/écarté par décision

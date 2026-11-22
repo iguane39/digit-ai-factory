@@ -374,7 +374,10 @@ veut(2151);
 // `oracle-modeles-en-service` lisent dans les transcripts du poste (« 229 réponse(s) lues », « sur 400 fichier(s) ») : d'autres
 // sessions les font grandir entre les deux lancements. Elles sont neutralisées, et rien d'autre : toute autre différence reste une perte.
 const neutreAvant = (t) => t.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g, "<horodatage>").replace(/\ben \d+ ms\b/g, "en <durée> ms");
-const neutre = (t) => neutreAvant(t).replace(/\b\d+( réponse\(s\))/g, "<n>$1").replace(/\b(lue\(s\) sur )\d+( fichier\(s\))/g, "$1<n>$2");
+// TF-2684 : la ligne « relectures d'intention » (essai D-23) lit les transcripts VIVANTS du poste, comme les comptes MS2 : son nombre de relectures, ses jetons
+// et le « jour le plus chargé » grandissent entre deux lancements. Seuls ces trois chiffres sont neutralisés — l'essai, sa revue et le seuil restent lus.
+const neutre = (t) => neutreAvant(t).replace(/\b\d+( réponse\(s\))/g, "<n>$1").replace(/\b(lue\(s\) sur )\d+( fichier\(s\))/g, "$1<n>$2")
+  .replace(/: \d+ relecture\(s\), [\d ]+ jetons(?: ; jour le plus chargé \d{4}-\d{2}-\d{2} : [\d ]+ jetons)?/g, ": <n> relecture(s), <n> jetons");
 
 check("TF-2151 rouge → vert — des comptes de transcripts qui ont grandi entre deux lancements ne comptent plus pour une perte du relevé", () => {
   const grandi = sortieOuverturePilot.replace(/\b(\d+)( réponse\(s\))/g, (_, n, s) => `${Number(n) + 7}${s}`).replace(/(lue\(s\) sur )(\d+)( fichier\(s\))/g, (_, a, n, s) => `${a}${Number(n) + 3}${s}`);
@@ -850,6 +853,9 @@ if (veut(2214)) {
   const reg = join(dossierReg, "REGISTRE.jsonl");
   const il = (jours) => new Date(Date.now() - jours * 86400000).toISOString();
   const decision = (n, jours) => JSON.stringify({ type: "decision", n, question: "Supprime-t-on le réseau vide créé en Europe du Nord ?", date: il(jours).slice(0, 10), ts: il(jours), origine: "reservation" });
+  const { decisionsPiloteSansReponse } = await import(new URL("./lib-decisions.mjs", import.meta.url));
+  // TF-2684 : une décision réservée AVANT l'entrée en service de l'écrivain (16/11/2026) est datée en dur ; « il y a 5 jours » est devenu le 17/11 le 22/11.
+  const decisionAvantEcrivain = (n) => JSON.stringify({ type: "decision", n, question: "Supprime-t-on le réseau vide créé en Europe du Nord ?", date: "2026-11-15", ts: "2026-11-15T12:00:00.000Z", origine: "reservation" });
   const joueRegistre = (...lignes) => {
     writeFileSync(reg, [JSON.stringify({ type: "registre", version: 1 }), ...lignes].join("\n") + "\n", "utf8");
     return execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme"], { cwd: PILOT, encoding: "utf8", timeout: delaiSousCharge(120000),
@@ -857,9 +863,18 @@ if (veut(2214)) {
   };
   const sectionPilote = (s) => (s.split("## Décisions posées sans réponse consignée (TF-2214, pilot)")[1] || "").split("\n## ")[0];
   check("TF-2214 (pilot) — la décision réservée au registre sans réponse consignée est nommée à l'ouverture (date, question), et elle seule", () => {
-    const l = sectionPilote(joueRegistre(decision(90, 0.01), decision(12, 5)));
+    const l = sectionPilote(joueRegistre(decision(90, 0.01), decisionAvantEcrivain(12)));
     if (!/1 décision\(s\)/.test(l) || !/D-90 \(posée le \d{4}-\d{2}-\d{2} — Supprime-t-on le réseau vide/.test(l)) throw new Error(`section : ${l.slice(0, 300) || "(absente)"}`);
     if (/D-12/.test(l)) throw new Error("une décision réservée avant l'entrée en service de l'écrivain est nommée");
+  });
+  check("TF-2684 — la borne de l'écrivain se prouve SANS l'horloge : au 20/11/2026, D-12 (15/11) n'est pas nommée, D-90 (19/11) l'est ; la même borne, relevée, nomme D-12", () => {
+    const f = join(dossierReg, "REGISTRE-BORNE.jsonl");
+    writeFileSync(f, [JSON.stringify({ type: "registre", version: 1 }), decisionAvantEcrivain(12),
+      JSON.stringify({ type: "decision", n: 90, question: "Q ?", date: "2026-11-19", ts: "2026-11-19T10:00:00.000Z", origine: "reservation" })].join("\n") + "\n", "utf8");
+    const maintenant = Date.parse("2026-11-20T10:00:00Z");
+    const noms = (o) => decisionsPiloteSansReponse({ fichier: f, maintenant, ...o }).map((d) => d.n).join(",");
+    if (noms({}) !== "D-90") throw new Error("la borne de l'entrée en service de l'écrivain ne retient pas D-12 : " + noms({}));
+    if (noms({ depuis: "2026-11-01T00:00:00Z" }) !== "D-12,D-90") throw new Error("la borne relevée ne nomme pas D-12 : le cas ne prouverait rien");
   });
   check("TF-2214 (pilot) — le remède se joue : l'entrée `reponse` au registre fait disparaître la section", () => {
     const sortie = joueRegistre(decision(90, 0.01), JSON.stringify({ type: "reponse", n: 90, lettres: ["a"], date: il(0).slice(0, 10), ts: il(0), origine: "hook-lexique" }));
@@ -1015,6 +1030,10 @@ if (veut(1635)) {
   // sa trace locale le début de sa fenêtre ; un essai non probant replace le témoin au milieu de la fenêtre
   // mesurée à l'essai précédent, 4 essais au plus. Le cas reste rouge si aucun essai ne tombe dans la fenêtre.
   const traceGestes = join(P, ".git", "digit-ai-gestes-avant-releve.jsonl");
+  // TF-2684 (16/11/2026) — LE TÉMOIN SUIT LA DURÉE MESURÉE DU LANCEMENT. Sous charge, le démarrage de Node dépasse à lui seul 1 200 ms (3,5 s mesurés) : le
+  // témoin tombait avant le début du relevé, aucune trace n'était écrite, et le repli « début = t0 » replaçait le témoin au milieu d'une fenêtre qui n'était pas
+  // la bonne. Une TRACE ABSENTE est un essai NON PROBANT : le témoin suivant se place aux trois quarts du temps écoulé de ce lancement (le relevé travaille
+  // après son démarrage, donc ce point tombe dans sa fenêtre), jamais d'après un début supposé. Quatre essais au plus ; le cas reste rouge si aucun ne tombe dans la fenêtre.
   let decalage = 1200, sortie = "", probant = false, fenetre = "";
   for (let essai = 0; essai < 4 && !probant; essai++) {
     retirer(traceGestes);
@@ -1023,11 +1042,11 @@ if (veut(1635)) {
     sortie = execFileSync(process.execPath, [hook, "--sans-bootstrap", "--sans-readme", "--pilot", PILOT, "--contexte-json"],
       { cwd: P, encoding: "utf8", timeout: delaiSousCharge(120000), input: JSON.stringify({ session_id: "s-test", transcript_path: tr }) });
     const fin = Date.now();
-    let debut = t0;
-    try { debut = Date.parse(JSON.parse(readFileSync(traceGestes, "utf8").trim().split(NL).pop()).debut_releve); } catch { /* trace absente : le cas le dira */ }
-    probant = debut <= t0 + decalage && t0 + decalage <= fin - 50;
-    fenetre = `fenêtre ${debut - t0} → ${fin - t0} ms, témoin à ${decalage} ms`;
-    decalage = Math.max(1, Math.round((debut - t0) + (fin - debut) / 2));
+    let debut = null;
+    try { debut = Date.parse(JSON.parse(readFileSync(traceGestes, "utf8").trim().split(NL).pop()).debut_releve); } catch { /* trace absente : essai non probant (TF-2684) */ }
+    probant = debut !== null && !Number.isNaN(debut) && debut <= t0 + decalage && t0 + decalage <= fin - 50;
+    fenetre = debut === null ? `trace absente, lancement de ${fin - t0} ms, témoin à ${decalage} ms` : `fenêtre ${debut - t0} → ${fin - t0} ms, témoin à ${decalage} ms`;
+    decalage = debut === null || Number.isNaN(debut) ? Math.max(1, Math.round((fin - t0) * 0.75)) : Math.max(1, Math.round((debut - t0) + (fin - debut) / 2));
   }
   const ctx = JSON.parse(sortie).hookSpecificOutput.additionalContext;
   check("TF-1635 (c) rouge → vert — un appel d'outil fait pendant le relevé est déclaré en tête, l'appel antérieur au relevé ne l'est pas", () => {

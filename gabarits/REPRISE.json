@@ -23,7 +23,9 @@
       "<emplacement du coffre sur le premier poste, ex. G:/Mon Drive/<Produit> - Reprise/SECRETS>",
       "<emplacement sur l'autre poste, ex. ~/Google Drive/<Produit> - Reprise/SECRETS>"
     ],
-    "cles_attendues": ["<NOM d'une clé que le produit exige, ex. API_TOKEN>"]
+    "cles_attendues": ["<NOM d'une clé que le produit exige, ex. API_TOKEN>"],
+    "_cles_hors_coffre": "Facultatif (TF-2793, RP12) : les NOMS de variables que .env.example ou PARAMETRAGE.md déclarent « à fournir » et dont la valeur ne voyage pas par le coffre (fournie par la plateforme, par exemple). Une variable déclarée à fournir qui n'est ni dans cles_attendues ni ici rend un avertissement RP12 : le coffre peut lui manquer sans que RP9 le voie.",
+    "cles_hors_coffre": []
   },
   "_memoire": "La mémoire Claude du projet (D-224 (a)) : <profil>/projects/<racine du produit, non alphanumériques en « - »>/memory, le profil étant celui de la session (CLAUDE_CONFIG_DIR, sinon ~/.claude). Elle se synchronise fichier par fichier avec ce dossier, par la règle du canal et sous le même feu vert ; l'index MEMORY.md en conflit prend l'union de ses lignes. Un poste à deux profils : chacun se synchronise quand une de ses sessions s'ouvre ou finit un tour. Retirer la section pour garder la mémoire propre à chaque poste.",
   "memoire": {

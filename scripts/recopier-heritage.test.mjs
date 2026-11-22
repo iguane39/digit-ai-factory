@@ -331,6 +331,30 @@ try {
     att(/n'est TENUE qu'une fois commise/i.test(r.sortie),
       "le geste ne dit pas qu'une recopie hors de l'histoire ne tient rien — un clone neuf repartirait sans elle");
   });
+
+  // ---- TF-2697 : le socle fixe les fins de ligne. `.gitattributes` est un artefact en mode `presence_et_motifs` : absent il naît du gabarit, présent mais
+  // sans la ligne du socle il se COMPLÈTE en fin de fichier (ses lignes propres gardées), présent avec la ligne il est LAISSÉ.
+  check("TF-2697 — `.gitattributes` absent : INSTANCIÉ depuis le gabarit, avec la ligne du socle `* text=auto eol=lf`", () => {
+    const produit = join(T, "produit-attr-absent");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    att(/\[INSTANCIÉ\] \.gitattributes/.test(r.sortie), "l'artefact absent n'est pas instancié : " + r.sortie.slice(0, 200));
+    const texte = readFileSync(join(produit, ".gitattributes"), "utf8");
+    att(texte.split(/\r?\n/).includes("* text=auto eol=lf"), "la ligne du socle manque");
+    att(texte.split(/\r?\n/).includes("*.png binary"), "les binaires du gabarit manquent");
+  });
+  check("TF-2697 — `.gitattributes` présent sans la ligne du socle : COMPLÉTÉ en fin de fichier, les lignes du produit gardées ; deuxième passage : LAISSÉ", () => {
+    const produit = join(T, "produit-attr-incomplet");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    writeFileSync(join(produit, ".gitattributes"), "*.svg -text\n", "utf8");
+    const r = lancer(produit);
+    att(r.code === 0 && /\[COMPLÉTÉ\] \.gitattributes/.test(r.sortie), "l'artefact incomplet n'est pas complété : " + r.sortie.slice(0, 200));
+    const lignes = readFileSync(join(produit, ".gitattributes"), "utf8").split(/\r?\n/);
+    att(lignes[0] === "*.svg -text" && lignes.includes("* text=auto eol=lf"), "les lignes du produit ou celle du socle manquent : " + lignes.join(" | "));
+    const encore = lancer(produit);
+    att(/\[LAISSÉ \] \.gitattributes/.test(encore.sortie), "le second passage réécrit l'artefact : " + encore.sortie.slice(0, 200));
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }
