@@ -54,6 +54,7 @@ process.env.FORGE_REGISTRE_DECISIONS_PILOT = REGISTRE_RECETTE;
 delete process.env.CLAUDE_PROJECT_DIR;   // TF-1943 : posée aux hooks par Claude Code, elle ne fuit pas dans la recette ; le cas 62 la pose lui-même
 const ENV_SANS_SESSION = { ...process.env };
 delete ENV_SANS_SESSION.CLAUDE_CODE_SESSION_ID;
+delete ENV_SANS_SESSION.FORGE_SESSION_ID;   // TF-2722 : l'identité que le hook SessionStart pose (lib-session.mjs) passe avant CLAUDE_CODE_SESSION_ID
 
 const MAUVAIS = "J'ai corrigé le script et commité. Tout s'est bien passé, dis-moi si tu veux autre chose.";
 // T2 (TF-1947, 26/10/2026, gabarit 2.50.0) : BON porte son bloc 9, toujours présent et exigé par S1 depuis. Il est placé AVANT le

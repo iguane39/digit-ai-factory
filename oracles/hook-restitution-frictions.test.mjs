@@ -32,6 +32,7 @@ const verifier = (condition, message) => { cas++; if (!condition) echecs.push(me
 delete process.env.CLAUDE_PROJECT_DIR;   // TF-1943 : posée aux hooks par Claude Code, elle ne fuit pas dans la recette
 const ENV_SANS_SESSION = { ...process.env };
 delete ENV_SANS_SESSION.CLAUDE_CODE_SESSION_ID;
+delete ENV_SANS_SESSION.FORGE_SESSION_ID;   // TF-2722 : l'identité que le hook SessionStart pose (lib-session.mjs) passe avant CLAUDE_CODE_SESSION_ID
 delete ENV_SANS_SESSION.FORGE_FRICTIONS_BLOQUANTE;
 // Chez un produit, la restitution témoin pose D-1 : la RÉSERVATION est repoussée (comme au cas 64 de hook-restitution.test.mjs), seul FRICTIONS est en jeu.
 const ENV_PRODUIT = { ...ENV_SANS_SESSION, FORGE_RESERVATION_BLOQUANTE_DES: "2099-01-01" };
