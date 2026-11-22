@@ -55,6 +55,32 @@ export function estPointDeSuivi(texte) {
   return lignesAgent(texte).length >= 1;
 }
 
+/**
+ * TF-2733 (22/11/2026) — LA SESSION EST-ELLE NON INTERACTIVE (`claude -p`, SDK) ? Même règle que `sessionProgrammatique` de `hook-restitution.mjs` (TF-2280, mesurée le
+ * 09/11/2026 sur 609 transcriptions) : un message humain porte `turnOrigin: "sdk"` et aucun ne porte `turnOrigin: "human"` ni `origin.kind: "human"` ; ou le premier porte
+ * `entrypoint: "sdk-cli"`. `entrypoint` seul ne suffit pas : lancée depuis l'extension VS Code, une session `-p` hérite de `claude-vscode`. Lit les 256 premiers Ko du
+ * transcript. Une transcription illisible, ou sans aucun de ces champs (versions anciennes du CLI), est lue comme interactive, comme avant. `FORGE_SUIVI_NON_INTERACTIF=1|0` force.
+ */
+export function sessionNonInteractive(cheminTranscript, env = process.env) {
+  if (env.FORGE_SUIVI_NON_INTERACTIF === "1") return true;
+  if (env.FORGE_SUIVI_NON_INTERACTIF === "0") return false;
+  let tete = "";
+  try {
+    const fd = openSync(cheminTranscript, "r");
+    try { const tampon = Buffer.alloc(256 * 1024); const n = readSync(fd, tampon, 0, tampon.length, 0); tete = tampon.subarray(0, n).toString("utf8"); } finally { closeSync(fd); }
+  } catch { return false; }
+  let sdk = false, cli = false;
+  for (const ligne of tete.split(/\r?\n/)) {
+    if (!ligne.trim()) continue;
+    let e; try { e = JSON.parse(ligne); } catch { continue; }
+    if (e?.type !== "user" || e.isMeta || e.isSidechain || e.isCompactSummary) continue;
+    if (e.turnOrigin === "human" || e.origin?.kind === "human") return false;
+    if (e.turnOrigin === "sdk") sdk = true;
+    if (e.entrypoint === "sdk-cli") cli = true;
+  }
+  return sdk || cli;
+}
+
 /** Lit au plus `octets` à la fin d'un fichier (les transcripts dépassent souvent 10 Mo). */
 export function lireFin(chemin, octets = 8 * 1024 * 1024) {
   const taille = statSync(chemin).size;
@@ -293,7 +319,12 @@ export function etatSuivi(cheminTranscript, maintenant = Date.now(), { tourEnCou
   }
   const agents = agentsDeSession(cheminTranscript, maintenant, parent);
   const dernierPoint = parent.points.length ? parent.points[parent.points.length - 1].ts : null;
-  const enCourse = agents.filter((a) => !a.fini);
+  // TF-2733 (22/11/2026, constat du 14/11/2026) — UN AGENT PRÉSUMÉ ARRÊTÉ N'A QU'UN POINT. Une session `claude -p` a été relancée à 17:24 et 17:39 pour un explorateur présumé
+  // arrêté depuis 25 puis 40 min, et ne s'est jamais terminée : chaque réveil rendait la main au modèle, qui écrivait un point, et la veille suivante attendait encore le point
+  // suivant pour le même agent. Un agent présumé arrêté, couvert par un point émis APRÈS qu'il l'est devenu (sa dernière preuve de vie + 15 min), a eu son point : il sort des
+  // agents en course (plus d'échéance) et des lignes montrées. S'il reprend vie, sa preuve de vie avance et il redevient suivi.
+  const dejaSignale = (a) => a.etat === "présumé arrêté" && parent.points.some((pt) => pt.ts >= a.vie + ARRETE_MIN * MINUTE);
+  const enCourse = agents.filter((a) => !a.fini && !dejaSignale(a));
   const echeances = enCourse.map((a) => echeanceAgent(a, parent.points));
   let session = null;
   if (tourEnCours && parent.debutTour) {
@@ -305,7 +336,7 @@ export function etatSuivi(cheminTranscript, maintenant = Date.now(), { tourEnCou
   }
   const echeance = echeances.length ? Math.min(...echeances) : null;
   const montres = agents.filter((a) => {
-    if (!a.fini) return (maintenant - a.lancement) >= ENTREE_POINT_MIN * MINUTE;
+    if (!a.fini) return (maintenant - a.lancement) >= ENTREE_POINT_MIN * MINUTE && !dejaSignale(a);
     // un agent fini figure UNE dernière fois, dans le premier point qui suit sa fin, s'il a couru au moins 14 min ; sans point
     // antérieur, seulement s'il a fini dans les 17 dernières minutes (relevé le 12/11/2026 : un agent fini 193 min plus tôt montré)
     const repere = Math.max(dernierPoint ?? 0, maintenant - 17 * MINUTE);

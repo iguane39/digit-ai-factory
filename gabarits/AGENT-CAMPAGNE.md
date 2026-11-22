@@ -206,6 +206,48 @@ harnais sont licites). Aucun `.env` lu, copié ou déplacé. Windows : écrire l
 via les outils du harnais (pas de heredoc shell pour du contenu accentué), `PYTHONUTF8=1`
 pour tout script Python qui imprime.
 
+**Variables héritées : `FORGE_ROOT` se juge avant la première recette (TF-2705, TF-2720, 22/11/2026).** Ta session hérite des variables de celle
+qui t'a lancé, et rien ne garantit que `FORGE_ROOT` désigne un parc. Le 15/11/2026 elle valait `…\digit-ai-factory\.claude\worktrees`, le parent d'un arbre
+lié : la recette d'un produit est tombée en 102 erreurs de fixture (`FileNotFoundError catalogue.jsonl`) avant toute modification, et
+`oracle-lot-retours.test` a rendu 6 faux rouges (95 PASS sous `FORGE_ROOT=C:\dev`).
+- **Avant ta première recette**, joue `node <pilot>\oracles\lib-racine-parc.mjs --juger` : il ne dit que l'état de `FORGE_ROOT` (exit 3 quand le dossier
+  `digit-ai-factory` n'y porte pas le pilot, avec la valeur à poser), jamais le reste de l'environnement.
+- **Une racine sans pilot se contourne par la valeur de ta consigne**, posée sur chaque commande (`FORGE_ROOT=C:\dev`) : tu ne corriges pas la variable de la session.
+- **`node oracles\self-tests.mjs` refuse de se jouer** (exit 3, « PRÉREQUIS ABSENT ») sous une racine sans pilot ; le refus nomme la racine à poser.
+
+**Un relevé de l'environnement ne s'affiche jamais en entier (TF-2721, 22/11/2026).** Le 15/11/2026, un agent `constructeur` a affiché
+`CLAUDE_CODE_MESSAGING_TOKEN` dans sa transcription par un relevé non filtré de l'environnement : tout ce qu'un outil affiche entre dans la transcription locale, en clair.
+- **Interdit** : `env`, `printenv` sans nom, `set`, `export -p`, `Get-ChildItem env:` et leurs équivalents, et l'affichage d'une variable dont le nom évoque un secret.
+- **La voie** : `node <pilot>\scripts\env-session.mjs` (valeurs de jeton masquées), `--noms` (les seuls noms), `--var NOM`, `--presente NOM` (oui ou non). Lire une variable
+  ordinaire (`printenv FORGE_ROOT`) reste permis. `oracles\hook-gardes-commande.mjs` refuse le relevé entier (exit 2) et nomme cette voie.
+
+**Un processus se vise par le PID noté à son lancement (TF-2689, TF-2731, 22/11/2026).** Le 16/11/2026, pour arrêter sa propre recette, un agent a tué 3 processus dont la ligne
+contenait `oracles/self-test.mjs` : 2 n'étaient pas les siens. Le 14/11/2026, une tâche déclarée arrêtée à 17:46 avait laissé tourner la session `claude -p` qu'elle avait lancée,
+encore écrite à 18:10.
+- **Arrêt par PID seulement** : jamais par nom d'image, par filtre ni par motif de ligne de commande (`taskkill /IM`, `Stop-Process -Name`, `pkill`, `kill $(pgrep …)`).
+  `oracles\hook-gardes-commande.mjs` les refuse (exit 2).
+- **Le PID se note au lancement** : toute consigne qui lance un processus long en arrière-plan, `claude -p` compris, le lance par
+  `node <pilot>\scripts\processus-par-pid.mjs lancer --fichier-pid <fichier> -- <commande>`, ou relève son PID par un moyen équivalent.
+- **L'arrêt se vérifie par la liste des processus**, jamais par le statut de la tâche : `arreter --pid <n> --arbre` arrête le processus et ses enfants puis vérifie, `verifier` lit la liste.
+
+**Une table de noms ne se sonde pas (TF-2725, 22/11/2026).** Le 15/11/2026, un agent à qui la consigne interdisait d'afficher les tables de `FORGE_NOMS_INTERDITS` et
+`FORGE_PRODUITS_PSEUDO` en a affiché les clés de sous-objets, qui sont des noms réels ; elles sont restées dans sa transcription. Toute consigne qui touche à une de ces tables cite
+`node <pilot>\scripts\structure-table-noms.mjs --clients | --produits | <fichier>` : elle rend le type, les effectifs et les champs structurels, jamais une clé ni une valeur de la table.
+
+**`ListAgents` est absent d'une session `claude -p` : le repli se prévoit (TF-2735, 22/11/2026).** Le 14/11/2026, la session `claude -p` du pilot a rendu `ListAgents` absent, et un
+critère qui exigeait son compte est devenu injugeable. Tout prompt, hameçon ou critère qui s'appuie sur `ListAgents` prévoit le repli `node <pilot>\scripts\sessions-par-transcriptions.mjs`
+(sessions dont une transcription est écrite depuis moins de 15 minutes) et écrit « mesuré par inférence sur les transcriptions », jamais « compte de `ListAgents` ».
+
+**Une consigne qui interdit des fichiers déclare les erreurs qu'ils portent déjà (TF-2703, 22/11/2026).** Le 15/11/2026, un constructeur ne pouvait pas mettre `ruff` au vert : 5 erreurs
+préexistantes dans 2 fichiers que sa consigne lui interdisait de toucher, alors que sa grille exigeait toutes les vérifications natives au vert. Une consigne qui interdit un fichier et
+exige des vérifications relève la commande native sur l'état de départ et en recopie les erreurs comme « référence admise » (fichier, règle, nombre) ; `relecture-intention.mjs
+--preparer consigne` alerte quand elle ne le fait pas.
+
+**La consigne d'un lot se relit comme une part de la demande (TF-2693, 22/11/2026).** Le 16/11/2026, 3 passes de relecture de la consigne commune d'une campagne ont rendu « dérive »
+parce qu'un lot ne couvre pas toute la demande. `node scripts\relecture-intention.mjs --preparer consigne --fichier <consigne.md> --repartition <répartition des lots.md>` joint la
+répartition ; une consigne dont une section « La part de cette campagne dans la demande » déclare sa part vaut de même. La relecture ne compte pas comme écart ce que la répartition
+attribue à un autre lot, et garde pour écart ce qui contredit la demande ou qu'aucun lot ne porte.
+
 **Effort de l'agent (TF-1557, 13/10/2026).** Le pilot lance chaque agent Opus à l'effort de la
 classe de sa tâche, lu dans la table `effort_par_classe` de `references\MODELES-EN-SERVICE.json`
 (paramètre d'effort de l'appel), et nomme cette classe dans le prompt. Sans paramètre, l'agent

@@ -296,6 +296,48 @@ check("rouge — TF-2621 : options invalides : --poser sans session (ni CLAUDE_C
   if (occuper("--inconnue").status !== 2) throw new Error("option inconnue acceptée");
 });
 
+// ---- TF-2705 : un agent hérite d'un FORGE_ROOT sans pilot ----
+const jouerSousRacine = (entree, forgeRoot) => {
+  const env = { ...process.env, USERPROFILE: maison, HOME: maison };
+  delete env.CLAUDE_PROJECT_DIR;
+  if (forgeRoot === null) delete env.FORGE_ROOT; else env.FORGE_ROOT = forgeRoot;
+  const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", input: JSON.stringify(entree), env });
+  let ctx = ""; try { ctx = JSON.parse(r.stdout || "{}").hookSpecificOutput?.additionalContext || ""; } catch { ctx = "<stdout illisible>"; }
+  return { code: r.status, ctx, out: r.stdout || "" };
+};
+const parcSansPilot = join(racine, "parc-sans-pilot", ".claude", "worktrees"); mkdirSync(parcSansPilot, { recursive: true });
+check("rouge — TF-2705 : un FORGE_ROOT sous .claude\\worktrees (la valeur du 15/11/2026) fait avertir AVANT le lancement, remède nommé, exit 0", () => {
+  const r = jouerSousRacine(appel({ subagent_type: "campagne" }), parcSansPilot);
+  if (r.code !== 0) throw new Error(`exit ${r.code} : un avertissement ne bloque jamais`);
+  if (!/FORGE_ROOT HÉRITÉ SANS PILOT \(TF-2705/.test(r.ctx) || !/102 erreurs de fixture/.test(r.ctx)) throw new Error(`aucun avertissement : ${r.ctx.slice(0, 240)}`);
+  if (!/nommer dans la consigne « FORGE_ROOT=\S+ pour toute commande/.test(r.ctx) || /FORGE_ROOT=undefined/.test(r.ctx)) throw new Error(`remède absent ou vide : ${r.ctx.slice(0, 500)}`);
+});
+check("rouge → vert — TF-2705 : le remède du message, posé dans FORGE_ROOT, ne fait plus avertir (la valeur nommée est un parc qui porte le pilot)", () => {
+  const rouge = jouerSousRacine(appel({ subagent_type: "campagne" }), parcSansPilot);
+  const valeur = /« FORGE_ROOT=(\S+) pour toute commande/.exec(rouge.ctx)?.[1];
+  if (!valeur) throw new Error("aucune valeur conseillée dans le message");
+  const vert = jouerSousRacine(appel({ subagent_type: "campagne" }), valeur);
+  if (/FORGE_ROOT HÉRITÉ SANS PILOT/.test(vert.ctx)) throw new Error(`la valeur conseillée « ${valeur} » avertit encore : ${vert.ctx.slice(0, 200)}`);
+});
+check("vert — TF-2705 : sans FORGE_ROOT, aucun avertissement de racine (les chemins se déduisent du dépôt)", () => {
+  const r = jouerSousRacine(appel({ subagent_type: "campagne" }), null);
+  if (/FORGE_ROOT HÉRITÉ/.test(r.ctx)) throw new Error(r.ctx.slice(0, 200));
+});
+// ---- TF-2736 : une consigne « lecture seule » lancée sur un agent qui peut écrire ----
+check("rouge — TF-2736 : une consigne « lecture seule » vers un agent générique avertit, nomme `relecteur`, exit 0", () => {
+  for (const ti of [{ subagent_type: "general-purpose", prompt: "Relecteur aveugle : lis le texte, aucune écriture.", model: "opus", effort: "high" }, { prompt: "Travail en lecture seule sur le registre." }]) {
+    const r = jouer(appel(ti));
+    if (r.code !== 0) throw new Error(`exit ${r.code}`);
+    if (!/LECTURE SEULE SANS LE TYPE QUI LA TIENT \(TF-2736/.test(r.ctx) || !/subagent_type: "relecteur"/.test(r.ctx)) throw new Error(`aucun avertissement : ${r.ctx.slice(0, 240)}`);
+  }
+});
+check("vert — TF-2736 : la même consigne vers `relecteur`, et une consigne sans lecture seule vers un générique daté, ne portent pas cet avertissement ; le remède joué (type relecteur) passe", () => {
+  const r1 = jouer(appel({ subagent_type: "relecteur", prompt: "Relecteur aveugle : lis le texte, aucune écriture." }));
+  if (/LECTURE SEULE SANS/.test(r1.ctx)) throw new Error("un relecteur reçoit l'avertissement de lecture seule");
+  const r2 = jouer(appel({ subagent_type: "general-purpose", prompt: "Écris le fichier de sortie.", model: "sonnet", effort: "high" }));
+  if (/LECTURE SEULE SANS/.test(r2.ctx)) throw new Error("une consigne d'écriture reçoit l'avertissement de lecture seule");
+});
+
 rmSync(racine, { recursive: true, force: true });
 console.log(`\nhook-flotte : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

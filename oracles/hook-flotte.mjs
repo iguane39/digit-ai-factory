@@ -43,6 +43,7 @@ import { basename, dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { racineDuProjet } from "./lib-racine-projet.mjs";
+import { jugerForgeRoot, remedeForgeRoot } from "./lib-racine-parc.mjs";
 
 export const OUTILS = new Set(["Agent", "Task"]);
 export const GENERIQUES = new Set(["general-purpose", "claude", "Explore", "Plan", ""]);
@@ -221,6 +222,46 @@ export function jugerOccupation(entree, { maison, env = process.env, maintenant 
   return null;
 }
 
+/**
+ * TF-2705 (22/11/2026, constat du 15/11/2026) — UN AGENT HÉRITE DU `FORGE_ROOT` DE LA SESSION, ET CELUI-CI PEUT NE PORTER AUCUN PILOT.
+ * Le fait : la session de l'agent a hérité `FORGE_ROOT=C:/dev/digit-ai-factory/.claude/worktrees`, un dossier sans catalogue ; la recette du
+ * produit est tombée en 102 erreurs de fixture (`FileNotFoundError catalogue.jsonl`) avant toute modification. Le harnais ne filtre pas
+ * l'environnement d'un sous-agent : ce qui est faux dans la session l'est chez lui. Le hook le dit AVANT le lancement et nomme le remède
+ * que l'agent peut tenir seul (poser la valeur sur chaque commande), puisque la variable de la session ne se corrige pas en cours de route.
+ * Avertissement seulement : l'appel part tel quel (même règle que la racine en minuscule). NON JUGÉ : un `FORGE_ROOT` valide mais qui désigne
+ * un autre parc que celui de la tâche ; l'environnement d'un agent lancé par un script ou une CLI hors de l'outil.
+ */
+export function jugerForgeRootHerite(entree, env = process.env) {
+  if (!OUTILS.has(entree?.tool_name)) return null;
+  const j = jugerForgeRoot(env);
+  if (j.etat !== "sans-pilot") return null;
+  return "FORGE_ROOT HÉRITÉ SANS PILOT (TF-2705, 15/11/2026) — " + j.motif + ". Un agent lancé ici hérite de cette variable : le 15/11/2026, la recette d'un produit est "
+    + "tombée en 102 erreurs de fixture (`FileNotFoundError catalogue.jsonl`) avant toute modification, et `oracle-lot-retours.test` a rendu 6 faux rouges. "
+    + "Remède : nommer dans la consigne « FORGE_ROOT=" + (/FORGE_ROOT=(\S+)/.exec(remedeForgeRoot(join(dirname(fileURLToPath(import.meta.url)), ".."))) || [])[1] + " pour toute commande qui cherche les forges ou le pilot » "
+    + "(l'agent le pose lui-même sur chaque commande), puis corriger la variable de la session au prochain démarrage. Avertissement seulement : l'appel part tel quel.";
+}
+
+/**
+ * TF-2736 (22/11/2026, récidive du 14/11/2026) — UNE CONSIGNE QUI DIT « LECTURE SEULE » NE SE LANCE PAS SUR UN AGENT QUI PEUT ÉCRIRE.
+ * Le fait : 3 relecteurs sur 6, en 3 passes d'une boucle, ont écrit des fichiers temporaires hors de leur lecture seule, dont un après l'interdit
+ * explicite ; la règle ne tenait qu'à la consigne. Le type `relecteur` (TF-2554) n'a ni Write, ni Edit, ni shell : la lecture seule y tient à
+ * l'absence d'outil. Ce qui restait ouvert : lancer ce travail sur un agent GÉNÉRIQUE, qui a Write et Edit. Le hook le relève sur la consigne.
+ * NON JUGÉ : une lecture seule dite autrement que par ces tournures ; un agent nommé qui écrit (`campagne`, `constructeur`, `redacteur`) lancé avec une
+ * consigne qui contient un tel mot dans un autre sens.
+ */
+export const LECTURE_SEULE = /\b(?:en\s+lecture\s+seule|lecture\s+seule|aucune\s+[ée]criture|n'[ée]cris\s+(?:aucun|rien)|rel(?:ecteur|ecture)\s+aveugle|sans\s+rien\s+[ée]crire|n'[ée]cris\s+aucun\s+fichier)\b/i;
+export function jugerLectureSeule(entree) {
+  if (!OUTILS.has(entree?.tool_name)) return null;
+  const ti = entree?.tool_input || {};
+  const type = typeof ti.subagent_type === "string" ? ti.subagent_type.trim() : "";
+  if (type && !GENERIQUES.has(type)) return null;
+  const m = LECTURE_SEULE.exec(`${ti.prompt || ""}\n${ti.description || ""}`);
+  if (!m) return null;
+  return "LECTURE SEULE SANS LE TYPE QUI LA TIENT (TF-2736, 14/11/2026) — la consigne de cet appel dit « " + m[0] + " », mais l'agent « " + (type || "générique") + " » a Write et Edit : "
+    + "la règle ne tient qu'à la consigne. Le 14/11/2026, 3 relecteurs sur 6 en 3 passes ont écrit des fichiers temporaires hors de leur lecture seule, dont un après l'interdit explicite. "
+    + "Remède : `subagent_type: \"relecteur\"` (ni Write, ni Edit, ni shell), ou `verificateur` si la relecture doit rejouer une commande. Avertissement seulement : l'appel part tel quel.";
+}
+
 /** Juge l'entrée d'un hook PreToolUse : rend { decision: "laisse" }, { decision: "avertit", message }, { decision: "rappelle", message } ou { decision: "refuse", message } (TF-2426, TF-2621). */
 export function juger(entree, options = {}) {
   const refus = jugerIsolation(entree, options.env);
@@ -229,8 +270,9 @@ export function juger(entree, options = {}) {
   if (occupee) return { decision: "refuse", message: occupee };
   const v = jugerFlotte(entree, options);
   const racine = OUTILS.has(entree?.tool_name) ? racineEnMinuscule(entree) : null;
-  if (!racine) return v;
-  return { decision: "avertit", message: messageRacine(racine) + (v.message ? "\n\n" + v.message : "") };
+  const avertissements = [racine && messageRacine(racine), jugerForgeRootHerite(entree, options.env ?? process.env), jugerLectureSeule(entree)].filter(Boolean);
+  if (!avertissements.length) return v;
+  return { decision: "avertit", message: avertissements.join("\n\n") + (v.message ? "\n\n" + v.message : "") };
 }
 
 function jugerFlotte(entree, { maison } = {}) {

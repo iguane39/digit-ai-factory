@@ -2,7 +2,7 @@
 // Recette de hook-suivi-agents.mjs et lib-suivi-agents.mjs (prompt 20261112g, ÉTAPE 3) : chaque état et chaque garde joués
 // sur une session fictive écrite dans un dossier temporaire, à double sens quand la règle a deux côtés.
 // Horloge : les instants sont passés en argument (`maintenant`), aucune attente réelle ; FORGE_SUIVI_POLL_MS=1 pour la veille.
-import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, utimesSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, appendFileSync, utimesSync, rmSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -138,6 +138,9 @@ for (const auTranscript of [false, true]) {
   let h = T0 + 16 * M;
   const reveils = [];
   for (let tour = 1; tour <= 6; tour++) {
+    // TF-2733 : l'agent de ce cas est ACTIF (le retour du 13/11 le dit) : il émet son avancement avant chaque fin de tour. Sans cela, sa dernière preuve de vie
+    // (14 min de course) vieillit de 90 minutes, il devient « présumé arrêté », et il n'a plus qu'un point : c'est le cas TF-2733 plus bas, pas celui-ci.
+    appendFileSync(join(s6.dir, "avancement-six0001.jsonl"), JSON.stringify({ ts: iso(h - 30000), faits: ["a"], restants: ["b"] }) + "\n");
     const debut = h;
     const r = await veiller({ session_id: `six-${auTranscript}`, transcript_path: s6.transcript }, { maintenant: () => h, dormirMs: async () => { h += M / 2; } });
     reveils.push({ code: r.code, attente_min: (h - debut) / M });
@@ -147,6 +150,69 @@ for (const auTranscript of [false, true]) {
   }
   verifier(`veille : 6 fins de tour consécutives, point ${auTranscript ? "écrit au transcript" : "absent du transcript"} — le premier point est dû tout de suite, chacun des 5 suivants attend son échéance`,
     reveils[0].code === 2 && reveils[0].attente_min === 0 && reveils.slice(1).every((x) => x.code === 2 && x.attente_min >= 14), JSON.stringify(reveils));
+}
+
+// 4 ter. TF-2733 (22/11/2026) : un agent présumé arrêté n'a QU'UN point, et une session non interactive (`claude -p`) n'a qu'UNE veille. Le 14/11/2026, une session `-p` a été
+// relancée à 17:24 et 17:39 pour un explorateur présumé arrêté depuis 25 puis 40 min et ne s'est jamais terminée.
+const { sessionNonInteractive } = await import("./lib-suivi-agents.mjs");
+{
+  const sa = session("s-arrete");
+  agent(sa, "arret001", { lance: T0, derniere: T0 + 1 * M, description: "explorateur" });
+  const avantPoint = etatSuivi(sa.transcript, T0 + 25 * M);
+  verifier("TF-2733 rouge — avant tout point, un agent présumé arrêté depuis 24 min est en course et montré", avantPoint.enCourse.length === 1 && /présumé arrêté/.test(redigerPoint(avantPoint, T0 + 25 * M) || ""));
+  const apresPoint = etatSuivi(sa.transcript, T0 + 40 * M, { pointsDemandes: [iso(T0 + 25 * M)] });
+  verifier("TF-2733 vert — après un point émis quand il était déjà présumé arrêté, il sort des agents en course, de l'échéance et des lignes montrées",
+    apresPoint.enCourse.length === 0 && apresPoint.echeance === null && redigerPoint(apresPoint, T0 + 40 * M) === null, JSON.stringify({ n: apresPoint.enCourse.length, e: apresPoint.echeance }));
+  const tot = etatSuivi(sa.transcript, T0 + 25 * M, { pointsDemandes: [iso(T0 + 10 * M)] });
+  verifier("TF-2733 vert — un point émis AVANT qu'il soit présumé arrêté (à 10 min, il avait 9 min de silence) ne le couvre pas : il reste suivi", tot.enCourse.length === 1);
+  const sb = session("s-revit");
+  agent(sb, "revit001", { lance: T0, derniere: T0 + 38 * M, description: "ranimé" });
+  const revit = etatSuivi(sb.transcript, T0 + 40 * M, { pointsDemandes: [iso(T0 + 25 * M)] });
+  verifier("TF-2733 vert — un agent qui reprend vie après le point (preuve de vie à 38 min) redevient suivi", revit.enCourse.length === 1 && revit.agents[0].etat === "actif", JSON.stringify(revit.agents.map((a) => a.etat)));
+  // La veille de bout en bout : deux fins de tour de suite sur le même agent présumé arrêté.
+  const sv2 = session("s-arret-veille");
+  agent(sv2, "arret002", { lance: T0, derniere: T0 + 1 * M, description: "explorateur" });
+  let h2 = T0 + 16 * M;
+  const v1 = await veiller({ session_id: "arret-veille", transcript_path: sv2.transcript }, { maintenant: () => h2, dormirMs: async () => { h2 += M; } });
+  h2 = T0 + 40 * M;
+  const v2 = await veiller({ session_id: "arret-veille", transcript_path: sv2.transcript }, { maintenant: () => h2, dormirMs: async () => { h2 += M; } });
+  verifier("TF-2733 — veille : un premier réveil (code 2) pour l'agent présumé arrêté, aucun second 24 min plus tard (code 0, aucun agent en course)", v1.code === 2 && v2.code === 0 && /aucun agent en course/.test(v2.motif || ""), `${v1.code}/${v2.code} ${v2.motif}`);
+}
+{
+  const sdk = (nom, champs) => {
+    const s = session(nom);
+    const l = readFileSync(s.transcript, "utf8").split("\n");
+    l[0] = JSON.stringify({ ...JSON.parse(l[0]), ...champs });
+    writeFileSync(s.transcript, l.join("\n"));
+    return s;
+  };
+  const cas = [
+    ["sdk-cli : message d'ouverture `turnOrigin: sdk` et `entrypoint: sdk-cli`", { turnOrigin: "sdk", entrypoint: "sdk-cli", promptSource: "sdk" }, true],
+    ["session -p lancée depuis l'extension : `entrypoint: claude-vscode` mais `turnOrigin: sdk` seul (TF-2280)", { turnOrigin: "sdk", entrypoint: "claude-vscode", promptSource: "sdk" }, true],
+    ["session interactive de l'extension : `promptSource: sdk` mais `turnOrigin: human`", { turnOrigin: "human", entrypoint: "claude-vscode", promptSource: "sdk", origin: { kind: "human" } }, false],
+    ["transcription sans aucun de ces champs (versions anciennes) : lue comme interactive", {}, false],
+  ];
+  for (const [nom, champs, attendu] of cas) {
+    const s = sdk(`s-ni-${nom.slice(0, 8)}`, champs);
+    verifier(`TF-2733 — sessionNonInteractive : ${nom}`, sessionNonInteractive(s.transcript, {}) === attendu, String(sessionNonInteractive(s.transcript, {})));
+  }
+  verifier("TF-2733 — sessionNonInteractive : transcript absent → interactive ; FORGE_SUIVI_NON_INTERACTIF force dans les deux sens", sessionNonInteractive(join(racine, "absent.jsonl"), {}) === false
+    && sessionNonInteractive(join(racine, "absent.jsonl"), { FORGE_SUIVI_NON_INTERACTIF: "1" }) === true && sessionNonInteractive(sdk("s-force", { turnOrigin: "sdk" }).transcript, { FORGE_SUIVI_NON_INTERACTIF: "0" }) === false);
+  // Une session -p avec un agent actif : un premier réveil au point dû, puis plus aucune veille ; la même session interactive est veillée à nouveau (cas r3 plus haut).
+  const sp = sdk("s-p-une-veille", { turnOrigin: "sdk", entrypoint: "sdk-cli", promptSource: "sdk" });
+  agent(sp, "pveil001", { lance: T0, derniere: T0 + 1 * M, av: [{ ts: iso(T0 + 16 * M), faits: ["a"], restants: ["b"] }], description: "explorateur" });
+  let hp = T0 + 16 * M;
+  const p1 = await veiller({ session_id: "p-une-veille", transcript_path: sp.transcript }, { maintenant: () => hp, dormirMs: async () => { hp += M; } });
+  hp = T0 + 32 * M;
+  const p2 = await veiller({ session_id: "p-une-veille", transcript_path: sp.transcript }, { maintenant: () => hp, dormirMs: async () => { hp += M; } });
+  verifier("TF-2733 rouge → vert — session `claude -p` : le premier réveil rend le point (code 2), la veille suivante se tait (code 0, « une seule veille »), alors qu'un agent est toujours en course", p1.code === 2 && p2.code === 0 && /une seule veille/.test(p2.motif || ""), `${p1.code}/${p2.code} ${p2.motif}`);
+  const si = session("s-i-deux-veilles");
+  agent(si, "iveil001", { lance: T0, derniere: T0 + 1 * M, av: [{ ts: iso(T0 + 16 * M), faits: ["a"], restants: ["b"] }], description: "explorateur" });
+  let hi = T0 + 16 * M;
+  await veiller({ session_id: "i-deux-veilles", transcript_path: si.transcript }, { maintenant: () => hi, dormirMs: async () => { hi += M; } });
+  hi = T0 + 32 * M;
+  const i2 = await veiller({ session_id: "i-deux-veilles", transcript_path: si.transcript }, { maintenant: () => hi, dormirMs: async () => { hi += M; } });
+  verifier("TF-2733 vert — session interactive : la veille se réarme comme avant (second réveil, code 2)", i2.code === 2, `${i2.code} ${i2.motif}`);
 }
 
 // 5. En tour (PostToolUse) : rappel au point dû, silence avant ; consigne d'agent sans avancement signalée.

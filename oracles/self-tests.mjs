@@ -62,11 +62,23 @@ import {
 } from "./lib-baseline-recettes.mjs";
 import { confronterSensRouge, verdictSensRouge, SEUIL_I6_BLOQUANT } from "./lib-sens-rouge.mjs";
 import { creerGarde } from "./lib-garde-arbre-suivi.mjs";
+import { jugerForgeRoot, remedeForgeRoot } from "./lib-racine-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 // TF-2256 (06/11/2026) : les recettes qui filtrent leurs cas par une variable `FORGE_CAS_*` (lib-filtre-cas.mjs) se jouent ICI en entier. Une variable
 // restée dans l'environnement de la session rendrait chacune PARTIELLE sans que ce total le dise : le total d'un dépôt ne se mesure jamais sur une sélection.
 for (const k of Object.keys(process.env)) if (k.startsWith("FORGE_CAS_")) delete process.env[k];
+// TF-2720 (22/11/2026) — UN `FORGE_ROOT` HÉRITÉ SANS PILOT FAIT REFUSER LA RECETTE, il ne la fait pas rougir par morceaux. Le 15/11/2026, la variable
+// valait `…\digit-ai-factory\.claude\worktrees` (le parent d'un arbre lié) : `oracle-lot-retours.test` rendait 89 PASS et 6 FAIL, 95 et 0 sous
+// `FORGE_ROOT=C:\dev`, et il avait fallu rejouer la recette entière sous une autre valeur pour conclure. Variable absente : rien à refuser, les
+// chemins se déduisent du dépôt. Exit 3 : prérequis absent, jamais un verdict (même code que la recette de forge-tests).
+{
+  const racineJugee = jugerForgeRoot(process.env);
+  if (racineJugee.etat === "sans-pilot") {
+    console.error(`PRÉREQUIS ABSENT (TF-2720) — ${racineJugee.motif}. La recette ne se joue pas sous une racine sans pilot : elle rendrait des faux rouges.\nRemède : ${remedeForgeRoot(join(ICI, ".."))}.`);
+    process.exit(3);
+  }
+}
 // I7 (TF-1690, 14/10/2026) — UNE RECETTE N'ÉCRIT PAS DANS L'ARBRE SUIVI. Chaque recette se joue sous
 // une garde qui relève les fichiers suivis avant et après elle ; un écart nomme la recette et les
 // chemins (motif et limites : `lib-garde-arbre-suivi.mjs`). Le cas : deux recettes réécrivaient à chaque

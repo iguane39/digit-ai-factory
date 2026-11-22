@@ -15,7 +15,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { argumentsLecteurIsole, ARGUMENTS_TEMOIN, clesPayantes, juger, premierMot, resoudreCli } from "./lecteur-isole.mjs";
+import { argumentsLecteurIsole, ARGUMENTS_TEMOIN, clesPayantes, codeDeBlanc, jetonsEntree, juger, messageDeBlanc, premierMot, resoudreCli } from "./lecteur-isole.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SCRIPT = join(ICI, "lecteur-isole.mjs");
@@ -28,24 +28,32 @@ const base = mkdtempSync(join(tmpdir(), "lecteur-isole-"));
 // par la présence de `--setting-sources`, comme la vraie CLI distingue un contexte chargé d'un contexte vide.
 const FAUSSE_CLI = join(base, "fausse-cli.js");
 writeFileSync(FAUSSE_CLI, `
+const { existsSync, readFileSync } = require("node:fs");
 const args = process.argv.slice(2);
 let q = ""; process.stdin.setEncoding("utf8"); process.stdin.on("data", (c) => q += c);
 process.stdin.on("end", () => {
   const isole = args.includes("--setting-sources") && args.includes("--tools") && args.includes("--strict-mcp-config");
   const s = process.env.FAUX_SCENARIO || "sain";
   const fuite = /CLAUDE\\.md/.test(q);
+  // La fausse CLI cite la première ligne du CLAUDE.md du dossier de lancement quand il existe (le marqueur), sinon une ligne fixe.
+  const ligneContexte = existsSync("CLAUDE.md") ? readFileSync("CLAUDE.md", "utf8").split(/\\r?\\n/)[0] : "# digit-ai-factory — noyau de pilotage";
+  const blanc = /CODE : (\\S+)/.exec(q);
   let r;
   if (s === "muette") process.exit(1);
-  if (!isole) r = s === "temoin-muet" ? "AUCUN" : "# digit-ai-factory — noyau de pilotage";
-  else if (fuite) r = s === "fuite" ? "# digit-ai-factory — noyau de pilotage" : "AUCUN";
+  if (blanc) r = s === "tronque" ? "INCONNU" : blanc[1];
+  else if (!isole) r = s === "temoin-muet" ? "AUCUN" : ligneContexte;
+  else if (fuite) r = s === "fuite" ? ligneContexte : "AUCUN";
   else r = s === "piege-rate" ? "OUI" : "NON.";
-  process.stdout.write(JSON.stringify({ type: "result", is_error: false, result: r, total_cost_usd: 0.01 }));
+  const entree = isole ? (s === "contexte-injecte" ? 9000 : 150) : 20000;
+  const sortie = { type: "result", is_error: false, result: r, total_cost_usd: 0.01 };
+  if (s !== "sans-jetons") sortie.usage = { input_tokens: entree, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
+  process.stdout.write(JSON.stringify(sortie));
 });
 `, "utf8");
-const jouer = (scenario, env = {}, extra = []) => {
+const jouer = (scenario, env = {}, extra = [], avecRacine = true) => {
   const e = { ...process.env, QO_JUGE_CLI: FAUSSE_CLI, FAUX_SCENARIO: scenario, ...env };
   for (const k of ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN"]) if (!(k in env)) delete e[k];
-  return spawnSync(process.execPath, [SCRIPT, "--recette", "--racine", base, ...extra], { encoding: "utf8", env: e });
+  return spawnSync(process.execPath, [SCRIPT, "--recette", ...(avecRacine ? ["--racine", base] : []), ...extra], { encoding: "utf8", env: e });
 };
 
 try {
@@ -92,7 +100,7 @@ try {
   });
   check("CLI muette (exit 1, aucune sortie) : exit 3, jamais un verdict ; sans argument : usage exit 2", () => {
     const r = jouer("muette");
-    att(r.status === 3 && /lancement « témoin »/.test(r.stderr), `exit ${r.status} : ${r.stderr}`);
+    att(r.status === 3 && /lancement « à blanc »/.test(r.stderr), `exit ${r.status} : ${r.stderr}`);
     const u = spawnSync(process.execPath, [SCRIPT], { encoding: "utf8" });
     att(u.status === 2 && /usage/.test(u.stderr), `usage : exit ${u.status} ${u.stderr}`);
   });
@@ -104,7 +112,63 @@ try {
     att(cli[0] === process.execPath && cli[1] === "x.js", `résolution : ${cli}`);
     att(resoudreCli({ QO_JUGE_CLI: "claude-xyz" }, () => true)[0] === "claude-xyz", "un exécutable est lancé tel quel");
   });
+  // ---- TF-2729 : la CLI se résout par bin/claude.exe, la recette s'arrête sous Windows au lieu de retomber sur claude.CMD, et un lancement à blanc vérifie le message entier ----
+  const PAQUET = join("APP", "npm", "node_modules", "@anthropic-ai", "claude-code");
+  const existent = (...chemins) => (p) => chemins.some((c) => p === c);
+  check("rouge → vert — TF-2729 : bin/claude.exe passe avant cli.js, cli.js sert quand l'exe manque, et sous Windows rien d'autre : null (jamais claude.CMD) ; hors Windows, `claude`", () => {
+    const exe = join(PAQUET, "bin", "claude.exe"), js = join(PAQUET, "cli.js");
+    const env = { APPDATA: "APP" };
+    const les2 = resoudreCli(env, existent(exe, js), "win32");
+    att(les2.length === 1 && les2[0] === exe, `l'exe ne passe pas avant cli.js : ${les2}`);
+    const seulJs = resoudreCli(env, existent(js), "win32");
+    att(seulJs[0] === process.execPath && seulJs[1] === js, `cli.js n'est pas le repli : ${seulJs}`);
+    att(resoudreCli(env, existent(), "win32") === null, "sous Windows sans exe ni cli.js, la résolution doit rendre null (la recette s'arrête), pas claude.CMD");
+    att(resoudreCli({}, existent(), "win32") === null, "sans APPDATA non plus");
+    const linux = resoudreCli(env, existent(join(PAQUET, "bin", "claude")), "linux");
+    att(linux.length === 1 && /claude$/.test(linux[0]), `hors Windows, le binaire du paquet : ${linux}`);
+    att(resoudreCli(env, existent(), "linux")[0] === "claude", "hors Windows sans paquet : claude");
+    att(resoudreCli({ ...env, QO_JUGE_CLI: "forcee.exe" }, existent("forcee.exe", exe), "win32")[0] === "forcee.exe", "QO_JUGE_CLI ne prime plus");
+  });
+  check("rouge — TF-2729 : un message qui n'arrive pas entier (le lanceur le tronque) arrête la recette (exit 3, aucun des trois lancements joué) ; --a-blanc le dit seul", () => {
+    const r = jouer("tronque");
+    att(r.status === 3 && /lancement « à blanc »/.test(r.stderr) && /n'arrive pas entier/.test(r.stderr) && /recette NON jouée/.test(r.stderr), `exit ${r.status} : ${r.stdout}${r.stderr}`);
+    att(!/TENU|DÉFAUT/.test(r.stdout), "un verdict a été rendu sur un message tronqué");
+    const seul = spawnSync(process.execPath, [SCRIPT, "--a-blanc", "--racine", base], { encoding: "utf8", env: { ...process.env, QO_JUGE_CLI: FAUSSE_CLI, FAUX_SCENARIO: "tronque" } });
+    att(seul.status === 3 && /ÉCHEC/.test(seul.stderr), `--a-blanc sur message tronqué : exit ${seul.status} ${seul.stderr}`);
+  });
+  check("vert — TF-2729 : un message entier passe le lancement à blanc, --a-blanc seul rend TENU (exit 0), et le message de blanc est long avec son code sur la DERNIÈRE ligne seulement", () => {
+    const seul = spawnSync(process.execPath, [SCRIPT, "--a-blanc", "--racine", base], { encoding: "utf8", env: { ...process.env, QO_JUGE_CLI: FAUSSE_CLI, FAUX_SCENARIO: "sain" } });
+    att(seul.status === 0 && /lancement à blanc : TENU/.test(seul.stdout), `exit ${seul.status} : ${seul.stdout}${seul.stderr}`);
+    const m = messageDeBlanc("BLANC-XYZ");
+    att(m.length > 5000 && m.trim().split("\n").at(-1) === "CODE : BLANC-XYZ" && m.split("BLANC-XYZ").length === 2, `forme du message de blanc : ${m.length} caractères`);
+    att(/^BLANC-[0-9A-Z]{8}$/.test(codeDeBlanc()) && codeDeBlanc() !== codeDeBlanc(), "le code de blanc n'est pas aléatoire");
+  });
+  // ---- TF-2714 : le marqueur injecté et les jetons d'entrée prouvent l'isolement objectivement ----
+  check("vert — TF-2714 : sans --racine, la recette joue depuis un dossier jetable au CLAUDE.md marqué : le témoin cite le marqueur, l'isolé non (TENU), le marqueur est dit au relevé", () => {
+    const r = jouer("sain", {}, ["--json"], false);
+    const j = JSON.parse(r.stdout);
+    att(r.status === 0 && /^MARQUEUR-[0-9A-Z]{8}$/.test(j.marqueur) && j.defauts.length === 0, `exit ${r.status} : ${r.stdout}${r.stderr}`);
+    att(j.temoin.includes(j.marqueur) && !j.fuite.includes(j.marqueur), `témoin « ${j.temoin} », fuite « ${j.fuite} »`);
+    att(j.jetons_entree_rapportes_par_la_cli.temoin === 20000 && j.jetons_entree_rapportes_par_la_cli.fuite === 150 && j.ratio_jetons_max_provisoire === 0.25, JSON.stringify(j.jetons_entree_rapportes_par_la_cli));
+  });
+  check("rouge — TF-2714 : un lecteur isolé qui rend le marqueur du CLAUDE.md est refusé par une chaîne cherchée, avec le marqueur nommé (exit 1)", () => {
+    const r = jouer("fuite", {}, [], false);
+    att(r.status === 1 && /a rendu le marqueur MARQUEUR-[0-9A-Z]{8}/.test(r.stdout) && /chaîne, non déclarée/.test(r.stdout), `exit ${r.status} : ${r.stdout}${r.stderr}`);
+  });
+  check("rouge — TF-2714 : un contexte automatique qui passe (le lecteur répond AUCUN et NON, mais reçoit 9000 jetons contre 20000 au témoin) est détecté par la mesure, exit 1", () => {
+    const r = jouer("contexte-injecte", {}, [], false);
+    att(r.status === 1 && /jetons d'entrée contre 20000 au témoin, plus de 25 %/.test(r.stdout) && /TF-2714/.test(r.stdout), `exit ${r.status} : ${r.stdout}${r.stderr}`);
+    att(!/n'a pas répondu/.test(r.stdout), "le défaut vient d'une réponse déclarative : la mesure n'est pas ce qui l'a trouvé");
+  });
+  check("vert — TF-2714 : une CLI qui ne rapporte aucun jeton laisse la recette tenir, et le dit (contrôle par les jetons NON joué) ; le jugement pur accepte marqueur et jetons", () => {
+    const r = jouer("sans-jetons", {}, [], false);
+    att(r.status === 0 && /contrôle par les jetons NON joué/.test(r.stdout), `exit ${r.status} : ${r.stdout}${r.stderr}`);
+    att(juger({ temoin: "# MARQUEUR-A", fuite: "AUCUN", piege: "NON", marqueur: "MARQUEUR-A", jetons: { temoin: 20000, fuite: 150, piege: 160 } }).length === 0, "un cas sain avec marqueur et jetons est accusé");
+    att(juger({ temoin: "AUCUN", fuite: "AUCUN", piege: "NON", marqueur: "MARQUEUR-A" }).length === 1, "un témoin qui ne cite pas le marqueur n'est pas accusé");
+    att(juger({ temoin: "# MARQUEUR-A", fuite: "AUCUN", piege: "NON", marqueur: "MARQUEUR-A", jetons: { temoin: 20000, fuite: 5001, piege: 100 } }).length === 1, "la borne de 25 % ne se tient pas à 5001 sur 20000");
+    att(jetonsEntree({ input_tokens: 3, cache_creation_input_tokens: 10, cache_read_input_tokens: 100 }) === 113 && jetonsEntree(undefined) === null && jetonsEntree({}) === null, "jetonsEntree");
+  });
 } finally { rmSync(base, { recursive: true, force: true }); }
 
-console.log(`\nlecteur-isole (TF-2553) : ${ok} PASS, ${ko} FAIL — cas rouges : fuite de contexte, piège raté, témoin muet, clé d'API refusée, CLI muette`);
+console.log(`\nlecteur-isole (TF-2553) : ${ok} PASS, ${ko} FAIL — cas rouges : fuite de contexte, piège raté, témoin muet, clé d'API refusée, CLI muette, message tronqué (TF-2729), marqueur rendu et contexte automatique mesuré par les jetons (TF-2714)`);
 process.exit(ko ? 1 : 0);

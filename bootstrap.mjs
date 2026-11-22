@@ -41,6 +41,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync, renameSync, readdirSync, statSync, readlinkSync, unlinkSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { skillsInstalles } from "./scripts/lib-config-installee.mjs";
+import { SOUS_ARBRE_LIE, jugerForgeRoot, racineConseillee } from "./oracles/lib-racine-parc.mjs";
 import { releverNonEnregistres, dire } from "./scripts/lib-non-enregistre.mjs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -63,7 +64,7 @@ if (iRebatir >= 0) {
   const nomDepot = args[iRebatir + 1];
   if (!nomDepot || nomDepot.startsWith("--")) { console.error("usage : node bootstrap.mjs --rebatir <nom-du-dépôt> [--essai]"); process.exit(2); }
   const iR = args.indexOf("--racine");
-  const racineR = resolve(iR >= 0 ? args[iR + 1] : process.env.FORGE_ROOT || dirname(ICI));
+  const racineR = resolve(iR >= 0 ? args[iR + 1] : (process.env.FORGE_ROOT && !SOUS_ARBRE_LIE.test(resolve(process.env.FORGE_ROOT)) ? process.env.FORGE_ROOT : null) || racineConseillee(ICI));
   const cible = existsSync(join(racineR, nomDepot)) ? join(racineR, nomDepot) : resolve(nomDepot);
   const r = spawnSync(process.execPath, [join(ICI, "scripts", "rebatir-clone.mjs"), cible, ...(args.includes("--essai") ? ["--essai"] : [])], { stdio: "inherit", env: { ...process.env, FORGE_ROOT: racineR } });
   process.exit(r.status ?? 1);
@@ -75,7 +76,14 @@ const sansSkills = args.includes("--sans-skills");
 const sousInstallateur = args.includes("--sous-installateur");
 const sansPilot = args.includes("--sans-pilot");
 const iRacine = args.indexOf("--racine");
-const racine = resolve(iRacine >= 0 ? args[iRacine + 1] : process.env.FORGE_ROOT || dirname(ICI));
+// TF-2720 (22/11/2026) — LA RACINE PAR DÉFAUT N'EST PAS LE PARENT D'UN ARBRE LIÉ. `dirname(ICI)` rendait `…\.claude\worktrees` quand le
+// bootstrap se jouait depuis un arbre d'agent, et la bannière conseillait d'exporter cette valeur (relevé d'ouverture du 14/11/2026) : le
+// pilot devenait introuvable, des recettes rougissaient (6 cas sur 95) et TF-2520 avait déjà vu le bootstrap recloner les forges sous
+// cet arbre. Le défaut vient donc de `racineConseillee` (le parent du dépôt PRINCIPAL), et un `FORGE_ROOT` hérité sous `.claude\worktrees`
+// n'est jamais un parc : il est écarté, dit à l'écran (voir plus bas), au profit de ce défaut.
+const racineHeritee = process.env.FORGE_ROOT;
+const racineHeriteeRefusee = iRacine < 0 && Boolean(racineHeritee) && SOUS_ARBRE_LIE.test(resolve(racineHeritee));
+const racine = resolve(iRacine >= 0 ? args[iRacine + 1] : (racineHeriteeRefusee ? null : racineHeritee) || racineConseillee(ICI));
 // La copie installée se résout par lib-config-installee (TF-0995) : `CLAUDE_CONFIG_DIR` est la
 // variable que le HARNAIS lit — l'ignorer faisait juger un parc que la session ne charge pas.
 // `SKILLS_DECIDE_PAR` accompagne le chemin partout où il s'imprime : un verdict qui ne dit pas
@@ -99,6 +107,15 @@ const versions = [];
 // qu'on vient de lire apprend à ne plus lire ni l'un ni l'autre.
 let avertsAffiches = 0;
 const ligne = (statut, msg) => { if (statut === "avert") avertsAffiches++; console.log(`[${statut}] ${msg}`); };
+if (racineHeriteeRefusee) {
+  ligne("avert", `FORGE_ROOT=${racineHeritee} est sous .claude\\worktrees : le parent d'un arbre lié d'agent n'est pas un parc, la valeur est ÉCARTÉE (TF-2720) ; racine employée : ${racine}. Corriger la variable : FORGE_ROOT=${racine}`);
+  averts.push("FORGE_ROOT hérité sous .claude\\worktrees");
+}
+const jugeRacineHeritee = racineHeriteeRefusee || iRacine >= 0 ? null : jugerForgeRoot(process.env);
+if (jugeRacineHeritee && jugeRacineHeritee.etat === "sans-pilot") {
+  ligne("avert", `${jugeRacineHeritee.motif} (TF-2720) : une recette ou un hook qui cherche le pilot sous cette racine ne le trouvera pas. Remède : FORGE_ROOT=${racineConseillee(ICI)}, ou retirer la variable`);
+  averts.push("FORGE_ROOT sans pilot");
+}
 // TF-1657 (14/10/2026) — DEUX VERDICTS : LE POSTE POUR UN PRODUIT, ET LE PARC. Mesuré le 13/10 : le
 // pilot et quatorze forges à jour, et pourtant « Poste NON prêt » à l'ouverture d'un produit, pour un
 // seul défaut du canal confidentiel que ce produit ne touche pas — et la consigne d'accueil disait
