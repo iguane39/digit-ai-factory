@@ -17,6 +17,8 @@
  *     l'échéance du prochain point (15 min après le lancement, puis après le dernier point), puis sort en code 2 avec le
  *     point rédigé. Une veille plus récente de la même session remplace la précédente (génération au fichier d'état).
  *     Sans agent en course, sort en 0, muette. Deux réveils d'une même session sont espacés de 4 min au moins.
+ *     Deux bornes de TF-2733 (22/11/2026, constat du 14/11) : un agent PRÉSUMÉ ARRÊTÉ n'a qu'un point (couvert par un point émis après qu'il l'est devenu, il sort du
+ *     suivi tant qu'il ne reprend pas vie) ; en session NON INTERACTIVE (`claude -p`, `sessionNonInteractive` de lib-suivi-agents) la veille ne rend qu'UN réveil, la suivante se tait.
  *   · défaut (hook PostToolUse, synchrone) : pendant un tour, si un agent ou le tour lui-même a passé l'échéance, met le
  *     point rédigé au contexte (`additionalContext`) ; vérifie au plus une fois par minute, rappelle au plus toutes les
  *     3 min. Sur l'outil Agent lancé en arrière-plan sans fichier d'avancement dans sa consigne, le dit.
@@ -33,7 +35,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { etatSuivi, redigerPoint, consignePoint, nommeUnAvancement, MINUTE } from "./lib-suivi-agents.mjs";
+import { etatSuivi, redigerPoint, consignePoint, nommeUnAvancement, sessionNonInteractive, MINUTE } from "./lib-suivi-agents.mjs";
 
 const POLL_MS = Number(process.env.FORGE_SUIVI_POLL_MS || 15000);
 const ECART_REVEILS_MS = 4 * MINUTE;
@@ -75,6 +77,10 @@ export async function veiller(entree, { maintenant = () => Date.now(), dormirMs 
   for (;;) {
     const etatFichier = lireEtat(session);
     if (etatFichier.generation_veille && etatFichier.generation_veille !== generation) return { code: 0, motif: "remplacée par une veille plus récente" };
+    // TF-2733 (22/11/2026) — EN SESSION NON INTERACTIVE (`claude -p`), UNE SEULE VEILLE. Le 14/11/2026, une session `claude -p` a été relancée à 17:24 et 17:39 après sa restitution
+    // (17:11) : chaque réveil en code 2 redonne un tour au modèle, qui se termine, déclenche un nouveau Stop et une nouvelle veille ; la session ne se terminait jamais et son
+    // processus ne rendait jamais son résultat à la session mère. Une session sans humain pour lire un second point n'en reçoit qu'un : le réveil déjà rendu, la veille se tait.
+    if (etatFichier.dernier_reveil && sessionNonInteractive(transcript)) return { code: 0, motif: "session non interactive : une seule veille, le point a déjà été rendu" };
     const t = maintenant();
     const etat = etatSuivi(transcript, t, { pointsDemandes: etatFichier.points_demandes || [] });
     if (!etat.enCourse.length) return { code: 0, motif: "aucun agent en course" };
