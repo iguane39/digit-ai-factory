@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { allouerIndice, allouerIndiceVuDuRegistre, canonique } from "./allouer-indice.mjs";
+import { allouerIndice, allouerIndiceVuDuRegistre, canonique, prefixeDeNom } from "./allouer-indice.mjs";
 
 let pass = 0, fail = 0;
 const check = (nom, fn) => {
@@ -406,6 +406,41 @@ try {
     const avant = reservations().length;
     const s = indice(null, "Produit - Etude - X - ", "--reserver");
     att(s.status === 2 && /session identifiée/.test(s.stderr) && reservations().length === avant, `${s.status} ${s.stderr}`);
+  });
+
+  // ---- TF-2724 (RP-46, 15/11/2026) : le nom réservé est le nom du livrable. Le fait : avec le préfixe « … D-219e » (le radical, sans le séparateur
+  // final), la réservation inscrivait « … D-219e20261115b.md » alors que le livrable s'écrit « … D-219e - 20261115b.md » (R-4) ; la fixture de la
+  // réservation comparait la lettre, pas le nom complet.
+  check("TF-2724 — prefixeDeNom : le séparateur manquant est ajouté, un préfixe complet ou vide ne bouge pas, et l'opération est idempotente", () => {
+    const cas = [["Produit - Brief - D-219e", "Produit - Brief - D-219e - "], ["Produit - Brief - D-219e -", "Produit - Brief - D-219e - "],
+      ["Produit - Brief - D-219e ", "Produit - Brief - D-219e - "], ["Produit - Brief - ", "Produit - Brief - "], ["", ""], [undefined, ""]];
+    for (const [entree, attendu] of cas) {
+      att(prefixeDeNom(entree) === attendu, `« ${entree} » → « ${prefixeDeNom(entree)} », attendu « ${attendu} »`);
+      att(prefixeDeNom(prefixeDeNom(entree)) === attendu, `« ${entree} » : pas idempotent`);
+    }
+  });
+  check("TF-2724 rouge/vert — --reserver avec un préfixe sans séparateur inscrit le nom du livrable (« <radical> - <jour><lettre>.md »), pas un nom où le jour colle au radical", () => {
+    const D4c = join(P4, "output", "05-briefs"); mkdirSync(D4c, { recursive: true });
+    const radical = "Produit - Brief - Mandat D-219e";
+    const r = spawnSync(process.execPath, [SCRIPT, "--dossier", D4c, "--prefixe", radical, "--jour", JOUR, "--extension", ".md", "--reserver"], { encoding: "utf8", env: envDe("session-D") });
+    const lettre = r.stdout.trim();
+    const livrable = `${radical} - ${JOUR}${lettre}.md`;
+    const reserve = reservations().filter((l) => l.session === "session-D");
+    att(r.status === 0 && lettre === "a", `exit ${r.status}, lettre « ${lettre} » ${r.stderr}`);
+    att(reserve.length === 1 && reserve[0].chemin === `output/05-briefs/${livrable}`, `réservé « ${reserve[0]?.chemin} », livrable « output/05-briefs/${livrable} »`);
+    att(new RegExp(` - \\d{8}[a-z]\\.md$`).test(reserve[0].chemin), "le nom réservé n'a pas la forme que R-4 juge : « … - AAAAMMJJ<indice>.md »");
+    // Le livrable écrit sous ce nom EST la réservation : un autre radical demandé ensuite saute la lettre, que le fichier soit écrit ou non.
+    const demande = () => spawnSync(process.execPath, [SCRIPT, "--dossier", D4c, "--prefixe", "Produit - Autre - ", "--jour", JOUR, "--extension", ".md"], { encoding: "utf8", env: envDe("session-E") });
+    att(demande().stdout.trim() === "b", `l'appel d'une autre session a rendu « ${demande().stdout.trim()} » : la réservation de « ${livrable} » n'est pas vue`);
+    writeFileSync(join(D4c, livrable), "livrable écrit sous le nom réservé", "utf8");
+    const apres = demande();
+    att(apres.stdout.trim() === "b", `le fichier écrit et sa réservation comptent deux fois : « ${apres.stdout.trim()} » au lieu de « b »`);
+  });
+  check("TF-2724 vert — sans réservation non plus : le module compte les livrables « <radical> - <jour><lettre> » d'un préfixe donné sans séparateur final (portée prefixe)", () => {
+    const d = join(T, "prefixe-sans-separateur"); mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, `Produit - Rapport - ${JOUR}a.md`), "un", "utf8");
+    att(allouerIndice({ dossier: d, prefixe: "Produit - Rapport", jour: JOUR, contenu: "deux", extension: ".md", porte: "prefixe" }) === "b",
+      "le livrable « Produit - Rapport - <jour>a.md » n'est pas vu par le préfixe « Produit - Rapport »");
   });
 
   check("un jour hors format AAAAMMJJ est REFUSÉ — il fabriquerait un motif faux en silence", () => {
