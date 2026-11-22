@@ -285,7 +285,10 @@ check("TF-1434 — la lecture : plusieurs déclarations s'additionnent, fins de 
   const TG = mkdtempSync(join(tmpdir(), "cliquet-arbres-"));
   const principal = join(TG, "principal"), lie = join(TG, "lie");
   mk(join(principal, "oracles"), { recursive: true });
-  for (const f of ["self-tests.mjs", "lib-baseline-recettes.mjs", "lib-sens-rouge.mjs", "lib-garde-arbre-suivi.mjs", "lib-recettes-dediees.mjs"]) copyFileSync(join(ICI, f), join(principal, "oracles", f));
+  for (const f of ["self-tests.mjs", "lib-baseline-recettes.mjs", "lib-sens-rouge.mjs", "lib-garde-arbre-suivi.mjs", "lib-recettes-dediees.mjs", "lib-racine-parc.mjs"]) copyFileSync(join(ICI, f), join(principal, "oracles", f));
+  // TF-2720 : `self-tests.mjs` charge `lib-racine-parc.mjs`, qui lit `scripts/lib-parc.mjs` ; sans eux le harnais copié meurt à l'import, avant tout verdict.
+  mk(join(principal, "scripts"), { recursive: true });
+  copyFileSync(join(ICI, "..", "scripts", "lib-parc.mjs"), join(principal, "scripts", "lib-parc.mjs"));
   writeFileSync(join(principal, "oracles", "oracle-fictif.mjs"), "if (process.argv.includes(\"--self-test\")) { console.log(\"oracle-fictif : 5 PASS, 0 FAIL (cas rouge joué)\"); process.exit(0); }\n");
   writeFileSync(join(principal, "oracles", "baseline-recettes.json"), JSON.stringify({ "oracle-fictif.mjs": { cas: 3, vu_le: "2026-01-01" } }, null, 1) + "\n");
   git(principal, "init", "-q"); git(principal, "add", "-A"); git(principal, "commit", "-q", "-m", "base");
