@@ -46,6 +46,10 @@
  * `langue:`, sinon « fr »). Les deux rendent le statut A_REJOUER, jamais FAIL : le verdict reste PASS, la sortie porte
  * `a_rejouer` (passages, consigne, passe n sur 3) et la session productrice réécrit puis rejoue, 3 passes au plus (TF-1960,
  * D-78 (c) amendée du 26/10/2026 ; references\ECRITURE.md, « La boucle de réécriture »).
+ * EC-19 une phrase de plus de 25 mots · EC-20 un paragraphe de plus de 6 phrases · EC-21 une consigne (cellule d'une
+ * colonne « Action », élément numéroté sous un titre d'étapes) qui ne commence pas par un verbe. Les trois en
+ * AVERTISSEMENT seulement, seuils et listes dans la clé `plancher_ste` de la donnée (D-230 (b) du 22/11/2026 : le
+ * plancher se resserre vers l'ASD-STE100, l'anglais technique simplifié des manuels de maintenance aéronautique).
  * Un AVERT n'échoue jamais : il nomme, et c'est ce qui permet à l'oracle de rester branché.
  *
  * Usage : node oracles\oracle-ecriture.mjs <fichier.md> [--donnee <tics.json>] [--chemin-relatif <x>] [--aujourd-hui AAAA-MM-JJ] [--langue <fr|en|…>] [--passe <1-9>] [--json]
@@ -65,7 +69,7 @@ import { fileURLToPath } from "node:url";
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = join(ICI, "..");
 const DONNEE_PAR_DEFAUT = join(RACINE, "references", "tics-redactionnels.json");
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const NOM = "oracle-ecriture";
 
 const NON_JUGE_ORACLE = [
@@ -603,6 +607,111 @@ export function juger(texte, options = {}) {
     }
     // Les deux comptes du verdict, lisibles par une machine (TF-1968) : un seuil se recalibre sur des nombres, pas sur un message.
     Object.assign(findings[findings.length - 1], { phrases_longues: longues.length, phrases: ph.length });
+  }
+
+  // EC-19, EC-20, EC-21 (D-230 (b) du 22/11/2026) — LE PLANCHER SE RESSERRE VERS L'ASD-STE100. AVERT SEULEMENT.
+  //
+  // LE FAIT. L'étude du 22/11/2026 (output/03-etudes, « Statuts courts et ASD-STE100 ») a comparé le plancher à la norme
+  // d'anglais technique simplifié des manuels de maintenance aéronautique : 20 mots par phrase de procédure, 25 par
+  // description, 6 phrases par paragraphe, une consigne à l'impératif. EC-2 n'avertit qu'au-delà de 35 mots, en série :
+  // sur les 10 dernières synthèses, 16 % des phrases (84 sur 524) dépassaient 25 mots sans rien déclencher. Sur 1 891
+  // cellules « Action » d'output/, 240 (13 %) ne commençaient pas par un verbe. LA DÉCISION : D-230 (b), « avertir dès
+  // 25 mots, demander l'impératif dans les consignes, et 6 phrases au plus par paragraphe ».
+  //
+  // CE QU'ELLES MESURENT. EC-19 : chaque phrase de plus de `phrase_mots_avertissement` mots. EC-20 : chaque paragraphe
+  // de plus de `paragraphe_phrases_max` phrases. EC-21 : chaque consigne qui ne commence pas par un verbe ; une consigne
+  // est une cellule d'une colonne « Action » ou un élément numéroté sous un titre d'étapes. L'infinitif d'injonction
+  // (« Choisir une option ») compte comme l'impératif : c'est la forme française des consignes techniques, et 87 % des
+  // cellules « Action » la portent déjà. Les seuils et les listes vivent dans `plancher_ste` de la donnée (loi n° 4).
+  // NON JUGÉ : où couper, un nom qui finit comme un infinitif, une consigne hors de ces deux formes.
+  {
+    const ste = donnee?.plancher_ste;
+    if (!ste) {
+      for (const r of ["EC-19", "EC-20", "EC-21"]) pousser(r, "SKIP", "aucune clé `plancher_ste` dans la donnée — règle non jouée");
+    } else {
+      const maxMots = Number(ste.phrase_mots_avertissement ?? 25);
+      const maxPh = Number(ste.paragraphe_phrases_max ?? 6);
+      const ext = (t) => String(t).replace(/\s+/g, " ").trim().slice(0, 60);
+      const decision = "AVERTISSEMENT, jamais bloquant (D-230 (b) du 22/11/2026)";
+
+      // EC-19 — une phrase de plus de 25 mots.
+      if (!assezLong) {
+        pousser("EC-19", "SKIP", `${mots} mots (< ${minimum}) : longueur de phrase non jugée`);
+      } else {
+        const trop = ph.filter((p) => p.mots > maxMots);
+        if (!trop.length) {
+          pousser("EC-19", "PASS", `aucune phrase de plus de ${maxMots} mots sur ${ph.length}`);
+        } else {
+          const tri = trop.slice().sort((a, b) => b.mots - a.mots);
+          pousser("EC-19", "AVERT",
+            `${trop.length} phrase(s) de plus de ${maxMots} mots sur ${ph.length} (${deuxDec((trop.length * 100) / ph.length)} %) ; les plus longues : `
+            + tri.slice(0, 4).map((p) => `l.${ligneDe(p.debut)} (${p.mots} mots) « ${ext(p.texte)} »`).join(" · ")
+            + ` — couper en deux, une idée et un verbe par phrase (E-2, seuil de l'ASD-STE100). ${decision}`,
+            ligneDe(tri[0].debut));
+          Object.assign(findings[findings.length - 1], { phrases_trop_longues: trop.length, phrases: ph.length });
+        }
+      }
+
+      // EC-20 — un paragraphe de plus de 6 phrases.
+      const longs = blocsDeProse(horsCode, proseLignes)
+        .map((b) => ({ ...b, n: phrases(b.prose).length }))
+        .filter((b) => b.n > maxPh);
+      if (!longs.length) pousser("EC-20", "PASS", `aucun paragraphe de plus de ${maxPh} phrases`);
+      else pousser("EC-20", "AVERT",
+        `${longs.length} paragraphe(s) de plus de ${maxPh} phrases : `
+        + longs.slice(0, 4).map((b) => `l.${b.ligne} (${b.n} phrases) « ${ext(b.prose)} »`).join(" · ")
+        + (longs.length > 4 ? ` · et ${longs.length - 4} autre(s)` : "")
+        + ` — un sujet par paragraphe ; au-delà de ${maxPh} phrases, couper où le sujet change (E-20). ${decision}`,
+        longs[0].ligne);
+
+      // EC-21 — une consigne commence par un verbe.
+      const terminaisons = (ste.terminaisons_verbe || ["er", "ir", "re", "oir", "ez"]).map((t) => t.replace(/[^\p{L}]/gu, ""));
+      const reVerbe = new RegExp(`^[\\p{L}-]+(?:${terminaisons.join("|")})$`, "iu");
+      const tu = new Set((ste.imperatifs_tu || []).map((m) => m.toLowerCase()));
+      const nonVerbes = new Set((ste.non_verbes || []).map((m) => m.toLowerCase()));
+      const estVerbe = (w) => !nonVerbes.has(w) && (reVerbe.test(w) || tu.has(w));
+      const premierMot = (t) => ((t.toLowerCase().match(/[\p{L}'’-]+/gu) || [])[0] || "");
+      const ouvreParUnVerbe = (brut) => {
+        let c = String(brut).replace(/`[^`]*`/g, " ` ").replace(/[*_[\]]/g, " ").replace(/\s+/g, " ").trim();
+        c = c.replace(/^A-\d+\s*[:—–-]\s*/i, "").replace(/^[\p{L}\s'’-]{1,40}[.:]\s+(?=\S)/u, (m) => (/^\p{Lu}/u.test(m) && /[.:]\s+$/.test(m) && m.split(/\s+/).length <= 5 ? "" : m));
+        if (!/^\p{L}/u.test(c)) return true;                       // code, chiffre ou symbole en tête : non jugé
+        const w = premierMot(c);
+        if (w === "ne" || /^n['’]/.test(w)) return true;            // « Ne pas coller… »
+        if (estVerbe(w.replace(/^[ldmts]['’]/, ""))) return true;
+        const v = c.indexOf(",");                                   // « Dans VS Code, ouvrir… », « Si …, lancer… »
+        if (v > 0 && v <= 80) { const a = premierMot(c.slice(v + 1)); if (a === "ne" || estVerbe(a)) return true; }
+        return false;
+      };
+      const reEtapes = new RegExp(`(?:${ste.titres_d_etapes || "étapes?"})`, "iu");
+      const fautives = [];
+      let colAction = null, titre = "", dansTableau = false;
+      for (let i = 0; i < horsCode.length; i++) {
+        const l = horsCode[i];
+        const t = /^\s*#{1,6}\s+(.*)$/.exec(l);
+        if (t) { titre = t[1]; dansTableau = false; continue; }
+        if (/^\s*\|/.test(l)) {
+          const cases = l.trim().replace(/^\|/, "").replace(/\|\s*$/, "").split("|").map((x) => x.trim());
+          if (!dansTableau) {
+            dansTableau = true;
+            colAction = cases.findIndex((x) => /^\**\s*action\s*\**$/i.test(x));
+            continue;
+          }
+          if (estSeparateurTableau(l) || colAction < 0 || colAction >= cases.length) continue;
+          if (cases[colAction] && !ouvreParUnVerbe(cases[colAction])) fautives.push({ ligne: i + 1, texte: cases[colAction], ou: "colonne « Action »" });
+          continue;
+        }
+        dansTableau = false;
+        const item = /^\s*\d+[.)]\s+(.*)$/.exec(l);
+        if (item && reEtapes.test(titre) && !ouvreParUnVerbe(item[1])) fautives.push({ ligne: i + 1, texte: item[1], ou: `étape sous « ${ext(titre).slice(0, 40)} »` });
+      }
+      if (!fautives.length) pousser("EC-21", "PASS", "toutes les consignes lues (colonne « Action », étapes numérotées) commencent par un verbe");
+      else pousser("EC-21", "AVERT",
+        `${fautives.length} consigne(s) qui ne commencent pas par un verbe : `
+        + fautives.slice(0, 4).map((f) => `l.${f.ligne} (${f.ou}) « ${ext(f.texte)} »`).join(" · ")
+        + (fautives.length > 4 ? ` · et ${fautives.length - 4} autre(s)` : "")
+        + ` — ouvrir sur le verbe de l'action, à l'infinitif ou à l'impératif : « Choisir une option », « Relancez le banc » (E-11). ${decision}`,
+        fautives[0].ligne);
+    }
   }
 
   // EC-3 — PROFONDEUR DE PUCES (S7 des restitutions, étendu à tout Markdown). Un troisième niveau
@@ -2236,12 +2345,48 @@ function selfTest() {
     const r18s = jouer(`ec18-seq-${nom.slice(0, 3)}.md`, `# Titre\n\nUne ligne saine.\n\nUne ligne avec ${seq} dedans.\n`);
     verifie(g18(r18s)?.statut === "FAIL" && g18(r18s)?.ligne === 5, `EC-18 : la séquence « ${seq} » (${nom}) n'est pas accusée à sa ligne : ${JSON.stringify(g18(r18s))}`);
   }
+  // EC-19, EC-20, EC-21 (D-230 (b) du 22/11/2026) — LE PLANCHER RESSERRÉ VERS L'ASD-STE100, EN AVERTISSEMENT.
+  const g = (x, r) => (x.j?.findings || []).find((f) => f.regle === r);
+  const FOND_230 = Array.from({ length: 16 }, (_, i) => `La règle numéro ${i + 1} se lit vite et se retient bien.`).join(" ");
+  const LONGUE_230 = "Cette phrase compte volontairement bien plus de mots que le seuil admis, parce qu'elle enchaîne une proposition principale, une subordonnée, une incise et encore une précision finale qui allonge tout.";
+  const r19r = jouer("ec19-rouge.md", `# Note\n\n${FOND_230}\n\n${LONGUE_230}\n`);
+  verifie(g(r19r, "EC-19")?.statut === "AVERT" && g(r19r, "EC-19")?.ligne === 5 && r19r.j?.verdict === "PASS" && r19r.statut === 0,
+    `EC-19 : une phrase de plus de 25 mots n'est pas signalée à sa ligne, ou fait échouer le texte : ${JSON.stringify(g(r19r, "EC-19"))}`);
+  const r19v = jouer("ec19-verte.md", `# Note\n\n${FOND_230}\n\nCette phrase enchaîne une principale et une subordonnée. Une incise et une précision suivent, dans une seconde phrase.\n`);
+  verifie(g(r19v, "EC-19")?.statut === "PASS", `EC-19 : la MÊME idée coupée en deux phrases est signalée — le remède échoue : ${JSON.stringify(g(r19v, "EC-19"))}`);
+  const r19c = jouer("ec19-court.md", `# Note\n\n${LONGUE_230}\n`);
+  verifie(g(r19c, "EC-19")?.statut === "SKIP", `EC-19 : un texte de moins de 150 mots est jugé : ${JSON.stringify(g(r19c, "EC-19"))}`);
+  const SEPT = Array.from({ length: 7 }, (_, i) => `Phrase courte ${i + 1}.`).join(" ");
+  const r20r = jouer("ec20-rouge.md", `# Note\n\n${SEPT}\n`);
+  verifie(g(r20r, "EC-20")?.statut === "AVERT" && g(r20r, "EC-20")?.ligne === 3 && r20r.j?.verdict === "PASS",
+    `EC-20 : un paragraphe de 7 phrases n'est pas signalé à sa ligne, ou fait échouer le texte : ${JSON.stringify(g(r20r, "EC-20"))}`);
+  const r20v = jouer("ec20-verte.md", `# Note\n\nPhrase courte 1. Phrase courte 2. Phrase courte 3. Phrase courte 4.\n\nPhrase courte 5. Phrase courte 6. Phrase courte 7.\n`);
+  verifie(g(r20v, "EC-20")?.statut === "PASS", `EC-20 : les MÊMES phrases en deux paragraphes sont signalées : ${JSON.stringify(g(r20v, "EC-20"))}`);
+  const TABLE_21 = (cellule) => `# Suite\n\n| A-N | Action | Acteur |\n|---|---|---|\n| A-1 | ${cellule} | auto_ia |\n`;
+  const r21r = jouer("ec21-rouge.md", TABLE_21("Le seuil de l'oracle à resserrer"));
+  verifie(g(r21r, "EC-21")?.statut === "AVERT" && g(r21r, "EC-21")?.ligne === 5 && r21r.j?.verdict === "PASS",
+    `EC-21 : une cellule « Action » qui ouvre sur un article n'est pas signalée à sa ligne, ou fait échouer le texte : ${JSON.stringify(g(r21r, "EC-21"))}`);
+  for (const [nom, cellule] of [["infinitif", "Resserrer le seuil de l'oracle"], ["imperatif", "Resserrez le seuil de l'oracle"],
+    ["tu", "Relance le banc"], ["negation", "Ne pas coller la ligne anglaise"], ["complement", "Dans VS Code, ouvrir le dossier"], ["code", "`node oracles/x.mjs`"]]) {
+    const r = jouer(`ec21-vert-${nom}.md`, TABLE_21(cellule));
+    verifie(g(r, "EC-21")?.statut === "PASS", `EC-21 : la consigne « ${cellule} » (${nom}) est signalée : ${JSON.stringify(g(r, "EC-21"))}`);
+  }
+  const r21e = jouer("ec21-etapes.md", "# Guide\n\n## Étapes\n\n1. La commande du banc.\n2. Lancer le banc.\n\n## Contexte\n\n1. La commande du banc.\n");
+  verifie(g(r21e, "EC-21")?.statut === "AVERT" && /1 consigne/.test(g(r21e, "EC-21")?.message || "") && g(r21e, "EC-21")?.ligne === 5,
+    `EC-21 : sous « Étapes », un élément sans verbe n'est pas seul signalé, ou un élément hors titre d'étapes l'est : ${JSON.stringify(g(r21e, "EC-21"))}`);
+  const donneeSans = join(dir, "sans-plancher.json");
+  const brute230 = JSON.parse(readFileSync(DONNEE_PAR_DEFAUT, "utf8"));
+  delete brute230.plancher_ste;
+  writeFileSync(donneeSans, JSON.stringify(brute230), "utf8");
+  const r230s = jouer("ec19-sans-donnee.md", `# Note\n\n${FOND_230}\n\n${LONGUE_230}\n`, ["--donnee", donneeSans]);
+  verifie(["EC-19", "EC-20", "EC-21"].every((r) => g(r230s, r)?.statut === "SKIP"), `EC-19 à EC-21 : sans clé plancher_ste, les règles ne disent pas SKIP : ${JSON.stringify((r230s.j?.findings || []).filter((f) => /EC-(19|20|21)/.test(f.regle)))}`);
+
   const BILAN_14 = cas14;
 
   rmSync(dir, { recursive: true, force: true });
   console.log(casse.length
     ? `Self-test ${NOM} : ${casse.length} DEFAUT(S)\n - ${casse.join("\n - ")}`
-    : `Self-test ${NOM} : ${58 + BILAN_14} cas, 0 défaut (${58 + BILAN_14}/${58 + BILAN_14} PASS — EC-18 en FAIL (TF-2604) : une fiche de 69 lignes dont l'UTF-8 a été relu en Windows-1252 refusée avec son compte et sa première ligne, la MÊME fiche saine PASS, un bloc de code, un code en ligne ou des guillemets français qui citent les séquences PASS, un bloc qui cite ne couvre pas une ligne corrompue hors bloc, chacune des quatre séquences accuse seule ; EC-17 (D-114 (a)) : comparatif sans rubrique AVERT, avec rubrique PASS, sans comparateur PASS ; EC-2 (D-115 (a)) : 15 phrases longues non consécutives AVERT, 14 PASS ; page HTML jugée sur son texte visible (TF-1968) : sept phrases de 40 mots d'affilée refusées par EC-2 à la ligne de la page, les mêmes mots en phrases de 10 mots PASS, <script> et <pre> non comptés, un titre « Ce que » en <h2> refusé par EC-8 à la ligne de la page, source html dite ; EC-8 titre NUMÉROTÉ (TF-2020) : « 7. », « 7) », « 2.1 » et « 3 · » refusés, le même titre qui nomme son contenu PASS, un fichier de la liste d'antériorité admis en le disant, le même texte hors liste ou non numéroté refusé ; EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; le jugement par défaut sous output/ ne vaut que pour les écrits neufs (TF-2259) — le même texte daté d'avant le seuil est écarté, dit au verdict et déclaré au non_juge, daté du seuil il est à rejouer, un en-tête tiers, un type de nom de tiers ou un nom sans date restent jugés, sans seuil dans la donnée tout est jugé ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
+    : `Self-test ${NOM} : ${58 + BILAN_14} cas, 0 défaut (${58 + BILAN_14}/${58 + BILAN_14} PASS — EC-19, EC-20 et EC-21 en AVERTISSEMENT (D-230 (b)) : une phrase de 30 mots signalée à sa ligne sans échec, la même coupée en deux PASS, un texte court SKIP ; un paragraphe de 7 phrases signalé, les mêmes en deux paragraphes PASS ; une cellule « Action » qui ouvre sur un article signalée, l'infinitif, l'impératif, la négation, un complément suivi d'une virgule et un code en tête PASS ; sous « Étapes » seul l'élément sans verbe signalé ; sans clé plancher_ste les trois SKIP ; EC-18 en FAIL (TF-2604) : une fiche de 69 lignes dont l'UTF-8 a été relu en Windows-1252 refusée avec son compte et sa première ligne, la MÊME fiche saine PASS, un bloc de code, un code en ligne ou des guillemets français qui citent les séquences PASS, un bloc qui cite ne couvre pas une ligne corrompue hors bloc, chacune des quatre séquences accuse seule ; EC-17 (D-114 (a)) : comparatif sans rubrique AVERT, avec rubrique PASS, sans comparateur PASS ; EC-2 (D-115 (a)) : 15 phrases longues non consécutives AVERT, 14 PASS ; page HTML jugée sur son texte visible (TF-1968) : sept phrases de 40 mots d'affilée refusées par EC-2 à la ligne de la page, les mêmes mots en phrases de 10 mots PASS, <script> et <pre> non comptés, un titre « Ce que » en <h2> refusé par EC-8 à la ligne de la page, source html dite ; EC-8 titre NUMÉROTÉ (TF-2020) : « 7. », « 7) », « 2.1 » et « 3 · » refusés, le même titre qui nomme son contenu PASS, un fichier de la liste d'antériorité admis en le disant, le même texte hors liste ou non numéroté refusé ; EC-8 titre imposé par contrat (TF-1974) : déclaré avec son contrat admis et compté, sans contrat refusé, un autre titre fautif refusé ; EC-16 en AVERTISSEMENT (TF-1977) : « 194 $ par mois, dont 105 $ » signalé, la même en USD et en signe échappé PASS, les « $ » de code non comptés ; EC-14 et EC-15 en A_REJOUER, jamais FAIL (TF-1960, D-78 (c) amendée du 26/10/2026) : ${BILAN_14} cas — un courriel à un tiers dont un paragraphe fait 90 mots est à rejouer avec sa ligne, ses mesures et sa consigne, le MÊME courriel réécrit PASS, une phrase de 29 mots et une énumération de 5 éléments sont à rejouer, les 3 éléments et la liste à puces PASS ; un document de travail à destinataire humain, long, est non concerné (SKIP dit), une fiche de conception aussi, un en-tête destinataire: qui nomme un tiers rend la règle applicable ; un courriel anglais sans --langue est à rejouer, le même avec --langue en ou langue: en PASS, une langue sans liste SKIP dit ; la passe 3 dit de remettre avec les écarts nommés, une passe hors 1-9 rend 2 ; le jugement par défaut sous output/ ne vaut que pour les écrits neufs (TF-2259) — le même texte daté d'avant le seuil est écarté, dit au verdict et déclaré au non_juge, daté du seuil il est à rejouer, un en-tête tiers, un type de nom de tiers ou un nom sans date restent jugés, sans seuil dans la donnée tout est jugé ; EC-13 en AVERTISSEMENT (revue des listes de tournures datée, TF-1926), cas rouge : deux revues dépassées et une date absente nommées, AVERT sans FAIL ; la donnée réelle PASS ; le remède PASS ; le jour dit PASS, le lendemain AVERT ; une date invalide rend 2 ; EC-12 en AVERTISSEMENT (E-11 sur le Markdown, TF-1847), cas rouge : « Comment faire : 1) … 2) … 3) » en ligne, hors restitution, AVERT sans FAIL ; la MÊME information en liste numérotée PASS ; une restitution SKIP, laissée à S80 ; la forme interdite montrée entre guillemets français non comptée ; EC-11 en AVERTISSEMENT, cas rouge : une question de décision qui ne nomme rien, transposée du 16/09/2026, AVERT sans FAIL ; le même texte avec le nom PASS ; une restitution SKIP, laissée à S47 ; une question citée ou rhétorique non comptée (TF-1392) ; rouge FAIL sur ${reglesRouges.size} règles, verte PASS sans FAIL, courte PASS densités non jugées, antériorité SKIP ; EC-7 dans ses TROIS sens — sans lexique SKIP et dit, deux emplois en prose FAIL, le terme retenu PASS avec la citation entre accents graves épargnée (TF-1045) ; EC-9 dans ses TROIS sens (E-14) — des mesures en toutes lettres FAIL, les MÊMES faits en chiffres PASS, et de la prose ordinaire — « un défaut », « un banc neuf », « l'un des deux » — PASS, la frontière étant le déclencheur à DROITE et jamais le mot-nombre seul ; EC-8 dans ses TROIS sens — titre et en-tête de colonne FAIL, la même tournure dans le corps PASS, le tableau d'options imposé par le gabarit PASS, et les 2 ANCIENS libellés désormais FAIL depuis que D-2 (a) a levé leur exemption (TF-1137) ; EC-10 dans ses TROIS sens — une commande de console FAIL quand le lecteur déclaré n'exécute pas, la MÊME commande PASS pour un exploitant, aucun lecteur déclaré SKIP et dit, le bloc qui se RECOPIE jamais compté (TF-1138) ; EC-4-gras dans ses TROIS sens (TF-1488) — un gras d'UN caractère « **0** » ne fait plus glisser l'appariement et les lignes du faux FAIL du 28/09 PASS, les mêmes sans ce gras PASS, et de vrais passages de 12 mots en gras placés après lui FAIL, comptés pour eux-mêmes ; EC-10 pour un lecteur qui EXÉCUTE dans ses DEUX sens (TF-1886) — une session Claude Code, un sous-agent, un agent de campagne PASS, un agent commercial, un agent immobilier et des développeurs assistés par IA restent FAIL)`);
   return casse.length ? 1 : 0;
 }
 

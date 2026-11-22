@@ -1,6 +1,7 @@
 {
   "format": "pilot/tics-redactionnels@1",
-  "version": "1.8.0",
+  "version": "1.9.0",
+  "evolution_1_9_0": "D-230 (b) du 22/11/2026 (étude output/03-etudes/Digit-AI - Étude - Statuts courts et ASD-STE100 - 20261122a.md) : le plancher se resserre vers les seuils de l'ASD-STE100, l'anglais technique simplifié des manuels de maintenance aéronautique. Nouvelle clé `plancher_ste`, jouée par 3 règles en AVERTISSEMENT seulement : EC-19, une phrase de plus de 25 mots ; EC-20, un paragraphe de plus de 6 phrases ; EC-21, une consigne qui ne commence pas par un verbe (cellule d'une colonne « Action », élément numéroté sous un titre d'étapes). Le fait : sur les 10 dernières synthèses, 16 % des phrases (84 sur 524) dépassaient 25 mots ; sur 1 891 cellules « Action » d'output/, 240 (13 %) ne commençaient pas par un verbe.",
   "evolution_1_8_0": "TF-2259 (06/11/2026, décision R-58 de la campagne « Traite les retours et TODOs ») : le jugement par défaut d'EC-14 sous output/ (1.7.0) ne vaut plus que pour les écrits NEUFS (nouvelle clé `ecrit_a_un_tiers.dossiers_juges_par_defaut_depuis`, AAAA-MM-JJ : 2026-11-06, jour de l'entrée de la règle). Le fait : 179 écrits sur 193 rendaient A_REJOUER (5 817 passages, 92,7 %) ; un contrôle qui accuse presque tout le corpus se fait désactiver (leçon N4), et la règle 5 interdit de réécrire l'existant. Un écrit dont le nom porte une date antérieure au seuil est écarté, le motif est dit au verdict et l'antériorité au non_juge ; un nom sans date reste jugé (rien ne prouve son antériorité). Les écrits à en-tête `destinataire:` tiers et ceux dont le type de nom désigne un tiers (courriel, proposition…) restent jugés à toute date. Le seuil est une donnée : le reculer rejuge le corpus, l'avancer l'exempte davantage.",
   "evolution_1_7_0": "TF-2189 (RT-48 de Produit-84, 05/11/2026, décision du 06/11/2026) : EC-14 juge par défaut tout écrit sous output/, avec ou sans en-tête `destinataire:` (nouvelle clé `ecrit_a_un_tiers.dossiers_juges_par_defaut`). Le fait : une synthèse en un paragraphe de 5 phrases denses rendait PASS, EC-14 en SKIP faute d'en-tête ; avec l'en-tête, EC-14 relevait 1 énumération et 3 phrases trop longues. Un en-tête `destinataire:` interne (humain, orchestrateur…) reste l'exception déclarée, et les index régénérés (README, LISEZMOI) rejoignent `exclusions_de_nom`.",
   "evolution_1_6_0": "TF-2020 et TF-1968 (29/10/2026) : (1) EC-8 retire la numérotation d'un titre (« 7. », « 2.1 », « 3 · ») avant de chercher la tournure refusée ; les 29 fichiers qui portaient déjà un tel titre sont nommés dans `anteriorite_titres_numerotes`, admis et dits au verdict, la liste étant figée au 29/10/2026 ; (2) l'oracle juge une page HTML sur son texte visible (`texteDeHtml`), le verdict citant les lignes de la page.",
@@ -563,6 +564,24 @@
       "la qualité de la langue : seule la dominante est lue, jamais l'orthographe ni la grammaire",
       "un texte mixte à parts proches (écart sous `ecart_minimum`) : non signalé, il reste à la relecture",
       "une langue absente de `mots_vides` : le texte n'est pas jugé, et le dit, il n'est pas PASS"
+    ]
+  },
+  "plancher_ste": {
+    "regle": "D-230 (b) du 22/11/2026 : le plancher se resserre vers les seuils de l'ASD-STE100. EC-19 avertit sur toute phrase de plus de `phrase_mots_avertissement` mots ; EC-20 sur tout paragraphe de plus de `paragraphe_phrases_max` phrases ; EC-21 sur toute consigne qui ne commence pas par un verbe. Une consigne est une cellule d'une colonne dont l'en-tête est « Action », ou un élément de liste numérotée sous un titre qui répond à `titres_d_etapes`. Un verbe est un mot qui finit comme un infinitif ou un impératif de `terminaisons_verbe`, ou un impératif de `imperatifs_tu`. Un préfixe de négation (`negations`) ou un complément suivi d'une virgule (« Dans VS Code, ouvrir… ») avant le verbe est admis. Les trois règles avertissent sans jamais faire échouer un texte.",
+    "source": "ASD-STE100, édition 9 de janvier 2025 : 20 mots par phrase de procédure, 25 par phrase de description, 6 phrases par paragraphe, une consigne par phrase à l'impératif (résumé de Wikipédia, texte officiel non lu) ; étude du pilot du 22/11/2026.",
+    "phrase_mots_avertissement": 25,
+    "paragraphe_phrases_max": 6,
+    "terminaisons_verbe": ["er", "ir", "re", "oir", "ez", "ons"],
+    "imperatifs_tu": ["fais", "va", "mets", "ouvre", "lance", "relance", "copie", "colle", "relis", "lis", "choisis", "réponds", "garde", "coupe", "écris", "dis", "prends", "vérifie", "joue", "rejoue", "ajoute", "retire", "remplace", "clique", "tape", "saisis", "note", "passe", "utilise", "demande", "cherche", "relève", "mesure", "enregistre", "publie", "corrige", "supprime", "crée", "installe"],
+    "non_verbes": ["votre", "notre", "autre", "entre", "contre", "leur", "premier", "dernier", "dossier", "fichier", "registre", "ordre", "titre", "membre", "nombre", "lettre", "chiffre", "filtre", "centre", "cadre", "livre", "propre", "chaque", "hier", "cher", "nous", "vous", "plusieurs", "avoir", "devoir", "pouvoir", "savoir", "vouloir", "soir", "espoir", "miroir", "tiroir", "couloir", "trottoir", "loisir", "désir", "plaisir", "avenir", "souvenir", "elixir", "mer", "fer", "ver", "hiver", "enfer"],
+    "negations": ["ne", "n'", "ne pas", "ne plus", "ne jamais"],
+    "titres_d_etapes": "étapes?|comment faire|marche à suivre|mode opératoire|procédure",
+    "derniere_lecture": "2026-11-22",
+    "revue_prevue": "2027-02-22",
+    "non_juge": [
+      "la justesse d'une coupe : EC-19 et EC-20 comptent des mots et des phrases, ils ne disent pas où couper",
+      "un nom qui finit comme un infinitif (« registre », « ordre ») : EC-21 le prend pour un verbe et ne dit rien",
+      "une consigne hors d'une colonne « Action » ou d'une liste numérotée sous un titre d'étapes : elle n'est pas lue comme une consigne"
     ]
   }
 }

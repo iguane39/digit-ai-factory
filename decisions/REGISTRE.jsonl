@@ -234,3 +234,4 @@
 {"type":"reponse","n":222,"lettres":["b"],"date":"2026-11-21","ts":"2026-11-21T15:19:37.785Z","session":"c45421a3","session_source":"heritee_possible","origine":"hook-lexique"}
 {"type":"reponse","n":223,"lettres":["a"],"date":"2026-11-21","ts":"2026-11-21T15:19:37.788Z","session":"c45421a3","session_source":"heritee_possible","origine":"hook-lexique"}
 {"type":"decision","n":230,"question":"Faut-il resserrer le plancher d'écriture de la Factory vers les seuils de l'ASD-STE100 ?","date":"2026-11-22","ts":"2026-11-22T10:09:55.678Z","session":"cc2137c8","session_source":"session_start","origine":"reservation"}
+{"type":"reponse","n":230,"lettres":["b"],"date":"2026-11-22","ts":"2026-11-22T10:44:03.146Z","session":"cc2137c8","session_source":"heritee_possible","origine":"hook-lexique"}

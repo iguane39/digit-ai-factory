@@ -58,7 +58,7 @@ jugé à sa prochaine réécriture de fond.
 
 ## Les règles
 
-17 règles, numérotées E-1 à E-17 — les douze du plancher d'origine, puis E-13 à E-17, nées de retours humains datés. Chaque règle porte les types qu'elle vise, son juge et son
+21 règles, numérotées E-1 à E-21 — les douze du plancher d'origine, puis E-13 à E-21, nées de retours humains et de décisions datés. Chaque règle porte les types qu'elle vise, son juge et son
 statut : **mécanisée** (un script la joue), **déléguée** (un oracle existant la joue déjà) ou
 **revue** (aucun script ; elle se tient à la relecture, et c'est dit). Les exemples avant / après
 sont tirés de textes réels de la Factory.
@@ -75,6 +75,16 @@ vous reste à valider la lecture de votre intention. »
 Viser 20 mots ; au-delà de trente-cinq, couper. Une phrase longue est une liberté ; trois
 d'affilée avertissent ; l'échec est posé au maximum du corpus PASS (sept d'affilée, mesuré sur
 171 textes le 12/09) et se resserre à chaque recalibrage.
+
+*Seuil de l'ASD-STE100, depuis le 22/11/2026 (D-230 (b)). Juge : `oracle-ecriture` EC-19, en avertissement.*
+
+Toute phrase de plus de 25 mots est signalée, avec sa ligne. C'est le seuil des phrases de description
+de l'ASD-STE100, l'anglais technique simplifié des manuels de maintenance aéronautique. Le fait : sur
+les 10 dernières synthèses, 84 phrases sur 524 (16 %) dépassaient 25 mots sans que rien ne le dise
+(source : étude `output/03-etudes/Digit-AI - Étude - Statuts courts et ASD-STE100 - 20261122a.md`).
+
+L'avertissement ne fait jamais échouer un texte. Mesuré le 22/11 : il signale 251 synthèses sur 252.
+C'est voulu : il nomme les phrases à couper, et le seuil vit dans `plancher_ste` de la donnée.
 
 ### E-3 — Un fait concret plutôt qu'un adjectif
 *Tous types. Juge : LC2 (chiffres sourcés), N3 (pourcentages avec formule), S3 (verdict factuel) ; famille `emphase-creuse` de EC-1. Déléguée et mécanisée.*
@@ -132,7 +142,7 @@ Un paragraphe qui énumère devient une liste ; un raisonnement dont chaque pas 
 précédent reste en prose. Découper une démonstration en puces casse le lien logique
 (`bonnes-pratiques.md` §3 du socle).
 
-Retour humain du 17/10/2026, mot pour mot : « J'ai déjà dit que lorsqu'il y avait des listes, il devait y avoir des puces et sous-puces affichées, ce qui n'est pas le cas ici. » Un guide de 4 étapes enchaînait chacune 3 à 6 gestes et son résultat attendu dans un paragraphe, et une option portait ses trois gestes sur une ligne de tableau. Les deux sont des énumérations : chaque geste a sa ligne, en sous-puce sous son étape, et « Résultat attendu » ferme la liste. Avant : « Comment faire : 1) ouvrir un terminal ; 2) coller la commande ; 3) saisir le code. » Après : « Comment faire (b) : » suivi de trois lignes numérotées.
+Retour humain du 17/10/2026, mot pour mot : « J'ai déjà dit que lorsqu'il y avait des listes, il devait y avoir des puces et sous-puces affichées, ce qui n'est pas le cas ici. » Un guide de 4 étapes enchaînait chacune 3 à 6 gestes et son résultat attendu dans un paragraphe, et une option portait ses 3 gestes sur une ligne de tableau. Les deux sont des énumérations : chaque geste a sa ligne, en sous-puce sous son étape, et « Résultat attendu » ferme la liste. Avant : « Comment faire : 1) ouvrir un terminal ; 2) coller la commande ; 3) saisir le code. » Après : « Comment faire (b) : » suivi de 3 lignes numérotées.
 
 ### E-12 — Le vocabulaire du lecteur, jamais celui du système
 *Types T2, T3, T4. Juge : `glossaire-restitution.json` (forge-data), contrat `voix.md` (T4). Revue.*
@@ -248,9 +258,29 @@ Exemple de la recette d'oracle-ecriture (26/10) : un courriel de relance en un s
 ### E-18 — Deux montants comparés disent ce que chacun comprend
 
 Un texte qui compare deux coûts porte la rubrique « Compris : … · Non compris : … · Conséquence : … » (décision humaine
-D-114 (a) du 02/11/2026). Le 19/10/2026, un livrable comparait 224 € à 320 €, pare-feu compris d'un seul côté, et
+D-114 (a) du 02/11/2026). Le 19/10/2026, un livrable comparait 224 € à 320 € (source : le fait cité par D-114 (a)), pare-feu compris d'un seul côté, et
 6 relectures à l'aveugle ne l'ont pas relevé. `oracle-ecriture` EC-17 avertit sur une ligne qui oppose deux montants
 dans un texte sans cette rubrique. Il ne voit pas deux montants placés dans deux cellules d'un tableau.
+
+### E-20 — Un paragraphe porte un sujet et 6 phrases au plus
+*Types T1, T2, T3. Juge : `oracle-ecriture` EC-20, en avertissement. D-230 (b) du 22/11/2026.*
+
+L'ASD-STE100 limite un paragraphe à 6 phrases et à un sujet. La Factory ne bornait que les écrits à un
+tiers (E-17, 3 phrases). Un paragraphe de plus de 6 phrases est signalé, avec sa ligne ; on le coupe où
+le sujet change. Mesuré le 22/11 : 44 synthèses sur 252 et 36 études sur 113 en portaient au moins un.
+Un écrit à un tiers garde sa borne plus stricte de E-17.
+
+### E-21 — Une consigne commence par son verbe
+*Types T2, T3. Juge : `oracle-ecriture` EC-21, en avertissement. D-230 (b) du 22/11/2026.*
+
+Une consigne est une cellule d'une colonne « Action » (bloc 8 d'une restitution, préconisations d'une
+étude) ou un élément numéroté sous un titre d'étapes. Elle ouvre sur le verbe de l'action, à
+l'impératif ou à l'infinitif : « Relancez le banc », « Choisir une option ». L'infinitif compte comme
+l'impératif, parce que c'est la forme française des consignes techniques. Une négation (« Ne pas
+coller… ») ou un complément suivi d'une virgule (« Dans VS Code, ouvrir… ») avant le verbe est admis.
+Mesuré le 22/11 : 240 cellules « Action » sur 1 891 dans output/ (13 %) n'ouvraient pas sur un verbe
+(source : relevé de la session du 22/11/2026, consigné dans `evolution_1_9_0` de `references/tics-redactionnels.json`).
+Avant : « Revue de l'essai, boucle comprise ». Après : « Relire l'essai, boucle comprise ».
 
 ### E-19 — Un message d'erreur reprend la saisie et donne la forme corrigée
 *Type : textes d'application. Juge : `oracles\oracle-erreurs-formulaire.mjs` de forge-design, règle EF3, sur l'instance servie.*
@@ -265,7 +295,7 @@ seul (E-12).
 
 1. La structure imposée par un gabarit prime (blocs et tableaux de `RESTITUTION.md`, sections
    d'une étude) : aucune règle de ce document ne s'y oppose.
-2. Le plancher (E-1 à E-17) ne se franchit pas.
+2. Le plancher (E-1 à E-21) ne se franchit pas.
 3. La voix du produit (`MARQUE.md`) se déploie au-dessus : ton, registre, vocabulaire choisi.
 4. Un conflit entre une règle de forge et ce document se tranche par la règle la plus stricte
    (R-43 : renforcer oui, assouplir jamais) et se consigne au ledger.
