@@ -37,7 +37,12 @@
  *                RP8 une base dérivée ignorée par git est copiée, régénérée ou écartée à dessein (TF-2680) ·
  *                RP9 chaque clé de `secrets.cles_attendues` est présente et non vide au poste ET au coffre
  *                (D-224 (a), R-2 du diagnostic 20261121c : deux copies également incomplètes ne passent plus) ·
- *                RP10 le coffre et la mémoire sont hors du périmètre que le canal copie, et disjoints.
+ *                RP10 le coffre et la mémoire sont hors du périmètre que le canal copie, et disjoints ·
+ *                RP11 un clone neuf du dépôt, fait avec la configuration de ce poste, extrait les mêmes octets que l'arbre
+ *                du poste (TF-2697 : sans `.gitattributes`, `core.autocrlf` fait servir un même commit différemment) ·
+ *                RP12 chaque variable que le produit déclare « à fournir » (`.env.example`, PARAMETRAGE.md) est exigée par
+ *                `secrets.cles_attendues`, ou écartée à dessein par `secrets.cles_hors_coffre` (TF-2793 : un coffre à 2 clés
+ *                a rendu PASS pendant que 2 clés que le produit cite manquaient ; avertissement, jamais un blocage).
  *                Avec `secrets` ou `memoire`, RP3, RP4 et RP6 jugent aussi le coffre et la mémoire : un constat
  *                de plus par flux, préfixé « coffre : » ou « mémoire : », champ `flux`.
  *   Options : --racine <produit> (défaut : dossier courant), --budget <secondes>, --etat <dossier>,
@@ -91,9 +96,9 @@
  *     reste en sauvegarde, sans fusion de contenu ;
  *   - la validité d'un secret, et tout ce que la liste `NON_JUGE` ci-dessous déclare pour le coffre et la mémoire.
  */
-import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, copyFileSync, utimesSync, renameSync, unlinkSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, readdirSync, statSync, lstatSync, copyFileSync, utimesSync, renameSync, unlinkSync, rmSync } from "node:fs";
 import { join, resolve, dirname, sep, relative, isAbsolute, basename, posix } from "node:path";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -101,7 +106,7 @@ import { empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 import { analyser, fusionner, clesPerdues, refusGit, dansLePilot } from "../scripts/fusionner-env.mjs";
 import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
 
-export const VERSION = "1.4.0";
+export const VERSION = "1.6.0";
 export const MANIFESTE = join("forge", "REPRISE.json");
 
 // Un motif par ligne : `*` vaut n'importe quel nom sans séparateur, et un motif sans « / » juge le
@@ -164,6 +169,8 @@ export function defautsManifeste(m) {
         else if (!FICHIER_ENV.test(basename(f)) || MODELE_ENV.test(f)) d.push(`« secrets.fichiers » : « ${f} » n'est pas un fichier d'environnement (« .env », « .env.<suffixe> » ou « <nom>.env », hors modèles versionnés .example, .sample, .template) : le coffre fusionne clé par clé, il ne porte que ces fichiers`);
       }
       if (!chemins(s.chemins)) d.push("« secrets.chemins » nomme au moins un emplacement du coffre, un par poste, ex. « G:/Mon Drive/<Produit> - Reprise/SECRETS »");
+      if (s.cles_hors_coffre !== undefined && (!Array.isArray(s.cles_hors_coffre) || s.cles_hors_coffre.some((k) => typeof k !== "string" || !NOM_CLE.test(k))))
+        d.push("« secrets.cles_hors_coffre » est une liste de NOMS de variables que le produit déclare à fournir et dont la valeur ne voyage pas par le coffre (fournie par la plateforme, par exemple), jamais une valeur");
       if (!Array.isArray(s.cles_attendues) || !s.cles_attendues.length) d.push("« secrets.cles_attendues » nomme au moins une clé que le produit exige : des NOMS, jamais une valeur");
       else s.cles_attendues.forEach((k, i) => { if (typeof k !== "string" || !NOM_CLE.test(k)) d.push(`« secrets.cles_attendues » : l'entrée n° ${i + 1} n'est pas un nom de clé (lettres, chiffres, « _ », « . », « - ») ; elle n'est pas recopiée ici, une valeur s'y est peut-être glissée`); });
     }
@@ -306,6 +313,80 @@ export function visiblesDeGit(racine, rels) {
   if (suivis.status !== 0 || (ignores.status !== 0 && ignores.status !== 1)) return null;
   const poses = new Set([...suivis.stdout.split("\0"), ...ignores.stdout.split("\0")].filter(Boolean));
   return new Set(rels.filter((r) => !poses.has(r)));
+}
+
+/**
+ * RP11 (TF-2697, 22/11/2026) — L'ESSAI DU CLONE NEUF. Le fait (factory-digit-ai-fr, 15/11/2026) : sans `.gitattributes`, sous
+ * `core.autocrlf=true`, les fins de ligne extraites varient d'un poste et d'une écriture à l'autre, et une application qui
+ * hache ses ressources sur leurs octets sert, pour le même commit, des pages différentes. Le poste de travail et le clone
+ * qu'un autre poste ferait doivent porter les MÊMES octets : le dépôt se clone en local, hors du produit, avec la
+ * configuration de ce poste, et chaque fichier suivi se compare entre l'arbre du poste et l'arbre du clone.
+ * Un fichier que git tient pour modifié (un travail en cours) ou supprimé n'est pas comparé : son écart n'est pas celui-là.
+ * Rend { etat: "ok", total } | { etat: "ecart", ecarts: [{ rel, nature }], total, gitattributes } |
+ * { etat: "non_juge", raison } — jamais une exception : un clone impossible se dit, il ne se devine pas.
+ */
+export function comparerClone(racine, opt = {}) {
+  const env = { ...process.env };
+  for (const k of ["GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"]) delete env[k];
+  const budgetMs = Math.max(5, Number(opt.budget) || 60) * 1000;
+  const git = (cwd, args, extra = {}) => spawnSync("git", ["-C", cwd, ...args], { encoding: "utf8", env, maxBuffer: 256 * 1024 * 1024, ...extra });
+  const dedans = git(racine, ["rev-parse", "--is-inside-work-tree"]);
+  if (dedans.status !== 0 || dedans.stdout.trim() !== "true") return { etat: "non_juge", raison: "produit hors dépôt git" };
+  if (git(racine, ["rev-parse", "--verify", "-q", "HEAD"]).status !== 0) return { etat: "non_juge", raison: "dépôt sans commit : un clone neuf serait vide" };
+  const suivis = git(racine, ["ls-files", "-z"]);
+  if (suivis.status !== 0) return { etat: "non_juge", raison: "la liste des fichiers suivis est illisible" };
+  const modifies = git(racine, ["diff", "--name-only", "-z", "HEAD", "--"]);
+  const supprimes = git(racine, ["ls-files", "-d", "-z"]);
+  if (modifies.status !== 0 || supprimes.status !== 0) return { etat: "non_juge", raison: "l'état des fichiers modifiés est illisible" };
+  const ecartes = new Set([...modifies.stdout.split("\0"), ...supprimes.stdout.split("\0")].filter(Boolean));
+  const rels = suivis.stdout.split("\0").filter((r) => r && !ecartes.has(r));
+  const tmp = mkdtempSync(join(tmpdir(), "reprise-clone-"));
+  try {
+    const dest = join(tmp, "clone");
+    const c = spawnSync("git", ["-c", "core.longpaths=true", "clone", "--quiet", "--no-hardlinks", racine, dest], { encoding: "utf8", env, timeout: budgetMs, maxBuffer: 64 * 1024 * 1024 });
+    if (c.error || c.status !== 0) return { etat: "non_juge", raison: c.error ? `le clone dépasse le budget (${budgetMs / 1000} s)` : `le clone échoue : ${String(c.stderr || "").trim().split(/\r?\n/)[0].slice(0, 160)}` };
+    const ecarts = [];
+    let compares = 0;
+    for (const rel of rels) {
+      let a, b;
+      try { a = lstatSync(join(racine, rel)); b = lstatSync(join(dest, rel)); } catch { continue; }   // absent d'un côté : déjà dit par git
+      if (!a.isFile() || !b.isFile()) continue;                                                       // lien, sous-module : sans octets à comparer
+      compares += 1;
+      const ba = readFileSync(join(racine, rel)), bb = readFileSync(join(dest, rel));
+      if (ba.equals(bb)) continue;
+      const sansCr = (x) => x.toString("latin1").replace(/\r\n/g, "\n");
+      ecarts.push({ rel, nature: sansCr(ba) === sansCr(bb) ? "fins de ligne" : "contenu" });
+    }
+    const attr = git(racine, ["ls-files", "--error-unmatch", "--", ".gitattributes"]).status === 0;
+    return ecarts.length ? { etat: "ecart", ecarts, total: compares, gitattributes: attr } : { etat: "ok", total: compares };
+  } finally {
+    try { rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré : le dossier est dans le temporaire du poste */ }
+  }
+}
+
+/**
+ * RP12 (TF-2793, 22/11/2026) — LES NOMS QUE LE PRODUIT DÉCLARE « À FOURNIR ». Le fait (20/11/2026) : le coffre d'un produit portait 2 clés,
+ * le produit en citait 2 de plus (un jeton de renouvellement, une clé d'API de paiement) dans son PARAMETRAGE.md et son ledger, et le juge
+ * de synchro rendait PASS : il ne comparait que ce que le manifeste déclarait. RP9 juge `secrets.cles_attendues`, pas ce que le produit
+ * déclare lui-même. Ce lecteur rend les NOMS (jamais une valeur, jamais un `.env`) : les lignes de `.env.example` / `.env.exemple` qui
+ * portent « # à fournir » et les lignes de tableau de docs/projet/PARAMETRAGE.md dont une cellule dit « à fournir ».
+ */
+export function clesAFournir(racine) {
+  const noms = new Set();
+  for (const n of [".env.example", ".env.exemple"]) {
+    let texte = "";
+    try { texte = readFileSync(join(racine, n), "utf8"); } catch { continue; }
+    for (const l of texte.split(/\r?\n/)) { const m = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=.*#\s*à\s+fournir/i.exec(l); if (m) noms.add(m[1]); }
+  }
+  let doc = "";
+  try { doc = readFileSync(join(racine, "docs", "projet", "PARAMETRAGE.md"), "utf8"); } catch { /* pas de fiche : rien de plus à lire */ }
+  for (const l of doc.split(/\r?\n/)) {
+    if (!/^\s*\|/.test(l)) continue;
+    const cellules = l.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+    const nom = (cellules[0] || "").replace(/[`{}*\s]/g, "");
+    if (/^[A-Z][A-Z0-9_]*$/.test(nom) && cellules.slice(1).some((c) => /à\s+fournir/i.test(c))) noms.add(nom);
+  }
+  return [...noms].sort();
 }
 
 /** La règle d'empreinte du canal, fichier par fichier : partagée par le canal et la mémoire Claude (D-224 (a)). */
@@ -686,6 +767,27 @@ export function verifier(racine, opt = {}) {
   else if (orphelines.length)
     findings.push({ regle: "RP8", statut: "AVERT", message: `${orphelines.length} base(s) ignorée(s) par git que le manifeste ne couvre pas, ni copiée(s) ni régénérée(s) : ${orphelines.slice(0, 3).join(", ")} — sur un autre poste elles manqueront, ou seront créées vides au démarrage. Les nommer dans « elements » (copie par le canal), dans « regenerer » ({ commande, produit }), ou dans « exclusions » si elles sont locales à dessein` });
   else if (regen.length || bases.length) ok("RP8", `${regen.length} base(s) dérivée(s) régénérable(s) par la commande déclarée, ${bases.length} base(s) ignorée(s) par git sur ce poste, toutes couvertes (copiées, régénérées ou écartées à dessein)`);
+  // RP11 (TF-2697) : l'arbre d'un clone neuf porte les mêmes octets que celui du poste ; sinon un même commit se sert différemment d'un poste à l'autre.
+  const clone = comparerClone(racine, opt);
+  if (clone.etat === "ecart") {
+    const natures = [...new Set(clone.ecarts.map((e) => e.nature))].join(" et ");
+    ko("RP11", `${clone.ecarts.length} fichier(s) suivi(s) sur ${clone.total} s'extrairaient avec d'autres octets dans un clone neuf de ce poste (${natures}) : ${clone.ecarts.slice(0, 3).map((e) => e.rel).join(", ")} — un même commit se servirait différemment d'un poste à l'autre. `
+      + (clone.gitattributes
+        ? "Le `.gitattributes` suivi ne fixe pas ces fins de ligne : y poser `* text=auto eol=lf` (socle du pilot, gabarits/gitattributes-produit), "
+        : "Le dépôt ne suit aucun `.gitattributes` : poser celui du socle (`* text=auto eol=lf`, `node <PILOT_ROOT>/scripts/recopier-heritage.mjs .`), ")
+      + "`git add .gitattributes`, puis `git add --renormalize .` pour les fichiers déjà suivis dont l'index porterait des CRLF, et un commit");
+  } else if (clone.etat === "ok") ok("RP11", `un clone neuf de ce poste extrait les mêmes octets que l'arbre du poste (${clone.total} fichier(s) suivi(s) comparés)`);
+  else if (clone.raison !== "produit hors dépôt git") findings.push({ regle: "RP11", statut: "AVERT", message: `essai du clone neuf non joué : ${clone.raison}` });
+  // RP12 (TF-2793) : ce que le produit déclare « à fournir » se compare à ce que le coffre exige ; un nom jamais exigé n'est jugé par aucune règle.
+  const aFournir = clesAFournir(racine);
+  const exigees = new Set([...(m.secrets?.cles_attendues || []), ...(m.secrets?.cles_hors_coffre || [])]);
+  const nonExigees = aFournir.filter((k) => !exigees.has(k));
+  if (aFournir.length && nonExigees.length)
+    findings.push({ regle: "RP12", statut: "AVERT", message: `${nonExigees.length} variable(s) que le produit déclare « à fournir » (.env.example, PARAMETRAGE.md) ne sont exigées par aucune clé du coffre : ${nonExigees.slice(0, 6).join(", ")} — RP9 ne les juge pas, elles peuvent manquer au coffre sans que rien le dise. `
+      + (m.secrets
+        ? "Les ajouter à « secrets.cles_attendues », ou à « secrets.cles_hors_coffre » si leur valeur se fournit ailleurs (plateforme) et ne voyage pas par le coffre"
+        : "Le manifeste ne déclare pas de coffre : ajouter la section « secrets » (gabarits/REPRISE.json) avec ces noms dans « cles_attendues », ou les lister dans « cles_hors_coffre » d'une section « secrets » si leur valeur se fournit ailleurs") });
+  else if (aFournir.length) ok("RP12", `les ${aFournir.length} variable(s) que le produit déclare « à fournir » sont toutes exigées par le coffre (cles_attendues) ou écartées à dessein (cles_hors_coffre)`);
   if (m.envoi?.actif && !goComplet(m)) ko("RP5", "envoi actif sans feu vert de publication complet — « envoi.go_publication » porte decision, date (AAAA-MM-JJ) et par : envoyer vers le canal publie sur un service hébergé (R-38)");
   else if (m.envoi?.actif) ok("RP5", `envoi actif sous le feu vert « ${m.envoi.go_publication.decision} » du ${m.envoi.go_publication.date}`);
   else findings.push({ regle: "RP5", statut: "AVERT", message: "envoi non actif : ce qui change hors de git sur ce poste ne part pas vers le canal, et l'autre poste ne le verra pas"
@@ -791,6 +893,8 @@ function jugerPerimetre(m, findings) {
 }
 
 export const NON_JUGE = [
+  "RP12 ne lit que les NOMS déclarés « à fournir » dans .env.example et dans les tableaux de PARAMETRAGE.md (jamais un .env, jamais une valeur) : une variable qui n'y porte pas cette mention n'est pas vue, et une variable « à fournir » qui n'est pas un secret se déclare dans « cles_hors_coffre »",
+  "RP11 compare le clone local de CE poste à son arbre : l'extraction d'un autre poste dépend de sa propre configuration git, que le juge ne lit pas ; un fichier que git tient pour modifié ou supprimé n'est pas comparé, un lien ou un sous-module non plus, et un dépôt sans commit ou hors git, ou un clone qui dépasse le budget (60 s par défaut, --budget), est dit non jugé",
   "une suppression ne se propage pas : un fichier effacé d'un côté revient de l'autre",
   "deux postes qui écrivent le même fichier entre deux synchronisations : le plus récent gagne, l'autre reste en sauvegarde, sans fusion de contenu",
   "le périmètre ignoré d'un produit qui n'est pas un dépôt git : sans git, rien ne dit ce qui serait commitable, et la restauration ne refuse rien",

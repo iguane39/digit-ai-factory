@@ -1,0 +1,46 @@
+# .gitattributes SOCLE d'un produit de la forge — instancié depuis `gabarits\gitattributes-produit`.
+#
+# POURQUOI CE FICHIER EXISTE (TF-2697, 22/11/2026). Le socle ne posait aucun `.gitattributes`.
+# Sous Windows, `core.autocrlf=true` fait extraire les fins de ligne selon le poste et selon
+# l'outil qui a écrit le fichier : une application qui calcule l'empreinte de ses ressources sur
+# leurs octets (mesuré chez factory-digit-ai-fr, le 15/11/2026) servait, pour le MÊME commit, des
+# pages différentes d'un poste à l'autre. Une ligne dans le dépôt fixe ce que `core.autocrlf`
+# laissait au poste : un clone neuf et le poste de travail extraient les mêmes octets.
+#
+# CE FICHIER EST UN SOCLE, PAS UN PLAFOND : un produit y ajoute ses propres types binaires et
+# ses exceptions. Le contrôle d'héritage vérifie que la ligne ci-dessous y est PRÉSENTE, jamais
+# que rien d'autre ne s'y trouve.
+#
+# APRÈS L'AVOIR POSÉ, un produit dont l'arbre porte déjà des CRLF le normalise une fois :
+# `git add .gitattributes`, `git add --renormalize .`, puis un commit. Sans cela, les fichiers
+# déjà suivis gardent leurs anciennes fins de ligne dans l'index.
+
+* text=auto eol=lf
+
+# ---- Binaires : jamais convertis, jamais comparés ligne à ligne --------------------------------
+# `text=auto` détecte déjà la plupart des binaires ; la déclaration explicite ne laisse rien à
+# l'heuristique pour les formats dont une empreinte d'intégrité dépend de chaque octet.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+*.zip binary
+*.gz binary
+*.mp3 binary
+*.mp4 binary
+*.wav binary
+*.docx binary
+*.pptx binary
+*.xlsx binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
