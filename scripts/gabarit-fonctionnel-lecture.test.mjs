@@ -93,8 +93,11 @@ try {
   });
   check("rouge — chaque gabarit du dossier privé de ses phrases de lecture échoue sur M7, une fois par phrase retirée (ARCHITECTURE 2, PARAMETRAGE 1, TECHNOS 4, FONCTIONNEL 2)", () => {
     const attendus = { "ARCHITECTURE.md": 2, "FONCTIONNEL.md": 2, "PARAMETRAGE.md": 1, "TECHNOS.md": 4 };
+    // TF-2692 (22/11/2026) : ARCHITECTURE ouvre chaque chapitre par une citation « Ce que ce chapitre apprend », qui est elle-même une ouverture pour M7.
+    // L'état d'avant se retrouve donc en retirant les phrases de lecture ET ces citations ; le compte attendu (2) reste celui des tables.
+    const CHAPEAU = /^> \{Ce que ce chapitre apprend[^\n]*\}\n\n/gm;
     for (const [f, nb] of Object.entries(attendus)) {
-      const ancien = LU[f].replace(PHRASE, "");
+      const ancien = LU[f].replace(PHRASE, "").replace(CHAPEAU, "");
       att(ancien !== LU[f], `${f} : chirurgie sans effet`);
       const r = juger(ancien);
       const m7 = (r.sortie.match(/M7 chapitre sans ouverture/g) || []).length;
