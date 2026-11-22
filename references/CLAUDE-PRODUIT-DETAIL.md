@@ -108,6 +108,16 @@ l'approbation, écrire le lot par `node forge\hooks\factory.mjs gestes-distants 
 destructive distante avec ce remède ; lectures et déploiements ordinaires passent. Liste fermée et format du
 lot : `references\GESTES-DISTANTS.md` du pilot.
 
+**Sessions multiples d'un même produit (D-218 (b) du 14/11/2026, TF-2722).** Le fait : le 14/11/2026, cinq sessions
+travaillaient sur un produit, aucune ligne de son ledger ne portait de session, et un indice de livrable a été pris deux fois. Le hook
+`sessions` du lanceur (`forge\hooks\factory.mjs sessions`) tient `forge\sessions.jsonl`, un registre en ajout seul qui n'est jamais
+commité : chaque session s'y inscrit à l'ouverture, pose son objet au premier message, revendique un fichier à sa première écriture
+et se clôt à SessionEnd. Il avertit sans bloquer : il n'arrête aucun geste, et une session seule ne voit aucune différence. Pour voir
+qui fait quoi, `node <pilot>\scripts\sessions-actives.mjs --produit .` ; pour obtenir un indice de livrable qu'une autre session ne
+prendra pas, `node <pilot>\scripts\allouer-indice.mjs --reserver`. Chaque ligne que `forge\ledger.py` écrit porte `session` et
+`session_source` (l'écrivain `ledger.mjs` de forge-agents ne les écrit pas encore). La règle et ses limites (un autre poste reste invisible, seules les écritures par Write et Edit sont vues) :
+`references\SESSIONS-MULTIPLES.md` du pilot.
+
 Boucle intérieure (libre, sans verdict) : `<commandes locales : pytest, ruff, serveur de dev…>`
 
 ## Règles de socle applicables — remplies à l'ouverture, selon le type de livrable (TF-0765)
