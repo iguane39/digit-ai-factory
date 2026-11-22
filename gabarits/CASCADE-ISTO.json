@@ -18,7 +18,7 @@
     }
   },
   "parties_prenantes": [
-    { "id": "PP-1", "role": "<demandeur>", "intention": "<ce qu'il cherche>" }
+    { "id": "PP-1", "role": "<demandeur>", "intention": "<ce qu'il cherche>", "utilisateur_final": "<true pour la partie qui se sert du produit chaque jour, false pour les autres : au moins une est true (règle T7 de forge-conception, TF-2660 ; I5 d'oracle-cascade-isto, TF-2683)>" }
   ],
   "arbitrage": "<obligatoire dès deux parties prenantes : quelle intention prime, et ce qui est garanti à l'autre>",
   "contraintes": [

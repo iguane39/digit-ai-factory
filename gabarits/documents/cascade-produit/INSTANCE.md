@@ -66,7 +66,7 @@ Mode de lecture : une ligne par tactique ; la troisième colonne liste les exige
 
 ## Test rétro
 
-Verdict d'`oracle-cascade-isto` à la génération : **PASS**, 15 règle(s) tenue(s) sur 15.
+Verdict d'`oracle-cascade-isto` à la génération : **PASS**, 16 règle(s) tenue(s) sur 16.
 
 - Rattachement des exigences : non jugé, le référentiel n'a pas été fourni à la génération.
 - M1, cibles encore à fixer : aucune.

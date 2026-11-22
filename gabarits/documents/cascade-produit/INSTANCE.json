@@ -14,7 +14,7 @@
  },
  "parties_prenantes": [
   { "id": "PP-1", "role": "services généraux, demandeurs", "intention": "des salles occupées quand elles sont réservées" },
-  { "id": "PP-2", "role": "équipes qui réservent", "intention": "trouver une salle en moins d'une minute" }
+  { "id": "PP-2", "role": "équipes qui réservent", "intention": "trouver une salle en moins d'une minute", "utilisateur_final": true }
  ],
  "arbitrage": "Le temps des équipes prime ; la libération automatique d'une salle inoccupée est garantie aux services généraux, après un délai que les équipes connaissent.",
  "contraintes": [

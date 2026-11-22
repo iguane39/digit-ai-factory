@@ -25,6 +25,9 @@
  *   I1  l'intention porte au moins une citation sourcée (texte + source) et une reformulation ;
  *   I2  l'intention porte sa VALIDATION humaine : date, auteur, trace (entrée de ledger, décision) ;
  *   I3  plusieurs parties prenantes → un `arbitrage` écrit entre leurs intentions ;
+ *   I5  (TF-2683) une partie prenante est marquée `utilisateur_final: true` — celle qui s'en sert chaque jour ; le
+ *       champ est un booléen ; l'absence ne bloque que les cascades datées du 16/11/2026 ou après (règle T7 de
+ *       forge-conception : une cascade ratifiée sans ce champ y échoue) ;
  *   I4  `contraintes` et `non_objectifs` sont DÉCLARÉS (liste vide = « aucun », gratuit) et chaque
  *       entrée porte son énoncé et sa source ou son motif ;
  *   S1  chaque stratégie porte effet, manque, cible et un indicateur STRUCTURÉ — formule,
@@ -56,7 +59,9 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
+/** Date de naissance de T7 (forge-conception, TF-2660) : avant elle, une cascade sans utilisateur final est une antériorité, pas un défaut. */
+const SEUIL_UTILISATEUR_FINAL = "2026-11-16";
 export const FORMAT = "pilot/cascade-isto@1";
 const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/;
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -130,6 +135,19 @@ export function juger(cascade, { referentiel = null, testsCites = null } = {}) {
     ...(Array.isArray(parties) && parties.length >= 2 && !plein(cascade.arbitrage)
       ? [`${parties.length} parties prenantes et aucun \`arbitrage\` écrit entre leurs intentions`] : []),
   ], Array.isArray(parties) && parties.length >= 2 ? "arbitrage écrit entre les parties prenantes" : "partie prenante unique déclarée");
+  // I5 (TF-2683, 16/11/2026) — L'UTILISATEUR FINAL EST NOMMÉ. T7 d'oracle-tracabilite (forge-conception, TF-2660) exige sous --cascade une
+  // partie prenante marquée `utilisateur_final: true` ; le gabarit et cet oracle ne connaissaient pas le champ, et une cascade ratifiée ici sans
+  // lui échouait là-bas. Un champ déclaré est un booléen (« oui » ne se lit pas) ; l'absence bloque les cascades datées du seuil ou après,
+  // et se compte en M5 pour les antérieures — ni rétroactive, ni muette.
+  const finaux = Array.isArray(parties) ? parties.filter((p) => p?.utilisateur_final === true) : [];
+  const malTypes = Array.isArray(parties) ? parties.filter((p) => p && typeof p === "object" && "utilisateur_final" in p && typeof p.utilisateur_final !== "boolean") : [];
+  const apresSeuil = DATE_ISO.test(cascade.date ?? "") && cascade.date >= SEUIL_UTILISATEUR_FINAL;
+  regle("I5", [
+    ...malTypes.map((p) => `${p.id ?? "partie prenante"} : \`utilisateur_final\` est un booléen (true ou false), lu « ${String(p.utilisateur_final)} »`),
+    ...(apresSeuil && Array.isArray(parties) && parties.length && !finaux.length
+      ? ["aucune partie prenante n'est l'utilisateur final (`utilisateur_final: true`) : celui qui s'en sert chaque jour n'est nommé nulle part, et la règle T7 de forge-conception refusera cette cascade (TF-2660)"] : []),
+  ], finaux.length ? `utilisateur final nommé : ${finaux.map((p) => p.id ?? p.role).join(", ")}`
+    : `aucun utilisateur final nommé, cascade antérieure au ${SEUIL_UTILISATEUR_FINAL} : compté en M5, exigé dès sa prochaine version datée`);
   regle("I4", [
     ...(Array.isArray(contraintes) ? [] : ["`contraintes` non déclarées — une liste vide vaut « aucune », l'omission ne vaut rien"]),
     ...(Array.isArray(nonObjectifs) ? [] : ["`non_objectifs` non déclarés — une liste vide vaut « aucun »"]),
@@ -210,6 +228,7 @@ export function juger(cascade, { referentiel = null, testsCites = null } = {}) {
     M1_cibles_a_fixer: strategies.filter((s) => /à (fixer|trancher)/i.test(s.cible ?? "")).map((s) => s.id),
     M2_justifications_reconstruites: tactiques.filter((t) => statutDe(t.statut_justification) === "reconstruite").map((t) => t.id),
     M4_strategies_non_mesurees: strategies.filter((s) => plein(s.valeur_actuelle?.non_mesuree)).map((s) => s.id),
+    M5_sans_utilisateur_final: Array.isArray(parties) && parties.length && !finaux.length ? [cascade.projet ?? "cascade"] : [],
   };
   if (testsCites) mesures.M3_exigences_sans_test = [...rattachement.keys()].filter((e) => !testsCites.has(e)).sort();
   return { findings, mesures };
@@ -252,7 +271,7 @@ export function fixtureVerte() {
       validation: { date: "2026-10-02", par: "porteur du produit", trace: "ledger seq 12, D-3 (a)" },
     },
     parties_prenantes: [{ id: "PP-1", role: "cabinet", intention: "gagner du temps" },
-      { id: "PP-2", role: "locataires", intention: "une réponse rapide" }],
+      { id: "PP-2", role: "locataires", intention: "une réponse rapide", utilisateur_final: true }],
     arbitrage: "Le temps du cabinet prime, sans allonger le délai de réponse aux locataires.",
     contraintes: [{ id: "C-1", enonce: "données personnelles traitées sur le poste", source: "RGPD, brief" }],
     non_objectifs: [{ id: "N-1", enonce: "envoyer sans relecture", motif: "le cabinet garde la main" }],
@@ -293,6 +312,17 @@ function selfTest() {
   rouge("intention non validée", "I2", (c) => { delete c.intention.validation; });
   rouge("deux parties sans arbitrage", "I3", (c) => { delete c.arbitrage; });
   rouge("contraintes omises", "I4", (c) => { delete c.contraintes; });
+  // I5 (TF-2683) : le champ de T7. Rouge : cascade datée du seuil sans utilisateur final ; booléen écrit « oui ». Vert : antérieure (comptée en M5), puis le remède.
+  rouge("cascade récente sans utilisateur final", "I5", (c) => { c.date = "2026-11-16"; delete c.parties_prenantes[1].utilisateur_final; });
+  rouge("utilisateur_final écrit « oui »", "I5", (c) => { c.parties_prenantes[1].utilisateur_final = "oui"; });
+  const ancienne = fixtureVerte(); delete ancienne.parties_prenantes[1].utilisateur_final;
+  const rAncienne = juger(ancienne, { referentiel: ref });
+  cas.push({ nom: "cascade antérieure au 16/11 sans utilisateur final : antériorité, M5", attendu: "PASS + M5",
+    ok: verdictDe(rAncienne.findings) === "PASS" && rAncienne.mesures.M5_sans_utilisateur_final.length === 1 });
+  const remede = fixtureVerte(); remede.date = "2026-11-16"; delete remede.parties_prenantes[1].utilisateur_final; remede.parties_prenantes[1].utilisateur_final = true;
+  const rRemede = juger(remede, { referentiel: ref });
+  cas.push({ nom: "remède joué : la cascade récente marque son utilisateur final", attendu: "PASS",
+    ok: verdictDe(rRemede.findings) === "PASS" && rRemede.mesures.M5_sans_utilisateur_final.length === 0 });
   rouge("non-objectif sans motif", "I4", (c) => { delete c.non_objectifs[0].motif; });
   rouge("indicateur en prose", "S1", (c) => { c.strategies[0].indicateur = "part des brouillons"; });
   rouge("indicateur sans dénominateur", "S1", (c) => { delete c.strategies[0].indicateur.denominateur; });
