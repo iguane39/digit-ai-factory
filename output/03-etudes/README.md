@@ -97,6 +97,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` | fichier | 98,4 Ko | Étude — Sécurité par défaut de bout en bout — 20261106a |
 | `Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` | fichier | 10,7 Ko | Étude d'opportunité — un skill pour trier une liste de sujets avant de payer des études —  |
 | `Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` | fichier | 14,2 Ko | Étude d'opportunité — skill PDF de la Factory — 20261030a |
+| `Digit-AI - Étude - Statuts courts et ASD-STE100 - 20261122a.md` | fichier | 8,4 Ko | Étude — « Statuts courts » et « écris à 80 % de l'ASD-STE100 » |
 | `Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` | fichier | 23,0 Ko | Étude d'opportunité — Suivi des temps et des coûts par produit — 20261105a |
 | `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` | fichier | 19,1 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261102e |
 | `Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109c.md` | fichier | 10,3 Ko | Tri des sujets Claude et IA des favoris TikTok — 20261109c |
@@ -145,4 +146,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md` | fichier | 20,0 Ko | Revue — prompt de tri des sujets TikTok et de skill, passé au crible L99 — 02/11/2026 |
 | `Digit-AI - Revue - Prompt tri des sujets TikTok et skill passe au crible L99 - 20261102a.md.boucle.json` | fichier | 9,2 Ko | JSON |
 
-_125 fichier(s), 3 sous-dossier(s)_
+_126 fichier(s), 3 sous-dossier(s)_

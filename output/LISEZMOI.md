@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 750 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 752 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -277,6 +277,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md | 20261106a | 98.4 Ko | `03-etudes/Digit-AI - Étude - Securite par defaut de bout en bout - 20261106a.md` |
 | Digit-AI - Étude - Skill de tri de sujets - 20261102c.md | 20261102c | 10.7 Ko | `03-etudes/Digit-AI - Étude - Skill de tri de sujets - 20261102c.md` |
 | Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md | 20261030a | 14.2 Ko | `03-etudes/Digit-AI - Étude - Skill PDF de la Factory - 20261030a.md` |
+| Digit-AI - Étude - Statuts courts et ASD-STE100 - 20261122a.md | 20261122a | 8.4 Ko | `03-etudes/Digit-AI - Étude - Statuts courts et ASD-STE100 - 20261122a.md` |
 | Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md | 20261105a | 23 Ko | `03-etudes/Digit-AI - Étude - Suivi des temps et des couts par produit - 20261105a.md` |
 | Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md | 20261102e | 19.1 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261102e.md` |
 | Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109c.md | 20261109c | 10.3 Ko | `03-etudes/Digit-AI - Étude - Tri des sujets Claude et IA des favoris TikTok - 20261109c.md` |
@@ -698,6 +699,7 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md | 20261026c | 10.8 Ko | `04-plans/Digit-AI - Synthese Mandat - L99 cible oeil critique retravaillee - 20261026c.md` |
 | Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md | 20261103e | 5 Ko | `04-plans/Digit-AI - Synthese Mandat - Largeur des gabarits de lecture corrigee - 20261103e.md` |
 | Digit-AI - Synthese Mandat - Lot de retours Produit-86 du 12-11 traite - 20261113f.md | 20261113f | 7.8 Ko | `04-plans/Digit-AI - Synthese Mandat - Lot de retours Produit-86 du 12-11 traite - 20261113f.md` |
+| Digit-AI - Synthese Mandat - Lots refuses remontes et fusion des postes - 20261121p.md | 20261121p | 7.1 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses remontes et fusion des postes - 20261121p.md` |
 | Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md | 20261004b | 7.4 Ko | `04-plans/Digit-AI - Synthese Mandat - Lots refuses traites huit corrections - 20261004b.md` |
 | Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md | 20261016i | 6.5 Ko | `04-plans/Digit-AI - Synthese Mandat - Mode boucle L99 construit et publie - 20261016i.md` |
 | Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md | 20261103q | 3.2 Ko | `04-plans/Digit-AI - Synthese Mandat - Moment de la revue de code dans la mise en production - 20261103q.md` |
