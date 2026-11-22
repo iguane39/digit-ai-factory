@@ -14,9 +14,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { INDICE, JOUR_INDICE, NOM_DE_LOT } from "./lib-indice-nom.mjs";
 import { dateDuLot } from "../gabarits/oracle-lot-retours.mjs";
-import { estUnLot } from "../todo/accueillir-lot.mjs";
 import { lotsARemettre } from "./lib-retours-produit.mjs";
 import { LIVRABLE, moisDuNom } from "../scripts/ranger-dossiers.mjs";
+
+// TF-0957 : `accueillir-lot.mjs` touche la chaîne d'anonymisation. Le banc pose ses tables jetables AVANT de charger ce module,
+// pour ne jamais lire ni écrire les tables réelles du poste (`todo\bancs-isoles.mjs`).
+const TABLES = mkdtempSync(join(tmpdir(), "indice-nom-tables-"));
+writeFileSync(join(TABLES, "_noms-interdits.json"), JSON.stringify({ noms: [], identifiants: [], sigles: [], pseudonymes: {} }), "utf8");
+writeFileSync(join(TABLES, "_produits-pseudonymes.json"), JSON.stringify({ produits: {} }), "utf8");
+process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
+process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
+const { estUnLot } = await import("../todo/accueillir-lot.mjs");
 
 let pass = 0, fail = 0;
 const check = async (nom, fn) => {
@@ -78,5 +86,6 @@ await check("ranger-dossiers — LIVRABLE et moisDuNom lisent « za » : le mois
   if (moisDuNom("Produit - Objet - 20261115zzz.md") !== null) throw new Error("« zzz » donne un mois");
 });
 
+rmSync(TABLES, { recursive: true, force: true });
 console.log(`\nlib-indice-nom : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
