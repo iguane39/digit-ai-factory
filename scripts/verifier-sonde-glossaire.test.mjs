@@ -175,6 +175,78 @@ check("CÂBLAGE — `oracle-glossaire.mjs --sondes` appelle bien le verbe et ren
   rmSync(D, { recursive: true, force: true });
 });
 
+// ---- TF-2786 — CHAQUE commande de la cellule est rejouée, pas la première seulement ---------------------------------------
+// Le fait (16/11/2026) : G5 exige deux preuves de nature différente, `lireSonde` retenait la première commande et le premier
+// sceau, et les secondes commandes du glossaire d'un produit (332 sur 482) étaient scellées sans jamais être rejouées.
+const SONDE_2 = `node -e "console.log('Hallenbad x29 bis')"`;
+const SCEAU_2 = createHash("sha256").update("Hallenbad x29 bis", "utf8").digest("hex");
+
+check("rouge TF-2786 — la SECONDE commande de la cellule dérive : PÉRIMÉE, nommée « sonde 2/2 », exit 1 (la première, fraîche, la masquait)", () => {
+  const { D, f } = fixture(`\`${SONDE}\` → attendu sha256:${SCEAU_OK} le 2026-09-20 · \`${SONDE_KO}\` → attendu sha256:${SCEAU_2} le 2026-09-20`);
+  const r = lancer(f, ...REJEU);
+  if (r.code !== 1 || r.j.mesure.frais !== 1 || r.j.mesure.perimes !== 1 || r.j.mesure.commandes !== 2) throw new Error(r.brut.slice(0, 500));
+  if (!/sonde 2\/2/.test(JSON.stringify(r.j.findings))) throw new Error("le constat ne nomme pas la seconde sonde : " + JSON.stringify(r.j.findings).slice(0, 300));
+  rmSync(D, { recursive: true, force: true });
+});
+
+check("vert TF-2786 — deux commandes scellées et fraîches dans la même cellule : 2 FRAÎCHES comptées, exit 0", () => {
+  const { D, f } = fixture(`\`${SONDE}\` → attendu sha256:${SCEAU_OK} le 2026-09-20 · \`${SONDE_2}\` → attendu contient:\`bis\` le 2026-09-20`);
+  const r = lancer(f, ...REJEU);
+  if (r.code !== 0 || r.j.mesure.frais !== 2 || r.j.mesure.commandes !== 2 || r.j.findings.length) throw new Error(r.brut.slice(0, 500));
+  rmSync(D, { recursive: true, force: true });
+});
+
+check("borne TF-2786 — la seconde commande SANS sceau : NON SCELLÉE comptée, la première rejouée ; un sceau sans commande devant lui : compté, jamais perdu", () => {
+  const a = fixture(`\`${SONDE}\` → attendu sha256:${SCEAU_OK} le 2026-09-20 · \`${SONDE_2}\``);
+  const ra = lancer(a.f, ...REJEU);
+  if (ra.code !== 0 || ra.j.mesure.frais !== 1 || ra.j.mesure.non_scellees !== 1 || ra.j.mesure.commandes !== 2) throw new Error(ra.brut.slice(0, 500));
+  rmSync(a.D, { recursive: true, force: true });
+  const b = fixture(`catalogue servi → attendu contient:\`Hallenbad\` le 2026-09-20 · \`${SONDE}\``);
+  const rb = lancer(b.f, ...REJEU);
+  if (rb.j.mesure.sceaux_sans_commande !== 1 || rb.j.mesure.non_scellees !== 1 || rb.j.mesure.frais !== 0) throw new Error(rb.brut.slice(0, 500));
+  rmSync(b.D, { recursive: true, force: true });
+});
+
+// ---- TF-2788 — deux sondes vers le même hôte ne partent pas dos à dos ----------------------------------------------------
+// Le fait (16/11/2026) : trois sondes simultanées vers une encyclopédie ont reçu un 429, 24 sondes ont été rejouées en différé.
+// Les commandes du banc sont locales : elles ÉCRIVENT une adresse, sans rien interroger, et l'outil lit l'hôte dans leur texte.
+const vers = (hote, chemin) => `node -e "console.log('https://${hote}/${chemin}')"`;
+const scelle = (hote, chemin) => `\`${vers(hote, chemin)}\` → attendu contient:\`${hote}\` le 2026-09-20`;
+
+check("rouge TF-2788 — deux sondes vers le MÊME hôte : l'outil attend l'espacement entre les deux, et le compte", () => {
+  const { D, f } = fixture(`${scelle("encyclo.invalid", "a")} · ${scelle("encyclo.invalid", "b")}`);
+  const debut = Date.now();
+  const r = lancer(f, ...REJEU, "--espacement", "900");
+  const ecoule = Date.now() - debut;
+  if (r.code !== 0 || r.j.mesure.frais !== 2) throw new Error(r.brut.slice(0, 500));
+  if (r.j.mesure.attentes_espacement !== 1 || r.j.mesure.attente_ms < 1) throw new Error("l'attente n'est pas comptée : " + JSON.stringify(r.j.mesure));
+  if (ecoule < 900) throw new Error(`les deux sondes sont parties dos à dos : ${ecoule} ms écoulés pour un espacement de 900 ms`);
+  if (r.j.rejeu.espacement_ms !== 900) throw new Error("l'espacement n'est pas rendu au rejeu");
+  rmSync(D, { recursive: true, force: true });
+});
+
+check("vert TF-2788 — hôtes DIFFÉRENTS, ou `--espacement 0`, ou commandes sans adresse : aucune attente", () => {
+  const a = fixture(`${scelle("un.invalid", "a")} · ${scelle("deux.invalid", "b")}`);
+  const ra = lancer(a.f, ...REJEU, "--espacement", "5000");
+  if (ra.code !== 0 || ra.j.mesure.frais !== 2 || ra.j.mesure.attentes_espacement !== 0) throw new Error(ra.brut.slice(0, 500));
+  rmSync(a.D, { recursive: true, force: true });
+  const b = fixture(`${scelle("meme.invalid", "a")} · ${scelle("meme.invalid", "b")}`);
+  const rb = lancer(b.f, ...REJEU, "--espacement", "0");
+  if (rb.code !== 0 || rb.j.mesure.attentes_espacement !== 0) throw new Error(rb.brut.slice(0, 500));
+  rmSync(b.D, { recursive: true, force: true });
+  const c = fixture(`\`${SONDE}\` → attendu sha256:${SCEAU_OK} le 2026-09-20 · \`${SONDE_2}\` → attendu contient:\`bis\` le 2026-09-20`);
+  const rc = lancer(c.f, ...REJEU, "--espacement", "5000");
+  if (rc.code !== 0 || rc.j.mesure.attentes_espacement !== 0) throw new Error(rc.brut.slice(0, 500));
+  rmSync(c.D, { recursive: true, force: true });
+});
+
+check("borne TF-2788 — un `--espacement` illisible est une erreur d'USAGE : exit 2, jamais un verdict sur le glossaire", () => {
+  const { D, f } = fixture(`\`${SONDE}\` → attendu sha256:${SCEAU_OK} le 2026-09-20`);
+  const r = lancer(f, ...REJEU, "--espacement", "vite");
+  if (r.code !== 2 || r.j.verdict !== "ERREUR" || !/--espacement/.test(r.j.message)) throw new Error(r.brut.slice(0, 300));
+  rmSync(D, { recursive: true, force: true });
+});
+
 // ---- PÉREMPTION PAR L'ÂGE (TF-1318, étape B4) --------------------------------------------------
 const PEREMPTION_365 = { entete: "peremption_preuves_jours: 365\n" };
 const LE = ["--le", "2026-09-23"];

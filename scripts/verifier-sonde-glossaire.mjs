@@ -63,8 +63,19 @@
  * mesure est `--le AAAA-MM-JJ`, par défaut le jour de l'exécution : c'est un verbe sur appel, pas un
  * oracle de forme, et l'horloge lui appartient — la recette la fixe pour rester déterministe.
  *
+ * TOUTES LES COMMANDES DE LA CELLULE (TF-2786, 16/11/2026). G5 exige deux preuves de nature différente, donc une
+ * cellule `preuve` porte souvent deux commandes entre accents graves, chacune avec son sceau. L'outil n'en lisait
+ * que la première : sur 482 commandes de preuve du glossaire d'un produit, 332 (les secondes) étaient scellées et
+ * jamais rejouées. Chaque commande est désormais une sonde, comptée (`mesure.commandes`) et rejouée avec son sceau.
+ *
+ * L'ESPACEMENT (TF-2788, 16/11/2026). Trois sondes simultanées vers une encyclopédie ont reçu un 429, et 24 sondes
+ * ont dû être rejouées en différé. Deux commandes vers le MÊME hôte (première adresse http(s) de leur texte) ne
+ * partent plus dos à dos : l'outil attend `--espacement` ms (1 500 par défaut, 0 pour le supprimer) depuis la fin de la
+ * précédente, et compte ses attentes (`mesure.attentes_espacement`, `mesure.attente_ms`). Le User-Agent descriptif
+ * s'écrit dans la commande (`curl -A …`, gabarits\GLOSSAIRE.md) : l'outil ne l'impose pas.
+ *
  * Usage : node scripts/verifier-sonde-glossaire.mjs <GLOSSAIRE.md|dossier> [...]
- *           [--rejouer] [--rejouer-hors-depot] [--delai <ms>] [--peremption <jours>] [--le <AAAA-MM-JJ>]
+ *           [--rejouer] [--rejouer-hors-depot] [--delai <ms>] [--espacement <ms>] [--peremption <jours>] [--le <AAAA-MM-JJ>]
  * Sortie : JSON · exit 0 = toutes fraîches et dans leur délai · 1 = au moins une PÉRIMÉE, injouable
  *          ou ÉCHUE · 2 = rien à juger (aucun glossaire, aucune ligne scellée ni datée sous une
  *          péremption, ou aucun rejeu autorisé), ou option illisible.
@@ -81,11 +92,17 @@ const RACINE = resolve(ICI, "..");
 const argv = process.argv.slice(2);
 const drapeau = (n) => argv.includes(n);
 const valeur = (n, d) => { const i = argv.indexOf(n); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
-const AVEC_VALEUR = ["--delai", "--peremption", "--le"];
+const AVEC_VALEUR = ["--delai", "--peremption", "--le", "--espacement"];
 const cibles = argv.filter((a, i) => !a.startsWith("--") && !AVEC_VALEUR.includes(argv[i - 1]));
 const REJOUER = drapeau("--rejouer");
 const REJOUER_HORS = drapeau("--rejouer-hors-depot");
 const DELAI = Number(valeur("--delai", "20000"));
+// TF-2788 : l'espacement de deux sondes vers le MÊME hôte (ms). Le 16/11/2026, trois sondes simultanées vers une encyclopédie
+// ont reçu un 429 ; 24 sondes ont dû être rejouées en différé. 0 le supprime.
+const ESPACEMENT_CLI = valeur("--espacement", null);
+const ESPACEMENT = ESPACEMENT_CLI === null ? 1500 : Number(ESPACEMENT_CLI);
+const dernierAppel = new Map();
+const attendre = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Math.ceil(ms));
 
 // ---- la péremption par l'âge (TF-1318) ---------------------------------------------------------
 const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/;
@@ -94,10 +111,12 @@ const enJour = (d) => Date.parse(`${d}T00:00:00Z`);
 const PEREMPTION_CLI = valeur("--peremption", null);
 const LE = valeur("--le", new Date().toISOString().slice(0, 10));
 // Une option illisible est une erreur d'USAGE : elle sort en 2, jamais en verdict sur le glossaire.
-if ((PEREMPTION_CLI !== null && !/^[1-9]\d*$/.test(PEREMPTION_CLI)) || !DATE_ISO.test(LE) || Number.isNaN(enJour(LE))) {
+if ((PEREMPTION_CLI !== null && !/^[1-9]\d*$/.test(PEREMPTION_CLI)) || !DATE_ISO.test(LE) || Number.isNaN(enJour(LE))
+  || (ESPACEMENT_CLI !== null && !/^\d+$/.test(ESPACEMENT_CLI))) {
   process.stdout.write(JSON.stringify({ outil: "verifier-sonde-glossaire", verdict: "ERREUR",
     message: `option illisible — --peremption attend un nombre de jours entier positif (lu « ${PEREMPTION_CLI} »), `
-      + `--le une date AAAA-MM-JJ (lue « ${LE} »)` }, null, 1) + "\n");
+      + `--le une date AAAA-MM-JJ (lue « ${LE} »), `
+      + `--espacement un nombre entier de millisecondes (lu « ${ESPACEMENT_CLI} »)` }, null, 1) + "\n");
   process.exit(2);
 }
 /** La durée de validité déclarée au frontmatter d'un glossaire : `{ jours }`, `{ illisible }`, ou null. */
@@ -109,6 +128,9 @@ function peremptionDeclaree(texte) {
 }
 
 const NON_JUGE = [
+  "une commande sans adresse http(s) dans son texte (une commande locale, un script) n'est pas espacée : l'hôte qu'elle interroge n'est pas lu "
+  + "ailleurs que dans son texte, et le User-Agent d'une sonde s'écrit dans sa commande — l'outil ne le vérifie pas (TF-2788)",
+  "un sceau qu'aucune commande ne précède dans la cellule : compté (`mesure.sceaux_sans_commande`), jamais rejoué ni accusé — un sceau scelle la commande qui le précède (TF-2786)",
   "la JUSTESSE de la sonde : l'outil dit si elle rend ENCORE ce qui a été scellé, jamais si ce "
   + "résultat était juste — c'est `verifie_le` qui date la vérification et une relecture humaine qui la tranche",
   "la PRÉSENCE de la commande dans la preuve : c'est G7 d'oracles/oracle-glossaire.mjs, et elle seule "
@@ -161,22 +183,50 @@ const horsDepot = (p) => { const r = resolve(p); return r !== RACINE && !r.toLow
 const normaliser = (s) => String(s).replace(/\r\n/g, "\n").trim();
 const hacher = (s) => createHash("sha256").update(normaliser(s), "utf8").digest("hex");
 
-/** La cellule `preuve` d'une ligne : son sceau, puis sa commande — la commande n'est PAS la valeur du sceau. */
-export function lireSonde(preuve) {
+/**
+ * TF-2786 (16/11/2026) — TOUTES LES COMMANDES DE LA CELLULE `preuve`, pas la première. G5 exige deux preuves de nature
+ * différente, donc une cellule porte souvent deux commandes, chacune avec son sceau : `lireSonde` retenait la première
+ * commande et le premier sceau, et la seconde n'était ni comptée ni rejouée (332 commandes de preuve sur 482 du glossaire
+ * d'un produit, mesuré le 16/11/2026, non rejouées par l'outil). Le sceau se lit D'ABORD (la valeur d'un `contient:` est
+ * elle-même entre accents graves, et ne passe pas pour une commande), puis chaque commande entre accents graves devient une
+ * sonde, et un sceau scelle la commande qui le PRÉCÈDE le plus près — la forme du gabarit : `<commande>` → attendu … le AAAA-MM-JJ.
+ * Un sceau qu'aucune commande ne précède est rendu à part (`orphelins`) : il est compté, jamais perdu en silence.
+ */
+export function lireSondes(preuve) {
   const cellule = String(preuve || "");
-  const m = SCEAU.exec(cellule);
-  const reste = m ? cellule.slice(0, m.index) + cellule.slice(m.index + m[0].length) : cellule;
-  const cmd = /`([^`]{3,})`/.exec(reste);
-  return {
-    commande: cmd ? cmd[1].trim() : null,
-    sceau: m ? { mode: m[1].toLowerCase(), attendu: m[2].replace(/^`|`$/g, ""), le: m[3] } : null,
-  };
+  const sceaux = [...cellule.matchAll(new RegExp(SCEAU.source, "g"))]
+    .map((m) => ({ debut: m.index, fin: m.index + m[0].length, mode: m[1].toLowerCase(), attendu: m[2].replace(/^`|`$/g, ""), le: m[3] }));
+  let reste = cellule;
+  for (const s of sceaux) reste = reste.slice(0, s.debut) + " ".repeat(s.fin - s.debut) + reste.slice(s.fin);
+  const sondes = [...reste.matchAll(/`([^`]{3,})`/g)].map((m) => ({ commande: m[1].trim(), fin: m.index + m[0].length, sceau: null }));
+  let orphelins = 0;
+  for (const s of sceaux) {
+    const cible = [...sondes].reverse().find((c) => c.fin <= s.debut && !c.sceau);
+    if (cible) cible.sceau = { mode: s.mode, attendu: s.attendu, le: s.le };
+    else orphelins += 1;
+  }
+  return { sondes: sondes.map(({ commande, sceau }) => ({ commande, sceau })), orphelins };
 }
+
+/** La première sonde de la cellule : la lecture d'avant TF-2786, gardée pour qui l'importe. */
+export function lireSonde(preuve) {
+  return lireSondes(preuve).sondes[0] || { commande: null, sceau: null };
+}
+
+/** L'hôte qu'une commande interroge (première adresse http(s) de son texte), ou null. */
+export const hoteDe = (commande) => {
+  const m = /https?:\/\/([^\/\s'"`\\?#]+)/i.exec(String(commande || ""));
+  return m ? m[1].toLowerCase() : null;
+};
 
 const findings = [];
 const mesure = {
   glossaires: 0, lignes_visibilite: 0, sans_commande: 0, non_scellees: 0,
   non_rejouees: 0, frais: 0, perimes: 0, injouables: 0,
+  // TF-2786 : le compte est PAR COMMANDE (une cellule en porte plusieurs) ; `sceaux_sans_commande` nomme ce qu'aucune commande ne précède.
+  commandes: 0, sceaux_sans_commande: 0,
+  // TF-2788 : les attentes imposées entre deux sondes vers un même hôte.
+  attentes_espacement: 0, attente_ms: 0,
   // TF-1318 — l'âge des preuves. Toujours présents, à zéro quand rien n'est jugé : un compteur qui
   // manque se lit « non mesuré » ou « rien à signaler » selon l'humeur du lecteur.
   dans_delai: 0, echues: 0, sans_peremption: 0, dates_illisibles: 0, dates_futures: 0,
@@ -226,29 +276,41 @@ for (const c of cibles) {
             }
           }
         }
-        const { commande, sceau } = lireSonde(l.preuve);
-        if (!commande) { mesure.sans_commande++; continue; }        // G7 le juge, pas nous
-        if (!sceau) { mesure.non_scellees++; continue; }            // compté, jamais un défaut
-        if (!REJOUER || (etranger && !REJOUER_HORS)) { mesure.non_rejouees++; continue; }
-
-        const r = spawnSync(commande, { shell: true, encoding: "utf8", timeout: DELAI, windowsHide: true });
-        const sortie = (r.stdout || "") + (r.stderr || "");
-        if (r.error || r.status !== 0) {
-          mesure.injouables++;
-          findings.push({ regle: "S-2", severite: "majeur", ou,
-            message: `sonde INJOUABLE (${r.error ? r.error.code || r.error.message : `exit ${r.status}`}) : scellée le ${sceau.le}, `
-              + `elle ne s'exécute plus — une preuve qu'on ne peut plus rejouer ne se contredit jamais toute seule. Commande : \`${commande.slice(0, 120)}\`` });
-          continue;
+        // TF-2786 : CHAQUE commande de la cellule est une sonde, avec son sceau ; la seconde preuve de G5 se rejoue comme la première.
+        const { sondes, orphelins } = lireSondes(l.preuve);
+        mesure.sceaux_sans_commande += orphelins;
+        if (!sondes.length) { mesure.sans_commande++; continue; }  // G7 le juge, pas nous
+        for (const [rang, { commande, sceau }] of sondes.entries()) {
+          mesure.commandes++;
+          const ouSonde = sondes.length > 1 ? `${ou} · sonde ${rang + 1}/${sondes.length}` : ou;
+          if (!sceau) { mesure.non_scellees++; continue; }          // compté, jamais un défaut
+          if (!REJOUER || (etranger && !REJOUER_HORS)) { mesure.non_rejouees++; continue; }
+          // TF-2788 : deux sondes vers le même hôte ne partent pas dos à dos — un service tiers répond 429 à des appels rapprochés.
+          const hote = hoteDe(commande);
+          if (hote && ESPACEMENT > 0 && dernierAppel.has(hote)) {
+            const reste = ESPACEMENT - (Date.now() - dernierAppel.get(hote));
+            if (reste > 0) { attendre(reste); mesure.attentes_espacement++; mesure.attente_ms += Math.round(reste); }
+          }
+          const r = spawnSync(commande, { shell: true, encoding: "utf8", timeout: DELAI, windowsHide: true });
+          if (hote) dernierAppel.set(hote, Date.now());
+          const sortie = (r.stdout || "") + (r.stderr || "");
+          if (r.error || r.status !== 0) {
+            mesure.injouables++;
+            findings.push({ regle: "S-2", severite: "majeur", ou: ouSonde,
+              message: `sonde INJOUABLE (${r.error ? r.error.code || r.error.message : `exit ${r.status}`}) : scellée le ${sceau.le}, `
+                + `elle ne s'exécute plus — une preuve qu'on ne peut plus rejouer ne se contredit jamais toute seule. Commande : \`${commande.slice(0, 120)}\`` });
+            continue;
+          }
+          const tenu = sceau.mode === "sha256"
+            ? hacher(sortie).slice(0, sceau.attendu.length).toLowerCase() === sceau.attendu.toLowerCase()
+            : normaliser(sortie).includes(sceau.attendu);
+          if (tenu) { mesure.frais++; continue; }
+          mesure.perimes++;
+          findings.push({ regle: "S-1", severite: "bloquant", ou: ouSonde,
+            message: `sonde PÉRIMÉE : scellée le ${sceau.le} sur ${sceau.mode}:${sceau.attendu.slice(0, 24)}${sceau.attendu.length > 24 ? "…" : ""}, `
+              + `elle rend aujourd'hui ${sceau.mode === "sha256" ? `sha256:${hacher(sortie).slice(0, sceau.attendu.length)}` : "une sortie qui ne le contient plus"}. `
+              + `Relire l'entrée, puis redater \`verifie_le\` ET le sceau — une preuve qui vieillit en silence fait autorité à tort (TF-0657)` });
         }
-        const tenu = sceau.mode === "sha256"
-          ? hacher(sortie).slice(0, sceau.attendu.length).toLowerCase() === sceau.attendu.toLowerCase()
-          : normaliser(sortie).includes(sceau.attendu);
-        if (tenu) { mesure.frais++; continue; }
-        mesure.perimes++;
-        findings.push({ regle: "S-1", severite: "bloquant", ou,
-          message: `sonde PÉRIMÉE : scellée le ${sceau.le} sur ${sceau.mode}:${sceau.attendu.slice(0, 24)}${sceau.attendu.length > 24 ? "…" : ""}, `
-            + `elle rend aujourd'hui ${sceau.mode === "sha256" ? `sha256:${hacher(sortie).slice(0, sceau.attendu.length)}` : "une sortie qui ne le contient plus"}. `
-            + `Relire l'entrée, puis redater \`verifie_le\` ET le sceau — une preuve qui vieillit en silence fait autorité à tort (TF-0657)` });
       }
     }
   }
@@ -273,8 +335,8 @@ const motif = jugees ? undefined
       + sansAge;
 
 process.stdout.write(JSON.stringify({
-  outil: "verifier-sonde-glossaire", version: "1.1.0", cibles,
-  rejeu: { autorise: REJOUER, hors_depot: REJOUER_HORS, delai_ms: DELAI },
+  outil: "verifier-sonde-glossaire", version: "1.2.0", cibles,
+  rejeu: { autorise: REJOUER, hors_depot: REJOUER_HORS, delai_ms: DELAI, espacement_ms: ESPACEMENT },
   peremption: { le: LE, par_glossaire: peremptions },
   verdict, motif, mesure, findings, non_juge: NON_JUGE,
 }, null, 1) + "\n");

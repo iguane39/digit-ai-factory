@@ -62,6 +62,27 @@ justesse — *un oracle peut dire que le champ manque, jamais qu'il est juste.*
   Mesuré : une complétion de recherche interrogée langue par langue a désigné « gite » comme le
   terme le plus suggéré dans six langues — le paramètre de langue fixait l'**interface**, pas le
   pays du chercheur, et le score le plus élevé du test mesurait l'**inverse** de ce qu'on cherchait.
+  **Chaque commande de la cellule est une sonde** (TF-2786) : la seconde preuve exigée par G5 se
+  rejoue comme la première, avec le sceau qui la suit. Mesuré le 16/11/2026 : 332 commandes de
+  preuve sur 482 d'un glossaire de produit, les secondes de leur cellule, étaient scellées et
+  jamais rejouées par l'outil.
+- **Le tableau d'un terme** *(TF-2787)* — six colonnes dans l'ordre ci-dessus, sept avec `genre`. Une
+  autre largeur rend G0 FAIL et aucune ligne n'est jugée : l'oracle ne devine pas quelle colonne manque.
+  **Seul un tableau placé sous une section qui porte `categorie` est lu.** Un tableau de présentation
+  sous une section sans `categorie` (langues couvertes, calendrier de revue) n'est pas un terme : il
+  est ignoré, quelle que soit sa largeur.
+- **Écrire une sonde de marché** *(TF-2788)* — une sonde qui interroge un service tiers s'écrit pour
+  être rejouée sans le fâcher : `curl -sS -A "digit-ai-glossaire-sonde/1.0 (verification terminologique)"
+  --max-time 20 '<adresse>'`, avec un User-Agent qui décrit l'appelant (une encyclopédie répond 429
+  aux appels sans User-Agent descriptif). Le rejeu n'envoie jamais deux sondes dos à dos vers le même
+  hôte : `verifier-sonde-glossaire.mjs` attend `--espacement` millisecondes (1 500 par défaut) entre
+  les deux. Un 429 se traite par l'attente, jamais par la répétition immédiate. Mesuré le 16/11/2026 :
+  trois sondes simultanées vers une encyclopédie ont reçu un 429, et 24 sondes ont été rejouées en différé.
+  **Une base citée mais injoignable ne s'écrit pas comme une preuve.** La base terminologique IATE a rendu
+  le code 000 (aucune réponse) depuis le poste le 16/11/2026, et aucune ligne n'a pu s'y appuyer : la
+  ligne cite une autre nature rejouable (complétion de recherche, article interlangue, catalogue de
+  langue servi) ; si aucune ne tient, l'entrée part à l'arbitrage humain (étape A4 de la chaîne de
+  traduction) avec la mention « IATE injoignable le AAAA-MM-JJ (curl 000) ». Un code 000 se note, il ne se contourne pas.
 - **Le SCEAU de la sonde** *(optionnel, TF-1084)* — une commande présente dit qu'on PEUT rejouer ;
   elle ne dit pas qu'on obtiendrait encore la même chose. À la suite de la commande, dans la même
   cellule `preuve` et **sans créer de colonne**, un `resultat_attendu` daté se déclare sous l'une
