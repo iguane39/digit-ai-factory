@@ -1,3 +1,7 @@
 # Fiches d'exécution d'agent (D-219 (e), TF-2563) : un seul fichier en ajout seul, écrit par
 # tous les postes. La fusion en union garde les lignes des deux côtés au lieu d'un conflit.
 todo/observabilite/fiches-agents.jsonl merge=union
+
+# Le gabarit du `.gitattributes` des produits (TF-2697) se lit et se recopie octet pour octet : sous `core.autocrlf=true` il s'extrairait en CRLF,
+# et la copie du produit serait alors le seul fichier que RP11 de `oracle-reprise` voit différer entre son poste et un clone neuf.
+gabarits/gitattributes-produit text eol=lf
