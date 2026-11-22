@@ -156,10 +156,31 @@ export function texteHumain(rec) {
   return t;
 }
 
+/**
+ * TF-2732 (22/11/2026, constat du 14/11/2026) — L'INVITE D'UNE SESSION `claude -p` LANCÉE PAR UNE AUTRE SESSION. Dans une session ouverte par son invite au pilot,
+ * `--preparer fin-de-tour` a échoué faute de message humain dans la transcription et l'exécutant a déclaré la relecture sans objet : deux sessions pilote non interactives du
+ * 14/11/2026 sans relecture d'intention. `estInviteOuverture` (TF-2235) exige `promptSource: "sdk"` ET `turnPosition.promptIndex: 0`, une forme relevée dans l'extension ;
+ * une session `-p` peut dater son invite autrement (`turnPosition` ou `promptSource` absents, `entrypoint: "sdk-cli"`). REPLI, joué seulement quand AUCUN message humain n'a
+ * été retrouvé : dans une transcription où aucun message ne porte `turnOrigin: "human"` ni `origin.kind: "human"` (une session programmatique, règle de TF-2280), le PREMIER
+ * message utilisateur sans `origin`, de `turnOrigin: "sdk"` ou de `entrypoint: "sdk-cli"`, hors méta, hors sidechain, hors résumé de compaction, dont la position d'invite n'est pas
+ * supérieure à 0, est l'invite d'ouverture. Un message du SDK plus tard dans la session reste refusé. HYPOTHÈSE NON RÉSOLUE : la forme exacte des invites du 14/11 n'est
+ * pas rejouable (aucune de leurs transcriptions n'est conservée sur ce poste) ; le repli couvre la famille des formes sans position, pas une forme observée.
+ */
+export function invitePremiere(records) {
+  if (records.some((r) => r?.type === "user" && (r.turnOrigin === "human" || r.origin?.kind === "human"))) return null;
+  const i = records.findIndex((r) => r?.type === "user" && !r.isMeta && !r.isSidechain && !r.origin && (r.turnOrigin === "sdk" || r.entrypoint === "sdk-cli"));
+  if (i < 0) return null;
+  const rec = records[i];
+  if ((rec.turnPosition?.promptIndex ?? 0) > 0) return null;
+  const t = texteHumain({ ...rec, origin: { kind: "human" } });
+  return t === null ? null : { rang: i, ts: rec.timestamp || null, texte: t, repli: "invite-premiere" };
+}
+
 /** Les messages humains d'une transcription, dans l'ordre, avec leur rang dans le fichier. */
 export function messagesHumains(records) {
   const sortie = [];
   records.forEach((r, i) => { const t = texteHumain(r); if (t !== null) sortie.push({ rang: i, ts: r.timestamp || null, texte: t }); });
+  if (!sortie.length) { const o = invitePremiere(records); if (o) sortie.push(o); }
   return sortie;
 }
 
@@ -858,7 +879,7 @@ export function fabriquerLivrablesConsigne(pieces, texte) {
   const out = [liste.length > 1
     ? `# La consigne de délégation d'une campagne : ${liste.length} pièces lues ensemble (le gabarit commun et la liste des sujets) — chaque agent reçoit le gabarit appliqué à UN sujet`
     : "# La consigne de délégation que le pilot s'apprête à passer à un agent", ""];
-  for (const p of liste) out.push(liste.length > 1 ? `## Pièce — ${p.chemin}` : `Source : ${p.chemin}`, "", "```", coupe(p.texte, BORNES.fichier, "consigne de délégation"), "```", "");
+  for (const p of liste) out.push(p.repartition ? `## Répartition des lots — ${p.chemin} (TF-2693 : la consigne ci-dessus n'est qu'une part de la demande, cette pièce dit qui traite le reste)` : liste.length > 1 ? `## Pièce — ${p.chemin}` : `Source : ${p.chemin}`, "", "```", coupe(p.texte, BORNES.fichier, p.repartition ? "répartition des lots" : "consigne de délégation"), "```", "");
   return out.join("\n");
 }
 
@@ -926,8 +947,43 @@ export function jugerForme(chemin, oracle = ORACLE_FORME) {
   return { joue: true, verdict: j.verdict, echecs, texte: `${basename(oracle, ".mjs")} ${j.verdict}${echecs.length ? `, ${echecs.length} règle(s) en échec` : ""}` };
 }
 
-/** La consigne complète à passer au `verificateur` (version 2). `avecRegles` : demande.txt porte un titre de règles applicables. */
-export function consigneRelecteur(point, fDemande, fLivrables, avecRegles = false) {
+/**
+ * TF-2703 (22/11/2026, constat du 15/11/2026) — UNE CONSIGNE QUI INTERDIT DES FICHIERS DÉCLARE LES ERREURS DE VÉRIFICATION QU'ILS PORTENT DÉJÀ. Le constructeur du socle v2 ne
+ * pouvait pas mettre ruff au vert : 5 erreurs préexistantes dans 2 fichiers que sa consigne lui interdisait de toucher, alors que sa grille exigeait toutes les vérifications natives
+ * au vert. Le point « consigne » relève l'écart : la consigne interdit des fichiers (tournure « interdit », « ne touche pas », « ne modifie pas », « hors périmètre » suivie d'un
+ * nom de fichier ou d'un chemin) ET parle de vérification (vert, recette, ruff, pytest, lint, tests) SANS déclarer de référence admise (« erreurs préexistantes », « référence
+ * admise »). Alerte seulement. NON JUGÉ : que la liste déclarée soit exacte ; une interdiction dite sans nom de fichier.
+ */
+const RE_INTERDIT_FICHIER = /\b(?:interdit(?:s|e|es)?|ne\s+(?:touche|modifie|modifies|toucher|modifier)\s+pas|ne\s+pas\s+(?:toucher|modifier)|hors\s+p[ée]rim[eè]tre)\b[^\n]{0,160}?([\w.\-/\\]+\.(?:py|mjs|cjs|js|ts|tsx|jsx|md|json|jsonl|ya?ml|html|css|toml|sh|ps1)\b|`[^`\n]*[\\/][^`\n]*`)/i;
+const RE_VERIFICATION = /\b(?:au\s+vert|v[ée]rifications?\s+natives?|recette|ruff|pytest|lint|oracles?|tests?)\b/i;
+const RE_REFERENCE_ADMISE = /\b(?:erreurs?|d[ée]fauts?|avertissements?|alertes?|rouges?)\s+(?:de\s+v[ée]rification\s+)?pr[ée]existant(?:e|s|es)?\b|\br[ée]f[ée]rence\s+admise\b|\bpr[ée]existant(?:e|s|es)?\s+(?:et\s+)?(?:admis|admise|admises|d[ée]clar[ée]s?)\b/i;
+export function detteNonDeclaree(texte) {
+  const t = String(texte ?? "");
+  const m = RE_INTERDIT_FICHIER.exec(t);
+  if (!m) return { alerte: false, interdit: false, extrait: null };
+  const declaree = RE_REFERENCE_ADMISE.test(t);
+  return { alerte: RE_VERIFICATION.test(t) && !declaree, interdit: true, declaree, extrait: court(m[1].replace(/`/g, ""), 80) };
+}
+
+/**
+ * TF-2693 (22/11/2026, constat du 16/11/2026) — LA CONSIGNE D'UN LOT EST UNE PART DE LA DEMANDE, ET LA RELECTURE LE SAIT. Le 16/11/2026, 3 passes de relecture de la consigne
+ * commune d'une campagne ont rendu « dérive » parce que la consigne d'UN lot ne couvre pas toute la demande « Traite les retours et les TODOs » (cas déjà vu, TF-1873) :
+ * la relecteur jugeait chaque lot contre la demande entière et comptait comme oubliés les lots confiés à d'autres. Deux voies déclarent la part : `--repartition <fichier>`
+ * joint la répartition des lots comme pièce du livrable ; ou la consigne porte une section qui déclare sa part (titre « La part de cette campagne dans la demande »,
+ * ou « Répartition des lots »). La règle de jugement admet alors une part DÉCLARÉE : ne compte pas comme écart ce que la répartition attribue à un autre lot. Elle garde
+ * pour écart ce qui contredit la demande, une part restreinte ou élargie sans le dire, et une partie que AUCUN lot ne porte.
+ * NON JUGÉ : la justesse de la répartition (qu'un lot soit bien confié à celui qui doit le traiter) ; une part déclarée en une phrase hors de ces deux titres.
+ */
+export const PART_DECLAREE = /^#{1,4}\s[^\n]*\bpart\b[^\n]*\b(?:demande|campagne)\b|^#{1,4}\s[^\n]*\bR[ée]partition des lots\b/im;
+export const ajoutPartDeclaree = (part) => `LA CONSIGNE EST UNE PART DE LA DEMANDE (TF-2693) : ${part === "repartition"
+  ? "la répartition des lots jointe au livrable dit qui traite chaque partie de la demande"
+  : "la consigne déclare elle-même la part de la demande qu'elle porte et renvoie le reste à d'autres lots"}. Une consigne de lot ne couvre donc pas toute la demande, et ce n'est pas un écart : `
+  + "ne compte PAS comme dérive ni comme partie oubliée ce que la répartition (ou la consigne) attribue à un autre lot. Compte comme écart : ce qui contredit la demande ; une restriction ou un élargissement "
+  + "de la part déclarée que la consigne ne dit pas ; une partie de la demande qu'AUCUN lot ne porte (ni cette consigne, ni la répartition) ; une part déclarée qui n'est pas ce que la consigne fait faire. "
+  + "Dans « le_livrable_fait », nomme la part déclarée que tu as retenue.";
+
+/** La consigne complète à passer au `verificateur` (version 2). `avecRegles` : demande.txt porte un titre de règles applicables. `part` (TF-2693) : null, « declaree » ou « repartition ». */
+export function consigneRelecteur(point, fDemande, fLivrables, avecRegles = false, { part = null } = {}) {
   if (point === "coherence") return [
     "Tu es RELECTEUR D'INTENTION (essai du 2026-10-18, references\\RELECTURE-INTENTION.md, consigne version 2, point « cohérence » du 19/10/2026). Lecture seule : tu lis EXACTEMENT deux fichiers, et aucun autre (ni le dépôt, ni d'autres dossiers, ni git).",
     `- DEMANDE : ${fDemande}`,
@@ -961,6 +1017,7 @@ export function consigneRelecteur(point, fDemande, fLivrables, avecRegles = fals
       ? "Question unique : la consigne sert-elle l'INTENTION de la demande — ce que le demandeur voulait obtenir — ou s'en écarte-t-elle (elle n'en sert que la lettre, elle en restreint ou en élargit le périmètre sans le dire, elle fait répondre à une autre question, elle ajoute ce qui n'était pas demandé, elle laisse sans réponse une partie de la demande) ?"
       : "Question unique : le livrable sert-il l'INTENTION de la demande — ce que le demandeur voulait obtenir — ou s'en écarte-t-il (il n'en sert que la lettre, il en restreint ou en élargit le périmètre sans le dire, il répond à une autre question, il ajoute ce qui n'était pas demandé, il laisse sans réponse une partie de la demande) ?",
     "Ne juge ni le style, ni la qualité technique, ni la forme. Ne juge que l'écart entre ce qui était voulu et ce qui est livré.",
+    ...(consigne && part ? [ajoutPartDeclaree(part)] : []),
     `Règle de jugement : ${CONSIGNE_V2}`,
     "",
     "Rends UNIQUEMENT ce bloc JSON, sans texte autour :",
@@ -1216,7 +1273,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   const cwd = contexte.cwd || process.cwd();
   const projetDir = contexte.projet || env.CLAUDE_PROJECT_DIR || cwd;   // le projet dont on lit la transcription
   const maison = contexte.maison || homedir();
-  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null, racine: null, agent: null, sansRubriques: null };
+  const a = { mode: null, preparer: null, fichiers: [], transcript: null, sortie: null, registre: REGISTRE_DEFAUT, regles: REGLES_DEFAUT, point: null, type: null, session: null, depuis: null, json: false, verdict: null, id: null, reponse: null, passe: null, suiteDe: null, boucle: null, racine: null, agent: null, sansRubriques: null, repartition: null };
   const usage = (m) => ({ code: 2, sortie: `relecture-intention : ${m}` });
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
@@ -1240,6 +1297,7 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       else if (x === "--suite-de") a.suiteDe = val();
       else if (x === "--agent") a.agent = val();
       else if (x === "--sans-rubriques") a.sansRubriques = val();
+      else if (x === "--repartition") a.repartition = val();
       else if (x === "--session") a.session = val();
       else if (x === "--depuis") a.depuis = val();
       else if (x === "--json") a.json = true;
@@ -1397,7 +1455,13 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
       const interdit = contenuInterdit(resolve(cwd, f));
       if (interdit) return usage(`--fichier ${f} : ${interdit.replace(/^\[|\]$/g, "")} — il n'est pas embarqué dans la préparation ; rien n'est écrit`);
       try { pieces.push({ chemin: resolve(cwd, f), texte: readFileSync(resolve(cwd, f), "utf8") }); } catch (e) { return usage(`consigne illisible : ${e.message}`); } }
-  }
+    // TF-2693 : la répartition des lots se joint comme dernière pièce, étiquetée : la relecture sait alors que la consigne n'est qu'une part de la demande.
+    if (a.repartition) {
+      const interditR = contenuInterdit(resolve(cwd, a.repartition));
+      if (interditR) return usage(`--repartition ${a.repartition} : ${interditR.replace(/^\[|\]$/g, "")} — il n'est pas embarqué dans la préparation ; rien n'est écrit`);
+      try { pieces.push({ chemin: resolve(cwd, a.repartition), texte: readFileSync(resolve(cwd, a.repartition), "utf8"), repartition: true }); } catch (e) { return usage(`répartition illisible : ${e.message}`); }
+    }
+  } else if (a.repartition) return usage("--repartition ne vaut que pour --preparer consigne");
   // TF-2663 : les quatre rubriques du contrat se lisent dans la consigne (le premier --fichier) AVANT toute préparation ; un manque REFUSE (exit 1).
   let noteRubriques = null;
   if (a.sansRubriques !== null && a.preparer !== "consigne") return usage("--sans-rubriques ne vaut que pour --preparer consigne");
@@ -1508,16 +1572,27 @@ export function executer(argv, env = process.env, maintenant = new Date(), conte
   writeFileSync(fLivrables, cavLivrables.texte, "utf8");
   const nbCaviardes = cavDemande.n + cavLivrables.n;
   const nomsCaviardes = [...new Set([...Object.keys(cavDemande.motifs), ...Object.keys(cavLivrables.motifs)])];
-  const consigne = consigneRelecteur(a.preparer, fDemande, fLivrables, !!regles);
+  // TF-2693 : la part que la consigne déclare — par la répartition jointe, ou par sa propre section ; sinon la consigne se juge contre toute la demande, comme avant.
+  const part = a.preparer === "consigne" && pieces
+    ? (pieces.some((p) => p.repartition) ? "repartition" : pieces.some((p) => PART_DECLAREE.test(p.texte)) ? "declaree" : null)
+    : null;
+  const consigne = consigneRelecteur(a.preparer, fDemande, fLivrables, !!regles, { part });
   const nbRegles = regles ? reglesDesTypes(regles.ref, types).length : 0;
   const sansTexte = pieces ? reglesSansTexte(pieces) : [];
   const alerte = sansTexte.length
     ? `ALERTE (D-116 (b), TF-1972) : cette consigne nomme ${sansTexte.length} règle(s) sans en porter le texte : ${sansTexte.slice(0, 8).map((t) => `${t.regle} (l.${t.ligne})`).join(", ")}. Citer le texte, mot pour mot, lu à la source : sans lui, ni l'agent ni le relecteur ne peuvent juger la conformité. Alerte, jamais blocage.`
     : null;
+  // TF-2703 : une consigne qui interdit des fichiers et exige des vérifications au vert, sans déclarer les erreurs que ces fichiers portent déjà. Alerte, jamais blocage.
+  const dette = a.preparer === "consigne" && pieces ? detteNonDeclaree(pieces[0].texte) : null;
+  const alerteDette = dette && dette.alerte
+    ? `ALERTE (TF-2703) : cette consigne interdit des fichiers (« ${dette.extrait} ») et exige des vérifications, sans déclarer les erreurs de vérification que ces fichiers portent déjà. Joue la commande native sur l'état de départ, recopie ses erreurs dans la consigne comme « référence admise » (fichier, règle, nombre) : sans elles, l'agent ne peut pas tenir un critère « tout au vert » sur des fichiers qu'il ne doit pas toucher (le 15/11/2026, 5 erreurs de ruff dans 2 fichiers interdits, un critère d'arbitre en échec). Alerte, jamais blocage.`
+    : null;
   const sortie = [
     ...(alerte ? [alerte, ""] : []),
+    ...(alerteDette ? [alerteDette, ""] : []),
     `relecture-intention ${VERSION} — point « ${a.preparer} » : ${humains.length} message(s) humain(s) cité(s) mot pour mot, ${decisions.length} décision(s) posée(s) retrouvée(s), ${resume}${regles ? `, ${nbRegles} règle(s) applicable(s) au type ${types.join("+")} (référentiel ${regles.ref.version})` : ", aucune règle applicable ajoutée (pas de --type)"}`,
     ...(noteRubriques ? [noteRubriques] : []),
+    ...(part ? [`part déclarée (TF-2693) : ${part === "repartition" ? "répartition des lots jointe (--repartition)" : "section de la consigne qui déclare sa part de la demande"} — la consigne est jugée comme UNE PART de la demande, le reste étant confié à d'autres lots`] : []),
     `transcription lue : ${transcript} (${origine}) ;${avisCwd}`,
     `écrit : ${fDemande} · ${fLivrables}`,
     ...(nbCaviardes ? [`${nbCaviardes} motif(s) de secret caviardé(s) avant l'écriture (demande.txt ${cavDemande.n}, livrables.md ${cavLivrables.n} ; ${nomsCaviardes.join(", ")}) : repéré(s) par leur forme, remplacé(s) par « [CAVIARDÉ … — TF-2160] » dans les deux fichiers (TF-2160)`] : []),

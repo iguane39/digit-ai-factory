@@ -1121,6 +1121,86 @@ try {
       egal(existsSync(d), false, `dossier de sortie créé par un refus au point ${point}`);
     }
   });
+  // ==== TF-2732 (22/11/2026) : l'invite d'une session `claude -p` lancée par une autre session, quand elle n'a pas la position d'ouverture de l'extension ====
+  // Formes SYNTHÉTIQUES (la transcription du 14/11 n'est pas conservée) : un message `turnOrigin: "sdk"` / `entrypoint: "sdk-cli"` sans `promptSource` ni `turnPosition`.
+  const INVITE_P = "Lis le fichier consigne-fictive.md et exécute la tâche qu'il décrit, puis rends ton résultat.";
+  const inviteP = (extra = {}, texteInvite = INVITE_P) => JSON.stringify({ type: "user", isSidechain: false, turnOrigin: "sdk", entrypoint: "sdk-cli", timestamp: "2026-11-14T16:52:12Z", message: { role: "user", content: texteInvite }, cwd: PROJET, ...extra });
+  const trP = (nom, premiers) => { const f = join(T, `${nom}.jsonl`); writeFileSync(f, [...premiers, assistant([texte("Je m'y mets.")], "2026-11-14T16:52:30Z")].join("\n") + "\n"); return f; };
+  check("rouge → vert — TF-2732 : une invite `claude -p` sans `promptSource` ni `turnPosition` est refusée par la règle d'ouverture seule (texteHumain null) et citée par le repli, exit 0", () => {
+    const f = trP("session-p-sans-position", [inviteP()]);
+    egal(texteHumain(JSON.parse(inviteP())), null, "la règle d'ouverture seule (TF-2235) lit déjà cette forme : le cas n'est plus rouge");
+    const d = join(T, "sortie-p-sans-position");
+    const r = executer(["--preparer", "fin-de-tour", "--transcript", f, "--sortie", d], {}, new Date("2026-11-14T18:00:00Z"), CTX);
+    egal(r.code, 0, `exit (${r.sortie.slice(0, 200)})`);
+    const dm = readFileSync(join(d, "demande.txt"), "utf8");
+    if (!dm.includes(`1. « ${INVITE_P} »`)) throw new Error(`l'invite n'est pas citée : ${dm.slice(0, 300)}`);
+    if (!/CONSIGNE À PASSER À L'AGENT verificateur/.test(r.sortie)) throw new Error("la consigne n'est pas imprimée");
+  });
+  check("vert — TF-2732 : le repli ne s'applique que sans aucun message humain retrouvé ; un humain dans la transcription garde la règle d'avant (le message du SDK n'est pas ajouté)", () => {
+    const f = trP("session-p-avec-humain", [inviteP(), humain("Ma vraie demande de l'humain.", { turnOrigin: "human", timestamp: "2026-11-14T16:53:00Z" })]);
+    const d = join(T, "sortie-p-avec-humain");
+    const r = executer(["--preparer", "fin-de-tour", "--transcript", f, "--sortie", d], {}, new Date("2026-11-14T18:00:00Z"), CTX);
+    const dm = readFileSync(join(d, "demande.txt"), "utf8");
+    egal(r.code, 0, "exit");
+    if (!dm.includes("Ma vraie demande de l'humain.") || dm.includes(INVITE_P)) throw new Error(`l'invite du SDK est citée à côté d'un humain : ${dm.slice(0, 300)}`);
+  });
+  check("rouge — TF-2732 : un message du SDK qui n'est pas en position d'ouverture (promptIndex 3), un message méta, une transcription sans aucun message : toujours refusés (exit 2, rien n'est préparé)", () => {
+    for (const [nom, premiers] of [["tardif", [inviteP({ turnPosition: { promptIndex: 3, turnIndex: 4 } })]], ["meta", [inviteP({ isMeta: true })]], ["sidechain", [inviteP({ isSidechain: true })]], ["vide", []]]) {
+      const f = trP(`session-p-${nom}`, premiers);
+      const d = join(T, `sortie-p-${nom}`);
+      const r = executer(["--preparer", "fin-de-tour", "--transcript", f, "--sortie", d], {}, new Date("2026-11-14T18:00:00Z"), CTX);
+      egal(r.code, 2, `exit pour « ${nom} »`);
+      egal(existsSync(d), false, `dossier de sortie créé par un refus (${nom})`);
+    }
+  });
+  // ==== TF-2693 (22/11/2026) : la consigne d'un lot est une part de la demande, déclarée par la répartition ou par sa propre section ====
+  const CONSIGNE_LOT = join(T, "consigne-lot.md");
+  writeFileSync(CONSIGNE_LOT, "# Consigne du lot pb\n\nTu corriges les 17 sujets de ta liste, dans la copie que je nomme.\n");
+  const CONSIGNE_PART = join(T, "consigne-part.md");
+  writeFileSync(CONSIGNE_PART, "# Consigne commune\n\n## La part de cette campagne dans la demande\n\nLa campagne exécute les 91 sujets décidés ; les sujets laissés hors campagne sont traités par la session pilote.\n");
+  const REPARTITION = join(T, "repartition.md");
+  writeFileSync(REPARTITION, "# Répartition des lots\n\n| Lot | Sujets |\n|---|---|\n| pa | 12 |\n| pb | 17 |\n| agents | 9 |\n");
+  check("rouge → vert — TF-2693 : `--repartition` joint la répartition comme pièce étiquetée, et la consigne du relecteur déclare que la consigne n'est qu'une PART (rien de plus que ce que la répartition ne dit pas n'est un écart)", () => {
+    const d = join(T, "s-repartition");
+    const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", CONSIGNE_LOT, "--repartition", REPARTITION, "--transcript", TRANSCRIPT, "--sortie", d], {}, new Date(), CTX);
+    egal(r.code, 0, `exit (${r.sortie.slice(0, 200)})`);
+    const l = readFileSync(join(d, "livrables.md"), "utf8");
+    if (!/## Répartition des lots — .*repartition\.md/.test(l) || !l.includes("| pb | 17 |")) throw new Error(`la répartition n'est pas jointe : ${l.slice(0, 300)}`);
+    if (!r.consigne.includes("LA CONSIGNE EST UNE PART DE LA DEMANDE (TF-2693)") || !/répartition des lots jointe au livrable/.test(r.consigne) || !/AUCUN lot ne porte/.test(r.consigne)) throw new Error(`la consigne du relecteur ne déclare pas la part : ${r.consigne.slice(0, 300)}`);
+    if (!/part déclarée \(TF-2693\) : répartition des lots jointe/.test(r.sortie)) throw new Error("la sortie ne dit pas la part");
+  });
+  check("vert — TF-2693 : une consigne qui déclare sa propre section « La part de cette campagne dans la demande » est lue comme une part, sans --repartition", () => {
+    const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", CONSIGNE_PART, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-part")], {}, new Date(), CTX);
+    egal(r.code, 0, "exit");
+    if (!/la consigne déclare elle-même la part de la demande qu'elle porte/.test(r.consigne) || !/section de la consigne qui déclare sa part/.test(r.sortie)) throw new Error(r.consigne.slice(0, 300));
+  });
+  check("vert — TF-2693 : sans répartition ni section de part, la consigne du relecteur est celle d'avant, mot pour mot (aucune part admise) ; les autres points n'en portent jamais", () => {
+    const r = executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", CONSIGNE_LOT, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-sans-part")], {}, new Date(), CTX);
+    egal(r.code, 0, "exit");
+    egal(r.consigne, consigneRelecteur("consigne", join(T, "s-sans-part", "demande.txt"), join(T, "s-sans-part", "livrables.md")), "la consigne sans part n'est pas celle de l'ancien appel");
+    if (/UNE PART DE LA DEMANDE/.test(r.consigne)) throw new Error("une part est admise sans avoir été déclarée");
+    for (const point of ["fin-de-tour", "reception", "coherence"]) if (/UNE PART DE LA DEMANDE/.test(consigneRelecteur(point, "d", "l", false, { part: "repartition" }))) throw new Error(`le point ${point} admet une part`);
+  });
+  check("rouge — TF-2693 : `--repartition` hors du point « consigne », ou vers un fichier absent, est refusé (exit 2)", () => {
+    egal(executer(["--preparer", "fin-de-tour", "--repartition", REPARTITION, "--transcript", TRANSCRIPT, "--sortie", join(T, "s-rep-fin")], {}, new Date(), CTX).code, 2, "--repartition au point fin-de-tour");
+    egal(executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", CONSIGNE_LOT, "--repartition", join(T, "absente.md"), "--transcript", TRANSCRIPT, "--sortie", join(T, "s-rep-abs")], {}, new Date(), CTX).code, 2, "--repartition absente");
+  });
+  // ==== TF-2703 (22/11/2026) : une consigne qui interdit des fichiers déclare les erreurs de vérification qu'ils portent déjà ====
+  const dette = (nom, texteConsigne) => { const c = join(T, `consigne-dette-${nom}.md`); writeFileSync(c, texteConsigne); return executer(["--preparer", "consigne", "--sans-rubriques", MOTIF_HORS_RUBRIQUES, "--fichier", c, "--transcript", TRANSCRIPT, "--sortie", join(T, `s-dette-${nom}`)], {}, new Date(), CTX); };
+  check("rouge — TF-2703 : une consigne qui interdit scripts/vieux.py et exige ruff au vert, sans référence admise, déclenche l'alerte (exit 0 : une alerte, jamais un blocage)", () => {
+    const r = dette("rouge", "# Consigne\n\nTu ne modifies pas scripts/vieux.py ni src/ancien.py : interdit.\nLes vérifications natives (ruff, pytest) doivent être au vert avant chaque commit.\n");
+    egal(r.code, 0, "exit");
+    if (!/ALERTE \(TF-2703\)/.test(r.sortie) || !/scripts\/vieux\.py/.test(r.sortie) || !/référence admise/.test(r.sortie)) throw new Error(r.sortie.slice(0, 400));
+  });
+  check("vert — TF-2703 : la même consigne qui déclare ses erreurs préexistantes (« référence admise »), celle qui n'interdit aucun fichier, et celle qui n'exige aucune vérification, ne déclenchent pas l'alerte", () => {
+    const declaree = dette("vert1", "# Consigne\n\nTu ne modifies pas scripts/vieux.py : interdit. Ruff doit être au vert.\n\nErreurs préexistantes (référence admise) : ruff, 3 dans scripts/vieux.py.\n");
+    const sansInterdit = dette("vert2", "# Consigne\n\nCorrige la fonction x. Ruff doit être au vert.\n");
+    const sansVerif = dette("vert3", "# Consigne\n\nTu ne modifies pas scripts/vieux.py : interdit. Rends-moi un résumé.\n");
+    for (const [nom, r] of [["déclarée", declaree], ["sans interdit", sansInterdit], ["sans vérification", sansVerif]]) {
+      egal(r.code, 0, `exit (${nom})`);
+      if (/ALERTE \(TF-2703\)/.test(r.sortie)) throw new Error(`alerte à tort : ${nom}`);
+    }
+  });
   // ==== TF-2659 (16/11/2026) : la recommandation d'une décision se juge contre la phrase du porteur ====
   // Le fait (Produit-82, RT-41) : le porteur demande que chaque rôle puisse utiliser les modèles mis à sa disposition ; la session recommande une clé d'API personnelle et écarte
   // l'écran de conversation ; le lendemain, le porteur demande l'interface de conversation : la personne visée n'écrit pas de code. La relecture jugeait la consigne de
