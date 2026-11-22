@@ -386,7 +386,11 @@ export function identifierChapitres(html) {
     /(<section id="[^"]+">\s*<h2>[\s\S]*?<\/h2>\s*(?:<section class="chap lire" data-mesure-lecture>\s*)?)<blockquote><p>([\s\S]*?)<\/p><\/blockquote>/g,
     (tout, avant, texteChapeau) => `${avant}<p class="ch-apprend">${texteChapeau}</p>`,
   );
-  return { html: dote, chapitres };
+  // TF-2692 — L10 (check_html.py) exige un élément `.exemple-lecture` d'au moins 30 caractères dans un chapitre dont un tableau a huit lignes
+  // ou plus. Il est ÉCRIT, jamais généré (même doctrine que le chapeau, TF-0423) : un paragraphe qui s'ouvre par « Exemple de lecture : »
+  // en devient l'élément, et rien d'autre.
+  const lu = dote.replace(/<p>(Exemple de lecture\s*:[\s\S]*?)<\/p>/g, '<p class="exemple-lecture">$1</p>');
+  return { html: lu, chapitres };
 }
 
 /** L25 du socle : « au-delà de trois chapitres », donc le sommaire se pose DÈS le 4e. */

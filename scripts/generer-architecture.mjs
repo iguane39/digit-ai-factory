@@ -40,9 +40,10 @@ const texte = readFileSync(src, "utf8");
 
 const { front, corps } = lireSource(texte);
 
-// composants : blocs « ## Composant : nom » + listes « - clé: valeur »
+// composants : blocs « ## Composant : nom » + listes « - clé: valeur ». TF-2692 : le CHAPEAU du chapitre (citation « > … »
+// juste sous le titre, L7 du socle) s'intercale entre le titre et la liste ; la liste se lit donc dans tout le bloc, jusqu'au « ## » suivant.
 const composants = [];
-for (const m of corps.matchAll(/^## Composant : (.+)$\r?\n((?:^- .+$\r?\n?)*)/gm)) {
+for (const m of corps.matchAll(/^## Composant : (.+)$([\s\S]*?)(?=^## |(?![\s\S]))/gm)) {
   const nom = m[1].trim();
   if (/[{}]/.test(nom)) continue; // placeholder de gabarit : hors diagramme
   const attrs = {};
