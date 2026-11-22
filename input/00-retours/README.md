@@ -54,6 +54,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `digit-ai-marketing - RETOURS - 20261112n.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `digit-ai-marketing - RETOURS - 20261113a.md` | fichier | 3,2 Ko | Retours forges — digit-ai-marketing — 20261113a |
 | `digit-ai-marketing - RETOURS - 20261113a.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
+| `digit-ai-marketing - RETOURS - 20261122a.md` | fichier | 3,1 Ko | Retours forges — digit-ai-marketing — 20261122a |
+| `digit-ai-marketing - RETOURS - 20261122a.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
+| `digit-ai-marketing - RETOURS - 20261122b.md` | fichier | 4,7 Ko | Retours forges — digit-ai-marketing — 20261122b |
+| `digit-ai-marketing - RETOURS - 20261122b.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114a.md` | fichier | 2,9 Ko | Retours forges — factory-digit-ai-fr — 20261114a |
 | `factory-digit-ai-fr - RETOURS - 20261114a.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114b.md` | fichier | 3,4 Ko | Retours forges — factory-digit-ai-fr — 20261114b |
@@ -176,6 +180,14 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `factory-digit-ai-fr - RETOURS - 20261116e.tf.jsonl` | fichier | 2,3 Ko | 2 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261116f.md` | fichier | 4,3 Ko | Retours forges — factory-digit-ai-fr — 20261116f |
 | `factory-digit-ai-fr - RETOURS - 20261116f.tf.jsonl` | fichier | 3,1 Ko | 2 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261116g.md` | fichier | 2,4 Ko | Retours forges — factory-digit-ai-fr — 20261116g |
+| `factory-digit-ai-fr - RETOURS - 20261116g.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261116h.md` | fichier | 4,6 Ko | Retours forges — factory-digit-ai-fr — 20261116h |
+| `factory-digit-ai-fr - RETOURS - 20261116h.tf.jsonl` | fichier | 4,4 Ko | 4 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261116i.md` | fichier | 2,4 Ko | Retours forges — factory-digit-ai-fr — 20261116i |
+| `factory-digit-ai-fr - RETOURS - 20261116i.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261116j.md` | fichier | 3,7 Ko | Retours forges — factory-digit-ai-fr — 20261116j |
+| `factory-digit-ai-fr - RETOURS - 20261116j.tf.jsonl` | fichier | 2,8 Ko | 3 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261015a.md` | fichier | 8,5 Ko | Retours forges — Produit-02 — 20261015a |
 | `Produit-02 - RETOURS - 20261015a.tf.jsonl` | fichier | 3,3 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261018a.md` | fichier | 6,4 Ko | Retours forges — Produit-02 — 20261018a |
@@ -208,12 +220,28 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-02 - RETOURS - 20261112a.tf.jsonl` | fichier | 1,9 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261116a.md` | fichier | 4,6 Ko | Retours forges — Produit-02 — 20261116a |
 | `Produit-02 - RETOURS - 20261116a.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261117a.md` | fichier | 4,8 Ko | Retours forges — Produit-02 — 20261117a |
+| `Produit-02 - RETOURS - 20261117a.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20261019a.md` | fichier | 3,7 Ko | Retours forges — Produit-03 — 20261019a |
 | `Produit-03 - RETOURS - 20261019a.tf.jsonl` | fichier | 1017 o | 1 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20261020a.md` | fichier | 5,2 Ko | Retours forges — Produit-03 — 20261020a |
 | `Produit-03 - RETOURS - 20261020a.tf.jsonl` | fichier | 1,4 Ko | 1 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261018a.md` | fichier | 6,6 Ko | Retours forges — Produit-12 — 20261018a |
 | `Produit-12 - RETOURS - 20261018a.tf.jsonl` | fichier | 2,8 Ko | 3 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261122a.md` | fichier | 5,7 Ko | Retours forges — Produit-12 — 20261122a |
+| `Produit-12 - RETOURS - 20261122a.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261122b.md` | fichier | 3,4 Ko | Retours forges — Produit-12 — 20261122b |
+| `Produit-12 - RETOURS - 20261122b.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261122c.md` | fichier | 6,8 Ko | Retours forges — Produit-12 — 20261122c |
+| `Produit-12 - RETOURS - 20261122c.tf.jsonl` | fichier | 4,0 Ko | 4 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261122d.md` | fichier | 5,3 Ko | Retours forges — Produit-12 — 20261122d |
+| `Produit-12 - RETOURS - 20261122d.tf.jsonl` | fichier | 2,6 Ko | 2 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261122e.md` | fichier | 4,0 Ko | Retours forges — Produit-12 — 20261122e |
+| `Produit-12 - RETOURS - 20261122e.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261122f.md` | fichier | 3,6 Ko | Retours forges — Produit-12 — 20261122f |
+| `Produit-12 - RETOURS - 20261122f.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261122g.md` | fichier | 6,2 Ko | Retours forges — Produit-12 — 20261122g |
+| `Produit-12 - RETOURS - 20261122g.tf.jsonl` | fichier | 3,7 Ko | 5 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20261020a.md` | fichier | 5,9 Ko | Lot de retours — Produit-64 → digit-ai-factory (garde R-62, `oracles/hook-identite-sortant |
 | `Produit-64 - RETOURS - 20261020a.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20261020b.md` | fichier | 6,8 Ko | Lot de retours — Produit-64 → digit-ai-factory (restitution, bloc 3, format B S78) — 2026- |
@@ -276,6 +304,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-79 - RETOURS - 20261113b.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `Produit-79 - RETOURS - 20261120a.md` | fichier | 5,2 Ko | Retours forges — Produit-79 — 20261120a |
 | `Produit-79 - RETOURS - 20261120a.tf.jsonl` | fichier | 2,7 Ko | 3 ligne(s) JSONL |
+| `Produit-79 - RETOURS - 20261120b.md` | fichier | 3,8 Ko | Retours forges — Produit-79 — 20261120b |
+| `Produit-79 - RETOURS - 20261120b.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
 | `Produit-81 - RETOURS - 20261105a.md` | fichier | 4,6 Ko | Retours forges — Produit-81 — 20261105a |
 | `Produit-81 - RETOURS - 20261105a.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 | `Produit-81 - RETOURS - 20261106a.md` | fichier | 5,7 Ko | Retours forges — Produit-81 — 20261106a |
@@ -448,6 +478,14 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-85 - RETOURS - 20261116a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `Produit-85 - RETOURS - 20261116b.md` | fichier | 4,7 Ko | Retours forges — Produit-85 — 20261116b |
 | `Produit-85 - RETOURS - 20261116b.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
+| `Produit-85 - RETOURS - 20261117a.md` | fichier | 3,0 Ko | Retours forges — Produit-85 — 20261117a |
+| `Produit-85 - RETOURS - 20261117a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
+| `Produit-85 - RETOURS - 20261117b.md` | fichier | 2,4 Ko | Retours forges — Produit-85 — 20261117b |
+| `Produit-85 - RETOURS - 20261117b.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
+| `Produit-85 - RETOURS - 20261122a.md` | fichier | 2,5 Ko | Retours forges — Produit-85 — 20261122a |
+| `Produit-85 - RETOURS - 20261122a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
+| `Produit-85 - RETOURS - 20261122b.md` | fichier | 3,9 Ko | Retours forges — Produit-85 — 20261122b |
+| `Produit-85 - RETOURS - 20261122b.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261103a.md` | fichier | 17,1 Ko | Retours forges — Produit-86 — 20261103a |
 | `Produit-86 - RETOURS - 20261103a.tf.jsonl` | fichier | 13,2 Ko | 14 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261103b.md` | fichier | 4,6 Ko | Retours forges — Produit-86 — 20261103b |
@@ -515,4 +553,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261113a.md` | fichier | 4,1 Ko | Retours forges — Produit-86 — 20261113a |
 | `Produit-86 - RETOURS - 20261113a.tf.jsonl` | fichier | 1015 o | 1 ligne(s) JSONL |
 
-_496 fichier(s), 2 sous-dossier(s)_
+_534 fichier(s), 2 sous-dossier(s)_
