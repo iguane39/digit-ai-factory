@@ -91,6 +91,21 @@ check("rouge — lot du 03/09 SANS classe : refusé, registre intact, le refus n
   if (r.creations.length) throw new Error("le registre a été touché malgré le refus");
 });
 
+// TF-2764 (21/11/2026) : 17 lignes de 11 lots d'un produit portaient une clé de FAMILLE là où le
+// registre attend une clé de classe, et le refus ne le disait pas.
+check("rouge — TF-2764 : une clé de FAMILLE donnée comme classe, le refus le dit et nomme les classes de la famille", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260903f", lignes: [cand({ classe: "page-html-socle" })] });
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+  if (!/est une FAMILLE/.test(r.sortie)) throw new Error(`le refus ne dit pas que la clé est une famille : ${r.sortie.slice(0, 400)}`);
+  if (!/page-html-polices-distantes/.test(r.sortie) || !/page-html-sommaire-absent/.test(r.sortie)) throw new Error("le refus ne nomme pas les classes de la famille");
+  if (r.creations.length) throw new Error("le registre a été touché malgré le refus");
+});
+
+check("rouge — TF-2764 : le refus SANS classe dit que les familles ne sont pas des clés", () => {
+  const r = ingerer({ nomLot: "PROD - RETOURS - 20260903g", lignes: [cand({})] });
+  if (!/ne sont PAS des cl/.test(r.sortie)) throw new Error(`le refus énumère les familles sans dire qu'elles ne sont pas des clés : ${r.sortie.slice(0, 400)}`);
+});
+
 check("rouge — classe INCONNUE : refusé, les clés proches sont nommées", () => {
   const r = ingerer({ nomLot: "PROD - RETOURS - 20260903b", lignes: [cand({ classe: "page-html-polices" })] });
   if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);

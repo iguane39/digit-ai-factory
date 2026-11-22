@@ -197,6 +197,26 @@ check("une creation dont la classe est INCONNUE est refusee, avec les cles proch
   if (!/oracle-faux-positif/.test(r.corps.message || "")) throw new Error("le refus ne propose aucune cle proche");
 });
 
+// TF-2764 (21/11/2026) : 17 lignes de 11 lots portaient une clé de FAMILLE (« lot-forme »,
+// « regle-morte »…) là où le registre attend une clé de classe ; le refus proposait alors des
+// « clés proches » sans rapport (« l99-forme-sortie » pour « lot-forme », par « plateforme »).
+check("TF-2764 — une cle de FAMILLE donnee comme classe : le refus le dit et nomme les classes de cette famille", () => {
+  const r = lancer([creation({ id: "TF-9916", classe: "regle-morte" })], r8);
+  if (r.code !== 1) throw new Error(`exit ${r.code} attendu 1`);
+  const m = r.corps.message || "";
+  if (!/est une FAMILLE/.test(m)) throw new Error(`le refus ne dit pas que la cle est une famille : ${m}`);
+  const ref = JSON.parse(readFileSync(new URL("./CLASSES.json", import.meta.url), "utf8"));
+  const une = ref.classes.find((c) => c.famille === "regle-morte");
+  if (une && !m.includes(une.cle)) throw new Error(`le refus ne nomme pas les classes de la famille (attendu ${une.cle})`);
+});
+
+check("TF-2764 — le refus SANS classe dit que les familles ne sont pas des cles", () => {
+  const sans = creation();
+  delete sans.classe;
+  const m = lancer([sans], r8).corps.message || "";
+  if (!/ne sont PAS des cl/.test(m)) throw new Error(`le refus enumere les familles sans dire qu'elles ne sont pas des cles : ${m}`);
+});
+
 check("une creation dont la classe EXISTE passe — le sens vert de la porte", () => {
   const r = lancer([creation({ id: "TF-9910", titre: "classe reelle", contenu: "sens vert de la porte" })], r8);
   if (r.code !== 0) throw new Error(`exit ${r.code} — une creation bien formee doit passer : ${r.corps.message}`);

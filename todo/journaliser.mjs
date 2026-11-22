@@ -184,7 +184,8 @@ export function classeFautive(evenement, referentiel) {
 
   if (brute === undefined || brute === null || String(brute).trim() === "") {
     return `création ${evenement.id || "(sans id)"} SANS classe — toute création désigne une clé de ` +
-      `${CLASSES_PATH} (${cles.size} clés ; familles : ${[...familles].join(", ")}). Si aucune ne ` +
+      `${CLASSES_PATH} (${cles.size} clés, champ "cle" du tableau "classes" ; elles se rangent en familles, ` +
+      `qui ne sont PAS des clés : ${[...familles].join(", ")}). Si aucune ne ` +
       `convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"} — ` +
       "la classe se crée dans le référentiel, datée et sourcée, jamais au fil d'un événement. Et si l'item " +
       `n'est PAS un défaut — une opportunité à construire —, porter "nature": "opportunite" et aucune classe`;
@@ -207,6 +208,18 @@ export function classeFautive(evenement, referentiel) {
         `référentiel : ${[...familles].join(", ")}`;
     }
     return null;
+  }
+
+  // TF-2764 (21/11/2026) : une clé de FAMILLE portée comme classe. Mesuré : 17 lignes de 11 lots
+  // le faisaient, et les « clés proches » rendues étaient sans rapport (« lot-forme » appariée à
+  // « l99-forme-sortie » par la sous-chaîne de « plateforme »). Le refus nomme l'erreur et les
+  // classes de cette famille, seules candidates sensées.
+  const familleDe = new Set([...familles, ...(referentiel.classes || []).map((c) => String(c.famille))]);
+  if (!cles.has(cle) && familleDe.has(cle)) {
+    const membres = (referentiel.classes || []).filter((c) => String(c.famille) === cle).map((c) => String(c.cle));
+    return `création ${evenement.id || "(sans id)"} : « ${cle} » est une FAMILLE du référentiel, pas une clé de ` +
+      `classe — choisir l'une des ${membres.length} classe(s) de cette famille : ${membres.join(", ") || "(aucune)"} ; ` +
+      `si aucune ne convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille": "${cle}", "libelle"}`;
   }
 
   if (!cles.has(cle)) {

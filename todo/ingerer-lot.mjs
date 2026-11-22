@@ -317,11 +317,19 @@ const verifierClasse = (c, i) => {
   if (c.classe === undefined || c.classe === null || c.classe === "") {
     if (exigee) {
       if (!REF_CLASSES) motifs.push(`ligne ${i + 1} : classe manquante, et le référentiel ${CLASSES_PATH} est illisible — un lot daté du ${SEUIL_CLASSE} ou après ne s'ingère pas sans référentiel de classes`);
-      else motifs.push(`ligne ${i + 1} : classe manquante — tout retour d'un lot daté du ${SEUIL_CLASSE} ou après désigne UNE classe de todo/CLASSES.json (${CLASSES.size} clés ; familles : ${FAMILLES.join(", ")}). Une classe nouvelle se crée dans le référentiel, datée et sourcée, jamais dans le sidecar`);
+      else motifs.push(`ligne ${i + 1} : classe manquante — tout retour d'un lot daté du ${SEUIL_CLASSE} ou après désigne UNE classe de todo/CLASSES.json (${CLASSES.size} clés, champ "cle" du tableau "classes" ; elles se rangent en familles, qui ne sont PAS des clés : ${FAMILLES.join(", ")}). Une classe nouvelle se crée dans le référentiel, datée et sourcée, jamais dans le sidecar`);
     }
     return;
   }
   if (!REF_CLASSES) { motifs.push(`ligne ${i + 1} : classe « ${c.classe} » déclarée mais référentiel ${CLASSES_PATH} illisible — on ne juge pas une clé sans référentiel`); return; }
+  // TF-2764 (21/11/2026) : 17 lignes de 11 lots portaient une clé de FAMILLE comme classe, et le
+  // refus ne le disait pas ; il nomme désormais l'erreur et les classes de cette famille.
+  const familleDe = new Set([...FAMILLES, ...((REF_CLASSES?.familles || []).map((f) => f.cle))]);
+  if (!CLASSES.has(String(c.classe)) && familleDe.has(String(c.classe))) {
+    const membres = [...CLASSES.entries()].filter(([, k]) => k.famille === String(c.classe)).map(([cle]) => cle);
+    motifs.push(`ligne ${i + 1} : « ${c.classe} » est une FAMILLE du référentiel, pas une clé de classe — choisir l'une des ${membres.length} classe(s) de cette famille : ${membres.join(", ") || "(aucune)"} ; si aucune ne convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille": "${c.classe}", "libelle"} et nommer la clé proposée dans le .md`);
+    return;
+  }
   if (!CLASSES.has(String(c.classe))) {
     const p = proches(c.classe);
     motifs.push(`ligne ${i + 1} : classe « ${c.classe} » inconnue du référentiel — clés proches : ${p.length ? p.join(", ") : "(aucune)"} ; si aucune ne convient, porter "classe": "${CLE_A_CREER}" avec "classe_proposee": {"cle", "famille", "libelle"} et nommer la clé proposée dans le .md — le pilot crée la classe dans son référentiel (TF-1128)`);
