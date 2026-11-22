@@ -153,6 +153,12 @@ export function clesLuesParLeCode(racine) {
  * (« tout ce qui est en majuscules ») attraperait les vraies clés. Mesure qui l'a imposée : joué sur
  * le pilot, l'oracle rendait 10 constats dont `USERPROFILE` et `HOME` — deux variables que le
  * système fournit et qu'aucun `.env.example` n'a à documenter. Lues avant d'être crues (N-23).
+ *
+ * L'IDENTITÉ DE SESSION EST FOURNIE PAR LE HARNAIS ET PAR LE HOOK SessionStart, jamais par le gabarit du projet (TF-2722, RP-50, D-218 (b)) :
+ * `CLAUDE_CODE_SESSION_ID` (le harnais), `CLAUDE_ENV_FILE` (le harnais, pour SessionStart) et `FORGE_SESSION_ID` (que le hook y écrit, `lib-session.mjs`).
+ * Mesure du 22/11/2026 : un dépôt qui porte `oracles/lib-session.mjs` (le pilot) fait rendre FAIL à PC2 (« CLAUDE_CODE_SESSION_ID (oracles/lib-session.mjs) »)
+ * par la seule citation de la variable dans l'en-tête du fichier. Les lectures sous une autre forme que `process.env.X` (`env?.X`, `env[VARIABLE]`) ne se voient pas :
+ * c'est la limite déclarée plus haut (chemin dynamique), que cette liste ne lève pas ; elle évite seulement qu'une lecture littérale de ces trois noms soit exigée au gabarit.
  */
 export const DU_SYSTEME = new Set([
   "HOME", "USERPROFILE", "PATH", "TEMP", "TMP", "TMPDIR", "SHELL", "COMSPEC", "PWD", "OS",
@@ -160,6 +166,7 @@ export const DU_SYSTEME = new Set([
   "CI", "NODE_ENV", "NODE_OPTIONS", "PYTHONPATH", "PYTHONIOENCODING", "VIRTUAL_ENV",
   "GITHUB_ACTIONS", "GITHUB_WORKSPACE", "GITHUB_TOKEN", "RUNNER_OS", "APPDATA", "LOCALAPPDATA",
   "PROGRAMFILES", "SYSTEMROOT", "WINDIR", "MSYS_NO_PATHCONV", "COLUMNS", "NO_COLOR", "FORCE_COLOR",
+  "CLAUDE_CODE_SESSION_ID", "CLAUDE_ENV_FILE", "FORGE_SESSION_ID",
 ]);
 
 /**
