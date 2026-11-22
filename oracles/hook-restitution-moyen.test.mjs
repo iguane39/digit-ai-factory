@@ -117,6 +117,9 @@ try {
     outil("Bash", { command: "git tag --merged main --format='%(refname:short)'" }),
     outil("Bash", { command: `curl -sL -o ${join(tmpdir(), "page.html").replace(/\\/g, "/")} https://example.com/qualification` }),
     outil("Bash", { command: `curl -s -o "$TEMP/x.json" -w '%{http_code}' https://example.com/api` }),
+    // TF-2688 (22/11/2026) : une adresse qui FINIT par `-d` suivie d'une espace n'est pas l'option `-d` de curl (le cas : `…/page-d -o f`, lu comme un POST).
+    outil("Bash", { command: `curl -s https://example.com/page-d -o "$TEMP/p.html"` }),
+    outil("Bash", { command: `curl -sL https://example.com/kebab-d | head -5` }),
   ];
   const e0 = detecterEffets(epargnes);
   check("4 détecteur : temporaire, néant, flèche, Explore, lecture connectée → aucun effet", e0.length === 0, e0.join(" ; "));
@@ -146,6 +149,9 @@ try {
     [outil("Bash", { command: "git tag --list 'v*' -d v1.0" }), /git tag/],
     // Un `curl -X POST` reste une écriture distante, même quand sa sortie va au dossier temporaire.
     [outil("Bash", { command: "curl -X POST -o $TEMP/r.json https://example.com/api" }), /curl -X POST/],
+    // TF-2688 : le remède ne rend pas muet le vrai `-d` — l'option de données, seule ou après d'autres options, reste une écriture distante.
+    [outil("Bash", { command: "curl -s -d 'a=1' https://example.com/api" }), /curl -s -d/],
+    [outil("Bash", { command: "curl https://example.com/page-d -d 'a=1'" }), /curl https:\/\/example\.com\/page-d -d/],
   ];
   // TF-2648 : le MÊME jeu par le relevé que le hook de fin de tour joue, `git -C <dossier>` compris (`GIT_A_OPTIONS`).
   const parRelevé = (cmd) => ecrituresDuTour([outil("Bash", { command: cmd })]);

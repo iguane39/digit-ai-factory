@@ -497,6 +497,76 @@ try {
       att(!r.sortie.derniere_demande.depuis, `${nom} : aucune heure d'origine ne doit être reprise : ${JSON.stringify(r.sortie.derniere_demande)}`);
     }
   });
+
+  // TF-2778 (RS-51 de Produit-12, 22/11/2026) : la fraîcheur d'un livrable se jugeait contre l'heure de la TRACE ; écrite en fin de run, elle rendait périmés les
+  // livrables produits pendant le run. Le ledger du produit atteste l'ouverture (`run_open`, `demande_humain`) : c'est elle qui date la demande quand elle précède la trace.
+  // Et un livrable exigé qui n'existe pas n'a pas à être « inchangé » : la forme « sans objet chez ce produit » (`livrables_sans_objet`) le déclare, motif à l'appui.
+  const ledgerDe = (d, entrees) => writeFileSync(join(d, "forge", "ledger.jsonl"), entrees.map((e, i) => JSON.stringify({ seq: i + 1, ...e })).join("\n") + "\n", "utf8");
+  const ilYa = (ms) => new Date(Date.now() - ms).toISOString();
+  const HEURE = 3_600_000;
+  const traceAudit = (d) => lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, verdictsAuditSeul()), "--demande", "audit complet du produit"]);
+  check("rouge → vert — TF-2778 : le livrable produit pendant le run, avant une trace écrite en fin de run, reste frais quand le ledger atteste l'ouverture", () => {
+    const d = produit("ouverture-attestee");
+    deposer(d, "forge/audit/20261122/rapport-data.json", 3 * HEURE); // produit en cours de run, il y a 3 h
+    att(traceAudit(d).code === 0, "écriture de la trace (maintenant)");
+    const rouge = lancer(d, ["--verifier"]);
+    att(rouge.code === 1 && /périmé/.test(rouge.sortie.manquants[0]), `rouge : sans ledger, le rapport d'avant la trace manque, périmé : exit ${rouge.code} ${rouge.brut.slice(0, 300)}`);
+    ledgerDe(d, [{ ts: ilYa(6 * HEURE), type: "run_open", run_id: "run-essai" }]);
+    const vert = lancer(d, ["--verifier"]);
+    att(vert.code === 0 && vert.sortie.verdict === "PRESENT", `vert : le ledger atteste l'ouverture il y a 6 h, le rapport d'il y a 3 h est frais : exit ${vert.code} ${vert.brut.slice(0, 400)}`);
+    att(vert.sortie.ouverture_attestee && vert.sortie.ouverture_attestee.type === "run_open", `la sortie doit dire que l'ouverture vient du ledger : ${JSON.stringify(vert.sortie.ouverture_attestee)}`);
+  });
+  check("TF-2778 bornes — le livrable d'AVANT l'ouverture attestée reste périmé ; une nouvelle demande consignée au ledger fait remonter l'heure ; un ledger illisible ne change rien", () => {
+    const avant = produit("ouverture-attestee-avant");
+    deposer(avant, "forge/audit/20261120/rapport-data.json", 2 * JOUR);
+    att(traceAudit(avant).code === 0, "écriture de la trace");
+    ledgerDe(avant, [{ ts: ilYa(6 * HEURE), type: "run_open", run_id: "run-essai" }]);
+    const r1 = lancer(avant, ["--verifier"]);
+    att(r1.code === 1 && /périmé/.test(r1.sortie.manquants[0]), `un rapport plus ancien que l'ouverture doit rester périmé : exit ${r1.code} ${r1.brut.slice(0, 300)}`);
+    const autre = produit("ouverture-attestee-demande");
+    deposer(autre, "forge/audit/20261122/rapport-data.json", 3 * HEURE);
+    att(traceAudit(autre).code === 0, "écriture de la trace");
+    ledgerDe(autre, [{ ts: ilYa(6 * HEURE), type: "run_open", run_id: "run-essai" }, { ts: ilYa(1 * HEURE), type: "demande_humain", demande: "refais l'audit du produit" }]);
+    const r2 = lancer(autre, ["--verifier"]);
+    att(r2.code === 1 && /périmé/.test(r2.sortie.manquants[0]), `une demande consignée APRÈS le rapport le rend périmé : exit ${r2.code} ${r2.brut.slice(0, 300)}`);
+    const casse = produit("ouverture-attestee-illisible");
+    deposer(casse, "forge/audit/20261122/rapport-data.json", 3 * HEURE);
+    att(traceAudit(casse).code === 0, "écriture de la trace");
+    writeFileSync(join(casse, "forge", "ledger.jsonl"), "{ pas du json\n", "utf8");
+    const r3 = lancer(casse, ["--verifier"]);
+    att(r3.code === 1 && !r3.sortie.ouverture_attestee, `un ledger illisible n'atteste rien : exit ${r3.code} ${r3.brut.slice(0, 300)}`);
+  });
+  const verdictsAuditSansObjet = (sansObjet) => { const v = verdictsAuditSeul(); v.audit = { ...v.audit, ...(sansObjet ? { livrables_sans_objet: sansObjet } : {}) }; return v; };
+  const MOTIF_SANS_OBJET = "ce produit n'a aucune donnée à auditer, le rapport n'existera jamais";
+  check("rouge → vert — TF-2778 : un livrable exigé JAMAIS CRÉÉ manque ; déclaré « sans objet chez ce produit » avec son motif, il est présent et dit pourquoi", () => {
+    const d = produit("sans-objet");
+    att(lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, verdictsAuditSeul()), "--demande", "audit du produit"]).code === 0, "écriture de la trace");
+    const rouge = lancer(d, ["--verifier"]);
+    att(rouge.code === 1 && rouge.sortie.manquants.length === 1 && !/périmé/.test(rouge.sortie.manquants[0]), `rouge : le rapport absent manque : exit ${rouge.code} ${rouge.brut.slice(0, 300)}`);
+    const inchange = lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, (() => { const v = verdictsAuditSeul(); v.audit.livrables_inchanges = { "rapport-forge-audit": MOTIF_SANS_OBJET }; return v; })()), "--demande", "audit du produit"]);
+    att(inchange.code === 0 && lancer(d, ["--verifier"]).code === 1, "un livrable jamais créé ne se déclare pas « inchangé » : il doit rester manquant");
+    const w = lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, verdictsAuditSansObjet({ "rapport-forge-audit": MOTIF_SANS_OBJET })), "--demande", "audit du produit"]);
+    att(w.code === 0, `écriture avec livrables_sans_objet : exit ${w.code} ${w.brut.slice(0, 300)}`);
+    att(trace(d).at(-1).verdicts.audit.livrables_sans_objet["rapport-forge-audit"] === MOTIF_SANS_OBJET, "la trace ne porte pas le livrable sans objet");
+    const vert = lancer(d, ["--verifier"]);
+    att(vert.code === 0 && vert.sortie.verdict === "PRESENT", `vert : exit ${vert.code} ${vert.brut.slice(0, 400)}`);
+    const e = vert.sortie.exiges[0];
+    att(e.present === true && e.sans_objet === MOTIF_SANS_OBJET && e.trouve === null && e.perime === false, `l'exigé doit dire qu'il est sans objet et pourquoi : ${JSON.stringify(e)}`);
+  });
+  check("TF-2778 — la déclaration « sans objet » est REFUSÉE (rien d'écrit) : motif court ou au gabarit, livrable non exigé de la forge, forge écartée", () => {
+    const d = produit("sans-objet-refuse");
+    const essai = (v) => lancer(d, ["--type", "audit-complet", "--verdicts", ecrireVerdicts(d, v)]);
+    const court = essai(verdictsAuditSansObjet({ "rapport-forge-audit": "sans objet" }));
+    att(court.code === 1 && /motif/.test(court.brut) && /rapport-forge-audit/.test(court.brut), `motif de 2 mots accepté : exit ${court.code} ${court.brut.slice(0, 300)}`);
+    const gabarit = essai(verdictsAuditSansObjet({ "rapport-forge-audit": "<motif : pourquoi ce livrable n'a pas d'objet>" }));
+    att(gabarit.code === 1, `motif au gabarit accepté : exit ${gabarit.code}`);
+    const inconnu = essai(verdictsAuditSansObjet({ "livrable-fictif": MOTIF_SANS_OBJET }));
+    att(inconnu.code === 1 && /livrable-fictif/.test(inconnu.brut) && /sans objet/.test(inconnu.brut), `livrable inconnu accepté : exit ${inconnu.code} ${inconnu.brut.slice(0, 300)}`);
+    const v = verdictsAuditSeul(); v.audit = { verdict: "ecartee", motif: "aucun audit n'est demandé (0 fichier)", livrables_sans_objet: { "rapport-forge-audit": MOTIF_SANS_OBJET } };
+    const ecartee = essai(v);
+    att(ecartee.code === 1 && /écartée|ecartee/.test(ecartee.brut), `forge écartée avec livrable sans objet acceptée : exit ${ecartee.code} ${ecartee.brut.slice(0, 300)}`);
+    att(trace(d).length === 0, `${trace(d).length} ligne(s) écrite(s) malgré les refus`);
+  });
 } finally {
   try { rmSync(T, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch { /* verrou toléré */ }
 }

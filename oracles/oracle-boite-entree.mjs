@@ -61,6 +61,7 @@ import { spawnSync } from "node:child_process";
 import { empreinteFichier, empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 import { emetteurDuNom } from "../scripts/ranger-dossiers.mjs";
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";   // B9 (TF-2559) : le juge de forme des lots du sas
+import { INDICE, JOUR_INDICE } from "./lib-indice-nom.mjs";
 
 const VERSION = "1.0.0";
 const ORACLE = "oracle-boite-entree";
@@ -199,7 +200,9 @@ const NOTICES_DE_DOSSIER = new Set(["LISEZMOI.md", "README.md"]);
 // qui la cite. Convention : `<base du lot> - PJ - <libellé>.<extension>`, la base étant celle du lot
 // (`<projet> - RETOURS - AAAAMMJJ<indice>`). Le nom DÉRIVE du lot : il suffit de le lire pour retrouver
 // le lot, et B10 vérifie que ce lot existe.
-const RE_PIECE_JOINTE = /^(.+ - RETOURS - \d{8}[a-z]?) - PJ - .+\.[A-Za-z0-9]+$/;
+// TF-2685 : l'indice du nom vient de `lib-indice-nom.mjs` (« za » à « zz » compris), jamais réécrit ici.
+const RE_PIECE_JOINTE = new RegExp(`^(.+ - RETOURS - ${JOUR_INDICE}) - PJ - .+\\.[A-Za-z0-9]+$`);
+const RE_LOT_DU_SAS = new RegExp(`^.+ - RETOURS - ${JOUR_INDICE}\\.md$`, "i");
 const pieceJointe = (nom) => RE_PIECE_JOINTE.exec(nom);
 
 const CANAL_ARTEFACTS = "03-artefacts";
@@ -322,7 +325,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
   // Entrée en vigueur DATÉE, comme R10 : les lots antérieurs au seuil sont une antériorité
   // déclarée. Un contrôle qui met en échec tout l'existant se fait désactiver (motif que R-33 bis donne pour le verdict websec).
   const SEUIL_B6 = "20260821";
-  const RE_DATE_LOT = /(\d{8})[a-z]?\.md$/i;
+  const RE_DATE_LOT = new RegExp(`(\\d{8})${INDICE}?\\.md$`, "i");
   const SECTION_B6 = /^##\s+Remarques\s+rest[ée]es?\s+au\s+produit\s*$/im;
   const VERDICT_B6 = /g[ée]n[ée]ralisab/i;
   const AUCUNE_B6 = /aucune\s+remarque\s+n['’]est\s+rest[ée]e?\s+au\s+produit/i;
@@ -506,7 +509,7 @@ function juger(repertoire, registre, registreIns = join(ICI, "..", "insatisfacti
     // TF-2559 (14/11/2026) : le juge de forme des lots (`gabarits\oracle-lot-retours.mjs`) joue AUSSI sur ceux du sas, comptés et jamais
     // nommés. Deux lots de produits y attendaient avec 4 sections absentes chacun, et seule l'ingestion, des jours plus tard, les refusait.
     const reglesEnForme = [], lotsEnForme = [];
-    for (const n of readdirSync(sasArrivee).filter((f) => /^.+ - RETOURS - \d{8}[a-z]?\.md$/i.test(f) && !pieceJointe(f))) {
+    for (const n of readdirSync(sasArrivee).filter((f) => RE_LOT_DU_SAS.test(f) && !pieceJointe(f))) {
       let r = null;
       try { r = verifierFormeLot(join(sasArrivee, n)); } catch { /* un lot que le juge ne lit pas n'est pas compté ici */ }
       if (r && r.verdict === "FAIL") { lotsEnForme.push(n); reglesEnForme.push(...(r.constats || []).filter((c) => c.statut === "FAIL").map((c) => c.regle)); }
@@ -917,6 +920,30 @@ function selfTest() {
   r = juger(boite10, reg10, regIns);
   cas.push(["B10 quinquies— une pièce orpheline déposée il y a 30 h compte dans B8 : c'est un OUBLI, pas une file d'attente",
     r.findings.some((f) => f.regle === "B8" && f.statut === "FAIL" && /Produit-99 - RETOURS - 20260909a - PJ - Etude\.md/.test(f.message)), r.verdict]);
+
+  // TF-2685 (22/11/2026) — LE 28e LOT D'UN JOUR PORTE UN INDICE « za » : B6 le sautait sans le dire (la date ne se lisait pas), B10 ne
+  // lui rattachait pas sa pièce jointe, et le sas ne le jugeait pas au juge de forme. Rouge d'abord (B6, B10), vert ensuite.
+  const boite85 = join(base, "b2685", "00-retours");
+  mkdirSync(join(boite85, "old"), { recursive: true });
+  const reg85 = join(base, "b2685", "TODO.jsonl");
+  writeFileSync(reg85, "");
+  const LOT85 = "Produit-61 - RETOURS - 20261115za";
+  writeFileSync(join(boite85, `${LOT85}.md`), "# lot du 28e rang, sans la section « Remarques restées au produit »\n");
+  writeFileSync(join(boite85, `${LOT85}.tf.jsonl`), '{"titre":"x"}\n');
+  writeFileSync(join(boite85, `${LOT85} - PJ - Etude.md`), "# étude jointe au lot za\n");
+  r = juger(boite85, reg85, regIns);
+  cas.push(["TF-2685 rouge — un lot à indice « za » sans section R-45 est jugé par B6 (il était sauté sans le dire)",
+    r.findings.some((f) => f.regle === "B6" && f.statut === "FAIL" && f.ou === `${LOT85}.md`), r.verdict]);
+  cas.push(["TF-2685 vert — la pièce jointe d'un lot « za » est rattachée à son lot (B10 PASS), ni orpheline ni lot sans sidecar",
+    r.findings.some((f) => f.regle === "B10" && f.statut === "PASS" && /1 pièce/.test(f.message)) && !r.findings.some((f) => f.statut === "FAIL" && f.ou === `${LOT85} - PJ - Etude.md`), r.verdict]);
+  writeFileSync(join(boite85, "Produit-61 - RETOURS - 20261115zb - PJ - Etude.md"), "# étude sans lot\n");
+  r = juger(boite85, reg85, regIns);
+  cas.push(["TF-2685 rouge — la pièce jointe d'un lot « zb » absent est ORPHELINE et le message nomme le lot attendu",
+    r.findings.some((f) => f.regle === "B10" && f.statut === "FAIL" && /Produit-61 - RETOURS - 20261115zb\.md/.test(f.message)), r.verdict]);
+  writeFileSync(join(boite85, `${LOT85}.md`), "# lot\n\n## Remarques restées au produit\n\nAucune remarque n'est restée au produit — vérifié le 2026-11-15.\n");
+  r = juger(boite85, reg85, regIns);
+  cas.push(["TF-2685 vert — le lot « za » qui porte sa section n'est plus refusé par B6",
+    !r.findings.some((f) => f.regle === "B6" && f.statut === "FAIL" && f.ou === `${LOT85}.md`), r.verdict]);
 
   // TF-1214 (13/10/2026) — LE POSTE QUI JUGE SE DIT : la sortie du CLI porte `poste`, et le non-jugé nomme
   // les autres postes. Joué par le CLI réel, sur la boîte vide du sas (b9), comme le hook d'ouverture le lance.

@@ -97,7 +97,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
-export const VERSION = "1.10.0"; // 1.10.0 (16/11/2026) : `--remettre` ne copie pas un lot dont la porte REFUSERA le sidecar (LOT-SIDECAR), sortie 1, TF-2636 · 1.9.1 (16/11/2026) : un lot à double suffixe « za » à « zz » est jugé comme une lettre simple, TF-2681 · 1.9.0 (10/11/2026) : `--remettre [<sas>]` lie la copie au sas au verdict du juge, TF-2314 · 1.8.1 (15/10/2026) : le lancement direct se reconnaît par le chemin réel, un chemin à nom court Windows ne rend plus le module muet · 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
+export const VERSION = "1.11.0"; // 1.11.0 (22/11/2026) : LOT-SIDECAR passe de l'avertissement à l'ÉCHEC, un motif que la porte refuse rend FAIL et sortie 1, TF-2761 ; règle LOT-OCTETS, un caractère de contrôle dans le .md d'un lot est refusé, TF-2777 · 1.10.0 (16/11/2026) : `--remettre` ne copie pas un lot dont la porte REFUSERA le sidecar (LOT-SIDECAR), sortie 1, TF-2636 · 1.9.1 (16/11/2026) : un lot à double suffixe « za » à « zz » est jugé comme une lettre simple, TF-2681 · 1.9.0 (10/11/2026) : `--remettre [<sas>]` lie la copie au sas au verdict du juge, TF-2314 · 1.8.1 (15/10/2026) : le lancement direct se reconnaît par le chemin réel, un chemin à nom court Windows ne rend plus le module muet · 1.8.0 (15/10/2026) : LOT-IDS lit les copies reçues par le pilot (TF-1813), LOT-SIDECAR sans exemption de date et refus prédit dit au verdict (TF-1814), « gabarit non marqué » rattache en R-46 (TF-1752), règle LOT-RATTACHEMENT avertissante (TF-1757) · 1.7.0 (13/10/2026) : délai de grâce d'une règle neuve, TF-1570 · 1.6.0 (13/10/2026) : règle LOT-SIDECAR en avertissement, TF-1591 · 1.5.0 (02/10/2026) : règle GFP-LOT, TF-1526 · 1.4.1 (28/09/2026) : le remède nomme le gabarit canonique, TF-1430 · 1.4.0 (28/09/2026) : règles R-57 et LOT-MURS, TF-1413 · 1.3.0 (26/09/2026) : règle LOT-DATE, TF-1358
 
 /**
  * Le gabarit que le remède de R-45, R-46 et R-57 fait ouvrir, sous sa cible CANONIQUE chez le
@@ -186,6 +186,8 @@ export function dateDuLot(chemin) {
 
 /** LOT-IDS (TF-1039) : entrée en vigueur — antériorité déclarée, un lot remis ne se modifie jamais. */
 export const SEUIL_IDS = "20260914";
+/** LOT-OCTETS (TF-2777) : entrée en vigueur le jour de la règle, 22/11/2026 ; antériorité déclarée. */
+export const SEUIL_OCTETS = "20261122";
 // Un identifiant est DÉFINI en tête d'une ligne de tableau qui porte sa GRAVITÉ dans l'une des deux
 // cellules suivantes (`| RT-50 | majeur | …`, la forme du gabarit), ou en tête d'un titre
 // (`### RT-50 — …`). Cité dans la prose (« déjà remontée en RT-6 ») ou dans un tableau de RAPPEL
@@ -479,6 +481,27 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
       `renommer le lot et son sidecar à la date du jour d'écriture, « <projet> - RETOURS - ${aujourdhui}<indice>.md », en prenant le premier indice libre de ce jour`);
   } else ajouter("LOT-DATE", "PASS", `lot du ${date}, pas postérieur au jour qui le juge (${aujourdhui})`, null);
 
+  // ---- LOT-OCTETS · UN LOT N'EST PAS UN FICHIER BINAIRE (TF-2777, 22/11/2026) -----------------------------
+  // Le fait : le lot 20261122f de Produit-12 a passé ce juge et a été remis avec un octet NUL à la ligne 5, là où
+  // « \00-retours » aurait dû s'écrire ; 2 autres lots (Produit-79 du 07/10, Produit-82 du 12/11) portent le même NUL.
+  // La suite `\0` d'un chemin Windows, écrite dans une chaîne non brute, devient un caractère de contrôle. Le sidecar
+  // est déjà jugé là-dessus (LOT-SIDECAR) ; le .md ne l'était pas. Refus : tout caractère de contrôle hors tabulation,
+  // saut de ligne et retour chariot. Antériorité déclarée : les lots d'avant le jour de la règle ne sont pas accusés.
+  if (date < SEUIL_OCTETS) {
+    ajouter("LOT-OCTETS", "SANS_OBJET", `lot du ${date}, antérieur à l'entrée en vigueur de LOT-OCTETS (${SEUIL_OCTETS}) — antériorité déclarée`, null);
+  } else {
+    const fautes = [];
+    String(texte).split("\n").forEach((l, i) => {
+      const trouves = [...l].filter((ch) => { const o = ch.charCodeAt(0); return (o < 32 && o !== 9 && o !== 13) || o === 127; });
+      if (trouves.length) fautes.push({ ligne: i + 1, codes: [...new Set(trouves.map((ch) => "U+" + ch.charCodeAt(0).toString(16).padStart(4, "0").toUpperCase()))] });
+    });
+    if (fautes.length) {
+      ajouter("LOT-OCTETS", "FAIL",
+        `${fautes.length} ligne(s) du lot portent un caractère de contrôle : ${fautes.slice(0, 5).map((f) => `ligne ${f.ligne} (${f.codes.join(", ")})`).join(" ; ")}${fautes.length > 5 ? ` ; et ${fautes.length - 5} autre(s)` : ""} — un NUL se lit mal, se coupe en chemin et ne se voit pas à l'écran`,
+        "retirer le caractère (le plus souvent un chemin Windows « \\00-retours » écrit dans une chaîne non brute : le « \\0 » est devenu un NUL — l'écrire avec l'outil d'écriture de fichier, ou doubler l'antislash), rejouer le juge, puis remettre");
+    } else ajouter("LOT-OCTETS", "PASS", "aucun caractère de contrôle (hors tabulation, fin de ligne) dans le lot", null);
+  }
+
   // Une table NOMMÉE plutôt qu'un tableau positionnel, et le motif est une mesure et non un goût :
   // le premier jet destructurait huit positions dans le mauvais ordre, et le message affiché
   // annonçait une « section » dont le nom était en réalité la SUBSTANCE attendue. Un tableau
@@ -600,9 +623,10 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
   // ce registre ; la cible `forges_cibles_initiales`, que la porte déduit du texte (R-48) ; et un sidecar au
   // format R10 BRUT (sans `schema`), que le pilot normalise lui-même (`normaliser-lot.mjs`).
   //
-  // AVERTISSEMENT, jamais blocage (campagne du 13/10, précédent D-70 (b)) : une règle neuve opposable à tous
-  // les produits entre en avertissement. La porte, elle, refuse toujours ; l'avertissement dit au produit,
-  // AVANT la remise, ce que la porte lui dira après. Le promouvoir en blocage est une décision humaine.
+  // AVERTISSEMENT jusqu'au 22/11/2026 (campagne du 13/10, précédent D-70 (b)) : une règle neuve opposable à tous
+  // les produits entrait en avertissement. TF-2761 (22/11/2026) : mesuré le 21/11, le juge rendait « PASS — la porte
+  // REFUSERA ce lot » (code 0) et 10 lots de 11 sont partis ainsi. Un motif que la porte refuse est un ÉCHEC (FAIL,
+  // sortie 1) : la prédiction et le verdict ne se contredisent plus. Décision du pilot sous R-58 (campagne du 22/11).
   // TF-1814 (2) (15/10/2026) : plus d'exemption par la date du lot. La porte juge le sidecar de TOUT lot
   // remis, quelle que soit sa date (un lot du 25/09 remis le 15/10 sans classe a été refusé) ; la seule
   // antériorité qu'elle connaît, la classe exigée dès le 03/09, est rejouée dans `jugerSidecar`.
@@ -610,7 +634,7 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
     const r = jugerSidecar(cheminLot, texte, date);
     if (r.sansObjet) ajouter("LOT-SIDECAR", "SANS_OBJET", r.sansObjet, null);
     else if (r.motifs.length) {
-      ajouter("LOT-SIDECAR", "AVERTISSEMENT",
+      ajouter("LOT-SIDECAR", "FAIL",
         `${r.motifs.length} motif(s) dont la porte du pilot REFUSERA ce lot (rejet atomique, registre intact) : ${r.motifs.slice(0, 6).join(" ; ")}${r.motifs.length > 6 ? ` ; et ${r.motifs.length - 6} autre(s)` : ""}`,
         "corriger le sidecar AVANT la remise (un lot remis ne se modifie plus : la correction passe par l'indice suivant) ; une classe sans clé qui convienne se porte par « classe-a-creer » + « classe_proposee »");
     } else {
@@ -750,7 +774,7 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
   }
 
   // TF-1814 (1) : un motif de refus PRÉDIT (LOT-SIDECAR) se porte au résultat ; la ligne de verdict le dit.
-  const refusPredit = constats.some((c) => c.regle === "LOT-SIDECAR" && c.statut === "AVERTISSEMENT");
+  const refusPredit = constats.some((c) => c.regle === "LOT-SIDECAR" && c.statut === "FAIL");
   return { verdict: constats.some((c) => c.statut === "FAIL") ? "FAIL" : "PASS", date, constats, ...(refusPredit ? { refus_predit: true } : {}) };
 }
 
@@ -763,9 +787,10 @@ export function verifier(cheminLot, texteFourni, { aujourdhui = jourLocal() } = 
 /** Copie `cheminLot` et son sidecar `.tf.jsonl` dans `sas` si `verdict` n'est pas FAIL. Rend `{ remis, raison, copies }`. */
 export function remettreAuSas(cheminLot, verdict, sas, { refusPredit = false } = {}) {
   const sansEcriture = (raison) => ({ remis: false, raison, copies: [] });
-  if (verdict === "FAIL") return sansEcriture("verdict FAIL : le lot n'est pas copié au sas — corriger le lot, rejouer le juge, puis remettre");
-  // TF-2636 : un refus PRÉDIT (LOT-SIDECAR) laisse le verdict PASS, mais la porte du pilot refusera ce lot tel quel : le copier coûte un lot de plus (un lot remis ne se modifie plus).
+  // TF-2636 puis TF-2761 : un refus PRÉDIT (LOT-SIDECAR) rend FAIL ; la porte du pilot refusera ce lot tel quel, le copier coûte un lot de plus (un lot remis ne se modifie plus).
+  // Il se dit AVANT le motif générique du FAIL, pour que la remise nomme la règle.
   if (refusPredit) return sansEcriture("refus prédit à la porte du pilot (LOT-SIDECAR, motifs ci-dessus) : le lot n'est pas copié au sas — corriger le sidecar, rejouer le juge, puis remettre");
+  if (verdict === "FAIL") return sansEcriture("verdict FAIL : le lot n'est pas copié au sas — corriger le lot, rejouer le juge, puis remettre");
   const sidecar = String(cheminLot).replace(/\.md$/i, ".tf.jsonl");
   if (!existsSync(cheminLot)) return sansEcriture(`lot introuvable : ${cheminLot}`);
   if (!existsSync(sidecar)) return sansEcriture(`sidecar introuvable (${basename(sidecar)}) : un lot sans sidecar n'est ingérable par aucun canal, il n'est pas remis`);
@@ -820,7 +845,7 @@ if (LANCE_DIRECTEMENT || import.meta.url === `file://${process.argv[1]?.split("\
     process.stdout.write(JSON.stringify({ oracle: "oracle-lot-retours", version: VERSION, cible, ...r }, null, 1) + "\n");
   } else {
     console.log(`oracle-lot-retours ${VERSION} — ${cible}`);
-    console.log(`verdict : ${r.verdict}${r.date ? ` (lot du ${r.date})` : ""}${r.refus_predit ? " — AVEC AVERTISSEMENT : la porte du pilot REFUSERA ce lot tel quel (LOT-SIDECAR ci-dessous), corriger le sidecar avant la remise" : ""}`);
+    console.log(`verdict : ${r.verdict}${r.date ? ` (lot du ${r.date})` : ""}${r.refus_predit ? " — la porte du pilot REFUSERA ce lot tel quel (LOT-SIDECAR ci-dessous), corriger le sidecar avant la remise" : ""}`);
     for (const c of r.constats) {
       console.log(`  [${c.statut}] ${c.regle} — ${c.message}`);
       if (c.remede) console.log(`      → ${c.remede}`);

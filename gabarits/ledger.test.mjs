@@ -736,6 +736,33 @@ try {
     att(v.status === 0 && !/DÉCLARÉ/.test(v.stdout), `--verifier : ${v.stdout}${v.stderr}`);
   });
 
+  // ---- TF-2695 (RP-225, lot Produit-79 20261120a, 20/11/2026) : « type inconnu : action_externe » ; deux entrées écrites à la main (seq 1243, 1244) ----
+  // Le fait : un produit consigne par `action_externe` tout geste sur une plateforme tierce et par `constat` un fait mesuré ; l'écrivain les refusait, le produit
+  // écrivait à la main, hors contrôle. Rouge : sans les deux types au vocabulaire, l'écrivain refuse et nomme le type ; vert : avec eux, l'entrée s'écrit avec ses champs.
+  check("rouge → vert — TF-2695 : `action_externe` et `constat` sont des types admis, écrits avec leurs champs ; un type inconnu reste refusé", () => {
+    const mutant = GABARIT.replace(' "action_externe", "constat",', "");
+    att(mutant !== GABARIT, "chirurgie sans effet : le témoin est vide");
+    const sans = unProduit(mutant);
+    const refus = ecrire(sans.script, "action_externe", "--plateforme", "GitHub", "--geste", "fusion de la PR", "--resultat", "fusionnee");
+    att(refus.status !== 0 && /type inconnu : action_externe/.test(refus.stderr || ""), `le témoin n'est pas refusé comme en production : exit ${refus.status} ${refus.stderr}`);
+    const { d, script } = unProduit();
+    const a = ecrire(script, "action_externe", "--plateforme", "GitHub", "--geste", "fusion de la PR", "--resultat", "fusionnee");
+    att(a.status === 0, `action_externe refusé : exit ${a.status} ${a.stderr}`);
+    const c = ecrire(script, "constat", "--objet", "l'arbre local retarde de 387 commits sur origin/main");
+    att(c.status === 0, `constat refusé : exit ${c.status} ${c.stderr}`);
+    const [ea, ec] = entrees(d).slice(-2);
+    att(ea.type === "action_externe" && ea.plateforme === "GitHub" && ea.geste === "fusion de la PR" && ea.resultat === "fusionnee", `entrée action_externe : ${JSON.stringify(ea)}`);
+    att(ec.type === "constat" && /387 commits/.test(ec.objet) && ec.seq === ea.seq + 1, `entrée constat : ${JSON.stringify(ec)}`);
+    const v = ecrire(script, "--verifier");
+    att(v.status === 0 && !/DÉCLARÉ|DECLARE/.test(v.stdout), `--verifier : exit ${v.status} ${v.stdout}`);
+    const inconnu = ecrire(script, "type_qui_n_existe_pas", "--objet", "x");
+    att(inconnu.status !== 0 && /type inconnu/.test(inconnu.stderr || ""), `un type inconnu doit rester refusé : exit ${inconnu.status}`);
+  });
+  check("vert — TF-2695 : `secret_range` reste le dernier type (la chirurgie de ranger-secret.test.mjs le retire par sa position)", () => {
+    att(/, "secret_range"\}/.test(GABARIT), "secret_range n'est plus le dernier type");
+    att(vocabulaire(GABARIT).has("action_externe") && vocabulaire(GABARIT).has("constat"), "action_externe ou constat absent de TYPES");
+  });
+
   // ---- TF-2527 (14/11/2026) : decision_retiree, lu par lib-decisions.mjs depuis TF-2415, n'était écrivable ni ici ni par ledger.mjs ----
   // Le fait : une décision retirée restait rappelée comme ouverte (D-12, D-178 le 10/11), et la seule retraite écrivable était un
   // `reponse_humain --decision D-M --remplace D-N`. Le type nomme la décision retirée et sa cause (20 caractères au moins).

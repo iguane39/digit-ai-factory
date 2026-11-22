@@ -164,30 +164,34 @@ export function validerVerdicts(verdicts) {
     if (motifVide(e.motif)) refus.push(`${f} : motif absent, trop court (3 mots au moins) ou resté au gabarit « <…> » — une forge ${verdict === "mobilisee" ? "mobilisée" : "écartée"} dit pourquoi`);
     normalises[f] = { verdict, motif: String(e.motif || "").trim() };
     // TF-2221 : `livrables_inchanges` { <livrable>: <motif> } déclare, pour une forge mobilisée, un livrable exigé que la demande ne touche pas.
-    if ("livrables_inchanges" in e) {
-      const li = e.livrables_inchanges;
-      if (!li || typeof li !== "object" || Array.isArray(li)) refus.push(`${f} : livrables_inchanges doit être un objet { livrable: motif }`);
-      else if (verdict === "ecartee" && Object.keys(li).length) refus.push(`${f} : livrables_inchanges sur une forge écartée — une forge écartée n'exige aucun livrable`);
+    // TF-2778 : `livrables_sans_objet` { <livrable>: <motif> } déclare un livrable exigé qui n'a pas d'objet chez CE produit et n'existe donc pas (un livrable
+    // jamais créé ne peut pas être déclaré inchangé). Même forme, mêmes refus.
+    for (const [champ, dit] of [["livrables_inchanges", "inchangé"], ["livrables_sans_objet", "sans objet"]]) {
+      if (!(champ in e)) continue;
+      const li = e[champ];
+      if (!li || typeof li !== "object" || Array.isArray(li)) refus.push(`${f} : ${champ} doit être un objet { livrable: motif }`);
+      else if (verdict === "ecartee" && Object.keys(li).length) refus.push(`${f} : ${champ} sur une forge écartée — une forge écartée n'exige aucun livrable`);
       else {
         const gardes = {};
         for (const [id, m] of Object.entries(li)) {
-          if (motifVide(m)) refus.push(`${f} : livrable inchangé « ${id} » sans motif (3 mots au moins, aucun gabarit « <…> ») — dis pourquoi la demande ne le touche pas`);
+          if (motifVide(m)) refus.push(`${f} : livrable ${dit} « ${id} » sans motif (3 mots au moins, aucun gabarit « <…> ») — dis pourquoi ${champ === "livrables_inchanges" ? "la demande ne le touche pas" : "il n'a pas d'objet chez ce produit"}`);
           else gardes[id] = String(m).trim();
         }
-        if (Object.keys(gardes).length) normalises[f].livrables_inchanges = gardes;
+        if (Object.keys(gardes).length) normalises[f][champ] = gardes;
       }
     }
   }
   return { refus, verdicts: normalises };
 }
 
-/** TF-2221 : les livrables déclarés inchangés doivent être exigés de leur forge par la demande ; rend la liste des refus (vide = conforme). */
+/** TF-2221 : les livrables déclarés inchangés, et (TF-2778) sans objet, doivent être exigés de leur forge par la demande ; rend la liste des refus (vide = conforme). */
 export function refusInchanges(carte, types, verdicts) {
   const exiges = new Map(livrablesExiges(carte, { types: types.map((t) => t.id), verdicts }).map((x) => [x.forge, x.livrables]));
   const refus = [];
-  for (const f of FORGES) for (const id of Object.keys(verdicts[f]?.livrables_inchanges || {}))
-    if (!(exiges.get(f) || []).includes(id))
-      refus.push(`${f} : « ${id} » est déclaré inchangé mais cette demande ne l'exige pas de ${f}${exiges.get(f)?.length ? ` (exigés : ${exiges.get(f).join(", ")})` : " (aucun livrable exigé)"}`);
+  for (const [champ, dit] of [["livrables_inchanges", "inchangé"], ["livrables_sans_objet", "sans objet chez ce produit"]])
+    for (const f of FORGES) for (const id of Object.keys(verdicts[f]?.[champ] || {}))
+      if (!(exiges.get(f) || []).includes(id))
+        refus.push(`${f} : « ${id} » est déclaré ${dit} mais cette demande ne l'exige pas de ${f}${exiges.get(f)?.length ? ` (exigés : ${exiges.get(f).join(", ")})` : " (aucun livrable exigé)"}`);
   return refus;
 }
 
@@ -527,7 +531,10 @@ function etatPorteClient(produit, std, seuil) {
  */
 export function etatDesLivrables(produit, carte, ligne) {
   // TF-2277 : une ligne qui amende la même demande porte `depuis`, l'heure de la première de la suite ; c'est elle qui date la demande.
-  const seuil = ligne && (ligne.depuis || ligne.ts) ? Date.parse(ligne.depuis || ligne.ts) : NaN;
+  const seuilTrace = ligne && (ligne.depuis || ligne.ts) ? Date.parse(ligne.depuis || ligne.ts) : NaN;
+  // TF-2778 : la trace s'écrit parfois en fin de run ; le ledger du produit atteste alors une ouverture plus ancienne, qui date la demande.
+  const ouverture = ouvertureAttestee(produit, ligne);
+  const seuil = ouverture && Number.isFinite(seuilTrace) && ouverture.t < seuilTrace ? ouverture.t : seuilTrace;
   const etats = [];
   for (const { forge, livrables } of livrablesExiges(carte, ligne)) for (const id of livrables) {
     const l = (carte.livrables || {})[id] || { libelle: id, chemins: [] };
@@ -542,9 +549,12 @@ export function etatDesLivrables(produit, carte, ligne) {
     // TF-2221 : un fichier présent mais écrit avant la demande compte quand la ligne de trace le déclare inchangé, avec son motif.
     const m = ligne?.verdicts?.[forge]?.livrables_inchanges?.[id];
     const inchange = trouve && !frais && !motifVide(m) ? String(m).trim() : null;
-    const present = !!trouve && (frais || !!inchange);
+    // TF-2778 : un livrable exigé qui n'existe pas et n'a pas d'objet chez ce produit se déclare « sans objet », avec son motif ; un livrable jamais créé n'est pas « inchangé ».
+    const so = ligne?.verdicts?.[forge]?.livrables_sans_objet?.[id];
+    const sansObjet = !trouve && !motifVide(so) ? String(so).trim() : null;
+    const present = (!!trouve && (frais || !!inchange)) || !!sansObjet;
     etats.push({ forge, livrable: id, libelle: l.libelle, chemins: l.chemins || [], present, trouve,
-      perime: !!trouve && !frais && !inchange, inchange, ecrit_le: ecritLe != null ? new Date(ecritLe).toISOString() : null });
+      perime: !!trouve && !frais && !inchange, inchange, sans_objet: sansObjet, ecrit_le: ecritLe != null ? new Date(ecritLe).toISOString() : null });
   }
   // TF-2144 : forge-audit mobilisée chez un produit d'un client qui publie une porte d'audit → la sortie de cette porte est exigée aussi.
   // Non rétroactif : une demande tracée avant le 05/11/2026 n'est pas jugée sur ce livrable.
@@ -552,5 +562,29 @@ export function etatDesLivrables(produit, carte, ligne) {
     const std = standardClientAudit(produit);
     if (std.porte) etats.push(etatPorteClient(produit, std, seuil));
   }
-  return { etats, manquants: etats.filter((e) => !e.present) };
+  return { etats, manquants: etats.filter((e) => !e.present), ouverture_attestee: ouverture && ouverture.t < seuilTrace ? { type: ouverture.type, ts: ouverture.ts } : null };
+}
+
+/**
+ * TF-2778 (RS-51 de Produit-12, 22/11/2026) : l'heure d'ouverture que le LEDGER du produit atteste pour la demande d'une ligne de trace. Une trace écrite en
+ * fin de run (à 19:40, pour une demande ouverte à 14:05) rendait périmés les livrables produits entre les deux, jugés contre l'heure de la trace. Le ledger
+ * porte l'ouverture : la plus récente des entrées `run_open` et `demande_humain` (celle de la session de la ligne quand elle la nomme) qui précèdent la ligne.
+ * Une nouvelle demande consignée au ledger fait remonter cette heure : le livrable d'avant elle reste périmé. Sans ledger, sans entrée ou sans ligne datée : null,
+ * le seuil reste l'heure de la trace. Limite dite : un run long sans `demande_humain` consignée date ses demandes de son ouverture.
+ */
+export function ouvertureAttestee(produit, ligne) {
+  const fichier = join(produit, "forge", "ledger.jsonl");
+  const fin = ligne?.ts ? Date.parse(ligne.ts) : NaN;
+  if (!Number.isFinite(fin) || !existsSync(fichier)) return null;
+  let meilleur = null;
+  for (const l of readFileSync(fichier, "utf8").split(/\r?\n/)) {
+    if (!l.trim()) continue;
+    let e; try { e = JSON.parse(l); } catch { continue; }
+    if (!e || (e.type !== "run_open" && e.type !== "demande_humain")) continue;
+    if (e.type === "demande_humain" && ligne.session && e.session && !String(ligne.session).startsWith(String(e.session))) continue;
+    const t = Date.parse(e.ts);
+    if (!Number.isFinite(t) || t > fin) continue;
+    if (!meilleur || t > meilleur.t) meilleur = { t, type: e.type, ts: e.ts };
+  }
+  return meilleur;
 }

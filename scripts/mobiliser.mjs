@@ -25,7 +25,9 @@
  *       ou --session <id>), présents ou manquants (la lecture du verrou S85) ; chaque ligne écrite porte l'identifiant de sa session
  *       (TF-2045), les lignes d'avant l'identifiant sont le repli déclaré ; exit 0 rien ne manque, 1 un livrable manque, 2 aucune trace ;
  *       le livrable retenu est le fichier le PLUS RÉCENT qui répond au motif de la carte (TF-2188, TF-2205), et un livrable écrit avant la demande
- *       mais déclaré INCHANGÉ avec son motif (`livrables_inchanges` du verdict de la forge, TF-2221) compte comme présent ;
+ *       mais déclaré INCHANGÉ avec son motif (`livrables_inchanges` du verdict de la forge, TF-2221) compte comme présent, et un livrable
+ *       exigé qui n'existe pas déclaré « SANS OBJET chez ce produit » avec son motif (`livrables_sans_objet`, TF-2778) aussi ; la fraîcheur se
+ *       juge contre l'ouverture que le ledger du produit atteste (`run_open`, `demande_humain`) quand elle précède la ligne de trace (TF-2778) ;
  *   options : --profil domaine_public=oui|non,page_indexable=…,donnees_personnelles=…,agents=…,mise_en_production=…  (déclare ou
  *       revoit forge/PROFIL.json, puis l'emploie) ; --produit <dossier> (désigne le produit sans y être).
  * Sortie : une ligne JSON ; exit 0 = écrit (ou squelette rendu), 1 = refus motivé, 2 = usage, carte illisible ou hors d'un produit.
@@ -65,13 +67,15 @@ if (args.includes("--verifier")) {
   if (!trace.derniere) sortie({ outil: OUTIL, verdict: "SANS_TRACE", session: trace.session, autres_sessions: trace.autres_sessions,
     message: `${trace.chemin} ${!trace.existe ? "absent" : trace.autres_sessions ? `ne porte aucune ligne de cette session (${trace.autres_sessions} ligne(s) d'autres sessions, non jugées à sa place)` : "sans ligne lisible"} : écris d'abord les 13 verdicts de la demande (--preparer, puis --verdicts)` }, 2);
   const d = trace.derniere;
-  const { etats, manquants } = etatDesLivrables(produit, carte, d);
+  const { etats, manquants, ouverture_attestee } = etatDesLivrables(produit, carte, d);
   sortie({ outil: OUTIL, verdict: manquants.length ? "MANQUE" : "PRESENT", session: trace.session, repli: trace.repli,
     ...(trace.repli ? { repli_dit: REPLI_DIT[trace.repli] } : {}),
     derniere_demande: { ts: d.ts, depuis: d.depuis ?? null, type: d.type, demande: d.demande ?? null, session: d.session ?? null },
-    exiges: etats.map((e) => ({ forge: e.forge, livrable: e.libelle, present: e.present, trouve: e.trouve, perime: e.perime, inchange: e.inchange, ecrit_le: e.ecrit_le, chemins: e.chemins })),
-    manquants: manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})${m.perime ? ` — périmé : ${m.trouve} écrit le ${m.ecrit_le}, avant la demande (${d.depuis || d.ts})` : ""}`),
-    remede: manquants.length ? "produire chaque livrable manquant, écarter avec son motif la forge qui n'a pas servi, ou déclarer inchangé — avec son motif — un livrable que la demande ne touche pas (livrables_inchanges de la forge), dans une nouvelle ligne de trace (--verdicts)" : null }, manquants.length ? 1 : 0);
+    // TF-2778 : quand le ledger du produit atteste une ouverture plus ancienne que la ligne de trace, c'est elle qui date la demande.
+    ...(ouverture_attestee ? { ouverture_attestee } : {}),
+    exiges: etats.map((e) => ({ forge: e.forge, livrable: e.libelle, present: e.present, trouve: e.trouve, perime: e.perime, inchange: e.inchange, sans_objet: e.sans_objet, ecrit_le: e.ecrit_le, chemins: e.chemins })),
+    manquants: manquants.map((m) => `${m.forge} → ${m.libelle} (${m.chemins.join(" ou ")})${m.perime ? ` — périmé : ${m.trouve} écrit le ${m.ecrit_le}, avant la demande (${ouverture_attestee ? `ouverture attestée par le ledger : ${ouverture_attestee.ts}` : (d.depuis || d.ts)})` : ""}`),
+    remede: manquants.length ? "produire chaque livrable manquant, écarter avec son motif la forge qui n'a pas servi, déclarer inchangé — avec son motif — un livrable que la demande ne touche pas (livrables_inchanges de la forge), ou déclarer « sans objet chez ce produit » — avec son motif — un livrable exigé qui n'existe pas et n'a pas à exister (livrables_sans_objet de la forge), dans une nouvelle ligne de trace (--verdicts)" : null }, manquants.length ? 1 : 0);
 }
 
 const DEMANDE_A_REMPLIR = "<résumé de la demande>";
@@ -107,7 +111,7 @@ if (args.includes("--preparer")) {
   // TF-2017 (RT-27, 29/10/2026) : le squelette porte `demande`, que --verdicts lit ; sans ce champ, la
   // session l'ajoutait au fichier et la trace sortait avec `demande: null`, sans un mot.
   const s = { types: t.types.map((x) => x.id), demande: DEMANDE_A_REMPLIR, profil, verdicts: squelette(carte, t.types, profil),
-    consigne: "remplace « demande » par le résumé de la demande, chaque motif « <…> » par une raison de 3 mots au moins, passe une forge à « ecartee » ou à « mobilisee » selon la demande et le profil, puis : node <pilot>/scripts/mobiliser.mjs --verdicts <ce fichier>. Un livrable exigé que la demande ne touche pas (un fichier de jetons quand aucun jeton n'est ajouté) se déclare dans la forge mobilisée : \"livrables_inchanges\": { \"<livrable>\": \"<motif de 3 mots au moins>\" }" };
+    consigne: "remplace « demande » par le résumé de la demande, chaque motif « <…> » par une raison de 3 mots au moins, passe une forge à « ecartee » ou à « mobilisee » selon la demande et le profil, puis : node <pilot>/scripts/mobiliser.mjs --verdicts <ce fichier>. Un livrable exigé que la demande ne touche pas (un fichier de jetons quand aucun jeton n'est ajouté) se déclare dans la forge mobilisée : \"livrables_inchanges\": { \"<livrable>\": \"<motif de 3 mots au moins>\" } ; un livrable exigé qui n'a pas d'objet chez ce produit et n'existe donc pas : \"livrables_sans_objet\": { \"<livrable>\": \"<motif de 3 mots au moins>\" }" };
   const f = valeur("--sortie");
   if (f) { writeFileSync(resolve(f), JSON.stringify(s, null, 2) + "\n", "utf8"); sortie({ outil: OUTIL, squelette: resolve(f), forges: FORGES.length, profil_connu: !!profil }, 0); }
   sortie({ outil: OUTIL, ...s }, 0);

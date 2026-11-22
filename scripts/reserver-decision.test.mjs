@@ -327,6 +327,82 @@ try {
       att(c.o?.reserve === "D-3" && /ledger\.jsonl$/.test(c.o?.registre || ""), `10 : le run ouvert, la réservation passe par le ledger du run et compte les D-N du journal hors run (D-3), obtenu ${JSON.stringify(c.o || c.brut).slice(0, 240)}`);
     }
   }
+  // 11 — TF-2694 (RP-224 de Produit-79, 20/11/2026) : LE LEDGER DE L'ORIGINE COMPTE POUR LE PROCHAIN NUMÉRO. Le fait : un arbre en retard de 387 commits sur origin/main a proposé D-990 (ledger local, seq 1181)
+  // alors que l'origine portait D-997 (seq 1242). Fixture rouge : un dépôt d'origine, un arbre A en RETARD d'un commit où le ledger d'origine nomme D-997 ; avant, `--prochain` et la réservation rendaient D-1 ; ils
+  // rendent D-998. Verts : `--sans-fetch` lit la branche amont sans l'actualiser (D-1, la sortie le dit) ; un dépôt sans branche amont garde son calcul d'avant, et la sortie le dit.
+  {
+    const git = (cwd, ...a) => spawnSync("git", ["-c", "user.name=essai", "-c", "user.email=essai@example.invalid", "-c", "commit.gpgsign=false", "-c", "core.longpaths=true", ...a], { cwd, encoding: "utf8" });
+    const origine = join(base, "origine-2694.git"), A = join(base, "arbre-a-2694"), B = join(base, "arbre-b-2694");
+    const pret = [git(base, "init", "-q", "--bare", origine), git(base, "clone", "-q", origine, A)];
+    att(pret.every((r) => r.status === 0), `11 : le dépôt d'origine et l'arbre A doivent se créer, obtenu ${pret.map((r) => r.status + " " + (r.stderr || "").trim().slice(0, 80)).join(" | ")}`);
+    mkdirSync(join(A, "forge", "retours"), { recursive: true });
+    writeFileSync(join(A, "forge", "retours", ".gitkeep"), "", "utf8");
+    if (PYTHON) {
+      writeFileSync(join(A, "forge", "ledger.py"), LEDGER_GABARIT, "utf8");
+      spawnSync(PYTHON, [join(A, "forge", "ledger.py"), "run_open", "--run_id", "essai"], { encoding: "utf8", cwd: A, env: { ...process.env, PYTHONUTF8: "1" } });
+    } else writeFileSync(join(A, "forge", "ledger.jsonl"), JSON.stringify({ seq: 1, ts: "2026-11-20T10:00:00.000Z", type: "run_open", run_id: "essai" }) + "\n", "utf8");
+    const branche = git(A, "symbolic-ref", "--short", "HEAD").stdout.trim() || "main";
+    const poussee = [git(A, "add", "-A"), git(A, "commit", "-q", "-m", "essai"), git(A, "push", "-q", "-u", "origin", branche)];
+    att(poussee.every((r) => r.status === 0), `11 : A doit pousser son premier commit à l'origine, obtenu ${poussee.map((r) => r.status + " " + (r.stderr || "").trim().slice(0, 80)).join(" | ")}`);
+    const clone = git(base, "clone", "-q", origine, B);
+    att(clone.status === 0, `11 : l'arbre B doit se cloner, obtenu ${clone.status} ${(clone.stderr || "").slice(0, 80)}`);
+    writeFileSync(join(B, "forge", "ledger.jsonl"), readFileSync(join(B, "forge", "ledger.jsonl"), "utf8") + JSON.stringify({ seq: 1242, ts: "2026-11-20T11:00:00.000Z", type: "question_humain", decisions_posees: { "D-997": "Publie-t-on la version de l'origine ?" } }) + "\n", "utf8");
+    const poussee2 = [git(B, "add", "-A"), git(B, "commit", "-q", "-m", "D-997 posée chez l'origine"), git(B, "push", "-q", "origin", branche)];
+    att(poussee2.every((r) => r.status === 0), `11 : B doit pousser D-997 à l'origine, obtenu ${poussee2.map((r) => r.status + " " + (r.stderr || "").trim().slice(0, 80)).join(" | ")}`);
+    att(!numerosDuLedger(A).numeros.has("997"), "11 : le ledger local de A ne nomme PAS D-997 (c'est ce qui rendait la collision possible)");
+    const sans = lancer(["--prochain", "--produit", A, "--sans-fetch"]);
+    att(sans.code === 0 && sans.o?.prochain === "D-1" && /non joué/.test(sans.o?.origine?.fetch || "") && !(sans.o?.origine?.retard > 0),
+      `11 : --sans-fetch lit la branche amont SANS l'actualiser (D-1, fetch « non joué », aucun retard connu), obtenu ${JSON.stringify(sans.o || sans.brut).slice(0, 300)}`);
+    const proche = lancer(["--prochain", "--produit", A]);
+    att(proche.code === 0 && proche.o?.prochain === "D-998" && proche.o?.origine?.retard === 1 && proche.o?.origine?.plus_grand === 997 && proche.o?.origine?.fetch === "fait" && /en retard de 1 commit\(s\)/.test(proche.o?.avertissement || ""),
+      `11 : --prochain d'un arbre en retard d'un commit doit lire l'origine (D-998, retard 1, plus grand 997, fetch fait, avertissement), obtenu ${JSON.stringify(proche.o || proche.brut).slice(0, 400)}`);
+    const r = lancer(["--question", "Publie-t-on la version de l'arbre en retard ?", "--produit", A]);
+    att(r.code === 0 && r.o?.reserve === "D-998" && r.o?.origine?.retard === 1 && /seq de l'entrée vient de l'arbre local/.test(r.o?.avertissement || ""),
+      `11 : la réservation d'un arbre en retard doit rendre D-998 (l'origine porte D-997) et avertir du seq, obtenu ${r.code} ${JSON.stringify(r.o || r.brut).slice(0, 400)}`);
+    att(numerosDuLedger(A).numeros.has("998"), "11 : D-998 doit être inscrite au ledger de l'arbre A");
+    // Sans branche amont (dépôt sans origine) : le calcul reste celui d'avant, et la sortie le dit.
+    const seul = join(base, "produit-sans-origine-2694");
+    mkdirSync(join(seul, "forge", "retours"), { recursive: true });
+    writeFileSync(join(seul, "forge", "ledger.jsonl"), JSON.stringify({ seq: 1, ts: "2026-11-20T10:00:00.000Z", type: "reponse_humain", portee: "D-4" }) + "\n", "utf8");
+    git(seul, "init", "-q");
+    const sa = lancer(["--prochain", "--produit", seul]);
+    att(sa.code === 0 && sa.o?.prochain === "D-5" && /aucune branche amont/.test(sa.o?.origine?.raison || "") && !sa.o?.avertissement,
+      `11 : sans branche amont, le prochain numéro garde son calcul d'avant (D-5) et la sortie dit pourquoi l'origine n'est pas lue, obtenu ${JSON.stringify(sa.o || sa.brut).slice(0, 300)}`);
+  }
+  // 12 — TF-2704 (RETOUR du porteur du 15/11/2026, seq 326 de factory-digit-ai-fr) : « on a déjà dit qu'il n'y avait pas besoin de clé API pour le mode --bare de b ». D-227 proposait une clé d'API que D-73 (a)
+  // avait retirée. ROUGE : avant, la réservation d'une question proche d'une décision DÉJÀ tranchée ne le disait pas ; maintenant elle nomme les décisions voisines tranchées et leur réponse, et demande de les relire
+  // avant les options. VERTS : une question sans rapport ne porte rien ; une décision voisine NON répondue n'est pas « tranchée » ; le registre du pilot et le ledger d'un produit sont lus tous deux.
+  {
+    const Q73 = "Le mode --bare de la boucle b prend-il une clé d'API de la plateforme ?";
+    const Q227 = "Quelle option prend-on pour le mode --bare de la boucle b, avec ou sans clé d'API ?";
+    const regVoisines = join(base, "registre-voisines-2704.jsonl");
+    writeFileSync(regVoisines, [{ type: "registre", version: 1 },
+      { type: "decision", n: 73, question: Q73, date: "2026-10-30", ts: "2026-10-30T09:00:00Z", origine: "reservation" },
+      { type: "reponse", n: 73, lettres: ["a"], date: "2026-10-30", ts: "2026-10-30T09:05:00Z", origine: "hook-lexique" },
+      { type: "decision", n: 74, question: "Quelle couleur donne-t-on au bouton de publication de la page d'accueil ?", date: "2026-10-30", ts: "2026-10-30T10:00:00Z", origine: "reservation" },
+      { type: "reponse", n: 74, lettres: ["b"], date: "2026-10-30", ts: "2026-10-30T10:05:00Z", origine: "hook-lexique" },
+      { type: "decision", n: 75, question: "Le mode --bare de la boucle b se lance-t-il avec une clé d'API partagée ?", date: "2026-10-31", ts: "2026-10-31T10:00:00Z", origine: "reservation" },
+    ].map((x) => JSON.stringify(x)).join("\n") + "\n", "utf8");
+    const rv = lancer(["--question", Q227, "--registre-pilot", regVoisines], base);
+    att(rv.code === 0 && rv.o?.reserve === "D-76", `12 : la réservation au registre d'essai doit rendre D-76, obtenu ${rv.code} ${JSON.stringify(rv.o || rv.brut).slice(0, 200)}`);
+    const ids = (rv.o?.decisions_voisines_tranchees || []).map((v) => v.id);
+    att(ids.length === 1 && ids[0] === "D-73" && /lettre\(s\) a/.test(rv.o.decisions_voisines_tranchees[0].reponse) && /relire D-73 AVANT d'écrire les options/.test(rv.o?.a_relire || ""),
+      `12 : la question proche de D-73 (tranchée, lettre a) doit nommer D-73 seule — ni D-74 (sans rapport) ni D-75 (non répondue) — avec sa réponse et « relire D-73 AVANT d'écrire les options », obtenu ${JSON.stringify(rv.o?.decisions_voisines_tranchees)} ${rv.o?.a_relire}`);
+    const sansRapport = lancer(["--question", "Faut-il renommer le dossier des archives de l'année dernière ?", "--registre-pilot", regVoisines], base);
+    att(sansRapport.code === 0 && !sansRapport.o?.decisions_voisines_tranchees && !sansRapport.o?.a_relire, `12 : une question sans rapport ne porte aucune décision voisine, obtenu ${JSON.stringify(sansRapport.o || sansRapport.brut).slice(0, 300)}`);
+    // Chez un produit : D-12 posée puis répondue au ledger (texte de la réponse consigné) ; la même réservation la nomme avec sa réponse.
+    const prod = join(base, "produit-voisines-2704");
+    mkdirSync(join(prod, "forge", "retours"), { recursive: true });
+    writeFileSync(join(prod, "forge", "ledger.jsonl"), [
+      { seq: 1, ts: "2026-11-10T10:00:00.000Z", type: "run_open", run_id: "essai" },
+      { seq: 2, ts: "2026-11-10T10:01:00.000Z", type: "question_humain", decisions_posees: { "D-12": Q73 } },
+      { seq: 3, ts: "2026-11-10T10:02:00.000Z", type: "reponse_humain", decision: "D-12", reponse: "non, pas de clé d'API pour le mode bare" },
+    ].map((x) => JSON.stringify(x)).join("\n") + "\n", "utf8");
+    const rp = lancer(["--question", Q227, "--produit", prod]);
+    const vp = rp.o?.decisions_voisines_tranchees || [];
+    att(rp.code === 0 && rp.o?.reserve === "D-13" && vp.length === 1 && vp[0].id === "D-12" && /pas de clé d'API/.test(vp[0].reponse),
+      `12 : chez un produit, la décision D-12 répondue au ledger doit être nommée avec le texte de sa réponse, obtenu ${rp.code} ${JSON.stringify(rp.o || rp.brut).slice(0, 400)}`);
+  }
   att(empreinte(REGISTRE_PILOT) === empreintePilot, "9 : le registre du pilot a été modifié par la recette (elle ne doit jamais l'écrire)");
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 240)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }

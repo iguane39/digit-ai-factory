@@ -658,7 +658,7 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
 // ---- LOT-SIDECAR (TF-1591, TF-1602) : le sidecar jugé comme la porte le jugera -----------------
 // Le fait : les lots Produit-02 du 03/10 ont été refusés pour « classe-a-creer sans classe_proposee »,
 // que ce juge ne regardait pas — le produit avait rendu PASS. Chaque règle rejouée a son cas rouge ET
-// son cas vert ; la règle entre en AVERTISSEMENT (jamais en blocage, précédent D-70 (b)).
+// son cas vert ; la règle est entrée en AVERTISSEMENT (D-70 (b)), puis en ÉCHEC le 22/11/2026 (TF-2761).
 {
   const { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, readdirSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
@@ -684,18 +684,18 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
     const r = verifier(`${base}.md`, md, { aujourdhui: AUJ });
     return { c: constat(r, "LOT-SIDECAR"), verdict: r.verdict };
   };
-  const avert = (res, motif) => {
-    if (!res.c || res.c.statut !== "AVERTISSEMENT") throw new Error(`statut ${res.c ? res.c.statut : "absent"} — ${res.c && res.c.message}`);
+  const refuse = (res, motif) => {
+    if (!res.c || res.c.statut !== "FAIL") throw new Error(`statut ${res.c ? res.c.statut : "absent"} — ${res.c && res.c.message}`);
     if (motif && !motif.test(res.c.message)) throw new Error(`le motif attendu ${motif} n'est pas dit : ${res.c.message}`);
-    if (res.verdict !== "PASS") throw new Error(`un AVERTISSEMENT ne doit jamais bloquer : verdict ${res.verdict}`);
+    if (res.verdict !== "FAIL") throw new Error(`un motif que la porte refuse doit rendre FAIL (TF-2761) : verdict ${res.verdict}`);
   };
   const passe = (res) => { if (!res.c || res.c.statut !== "PASS") throw new Error(`statut ${res.c ? res.c.statut : "absent"} — ${res.c && res.c.message}`); };
 
-  check("LOT-SIDECAR rouge — le cas du 03/10 : « classe-a-creer » SANS classe_proposee est signalé, et le lot n'est pas bloqué", () => {
-    avert(jouer([ligne({ classe: "classe-a-creer" })]), /classe_proposee complète — manque cle, famille, libelle/);
+  check("LOT-SIDECAR rouge — le cas du 03/10 : « classe-a-creer » SANS classe_proposee est refusé (FAIL, TF-2761)", () => {
+    refuse(jouer([ligne({ classe: "classe-a-creer" })]), /classe_proposee complète — manque cle, famille, libelle/);
   });
   check("LOT-SIDECAR rouge — une classe_proposee INCOMPLÈTE nomme ce qui manque", () => {
-    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "ma-cle-neuve", famille: FAMILLE } })]), /manque libelle/);
+    refuse(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "ma-cle-neuve", famille: FAMILLE } })]), /manque libelle/);
   });
   check("LOT-SIDECAR vert — le remède joué : classe_proposee complète, clé neuve, famille connue, clé nommée dans le .md → PASS", () => {
     const cle = "regle-neuve-essai";
@@ -703,27 +703,27 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
       { md: lotMd(`## La règle qui aurait évité le retour\n\n${cle} (${FAMILLE}) : un défaut neuf d'essai\n`) }));
   });
   check("LOT-SIDECAR rouge — la clé proposée n'est pas nommée dans le .md du lot", () => {
-    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "cle-absente-du-md", famille: FAMILLE, libelle: "x" } })]), /n'est pas nommée dans le \.md/);
+    refuse(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "cle-absente-du-md", famille: FAMILLE, libelle: "x" } })]), /n'est pas nommée dans le \.md/);
   });
   check("LOT-SIDECAR rouge — la famille de la classe proposée est inconnue", () => {
-    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "cle-neuve-2", famille: "famille-inventee", libelle: "x" } })],
+    refuse(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: "cle-neuve-2", famille: "famille-inventee", libelle: "x" } })],
       { md: lotMd("cle-neuve-2") }), /famille « famille-inventee » .* inconnue/);
   });
   check("LOT-SIDECAR rouge — la clé proposée EXISTE déjà au référentiel", () => {
-    avert(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: EXISTANTE.cle, famille: FAMILLE, libelle: "x" } })],
+    refuse(jouer([ligne({ classe: "classe-a-creer", classe_proposee: { cle: EXISTANTE.cle, famille: FAMILLE, libelle: "x" } })],
       { md: lotMd(EXISTANTE.cle) }), /EXISTE déjà/);
   });
   check("LOT-SIDECAR vert — une classe existante du référentiel : PASS", () => passe(jouer([ligne()])));
   check("LOT-SIDECAR rouge — une classe INCONNUE, avec la sortie conforme proposée", () => {
-    avert(jouer([ligne({ classe: "classe-qui-n-existe-pas" })]), /inconnue du référentiel .*classe-a-creer/);
+    refuse(jouer([ligne({ classe: "classe-qui-n-existe-pas" })]), /inconnue du référentiel .*classe-a-creer/);
   });
   check("LOT-SIDECAR rouge — classe MANQUANTE d'un lot daté du 03/09 ou après", () => {
     const sans = JSON.parse(ligne()); delete sans.classe;
-    avert(jouer([JSON.stringify(sans)]), /classe manquante/);
+    refuse(jouer([JSON.stringify(sans)]), /classe manquante/);
   });
   check("LOT-SIDECAR rouge — champ obligatoire manquant, JSON invalide, id présent, caractère de contrôle : chacun nommé", () => {
     const sansDem = JSON.parse(ligne()); delete sansDem.demandeur;
-    avert(jouer([JSON.stringify(sansDem), "{ pas du json", ligne({ id: "RT-1" }), ligne({ titre: "avec un octet nul \u0000 dedans" })]),
+    refuse(jouer([JSON.stringify(sansDem), "{ pas du json", ligne({ id: "RT-1" }), ligne({ titre: "avec un octet nul \u0000 dedans" })]),
       /champ demandeur manquant.*JSON invalide.*JAMAIS d'id.*caractère de contrôle U\+0000/);
   });
   check("LOT-SIDECAR vert — une ligne de rectification n'a pas de classe à porter", () => {
@@ -744,7 +744,7 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   // Vert : un lot daté d'avant le 03/09 sans classe passe, comme à la porte.
   check("LOT-SIDECAR rouge — TF-1814 : un lot daté du 25/09 SANS classe est signalé, la porte le refusant", () => {
     const sans = JSON.parse(ligne()); delete sans.classe;
-    avert(jouer([JSON.stringify(sans)], { date: "20260925" }), /classe manquante/);
+    refuse(jouer([JSON.stringify(sans)], { date: "20260925" }), /classe manquante/);
   });
   check("LOT-SIDECAR vert — TF-1814 : un lot daté du 02/09 sans classe passe, la porte n'exigeant la classe que dès le 03/09", () => {
     const sans = JSON.parse(ligne()); delete sans.classe;
@@ -752,14 +752,14 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
   });
   // TF-1814 (1) — le verdict PASS d'un lot que la porte REFUSERA ne se lit plus « PASS » tout court :
   // le résultat porte `refus_predit`, que la ligne de verdict de la CLI dit en toutes lettres.
-  check("LOT-SIDECAR rouge — TF-1814 : un refus prédit est porté au résultat (refus_predit) et dit sur la ligne de verdict", () => {
+  check("LOT-SIDECAR rouge — TF-1814 et TF-2761 : un refus prédit rend FAIL, est porté au résultat (refus_predit), dit sur la ligne de verdict, sortie 1", () => {
     const base = join(D, "PROD - RETOURS - 20261013y");
     writeFileSync(`${base}.md`, lotMd(), "utf8");
     writeFileSync(`${base}.tf.jsonl`, ligne({ classe: "classe-qui-n-existe-pas" }) + "\n", "utf8");
     const r = verifier(`${base}.md`, lotMd(), { aujourdhui: AUJ });
     if (r.refus_predit !== true) throw new Error(`refus_predit ${r.refus_predit}`);
     const cli = spawnSyncS(process.execPath, [join(ICI_S, "oracle-lot-retours.mjs"), `${base}.md`], { encoding: "utf8" });
-    if (!/^verdict : PASS[^\n]*la porte du pilot REFUSERA ce lot/m.test(cli.stdout || "")) throw new Error(`ligne de verdict : ${(cli.stdout || "").split("\n").find((l) => /^verdict/.test(l))}`);
+    if (cli.status !== 1 || !/^verdict : FAIL[^\n]*la porte du pilot REFUSERA ce lot/m.test(cli.stdout || "")) throw new Error(`ligne de verdict : ${(cli.stdout || "").split("\n").find((l) => /^verdict/.test(l))}`);
     const ok = join(D, "PROD - RETOURS - 20261013z");
     writeFileSync(`${ok}.md`, lotMd(), "utf8");
     writeFileSync(`${ok}.tf.jsonl`, ligne() + "\n", "utf8");
@@ -804,7 +804,7 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
     });
     // TF-2636 (RP-34 de Produit-79, 12/11/2026) : le juge rendait PASS avec l'avertissement « la porte du pilot REFUSERA ce lot tel quel (LOT-SIDECAR) », puis
     // `--remettre` copiait le lot au sas : un lot remis ne se modifie plus, la correction a coûté un lot de plus et 2 numéros de retour. Le refus prédit
-    // bloque désormais la COPIE (sortie 1), pas le verdict du juge, qui reste PASS avec avertissement.
+    // bloque la COPIE (sortie 1) ; depuis TF-2761 (22/11/2026) le verdict du juge est lui-même FAIL.
     const avecSidecar = (nom, md, lignes) => {
       const base = join(D, nom);
       writeFileSync(`${base}.md`, md, "utf8");
@@ -817,7 +817,7 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
         [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: "famille-qui-n-existe-pas", libelle: "Essai" } })]);
       const avant = auSas();
       const r = remettre(lot);
-      if (!/^verdict : PASS[^\n]*la porte du pilot REFUSERA/m.test(r.stdout || "")) throw new Error(`le juge ne prédit pas le refus (le cas ne reproduit pas RP-34) : ${(r.stdout || "").slice(0, 300)}`);
+      if (!/^verdict : FAIL[^\n]*la porte du pilot REFUSERA/m.test(r.stdout || "")) throw new Error(`le juge ne prédit pas le refus (le cas ne reproduit pas RP-34) : ${(r.stdout || "").slice(0, 300)}`);
       if (r.status !== 1) throw new Error(`sortie ${r.status}, attendu 1 : ${(r.stderr || "").slice(0, 200)}`);
       if (auSas() !== avant) throw new Error(`le sas a changé : ${auSas()}`);
       if (!/NON FAITE/.test(r.stderr || "") || !/LOT-SIDECAR/.test(r.stderr || "")) throw new Error(`la sortie ne dit pas pourquoi la remise n'est pas faite : ${(r.stderr || "").slice(0, 240)}`);
@@ -830,11 +830,11 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
       if (r.status !== 0) throw new Error(`sortie ${r.status}, attendu 0 : ${(r.stdout || "").slice(0, 200)} ${(r.stderr || "").slice(0, 200)}`);
       if (auSas() === avant || !/20261013w\.md/.test(auSas()) || !/20261013w\.tf\.jsonl/.test(auSas())) throw new Error(`le lot corrigé n'est pas au sas : ${auSas()}`);
     });
-    check("TF-2636 — le juge SEUL (sans --remettre) garde son contrat : PASS avec avertissement, sortie 0", () => {
+    check("TF-2761 rouge — le juge SEUL (sans --remettre) rend FAIL et sortie 1 sur un refus prédit : plus de PASS qui annonce son propre refus", () => {
       const lot = avecSidecar("PROD - RETOURS - 20261013x", lotMd("\nclasse-neuve-essai\n"),
         [ligne({ classe: "classe-a-creer", classe_proposee: { cle: "classe-neuve-essai", famille: "famille-qui-n-existe-pas", libelle: "Essai" } })]);
       const r = spawnSyncS(process.execPath, [join(ICI_S, "oracle-lot-retours.mjs"), lot], { encoding: "utf8" });
-      if (r.status !== 0) throw new Error(`sortie ${r.status}, attendu 0 (le verdict reste PASS) : ${(r.stdout || "").slice(0, 200)}`);
+      if (r.status !== 1) throw new Error(`sortie ${r.status}, attendu 1 (LOT-SIDECAR rend FAIL) :${(r.stdout || "").slice(0, 200)}`);
     });
     check("TF-2314 rouge — un lot sans sidecar et un sas introuvable ne sont pas remis, sortie 2", () => {
       const sansSidecar = poser("PROD - RETOURS - 20261013t", lotMd(), false);
@@ -845,6 +845,60 @@ check("la casse et les accents du titre de section ne changent pas le verdict", 
     });
   }
   try { rmSync(D, { recursive: true, force: true }); } catch { /* verrou toléré */ }
+}
+
+// ---- LOT-OCTETS (TF-2777, 22/11/2026) : un caractère de contrôle dans le .md d'un lot est refusé ----------
+// Le fait : le lot 20261122f de Produit-12 est parti avec un NUL à la ligne 5 (« \00-retours » écrit dans une chaîne
+// non brute) ; le juge ne lisait le caractère de contrôle que dans le sidecar. Rouge : le NUL est refusé, sa ligne et son
+// code sont dits. Vert : le même lot sans NUL passe ; tabulation, retour chariot (CRLF) et accents passent ; un lot
+// antérieur au 22/11 n'est pas accusé (antériorité déclarée).
+{
+  const { mkdirSync, readdirSync } = await import("node:fs");
+  const { spawnSync } = await import("node:child_process");
+  const { dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const AUJ_O = "20261122";
+  const corps = `# lot\n\n${R45}\n${R46}\n`;
+  const octets = (nom, texte) => constat(verifier(lot(nom), texte, { aujourdhui: AUJ_O }), "LOT-OCTETS");
+  check("LOT-OCTETS rouge — TF-2777 : un NUL en ligne 5 est refusé (FAIL), la ligne et le code U+0000 sont dits, le verdict est FAIL", () => {
+    const texte = `# lot\n\n- a\n- b\n- copier dans \u0000-retours\n\n${R45}\n${R46}\n`;
+    const r = verifier(lot("20261122a"), texte, { aujourdhui: AUJ_O });
+    const c = constat(r, "LOT-OCTETS");
+    if (!c || c.statut !== "FAIL" || !/ligne 5 \(U\+0000\)/.test(c.message)) throw new Error(`${c && c.statut} — ${c && c.message}`);
+    if (r.verdict !== "FAIL") throw new Error(`verdict ${r.verdict}`);
+    if (!/\\00-retours/.test(c.remede || "")) throw new Error(`le remède ne nomme pas la cause (« \\00-retours ») : ${c.remede}`);
+  });
+  check("LOT-OCTETS rouge — TF-2777 : un caractère de contrôle autre que le NUL (U+0008, U+007F) est refusé aussi", () => {
+    for (const ch of ["\u0008", "\u007f", "\u001b"]) {
+      const c = octets("20261122b", `${corps}une ligne avec ${ch} dedans\n`);
+      if (!c || c.statut !== "FAIL") throw new Error(`U+${ch.charCodeAt(0).toString(16)} : ${c && c.statut}`);
+    }
+  });
+  check("LOT-OCTETS vert — TF-2777 : le remède joué (le lot sans le NUL) passe", () => {
+    const c = octets("20261122c", `# lot\n\n- a\n- b\n- copier dans le sas \`<pilot>\\input\\00-retours\\_arrivee\`\n\n${R45}\n${R46}\n`);
+    if (!c || c.statut !== "PASS") throw new Error(`${c && c.statut} — ${c && c.message}`);
+  });
+  check("LOT-OCTETS vert — TF-2777 : tabulation, fins de ligne CRLF et accents ne sont pas des caractères de contrôle accusés", () => {
+    const c = octets("20261122d", `${corps}\ttabulation, é à ç, œ — « guillemets »\n`.split("\n").join("\r\n"));
+    if (!c || c.statut !== "PASS") throw new Error(`${c && c.statut} — ${c && c.message}`);
+  });
+  check("LOT-OCTETS borne — TF-2777 : un lot daté d'avant le 22/11/2026 n'est pas accusé, et la règle le dit (antériorité déclarée)", () => {
+    const c = constat(verifier(lot("20261121a"), `${corps}avec \u0000 dedans\n`, { aujourdhui: AUJ_O }), "LOT-OCTETS");
+    if (!c || c.statut !== "SANS_OBJET" || !/antériorité déclarée/.test(c.message)) throw new Error(`${c && c.statut} — ${c && c.message}`);
+  });
+  check("LOT-OCTETS rouge — TF-2777 : la CLI sur un fichier au NUL sort en 1 et nomme LOT-OCTETS ; `--remettre` ne copie rien au sas", () => {
+    const D_O = mkdtempSync(join(tmpdir(), "lot-octets-"));
+    try {
+      const sas = join(D_O, "sas"); mkdirSync(sas);
+      const f = join(D_O, "PROD - RETOURS - 20261122e.md");
+      writeFileSync(f, `# lot\n\n- copier dans \u0000-retours\n\n${R45}\n${R46}\n`, "utf8");
+      writeFileSync(join(D_O, "PROD - RETOURS - 20261122e.tf.jsonl"), "", "utf8");
+      const r = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), "oracle-lot-retours.mjs"), f, "--remettre", sas], { encoding: "utf8" });
+      if (r.status !== 1) throw new Error(`sortie ${r.status}, attendu 1 : ${(r.stdout || "").slice(0, 300)}`);
+      if (!/\[FAIL\] LOT-OCTETS/.test(r.stdout || "")) throw new Error(`LOT-OCTETS non nommé : ${(r.stdout || "").slice(0, 400)}`);
+      if (readdirSync(sas).length !== 0) throw new Error(`le sas contient ${readdirSync(sas).join(", ")}`);
+    } finally { rmSync(D_O, { recursive: true, force: true }); }
+  });
 }
 
 // ---- TF-1473 : un IMPORT sans fichier de script (node -e) ne doit pas exécuter la CLI ---------
