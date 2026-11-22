@@ -200,7 +200,7 @@ try {
     const bloquantsDuHook = (d, texte, nom, env = {}) => {
       const f = join(base, nom + ".md"); writeFileSync(f, texte, "utf8");
       // sans la session qui joue la recette : --prejuger relirait SA transcription, où une D-7 citée n'est plus « nouvelle »
-      const sansSession = { ...process.env, ...env }; delete sansSession.CLAUDE_CODE_SESSION_ID;
+      const sansSession = { ...process.env, ...env }; delete sansSession.CLAUDE_CODE_SESSION_ID; delete sansSession.FORGE_SESSION_ID; // TF-2722 : FORGE_SESSION_ID (lib-session.mjs) passe avant
       const r = spawnSync(process.execPath, [join(PILOT, "oracles", "hook-restitution.mjs"), "--prejuger", f], { encoding: "utf8", cwd: d, env: sansSession });
       let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
       return { code: r.status, o };

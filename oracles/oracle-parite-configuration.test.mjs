@@ -10,7 +10,7 @@
  *   · un bloc de commentaire couvre TOUTES les clés consécutives qu'il introduit.
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { juger, clesDeFichier, clesLuesParLeCode, familiesDeclarees, couvertePar,
@@ -88,6 +88,19 @@ try {
     const r = juger(depot({ gabarit: "A=\n", code: { "src/a.mjs": "process.env.HOME; process.env.USERPROFILE;\n" } }));
     att(!echoue(r, "PC2"), "`HOME` et `USERPROFILE` ont été exigés au gabarit");
     att(DU_SYSTEME.has("HOME") && DU_SYSTEME.has("CI"), "la liste fermée a perdu une entrée");
+  });
+
+  // ── TF-2722 (RP-50, D-218 (b)) : l'identité de session est fournie par le harnais et par le hook SessionStart, pas par le gabarit ─────────────
+  check("TF-2722 rouge/vert — les trois variables d'identité de session ne sont pas exigées au gabarit, une vraie clé l'est toujours, et lib-session.mjs ne fait plus échouer PC2", () => {
+    const r = juger(depot({ gabarit: "A=\n", code: { "src/id.mjs": "const a = process.env.CLAUDE_CODE_SESSION_ID, b = process.env.FORGE_SESSION_ID, c = process.env.CLAUDE_ENV_FILE, d = process.env.VRAIE_CLE;\n" } }));
+    att(echoue(r, "PC2"), "la vraie clé n'est plus vue");
+    const m = regle(r, "PC2").message;
+    att(/VRAIE_CLE/.test(m), "la vraie clé n'est pas nommée");
+    att(!/CLAUDE_CODE_SESSION_ID|FORGE_SESSION_ID|CLAUDE_ENV_FILE/.test(m), `une variable d'identité de session est exigée au gabarit : ${m.slice(0, 160)}`);
+    for (const k of ["CLAUDE_CODE_SESSION_ID", "FORGE_SESSION_ID", "CLAUDE_ENV_FILE"]) att(DU_SYSTEME.has(k), `${k} manque à la liste du système`);
+    // Le fichier réel du pilot : sa citation de `process.env.CLAUDE_CODE_SESSION_ID` en en-tête faisait rendre FAIL à PC2 (mesuré le 22/11/2026).
+    const reel = juger(depot({ gabarit: "A=\n", code: { "oracles/lib-session.mjs": readFileSync(new URL("./lib-session.mjs", import.meta.url), "utf8") } }));
+    att(!echoue(reel, "PC2"), `lib-session.mjs fait échouer PC2 : ${(regle(reel, "PC2") || {}).message}`);
   });
 
   // ── FAUX POSITIF 2, mesuré : les fichiers de test ─────────────────────────

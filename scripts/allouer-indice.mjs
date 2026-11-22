@@ -78,6 +78,18 @@ const LETTRES = "abcdefghijklmnopqrstuvwxyz";
 // TF-2681 : après « z », l'indice est un double suffixe « za » à « zz » (52 noms par jour et par dossier).
 // TF-2685 : l'expression de l'indice vit dans `oracles\lib-indice-nom.mjs`, lue par tous les lecteurs de nom de lot.
 
+/**
+ * TF-2724 (RP-46, 15/11/2026) : le préfixe tel que le NOM DU LIVRABLE le porte. R-4 écrit « <radical> - AAAAMMJJ<indice>.<ext> » ; un appel
+ * dont le préfixe s'arrête sur le radical (« … D-219e ») faisait coller le jour au radical dans le nom réservé (« … D-219e20261115b.md »),
+ * alors que le livrable s'écrit « … D-219e - 20261115b.md » : la réservation ne correspondait pas au fichier. Un préfixe qui ne finit pas
+ * par le séparateur « - » le reçoit ; un préfixe vide reste vide.
+ */
+export const prefixeDeNom = (prefixe) => {
+  const p = String(prefixe ?? "");
+  if (!p.trim() || /\s-\s$/.test(p)) return p;
+  return `${p.replace(/\s*-?\s*$/, "")} - `;
+};
+
 /** La forme canonique : chaque occurrence de `<jour><indice>` perd son indice (une lettre, ou « z » et sa seconde lettre). */
 export const canonique = (texte, jour) =>
   String(texte).replaceAll(new RegExp(`${jour}${INDICE}`, "g"), jour);
@@ -88,6 +100,7 @@ export const canonique = (texte, jour) =>
  */
 export function allouerIndice({ dossier, prefixe, jour, contenu, extension = ".html", porte = "dossier", reserves = [] }) {
   if (!/^\d{8}$/.test(String(jour))) throw new Error(`jour attendu AAAAMMJJ, reçu « ${jour} »`);
+  prefixe = prefixeDeNom(prefixe);
   // TF-1450 : portée « dossier » — tous les radicaux du jour, quel que soit leur préfixe ou leur
   // extension (même repérage que R-4, ` - AAAAMMJJ<lettre>.<ext>` en fin de nom). Portée « prefixe »
   // (par défaut, inchangée) : uniquement CE préfixe, la seule que R-4 ne peut pas voir en collision.
@@ -198,6 +211,7 @@ export function nomsDesDossiers(dossiers = []) {
 /** L'indice que rend la commande sans `--reserver` : le disque, plus les réservations des sessions vivantes du produit, lues sans verrou.
  *  Hors d'un produit, ou registre illisible, le disque seul (le second cas est dit à `avertir`). `aussi` : d'autres dossiers dont les noms comptent comme pris (TF-2634). */
 export function allouerIndiceVuDuRegistre({ dossier, prefixe = "", jour, contenu, extension = ".html", porte = "dossier", session = sessionCourante().id, avertir = () => {}, aussi = [] }) {
+  prefixe = prefixeDeNom(prefixe);
   const p = registreDuDossier(dossier);
   let reservations = { noms: [], propre: null };
   if (p) {
@@ -214,6 +228,7 @@ export function allouerIndiceVuDuRegistre({ dossier, prefixe = "", jour, contenu
  */
 export function reserverIndice({ dossier, prefixe = "", jour, contenu, extension = ".html", porte = "dossier", session = sessionCourante(), maintenant = Date.now(), aussi = [] }) {
   if (!/^\d{8}$/.test(String(jour))) throw new Error(`jour attendu AAAAMMJJ, reçu « ${jour} »`);
+  prefixe = prefixeDeNom(prefixe);
   if (!session?.id) throw new ErreurUsage("--reserver exige une session identifiée : FORGE_SESSION_ID (posée par le hook SessionStart) ou CLAUDE_CODE_SESSION_ID");
   const p = registreDuDossier(dossier);
   if (!p) throw new ErreurUsage(`${resolve(dossier)} n'est sous aucun produit (aucun dossier forge/ en remontant) : le registre des sessions vit chez un produit ; sans --reserver, l'indice se rend sans réservation`);

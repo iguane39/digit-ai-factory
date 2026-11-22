@@ -312,6 +312,28 @@ try {
     att(sans.length > 0 && !nommeLaVoieMasquee(sans), "le prédicat accepte un texte sans la phrase, ou la phrase n'a pas été retirée du témoin");
   });
 
+  // TF-2722 (RP-50, 15/11/2026) : le registre des sessions d'un produit (D-218 (b)) était construit, câblé et documenté au pilot, et le CLAUDE.md
+  // d'un produit neuf n'en disait rien : la session qui y arrive ne savait ni où voir qui travaille ni comment réserver un indice de livrable.
+  const nommeLesSessions = (texte) => /Sessions multiples \(D-218 \(b\)\)[\s\S]{0,600}sessions-actives\.mjs --produit[\s\S]{0,300}allouer-indice\.mjs --reserver[\s\S]{0,200}SESSIONS-MULTIPLES\.md/.test(texte);
+  check("TF-2722 — le CLAUDE.md recopié chez un produit neuf nomme le registre des sessions, la commande qui le lit et la réservation d'indice", () => {
+    const produit = join(T, "produit-sessions");
+    mkdirSync(join(produit, "forge"), { recursive: true });
+    const r = lancer(produit);
+    att(r.code === 0, `exit ${r.code}`);
+    const claude = readFileSync(join(produit, "CLAUDE.md"), "utf8");
+    att(nommeLesSessions(claude), "le CLAUDE.md recopié ne porte pas la section « Sessions multiples (D-218 (b)) » et ses trois renvois");
+    for (const f of ["scripts/sessions-actives.mjs", "scripts/allouer-indice.mjs", "references/SESSIONS-MULTIPLES.md"]) {
+      att(existsSync(join(PILOT, f)), `${f} n'existe pas au pilot : la phrase pointerait dans le vide`);
+    }
+  });
+  check("TF-2722 rouge — le prédicat distingue : le même gabarit sans la section est refusé, et le détail du pilot porte la section en entier", () => {
+    const gabarit = readFileSync(join(PILOT, "gabarits", "CLAUDE-PRODUIT.md"), "utf8");
+    const sans = gabarit.replace(/\*\*Sessions multiples \(D-218 \(b\)\)\.\*\*[\s\S]*?SESSIONS-MULTIPLES\.md` du pilot\./, "");
+    att(sans.length > 0 && sans.length < gabarit.length && !nommeLesSessions(sans), "le prédicat accepte un texte sans la section, ou la section n'a pas été retirée du témoin");
+    const detail = readFileSync(join(PILOT, "references", "CLAUDE-PRODUIT-DETAIL.md"), "utf8").split("\r\n").join("\n");
+    att(/Sessions multiples d'un même produit \(D-218 \(b\)/.test(detail) && detail.includes("forge\\sessions.jsonl"), "le détail du pilot ne porte pas la section sessions");
+  });
+
   check("TF-1949 — sans perte : le détail du pilot garde, mot pour mot, chaque section sortie du gabarit", () => {
     const detail = join(PILOT, "references", "CLAUDE-PRODUIT-DETAIL.md");
     att(existsSync(detail), "references/CLAUDE-PRODUIT-DETAIL.md absent : le texte sorti du gabarit n'a plus de lieu");
