@@ -88,8 +88,11 @@ valide, `schema` 1, aucun `id`, les cinq champs obligatoires, aucun caractère d
 (présente, connue de `CLASSES.json`) et, pour `classe-a-creer`, une `classe_proposee` complète, d'une
 clé neuve, d'une famille connue, nommée dans le `.md`. Le 03/10, deux lots ont été refusés pour une
 `classe_proposee` absente alors que leur contrôle de remise rendait PASS : il ne regardait pas le
-sidecar. La règle est un **avertissement** (le lot n'est pas bloqué chez vous) ; la porte, elle,
-refuse toujours. Corriger le sidecar avant la remise ; ce qui exige le registre du pilot (rectification
+sidecar. Depuis le 22/11/2026 (TF-2761), un motif que la porte refuse est un **échec** chez vous aussi
+(verdict FAIL, sortie 1, et `--remettre` ne copie rien au sas) : le 21/11, le contrôle rendait PASS en
+annonçant lui-même le refus, et 10 lots sur 11 sont partis ainsi. La règle LOT-OCTETS (TF-2777) refuse de
+même un caractère de contrôle dans le `.md` du lot, le plus souvent un NUL né d'un chemin Windows
+`\00-retours` écrit dans une chaîne non brute. Corriger le sidecar avant la remise ; ce qui exige le registre du pilot (rectification
 d'un id inconnu, doublon strict) ne se rejoue pas chez vous. Dans le `.md`, rappeler le numéro du
 retour (« **RT-xxx** : … clé proposée ») sur la ligne de chaque proposition de classe.
 

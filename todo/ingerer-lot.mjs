@@ -214,6 +214,9 @@ const lignes = contenu.split("\n").filter((l) => l.trim());
     const forme = verifierFormeLot(lotMd);
     for (const c of forme.constats) {
       if (c.statut !== "FAIL") continue;
+      // TF-2761 (22/11/2026) : LOT-SIDECAR est un ÉCHEC chez le produit ; ici la porte juge ce même sidecar plus bas, avec ses
+      // propres messages (clé de famille donnée comme classe, familles listées : TF-2764). Le refus générique ne les masque pas.
+      if (c.regle === "LOT-SIDECAR") continue;
       if (derogee(c.regle, c.message)) continue;
       console.error(
         `[REJET ATOMIQUE] ${sidecarPath} — registre intact.\n` +
