@@ -11,7 +11,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fautesArretParMotif, fautesEnvironnement, juger, SCRIPT_ENV, SCRIPT_PROCESSUS } from "./hook-gardes-commande.mjs";
+import { fautesArretParMotif, fautesEnvironnement, juger, sansHeredoc, SCRIPT_ENV, SCRIPT_PROCESSUS } from "./hook-gardes-commande.mjs";
 
 const HOOK = join(dirname(fileURLToPath(import.meta.url)), "hook-gardes-commande.mjs");
 let pass = 0, fail = 0;
@@ -74,6 +74,14 @@ const ARRET_VERTS = [
 ];
 for (const commande of ARRET_VERTS) check(`vert (TF-2689) — « ${commande.slice(0, 70)} » : laisse passer`, () => { const f = fautesArretParMotif(commande); att(f.length === 0, `faux refus : ${f.join(" ; ")}`); });
 
+check("vert — le corps d'un document ici (message de commit, fichier écrit par cat) n'est pas une suite de commandes : ses lignes ne sont pas jugées ; la ligne qui l'ouvre l'est encore", () => {
+  const msg = "git commit -F - <<'EOF'\nUn correctif.\npkill -f self-test\nprintenv\nenv\nTaskkill /IM node.exe\nEOF";
+  att(fautesArretParMotif(msg).length === 0 && fautesEnvironnement(msg).length === 0, `faux refus : ${[...fautesArretParMotif(msg), ...fautesEnvironnement(msg)].join(" ; ")}`);
+  att(juger({ tool_name: "Bash", tool_input: { command: msg } }).decision === "laisse", "le hook refuse un message de commit");
+  att(fautesEnvironnement("cat <<EOF > notes.txt\nligne\nEOF\nprintenv").length === 1, "une commande APRÈS le document ici n'est plus jugée");
+  att(fautesArretParMotif("pkill -f x <<EOF\nrien\nEOF").length === 1, "la ligne qui ouvre le document n'est plus jugée");
+  att(sansHeredoc("a <<-'FIN'\nx\n\tFIN\nb") === "a <<-'FIN'\nb", `sansHeredoc : ${JSON.stringify(sansHeredoc("a <<-'FIN'\nx\n\tFIN\nb"))}`);
+});
 check("remède joué (TF-1013) — les commandes que les deux motifs de refus proposent passent le hook, bouclée sur le texte du motif", () => {
   const refus = juger({ tool_name: "Bash", tool_input: { command: "env | grep TOKEN; taskkill /IM node.exe /F" } });
   att(refus.decision === "refuse" && /RELEVÉ/.test(refus.motif) && /ARRÊT/.test(refus.motif), "un refus double est attendu");

@@ -40,6 +40,23 @@ export const SCRIPT_PROCESSUS = resolve(ICI, "..", "scripts", "processus-par-pid
 const base = (m) => String(m).split(/[\\/]/).pop().replace(/\.(?:exe|cmd|bat|ps1)$/i, "").toLowerCase();
 const PREFIXES = new Set(["sudo", "command", "builtin", "exec", "nohup", "time", "nice", "call", "&", "then", "else", "do", "if", "while", "until", "!", "{", "}"]);
 
+/**
+ * La commande sans le CORPS de ses documents ici (`<<'EOF' … EOF`, `<<EOF`, `<<-EOF`) : un message de commit ou un fichier écrit par `cat <<EOF` n'est pas une suite de commandes, et
+ * ses lignes ne se jugent pas comme telles (un message qui cite « pkill -f » en début de ligne serait refusé à tort). La ligne qui ouvre le document reste jugée.
+ */
+export function sansHeredoc(commande) {
+  const lignes = String(commande || "").split("\n");
+  const sortie = [];
+  let fin = null;
+  for (const l of lignes) {
+    if (fin !== null) { if (l.trim() === fin) fin = null; continue; }
+    sortie.push(l);
+    const m = /<<-?\s*(?:'([^']+)'|"([^"]+)"|\\?([A-Za-z_][\w]*))/.exec(l);
+    if (m) fin = m[1] || m[2] || m[3];
+  }
+  return sortie.join("\n");
+}
+
 /** Le texte sans ses chaînes entre guillemets : une charge qui n'est qu'un mot dans un message ne se juge pas comme une commande. */
 const sansGuillemets = (t) => String(t).replace(/"(?:[^"\\]|\\.)*"|'[^']*'/g, '""');
 
@@ -69,7 +86,7 @@ const NOM_ENV_PS = /^\$?\{?env:\\?(\*?)([A-Za-z_][\w.\-]*)?\}?$/i;
 export function fautesEnvironnement(commande, profondeur = 0) {
   const fautes = [];
   if (profondeur > 3) return fautes;
-  const texte = String(commande || "");
+  const texte = sansHeredoc(commande);
   if (!/env|set|export|declare|typeset|environ|Environment|Get-ChildItem|gci|\bls\b|\bdir\b|Get-Item|\bgi\b|TOKEN|SECRET|KEY|PASS|AUTH|CREDENTIAL/i.test(texte)) return fautes;
 
   for (const m of texte.matchAll(/\$\(([^()]*)\)/g)) fautes.push(...fautesEnvironnement(m[1], profondeur + 1));
@@ -132,7 +149,7 @@ const ARRETEURS = new Set(["stop-process", "spps", "kill", "taskkill", "pkill", 
 export function fautesArretParMotif(commande, profondeur = 0) {
   const fautes = [];
   if (profondeur > 3) return fautes;
-  const texte = String(commande || "");
+  const texte = sansHeredoc(commande);
   if (!/kill|Stop-Process|spps|Terminate|wmic/i.test(texte)) return fautes;
 
   for (const m of texte.matchAll(/\$\(([^()]*)\)/g)) fautes.push(...fautesArretParMotif(m[1], profondeur + 1));
