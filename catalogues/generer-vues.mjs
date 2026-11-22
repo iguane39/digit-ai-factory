@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 // Générateur des vues du catalogue de services — source unique : catalogue.jsonl.
 // Vues produites : CATALOGUES.md (complète) + section balisée du README pilot (compacte).
-// Usage : node catalogues/generer-vues.mjs [--check | --sceller]
-//   --check   : ne rien écrire, exit 1 si une vue diverge de la source (utilisé par l'oracle).
+// Usage : node catalogues/generer-vues.mjs [--check | --sceller | --forge <nom>]
+//   --check   : ne rien écrire, exit 1 si une vue diverge de la source (utilisé par l'oracle), ou si la source
+//               se contredit (service « prouvé » dont la preuve dit l'exécution réelle non faite, date de
+//               contrôle postérieure au fichier : TF-2719, TF-2713). La génération refuse de même.
+//   --forge   : imprime la section « Catalogue de services » du README de cette forge (TF-2710 à TF-2717).
 //   --sceller : quand le CONTENU des services a changé depuis la dernière version scellée, monte la
 //               version (mineure suivante) et la date `genere` de la méta, ajoute l'empreinte du
 //               contenu à `versions.jsonl`, puis régénère les vues. Sans changement : ne fait rien.
@@ -96,6 +99,45 @@ export function sceller({ source = SOURCE, journal = JOURNAL, jour = new Date().
   return { action: "scelle", version, genere: jour };
 }
 
+// ---- sens des champs (TF-2719, TF-2702, TF-2718, TF-2713) ---------------------------------------
+// Une vue ne ment pas sur ce que la source dit. Deux défauts se refusent à la génération, avant toute
+// écriture : un service « prouvé » dont sa propre preuve dit l'exécution réelle non faite (cat-con-08 et
+// cat-con-09 « pas encore de run réel », DAST « exécution ZAP réelle non prouvée », le feu vert GitHub et
+// les plans Supabase d'ops : 9 prouvés sur 9 au cartouche d'une page de forge, 7 sur 9 en vérité), et une
+// date de contrôle postérieure au fichier qui la porte (cat-agt-13, 12/11, dans un fichier du 06/11).
+// Les marques sont une liste FERMÉE de tournures : la preuve qui dit une portée limitée (« applications
+// riches non prouvées ») n'en fait pas partie, elle reste un statut prouvé sur ce qu'elle nomme.
+export const MARQUES_SANS_EXECUTION_REELLE = [
+  { motif: /pas encore de (?:run|ex[ée]cution) r[ée]el/i, dit: "« pas encore de run réel »" },
+  { motif: /aucune ex[ée]cution r[ée]elle/i, dit: "« aucune exécution réelle »" },
+  { motif: /jamais ex[ée]cut[ée]e? sur (?:un |une |le |la |les )?(?:d[ée]p[ôo]t|produit|compte|cible|instance|plateforme|projet) r[ée]el/i, dit: "« jamais exécutée sur … réel »" },
+  { motif: /ex[ée]cution(?: [A-Za-zÀ-ÿ]+)? r[ée]elle (?:[A-Za-zÀ-ÿ]+ )?non prouv[ée]e?/i, dit: "« exécution réelle non prouvée »" },
+];
+
+/** La tournure par laquelle une preuve dit l'exécution réelle non faite, ou null. */
+export function marqueSansExecutionReelle(preuve) {
+  const trouvee = MARQUES_SANS_EXECUTION_REELLE.find((m) => m.motif.test(String(preuve ?? "")));
+  return trouvee ? trouvee.dit : null;
+}
+
+const ISO_JOUR = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Les défauts de sens d'un catalogue : [{ regle, id, message }]. `K10` : statut « prouve » contredit par la
+ * preuve ; `K13` : `challenge_date` postérieure à la date `genere` du fichier. Le remède est dans le message.
+ */
+export function defautsDeSens({ meta, services }) {
+  const defauts = [];
+  for (const s of services) {
+    const marque = s.statut === "prouve" ? marqueSansExecutionReelle(s.preuve) : null;
+    if (marque) defauts.push({ regle: "K10", id: s.id, message: `${s.id} : statut « prouve » alors que sa preuve dit ${marque} — passer le service en « declare », ou n'écrire « prouve » que sur une exécution réelle datée` });
+    if (ISO_JOUR.test(s.challenge_date ?? "") && ISO_JOUR.test(meta.genere ?? "") && s.challenge_date > meta.genere) {
+      defauts.push({ regle: "K13", id: s.id, message: `${s.id} : challenge_date ${s.challenge_date} postérieure à la date du fichier (${meta.genere}) — une date de contrôle ne précède pas le fichier qui la porte ; \`node catalogues/generer-vues.mjs --sceller\` date le contenu` });
+    }
+  }
+  return defauts;
+}
+
 function parForge(services) {
   const groupes = new Map();
   for (const f of ORDRE_FORGES) groupes.set(f, []);
@@ -153,6 +195,28 @@ export function genererSectionReadme({ meta, services }) {
   return L.join("\n");
 }
 
+/**
+ * La section « Catalogue de services » qu'un README de forge porte (TF-2710 à TF-2717) : le tableau de SES
+ * services, tiré de la source unique, à la version du catalogue. Les README de forge portaient un instantané
+ * du 13/08/2026 (v1.6.0), réécrit par personne ; la forge colle ce que cette commande imprime, et
+ * `oracle-catalogues` (K12) dit quand le tableau de sa forge retarde. Le pilot n'écrit jamais chez la forge.
+ */
+export function genererSectionForge({ meta, services }, forge) {
+  const liste = services.filter((s) => s.forge === forge);
+  if (!liste.length) return null;
+  const c = (v) => String(v).replaceAll("|", "\\|");
+  const L = [];
+  L.push("## Catalogue de services");
+  L.push("");
+  L.push(`> Section générée par \`node catalogues/generer-vues.mjs --forge ${forge}\` du pilot, depuis la source unique \`catalogues/catalogue.jsonl\` (v${meta.version}, ${meta.genere}). **prouvé** = preuve exécutée ; *déclaré* = méthode documentée seulement.`);
+  L.push("");
+  L.push("| Service | Intention (« je veux… ») | Point d'entrée | Statut |");
+  L.push("|---|---|---|---|");
+  for (const s of liste) L.push(`| **${c(s.nom)}** | ${c(s.intention)} | \`${c(s.point_entree)}\` | ${s.statut === "prouve" ? "prouvé" : "déclaré"} (${s.cycle_de_vie}) |`);
+  L.push("");
+  return L.join("\n");
+}
+
 // Fins de ligne normalisées AVANT comparaison (TF-0359, idiome TF-0253) : avec
 // core.autocrlf=true — le défaut de l'installateur Git for Windows, ni le dépôt ni
 // l'utilisateur ne l'ont demandé — le checkout pose des CRLF sur des vues que ce
@@ -180,6 +244,18 @@ function principal() {
       : `[ok] contenu nouveau : version ${s.version} (${s.genere}) scellée dans versions.jsonl`);
   }
   const catalogue = lireCatalogue();
+  const iForge = process.argv.indexOf("--forge");
+  if (iForge !== -1) {
+    const section = genererSectionForge(catalogue, process.argv[iForge + 1] ?? "");
+    if (section === null) { console.error(`--forge : aucun service au catalogue pour « ${process.argv[iForge + 1] ?? ""} »`); process.exit(2); }
+    console.log(section);
+    return;
+  }
+  const defauts = defautsDeSens(catalogue);
+  if (defauts.length) {
+    console.error(`[${check ? "check" : "refus"}] FAIL : le catalogue contredit sa propre preuve ou sa date, aucune vue écrite :\n${defauts.map((d) => `  - ${d.regle} ${d.message}`).join("\n")}`);
+    process.exit(1);
+  }
   const vueComplete = genererVueComplete(catalogue);
   const section = genererSectionReadme(catalogue);
   const readmeActuel = readFileSync(README, "utf8");
