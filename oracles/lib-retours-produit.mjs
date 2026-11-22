@@ -21,8 +21,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { NOM_DE_LOT } from "./lib-indice-nom.mjs";   // TF-2685 : l'indice du nom (« za » compris) s'écrit une seule fois
 
-const NOM_DE_LOT = /^(.*) - RETOURS - (\d{8})([a-z]?)\.md$/i;
 const STATUT_A_REMETTRE = /^\s*-\s*\*\*Statut\*\*\s*:\s*a_remettre\b/im;
 export const SEUIL_H = 24;
 const STATUTS_CLOS = new Set(["corrige", "ecarte", "clos"]);

@@ -63,6 +63,7 @@ import { aQualifier as adressesAQualifier, messageAQualifier } from "./adresses-
 import { aQualifier as personnesAQualifier, messageAQualifier as messagePersonnes } from "./noms-de-personnes.mjs";
 import { aQualifier as designationsAQualifier, messageAQualifier as messageDesignations } from "./designation-projet.mjs";
 import { verifier as verifierFormeLot } from "../gabarits/oracle-lot-retours.mjs";
+import { JOUR_INDICE } from "../oracles/lib-indice-nom.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 export const BOITE = join(ICI, "..", "input", "00-retours");
@@ -150,7 +151,7 @@ function possiblementInconnuDesTables(nom) {
 // d'ouverture le dit aussi, par le sas : `oracles\oracle-boite-entree.mjs` (B9) juge les lots qui y attendent.
 // CE QU'IL NE FAIT PAS : refuser un lot, ni le corriger.
 
-const RE_LOT_DE_RETOURS = /^.+ - RETOURS - \d{8}[a-z]?\.md$/i;
+const RE_LOT_DE_RETOURS = new RegExp(`^.+ - RETOURS - ${JOUR_INDICE}\\.md$`, "i");   // TF-2685 : indice « za » compris
 /** Un lot de retours : ni un sidecar, ni une pièce jointe (`<base du lot> - PJ - <libellé>`). */
 export const estUnLot = (nom) => RE_LOT_DE_RETOURS.test(String(nom)) && !/ - PJ - /.test(String(nom));
 

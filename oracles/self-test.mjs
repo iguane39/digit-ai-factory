@@ -1329,6 +1329,27 @@ check("TF-1177 — R-4 juge le DOSSIER-livrable daté et non ses parties interne
     throw new Error("le `.png` livré À PLAT dans output\\ n'est plus jugé — la dispense du dossier daté s'est étendue en échappatoire générale");
 });
 
+// ---- fixture INDICE « za » (TF-2685, 22/11/2026) : au 27e nom d'un jour, l'allocateur rend « za » à « zz » (TF-2681) ; R-4
+// refusait ces noms (« sans nommage »), jugeait mal le dossier-livrable daté qui les porte et ne voyait pas l'indice partagé.
+// Rouge sur l'ancienne expression `\d{8}[a-z]?`, vert sur la commune (`oracles\lib-indice-nom.mjs`). ------------------
+const rougeZa = mkdtempSync(join(tmpdir(), "conf-za-"));
+mkdirSync(join(rougeZa, "output", "Produit - Projet Zip - 20260917za", "interne"), { recursive: true });
+writeFileSync(join(rougeZa, "output", "Produit - Projet Zip - 20260917za", "interne", "partie.json"), "{}" + NL_TEST);
+writeFileSync(join(rougeZa, "output", "Produit - Note Un - 20260917zb.md"), "x" + NL_TEST);
+writeFileSync(join(rougeZa, "output", "Produit - Note Deux - 20260917zb.md"), "x" + NL_TEST);   // même indice « zb », autre radical
+writeFileSync(join(rougeZa, "output", "Produit - Note Trois - 20260917z.md"), "x" + NL_TEST);   // la lettre simple « z » reste lue
+sh("git", ["init", "-q", "-b", "main"], rougeZa);
+check("TF-2685 — R-4 lit l'indice « za » : un nom en « zb » et le dossier-livrable en « za » sont reconnus, la lettre simple « z » aussi", () => {
+  const r4 = lance(rougeZa).rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
+  const nommage = r4.filter((f) => /nommage/.test(f.message));
+  if (nommage.length) throw new Error(`un nom à indice « za »-« zb » est refusé comme sans nommage : ${nommage.map((f) => f.ou).join(", ")}`);
+  if (r4.some((f) => /partie\.json/.test(f.ou))) throw new Error("une partie interne du dossier-livrable « za » est jugée comme un livrable");
+});
+check("TF-2685 — R-4 voit l'indice « zb » partagé par deux radicaux, et le nomme en entier", () => {
+  const r4 = lance(rougeZa).rapport.findings.filter((f) => f.regle === "R-4" && f.statut === "FAIL");
+  if (!r4.some((f) => /indice « 20260917zb »/.test(f.message))) throw new Error(`l'indice partagé « 20260917zb » n'est pas dit : ${JSON.stringify(r4.map((f) => f.message.slice(0, 80)))}`);
+});
+
 // ---- fixture DOSSIERS DE SEMAINE (TF-2638, 16/11/2026) : `RUN-RESEAU.md` N2 prescrit des fichiers à nom fixe
 // (`calendrier.md`, `publication*.md`) ; sous `output\` sans ancêtre daté, chacun prenait un FAIL R-4 (RP-218, 15 semaines
 // du 12/11). Les DEUX SENS : un dossier qui porte calendrier ET publication est une semaine, sous un dossier-livrable daté

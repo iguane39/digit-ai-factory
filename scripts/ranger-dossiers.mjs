@@ -45,6 +45,7 @@ import { readdirSync, statSync, existsSync, writeFileSync, mkdirSync, appendFile
 import { join, dirname, resolve, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { INDICE, JOUR_INDICE } from "../oracles/lib-indice-nom.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const RACINE = resolve(ICI, "..");
@@ -61,9 +62,11 @@ const PLAFOND_CHEMIN = 150, SIDECAR_ORACLE = ".oracles/".length + ".oracles-hist
 export const JOURNAL = "references/RENOMMAGES-LIVRABLES.jsonl";
 
 /** Le mois AAAA-MM porté par un nom : « … - AAAAMMJJ<i>… » ou « AAAAMMJJ-… » ou « …-AAAAMMJJ<i>… ». */
+const MOIS_APRES_TIRET_ESPACE = new RegExp(` - (20\\d{2})(\\d{2})\\d{2}${INDICE}?[.\\s]`);   // TF-2685 : indice « za » compris
+const MOIS_APRES_TIRET = new RegExp(`-(20\\d{2})(\\d{2})\\d{2}${INDICE}?\\.`);
 export function moisDuNom(nom) {
-  const m = / - (20\d{2})(\d{2})\d{2}[a-z]?[.\s]/.exec(nom) || /^(20\d{2})(\d{2})\d{2}-/.exec(nom)
-    || /-(20\d{2})(\d{2})\d{2}[a-z]?\./.exec(nom);
+  const m = MOIS_APRES_TIRET_ESPACE.exec(nom) || /^(20\d{2})(\d{2})\d{2}-/.exec(nom)
+    || MOIS_APRES_TIRET.exec(nom);
   return m ? `${m[1]}-${m[2]}` : null;
 }
 
@@ -88,7 +91,7 @@ export const REGLES = {
   "output/06-travaux-confies": moisClos,
 };
 
-const LIVRABLE = /^(.*) - (\d{8}[a-z]?)\.([A-Za-z0-9]+)$/;
+export const LIVRABLE = new RegExp(`^(.*) - (${JOUR_INDICE})\\.([A-Za-z0-9]+)$`);   // TF-2685 : indice « za » compris
 // Mots retirés en premier : ils ne portent pas le sens du titre.
 const VIDES = new Set(["le", "la", "les", "l", "de", "des", "du", "d", "et", "a", "au", "aux", "en", "sur", "pour",
   "par", "un", "une", "dans", "qui", "que", "ses", "son", "sa", "leur", "leurs", "avec"]);

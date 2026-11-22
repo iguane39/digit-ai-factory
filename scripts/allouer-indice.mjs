@@ -70,12 +70,13 @@ import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sessionCourante } from "../oracles/lib-session.mjs";
+import { INDICE } from "../oracles/lib-indice-nom.mjs";
 import { cleDeChemin, etatDesSessions, ligneRevendique, lireRegistre, racineDeSession, registreDe, sousVerrouDuRegistre, tientDeja } from "../oracles/lib-sessions.mjs";
 
 const LETTRES = "abcdefghijklmnopqrstuvwxyz";
 
 // TF-2681 : après « z », l'indice est un double suffixe « za » à « zz » (52 noms par jour et par dossier).
-const INDICE = "(?:z[a-z]|[a-z])";
+// TF-2685 : l'expression de l'indice vit dans `oracles\lib-indice-nom.mjs`, lue par tous les lecteurs de nom de lot.
 
 /** La forme canonique : chaque occurrence de `<jour><indice>` perd son indice (une lettre, ou « z » et sa seconde lettre). */
 export const canonique = (texte, jour) =>

@@ -45,6 +45,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { empreinteTexte } from "../scripts/lib-empreinte.mjs";
+import { JOUR_INDICE } from "./lib-indice-nom.mjs";
 import { COMMANDE_RELATIVE_FACTORY } from "./lib-ouverture-async.mjs";
 import { cadencesSansPorteur, gestesAHeureSurGithub } from "./lib-cadence-promise.mjs";
 import { attribuerDivergence, racineWebDeclaree, estCouvertParPlusLarge, texteDesMotifs, copiesDuSocle } from "../scripts/relever-heritage.mjs";
@@ -132,11 +133,12 @@ const p = (...seg) => join(cible, ...seg);
 const git = (...args) => spawnSync("git", ["-C", cible, ...args], { encoding: "utf8" });
 const aGit = existsSync(p(".git"));
 
-const MOTIF_DATE = / - \d{8}[a-z]?\.[\w.]+$/;
+// TF-2685 (22/11/2026) : l'indice (« a » à « z », puis « za » à « zz », TF-2681) vient de `lib-indice-nom.mjs`, jamais réécrit ici.
+const MOTIF_DATE = new RegExp(` - ${JOUR_INDICE}\\.[\\w.]+$`);
 // Le même nommage, sans extension : celui d'un livrable-DOSSIER (TF-1177). Un projet PBIP, un
 // export multi-fichiers, un site statique se remettent en dossier ; leurs parties sont imposées par
 // le format et ne se renomment pas.
-const MOTIF_DOSSIER_DATE = / - \d{8}[a-z]?$/;
+const MOTIF_DOSSIER_DATE = new RegExp(` - ${JOUR_INDICE}$`);
 // Motif de SECRET RÉEL (clé AWS, jeton GitHub/Slack, clé `sk-…`, en-tête de clé privée PEM) — un
 // FORMAT, jamais un simple mot. Partagé R-13 (.env.example) et R-47 (forge\, TF-1426) : hissé ici
 // (il vivait local au bloc R-13) pour que R-47, plus haut dans le fichier, puisse aussi le lire.
@@ -367,7 +369,7 @@ function lireLotsDeclares() {
     if (!e || typeof e !== "object" || Array.isArray(e)) { sortie.refus.push({ ligne: i + 1, motif: "la ligne n'est pas un objet JSON" }); return; }
     if (!jourReelNonFutur(e.ts) || String(e.ts).length < 10) manques.push("`ts` (date ISO réelle, non future)");
     if (!texteRempli(e.dossier, 1)) manques.push("`dossier`");
-    if (typeof e.indice !== "string" || !/^\d{8}[a-z]?$/.test(e.indice)) manques.push("`indice` (AAAAMMJJ<i>)");
+    if (typeof e.indice !== "string" || !new RegExp(`^${JOUR_INDICE}$`).test(e.indice)) manques.push("`indice` (AAAAMMJJ<i>)");
     if (!texteRempli(e.traitement, 20)) manques.push("`traitement` (20 caractères au moins, sans gabarit « <…> » non rempli)");
     if (manques.length) { sortie.refus.push({ ligne: i + 1, motif: `déclaration incomplète — manque : ${manques.join(", ")}` }); return; }
     sortie.lots.set(`${normDossierDeclare(e.dossier)}|${e.indice}`, { ...e, ligne: i + 1 });
@@ -462,7 +464,7 @@ for (const d of ["output", "docs"]) {
     if (iDossier >= 0) {
       const nomDossier = segments[iDossier];
       const parent = segments.slice(0, iDossier).join("/") || ".";
-      const cleD = nomDossier.match(/ - (\d{8}[a-z]?)$/)[1];
+      const cleD = nomDossier.match(new RegExp(` - (${JOUR_INDICE})$`))[1];
       if (!indicesParDossier.has(parent)) indicesParDossier.set(parent, new Map());
       const parCleD = indicesParDossier.get(parent);
       if (!parCleD.has(cleD)) parCleD.set(cleD, new Set());
@@ -489,7 +491,7 @@ for (const d of ["output", "docs"]) {
     // unicité de l'indice, plafond de chemin).
     if (/^output[\/]03-etudes[\/]/.test(rel(f)) && /^\d{8}-/.test(nom)) continue;
     if (!MOTIF_DATE.test(nom)) { ko("R-4", rel(f), "livrable sans nommage « <Marque> - <Objet> - AAAAMMJJ<indice> »"); r4 = false; continue; }
-    const m = nom.match(/ - (\d{8}[a-z]?)\.[\w.]+$/);
+    const m = nom.match(new RegExp(` - (${JOUR_INDICE})\\.[\\w.]+$`));
     const dossier = dirname(rel(f));
     const radical = nom.slice(0, nom.lastIndexOf(m[1]) + m[1].length); // le nom sans son extension
     if (!indicesParDossier.has(dossier)) indicesParDossier.set(dossier, new Map());
@@ -906,7 +908,7 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
       if (/(^|\/)[Oo]ld\//.test("/" + rel(f))) continue;
       if (/[\/]\.oracles[\/]/.test("/" + rel(f))) continue;
       if (estExcluDuDepot(rel(f))) continue;   // TF-0853 : jamais versionné = pas un livrable
-      const m = nom.match(/^(.*) - (\d{8}[a-z]?)\.([\w.]+)$/);
+      const m = nom.match(new RegExp(`^(.*) - (${JOUR_INDICE})\\.([\\w.]+)$`));
       if (!m) continue;
       // Un sous-dossier de mois (`AAAA-MM\`, `scripts\ranger-dossiers.mjs` du 16/10/2026) range une
       // famille sans en changer le sens : les versions d'un radical se comparent dans la FAMILLE, sinon
