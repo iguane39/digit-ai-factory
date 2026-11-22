@@ -100,6 +100,9 @@ RUNS = FORGE.parent / "runs"
 # (D-191 (a), `oracles/lib-retours-produit.mjs`) lisait ce faux retour comme un retour à remettre en lot : un retour orphelin créé par la consignation
 # de sa propre remise. Le hook ne compte que `type: retour` : un `lot_remis` n'entre pas dans son contrôle des lots. Champs conseillés : `lot` (nom
 # du lot remis), `sas` (dossier de destination), `verdict` (celui de `oracle-lot.mjs`). Le type est à porter aussi dans `ledger.mjs` de forge-agents.
+# `action_externe` et `constat` (TF-2695, RP-225 du lot Produit-79 20261120a, seq 843 et 1180 du produit ; récidive de TF-2083, TF-2494 et TF-2586) : un produit
+# consigne ainsi un geste sur une plateforme tierce (fusion, push, réglage ; champs conseillés `plateforme`, `geste`, `resultat`) et un fait mesuré qui n'est ni un retour ni
+# une décision. Refusés ici comme types inconnus, ils s'écrivaient à la main (seq 1243 et 1244, hors contrôle de l'écrivain). Le type est à porter aussi dans `ledger.mjs` de forge-agents.
 # `secret_range` reste le DERNIER type : la chirurgie du banc de `scripts/ranger-secret.test.mjs` le retire par sa position.
 TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_modele",
          "question_humain", "reponse_humain", "etape_close", "retour", "relais_arme",
@@ -107,7 +110,7 @@ TYPES = {"run_open", "etape_open", "invocation", "oracles_verdict", "escalade_mo
          "rectification_horodatage", "rectification_forges_mobilisees", "go_publication",
          "conflit_regles", "demande_emise", "demande_recue", "deplacement_effectue",
          "deplacement_en_attente", "demande_humain", "qualification_enclenchement",
-         "anteriorite_ledger", "rectification_doublon", "decision_retiree", "lot_remis", "secret_range"}
+         "anteriorite_ledger", "rectification_doublon", "decision_retiree", "lot_remis", "action_externe", "constat", "secret_range"}
 
 
 # L-03 de la boussole (GO du porteur du 21/11/2026, references/BOUSSOLE.md). Le fait, mesuré sur les 15 journaux de run de la racine :
