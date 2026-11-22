@@ -397,6 +397,33 @@ try {
     att(echoue(r, "CP5") && /R\.md:5/.test(regle(r, "CP5").message), `le second paragraphe n'est pas accusé seul : ${(regle(r, "CP5") || {}).message}`);
   });
 
+  // ── CP5, entrée « uv-run-pytest-executable » (TF-2792, retour du 16/11/2026) ───────────────────────────────────────────────
+  // Le fait : sur un poste, `uv run pytest` rend l'erreur 4551 (une stratégie de contrôle d'application bloque l'exécutable
+  // pytest.exe) alors que `uv run python -m pytest` rend 338 tests réussis. Les consignes de produits prescrivaient la forme exécutable.
+  check("CP5 ROUGE (TF-2792) — une consigne qui prescrit `uv run pytest` : DOIT ÉCHOUER, avec sa ligne, l'erreur 4551 et la forme module", () => {
+    const r = jugerParc(doc("Les tests se jouent par `uv run pytest`."));
+    att(echoue(r, "CP5"), "la forme exécutable est prescrite sans que rien la refuse");
+    const m = regle(r, "CP5").message;
+    att(/R\.md:3/.test(m) && /4551/.test(m) && /uv run python -m pytest/.test(m) && /TF-2792/.test(m), `le constat ne nomme pas la ligne, l'erreur et le remède : ${m.slice(0, 300)}`);
+    att(!/n'obtient plus de verdict/.test(m), "la conséquence du repli du rendu est recopiée sur un autre sujet");
+  });
+
+  check("CP5 ROUGE (TF-2792) — la forme avec options (`uv run --frozen pytest -q`) est la même commande exécutable : DOIT ÉCHOUER aussi", () => {
+    att(echoue(jugerParc(doc("Avant la fusion : `uv run --frozen pytest -q`.")), "CP5"), "l'option devant pytest masque la forme exécutable");
+  });
+
+  check("CP5 VERT (TF-2792) — le REMÈDE que le message recommande passe : `uv run python -m pytest`, seul ou à côté de la forme refusée", () => {
+    const seul = jugerParc(doc("Les tests se jouent par `uv run python -m pytest`."));
+    att(passe(seul, "CP5"), `CP5 ${(regle(seul, "CP5") || {}).statut} — ${(regle(seul, "CP5") || {}).message}`);
+    const explique = jugerParc(doc("Jamais `uv run pytest` (erreur 4551 sur certains postes) : écrire `uv run python -m pytest`."));
+    att(passe(explique, "CP5"), `le paragraphe qui explique le retrait est accusé : ${(regle(explique, "CP5") || {}).message}`);
+  });
+
+  check("CP5 VERT (TF-2792) — pytest sans uv run, `uv run pytest-cov`, `uv run python -m pytest` plus bas : aucun n'est la forme exécutable", () => {
+    const r = jugerParc(doc("Le test se nomme pytest dans les logs.\n\nRapport par `uv run pytest-cov`.\n\nEnsuite `uv run python -m pytest -q`."));
+    att(passe(r, "CP5"), `faux positif : ${(regle(r, "CP5") || {}).message}`);
+  });
+
   // ── CP6 (TF-2526, piste 2 de TF-2518) : les arguments positionnels prescrits tiennent dans l'usage du script ────────────────
   //
   // Le fait fondateur : le README de forge-websec prescrivait `node scripts\capturer.mjs <url> <capture.json>` ; le script déclarait

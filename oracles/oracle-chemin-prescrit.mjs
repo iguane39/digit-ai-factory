@@ -325,6 +325,20 @@ export const REPLIS_RETIRES = [
     dit: "le rendu de forge-design ne cherche plus playwright dans l'environnement uv du dossier courant",
     reparer: "poser FORGE_DESIGN_PYTHON sur l'interpréteur qui porte playwright (`uv run python -c \"import sys; print(sys.executable)\"` le donne, chez le produit)",
   },
+  // TF-2792 (retour du 16/11/2026) : `uv run pytest` lance l'exécutable `pytest.exe`, et un poste dont la stratégie de contrôle
+  // d'application bloque ce fichier rend l'erreur 4551 (« Une stratégie de contrôle d'application a bloqué ce fichier », lue par
+  // `net helpmsg 4551`), alors que `uv run python -m pytest` lance python.exe et rendait 338 tests réussis sur le même poste.
+  // Une consigne qui prescrit la forme exécutable envoie le producteur sur un chemin qui échoue sur ce poste.
+  {
+    id: "uv-run-pytest-executable",
+    retire_par: "TF-2792 (retour du 16/11/2026 : erreur 4551 sur un poste, 338 tests réussis par la forme module)",
+    exige: [/(?<![\w.-])uv run(?: +--?[\w-]+)* +pytest(?![\w-])/],
+    cite: /(?<![\w.-])uv run(?: +--?[\w-]+)* +pytest(?![\w-])/,
+    remede: /uv run python -m pytest/,
+    consequence: "Le producteur qui la suit, sur un poste dont la stratégie de contrôle d'application bloque l'exécutable pytest.exe, obtient l'erreur 4551 et aucun test ne se joue",
+    dit: "la forme exécutable `uv run pytest` échoue (erreur 4551) sur un poste où la forme module passe",
+    reparer: "prescrire `uv run python -m pytest`, qui lance python.exe et non l'exécutable de pytest (même remède pour tout outil installé sous forme d'exécutable : `uv run python -m <module>`)",
+  },
 ];
 
 /** Les paragraphes d'un texte : `{ ligne, lignes[] }`, `ligne` étant celle de la première ligne. */
@@ -551,7 +565,7 @@ export function juger(depot, { racineParc = null } = {}) {
     ko("CP5", citees.map((c) => `${rel(c.document)}:${c.ligne}`).join(", "),
       `${citees.length} consigne(s) citent un repli RETIRÉ : `
       + citees.map((c) => `${rel(c.document)}:${c.ligne} (${c.repli.id}, retiré par ${c.repli.retire_par} : ${c.repli.dit})`).join(" ; ")
-      + `. Le producteur qui la suit n'obtient plus de verdict. Remède : ${[...new Set(citees.map((c) => c.repli.reparer))].join(" ; ")}`);
+      + `. ${[...new Set(citees.map((c) => c.repli.consequence || "Le producteur qui la suit n'obtient plus de verdict"))].join(" ; ")}. Remède : ${[...new Set(citees.map((c) => c.repli.reparer))].join(" ; ")}`);
   }
 
   // ── CP6 — les arguments positionnels prescrits tiennent dans l'usage du script (TF-2526) ────────
