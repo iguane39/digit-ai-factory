@@ -128,8 +128,8 @@
   "vu_le": "2026-10-14"
  },
  "oracle-catalogues.mjs": {
-  "cas": 19,
-  "vu_le": "2026-11-16"
+  "cas": 44,
+  "vu_le": "2026-11-22"
  },
  "oracle-chemin-ancre.mjs": {
   "cas": 16,
@@ -264,6 +264,10 @@
  "oracle-parite-configuration.mjs": {
   "cas": 18,
   "vu_le": "2026-08-26"
+ },
+ "oracle-peremption-competences.mjs": {
+  "cas": 22,
+  "vu_le": "2026-11-22"
  },
  "oracle-pieges-regex.mjs": {
   "cas": 30,

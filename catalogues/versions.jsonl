@@ -1,2 +1,4 @@
 {"version":"1.8.0","genere":"2026-08-19","empreinte":"aa8faf47421f844b5a4e513f1f9d8cef8f135bdf3df8a2a5157a83a987df7258","services":83,"note":"contenu du commit f634eabd du 19/08/2026 ; la même étiquette a ensuite porté 91, 98 puis 111 services (commits a0f3a526, 097584d3 et e73c06b5) sans nouvelle version, d'où TF-2667"}
 {"version":"1.9.0","genere":"2026-11-16","empreinte":"146834d9e729e135483884d4081965c9dca6c6dd35ab82cd5acb99ecca18a257","services":111}
+{"version":"1.10.0","genere":"2026-11-22","empreinte":"9d37f5d08066fb1e8d3e937ebda51586b15de5ae26ea2a254b58c720257fe6e0","services":135}
+{"version":"1.11.0","genere":"2026-11-22","empreinte":"280c5dbfdb76b13afddd9f798a3349289ebbbc57e474f3cc54b64b9987209277","services":135}
