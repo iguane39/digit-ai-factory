@@ -22,10 +22,11 @@ import { tmpdir, homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
+import { numerosRepondus } from "./lib-decisions.mjs";
 import { retirer } from "./hook-ecriture.mjs";
 import { RESERVATION_BLOQUANTE_DES, RESERVATION_PILOT_BLOQUANTE_DES, analyserTranscript, comparerAffiche, controlerDetail, controlerReservation, controlerExplication, controlerGeste, controlerPossession, controlerProcedure, demandeProcedure, demandesDetail, syntheseDuTour,
   BLOQUANTES_DATEES, estBloquante, controlerCritique, critiqueDuTour, critiqueCouvre, ciblesDeCritique, fichierServi, verdictDeCritique, controlerReaffichage, decisionsOuvertesDeLaSession, controlerReservationPilot, numerosPosesAvant,
-  livrablesEcrits, controlerLivre, cibleDuLivrable, gainsDuTour, gainsSansReleve, avertsDeGains, nombresDuTour, releveRemontee, scellerLivrable, controlerLotDansLeTour } from "./hook-restitution.mjs";
+  livrablesEcrits, controlerLivre, jugerNommageDesLivrables, cibleDuLivrable, gainsDuTour, gainsSansReleve, avertsDeGains, nombresDuTour, releveRemontee, scellerLivrable, controlerLotDansLeTour } from "./hook-restitution.mjs";
 import { retoursDuTourSansLot } from "./lib-retours-produit.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -1973,8 +1974,11 @@ try {
     const RACINE61 = "C:\\dev\\produit-essai";
     const GUIDE = `${RACINE61}\\output\\04-cadrages\\Produit - Guide - Lot 0 - 20261029b.md`, NOTE = `${RACINE61}\\output\\03-etudes\\2026-10\\Produit - Note - 20261029c.md`;
     const SYNTHESE = `${RACINE61}\\output\\04-plans\\Digit-AI - Synthese Mandat - Essai - 20261029z.md`;
-    const LIEN_GUIDE = "[Produit - Guide - Lot 0 - 20261029b](output/04-cadrages/Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b.md)";
-    const LIEN_NOTE = "[Produit - Note - 20261029c](output/03-etudes/2026-10/Produit%20-%20Note%20-%2020261029c.md)";
+    const LIEN_SANS_CHEMIN_GUIDE = "[Produit - Guide - Lot 0 - 20261029b](output/04-cadrages/Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b.md)";
+    // TF-2782 (17/11/2026) : le chemin COMPLET suit chaque lien, entre parenthèses, une espace après.
+    const LIEN_GUIDE = `${LIEN_SANS_CHEMIN_GUIDE} (${GUIDE})`;
+    const LIEN_SANS_CHEMIN_NOTE = "[Produit - Note - 20261029c](output/03-etudes/2026-10/Produit%20-%20Note%20-%2020261029c.md)";
+    const LIEN_NOTE = `${LIEN_SANS_CHEMIN_NOTE} (${NOTE})`;
     const ecr61 = (chemin, outil = "Write") => ({ outil, input: { file_path: chemin, content: "x", new_string: "x" }, sortie: "ok" });
     const avecLivre61 = (ligne, titre = false) => {
       const t = titre ? BON.replace(/^/, "## 0. Synthèse d'ouverture\n\n") : BON;
@@ -2057,11 +2061,11 @@ try {
     const verdictLivre = (livrables, texte, synthese = null) => controlerLivre({ livrables, synthese, texte, racine: RACINE61 });
     const B0 = (ligne) => avecLivre61(ligne);
     for (const [cas, obtenu, attendu] of [
-      ["lien en chevrons avec espaces", verdictLivre([GUIDE], B0("Livré : [g](<output/04-cadrages/Produit - Guide - Lot 0 - 20261029b.md>)")).verdict, "PASS"],
+      ["lien en chevrons avec espaces", verdictLivre([GUIDE], B0(`Livré : [g](<output/04-cadrages/Produit - Guide - Lot 0 - 20261029b.md>) (${GUIDE})`)).verdict, "PASS"],
       ["cible nue avec espaces : pas un lien", verdictLivre([GUIDE], B0("Livré : [g](output/04-cadrages/Produit - Guide - Lot 0 - 20261029b.md)")).verdict, "FAIL"],
-      ["séparateurs \\ dans la cible", verdictLivre([GUIDE], B0("Livré : [g](output\\04-cadrages\\Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b.md)")).verdict, "PASS"],
-      ["casse différente", verdictLivre([GUIDE], B0("Livré : [g](output/04-cadrages/PRODUIT%20-%20GUIDE%20-%20LOT%200%20-%2020261029B.md)")).verdict, "PASS"],
-      ["accent décomposé dans la cible", verdictLivre([`${RACINE61}\\output\\x\\Synthèse de l'été - 20261029a.md`.replace("Synthèse", "Bilan")], B0("Livré : [g](output/x/Bilan%20de%20l'e\u0301te\u0301%20-%2020261029a.md)")).verdict, "PASS"],
+      ["séparateurs \\ dans la cible", verdictLivre([GUIDE], B0(`Livré : [g](output\\04-cadrages\\Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b.md) (${GUIDE})`)).verdict, "PASS"],
+      ["casse différente", verdictLivre([GUIDE], B0(`Livré : [g](output/04-cadrages/PRODUIT%20-%20GUIDE%20-%20LOT%200%20-%2020261029B.md) (${GUIDE})`)).verdict, "PASS"],
+      ["accent décomposé dans la cible", verdictLivre([`${RACINE61}\\output\\x\\Synthèse de l'été - 20261029a.md`.replace("Synthèse", "Bilan")], B0(`Livré : [g](output/x/Bilan%20de%20l'e\u0301te\u0301%20-%2020261029a.md) (${RACINE61}\\output\\x\\Bilan de l'e\u0301te\u0301 - 20261029a.md)`)).verdict, "PASS"],
       ["lien dans la prose du bloc 0 (pas seulement la ligne Livré)", verdictLivre([GUIDE], B0(`Le guide est ici : ${LIEN_GUIDE}.`)).verdict, "PASS"],
       ["lien au bloc 8 seulement", verdictLivre([GUIDE], BON.replace("- manuelle_dev : aucune.", `- manuelle_dev : aucune. ${LIEN_GUIDE}`)).verdict, "FAIL"],
       ["nom cité au bloc 9 sans lien", verdictLivre([GUIDE], BON.replace("## 9. Traces", "## 9. Traces\n- Produit - Guide - Lot 0 - 20261029b.md")).verdict, "FAIL"],
@@ -2077,6 +2081,57 @@ try {
     const six = verdictLivre(Array.from({ length: 7 }, (_, i) => `${RACINE61}\\output\\04-cadrages\\Doc ${i} - 20261029a.md`), BON);
     if (six.verdict !== "FAIL" || !/\(\+2\)/.test(six.ecarts[0]) || !/Doc 0 - 20261029a\.md/.test(six.ecarts[0]) || /Doc 6/.test(six.ecarts[0]))
       echecs.push(`61 undecies : 7 livrables sans lien → attendu un constat qui en nomme 5 et dit « (+2) », obtenu ${six.ecarts[0]?.slice(0, 300)}`);
+    // 61 duodecies à sexdecies — TF-2782 (RT-152 de Produit-02, consigne du porteur du 17/11/2026, mot pour mot : « Lorsque tu affiches les fichiers dans le chapitre 0, ajoute le chemin complet entre
+    // parenthèses juste après, tout le temps. »). Le chat n'affiche que le nom lisible d'un lien : le chemin COMPLET suit chaque lien, entre parenthèses. ROUGES : le lien seul, un chemin relatif, le chemin d'un
+    // AUTRE fichier, un seul des deux liens suivi de son chemin. VERTS : le chemin complet Windows (parenthèse interne comprise) et POSIX, et la ligne que le hook propose (le remède joué).
+    const sansChemin = verdictLivre([GUIDE], B0(`Livré : ${LIEN_SANS_CHEMIN_GUIDE}`));
+    if (sansChemin.verdict !== "FAIL" || !/sans son chemin complet entre parenthèses juste après le lien/.test(sansChemin.ecarts[0]) || !sansChemin.ecarts[0].includes(`(${GUIDE})`) || sansChemin.manquants.length)
+      echecs.push(`61 duodecies : un lien sans chemin complet → attendu FAIL qui dit « sans son chemin complet entre parenthèses juste après le lien », donne la ligne avec « (${GUIDE}) » et ne le dit pas non lié, obtenu ${sansChemin.verdict} ${sansChemin.ecarts[0]?.slice(0, 300)}`);
+    for (const [cas, texte] of [["chemin relatif", `Livré : ${LIEN_SANS_CHEMIN_GUIDE} (output/04-cadrages/Produit - Guide - Lot 0 - 20261029b.md)`],
+      ["chemin d'un autre fichier", `Livré : ${LIEN_SANS_CHEMIN_GUIDE} (${NOTE})`], ["commentaire entre parenthèses", `Livré : ${LIEN_SANS_CHEMIN_GUIDE} (le guide du lot 0)`]])
+      if (verdictLivre([GUIDE], B0(texte)).verdict !== "FAIL") echecs.push(`61 terdecies : ${cas} entre parenthèses → attendu FAIL (ce n'est pas le chemin complet du fichier lié)`);
+    const unSeul = verdictLivre([GUIDE, NOTE], B0(`Livré : ${LIEN_GUIDE} · ${LIEN_SANS_CHEMIN_NOTE}`));
+    if (unSeul.verdict !== "FAIL" || unSeul.sansChemin.map((c) => c.split("\\").pop()).join("|") !== "Produit - Note - 20261029c.md" || /Guide/.test(unSeul.ecarts[0]))
+      echecs.push(`61 quaterdecies : deux liens, seul le guide suivi de son chemin → attendu FAIL qui nomme la note seule, obtenu ${unSeul.verdict} ${JSON.stringify(unSeul.sansChemin)} ${unSeul.ecarts[0]?.slice(0, 200)}`);
+    const AVEC_PAREN = `${RACINE61}\\output\\04-plans\\Rapport (1) - 20261029a.md`, POSIX = "/home/u/proj/output/04-plans/Rapport - 20261029b.md";
+    for (const [cas, livrable, texte] of [
+      ["parenthèse interne", AVEC_PAREN, `Livré : [r](output/04-plans/Rapport%20%281%29%20-%2020261029a.md) (${AVEC_PAREN})`],
+      ["chemin POSIX", POSIX, `Livré : [r](output/04-plans/Rapport%20-%2020261029b.md) (${POSIX})`],
+      ["chemin avec des /", GUIDE, `Livré : [g](output/04-cadrages/Produit%20-%20Guide%20-%20Lot%200%20-%2020261029b.md) (${GUIDE.replace(/\\/g, "/")})`],
+    ]) if (verdictLivre([livrable], B0(texte)).verdict !== "PASS") echecs.push(`61 quindecies : ${cas} → attendu PASS (chemin complet juste après le lien), obtenu ${verdictLivre([livrable], B0(texte)).ecarts[0]?.slice(0, 200)}`);
+    const sansCheminHook = hook61("sans-chemin", [ecr61(GUIDE)], avecLivre61(`Livré : ${LIEN_SANS_CHEMIN_GUIDE}`)).o;
+    if (sansCheminHook?.decision === "block" || !/S87 — le bloc 0 lie 1 livrable sans son chemin complet entre parenthèses juste après le lien \(consigne du porteur du 17\/11\/2026, TF-2782\) : Produit - Guide - Lot 0 - 20261029b\.md/.test(sansCheminHook?.systemMessage || ""))
+      echecs.push(`61 sexdecies : par le hook de fin de tour, un lien sans chemin complet → attendu l'avertissement S87 (sans refus) qui nomme le guide, obtenu ${JSON.stringify(sansCheminHook).slice(0, 400)}`);
+    // 61 TF-2768 — TF-2768 (RS-39 de Produit-12, 22/11/2026) : LE NOMMAGE (R-4, R-25) DU LIVRABLE LIÉ SE JUGE DANS LE TOUR QUI L'ÉCRIT. Le fait : un statut remis avec le type « Statut », absent du
+    // registre, passait l'oracle d'écriture, le préjugement et le hook de fin de tour, et n'était vu qu'à la conformité de clôture. Le juge est l'oracle de conformité lui-même, joué sur le seul chemin du livrable lié.
+    // ROUGES : un type hors registre (R-25), un nom sans date (R-4), par le hook et par le préjugement. VERTS : un type admis, un livrable écrit mais NON lié (S87 le dit, le nommage non), et un oracle introuvable
+    // (non jugé, dit, aucune accusation). Sans registre des types sur ce poste, R-25 rend SANS_OBJET : les cas rouges de type sont alors sautés, et le disent.
+    const REGISTRE_TYPES61 = join(process.env.FORGE_ROOT || join(ICI, "..", ".."), "digit-ai-forge-organization", "registre-types.json");
+    const lie61 = (f, nomLien) => `Livré : [${nomLien}](output/04-plans/${encodeURIComponent(f.split("\\").pop()).replace(/%2F/g, "/")}) (${f})`;
+    const STATUT61 = `${RACINE61}\\output\\04-plans\\Produit-12 - Statut - Essai - 20261122a.md`, NOTE61 = `${RACINE61}\\output\\04-plans\\Produit-12 - Note - Essai - 20261122b.md`;
+    const SANS_DATE61 = `${RACINE61}\\output\\04-plans\\Rapport sans date.md`;
+    const nommageDit = (o, quoi) => new RegExp(`NOMMAGE — le livrable lié « ${quoi} ne tient pas`).test(o?.systemMessage || "");
+    if (existsSync(REGISTRE_TYPES61)) {
+      const statut = hook61("nommage-statut", [ecr61(STATUT61)], avecLivre61(lie61(STATUT61, "Produit-12 - Statut - Essai - 20261122a"))).o;
+      if (statut?.decision === "block" || !nommageDit(statut, "Produit-12 - Statut - Essai - 20261122a\\.md »") || !/R-25 : type « Statut » absent du registre des types/.test(statut?.systemMessage || ""))
+        echecs.push(`61 TF-2768 (a) : un livrable LIÉ de type « Statut » (hors registre) → attendu l'avertissement NOMMAGE (sans refus) qui nomme le fichier, R-25 et le type, obtenu ${JSON.stringify(statut).slice(0, 500)}`);
+      const pjStatut = prejuge61("nommage-statut", hook61("nommage-statut-t", [ecr61(STATUT61)], avecLivre61(lie61(STATUT61, "Produit-12 - Statut - Essai - 20261122a"))).p, avecLivre61(lie61(STATUT61, "Produit-12 - Statut - Essai - 20261122a")));
+      if (!(pjStatut.o?.avertissements || []).some((a) => /^NOMMAGE — le livrable lié « Produit-12 - Statut/.test(a)) || pjStatut.o?.nommage?.verdict !== "FAIL" || pjStatut.o?.affichable !== false)
+        echecs.push(`61 TF-2768 (b) : --prejuger du même brouillon → attendu l'avertissement NOMMAGE non motivé (affichable: false) et nommage.verdict FAIL, obtenu exit ${pjStatut.code} ${JSON.stringify(pjStatut.o?.nommage)} ${JSON.stringify(pjStatut.o?.avertissements).slice(0, 200)}`);
+      const note = hook61("nommage-note", [ecr61(NOTE61)], avecLivre61(lie61(NOTE61, "Produit-12 - Note - Essai - 20261122b"))).o;
+      if (note !== null) echecs.push(`61 TF-2768 (c) : le MÊME tour avec un type admis (« Note », le remède) → attendu silence, obtenu ${JSON.stringify(note).slice(0, 400)}`);
+    } else console.log("  [SAUTÉ] 61 TF-2768 (a) à (d) — registre-types.json d'organization absent de ce poste : R-25 n'est pas jugeable, le cas rouge de type n'est pas joué");
+    const sansDate = hook61("nommage-sans-date", [ecr61(SANS_DATE61)], avecLivre61(lie61(SANS_DATE61, "Rapport sans date"))).o;
+    if (!nommageDit(sansDate, "Rapport sans date\\.md »") || !/R-4 : livrable sans nommage/.test(sansDate?.systemMessage || ""))
+      echecs.push(`61 TF-2768 (d) : un livrable LIÉ sans date dans son nom → attendu l'avertissement NOMMAGE qui nomme R-4, obtenu ${JSON.stringify(sansDate).slice(0, 500)}`);
+    const nonLie = hook61("nommage-non-lie", [ecr61(SANS_DATE61)], BON).o;
+    if (!s87(nonLie) && !/S87/.test(nonLie?.systemMessage || "")) echecs.push(`61 TF-2768 (e) : le livrable écrit et non lié → attendu S87 (cas de contrôle), obtenu ${JSON.stringify(nonLie).slice(0, 300)}`);
+    if (/NOMMAGE/.test(nonLie?.systemMessage || "")) echecs.push(`61 TF-2768 (f) : un livrable écrit mais NON lié par la ligne « Livré : » → attendu aucun NOMMAGE (le contrôle juge les fichiers liés), obtenu ${JSON.stringify(nonLie).slice(0, 300)}`);
+    const sansOracle = jugerNommageDesLivrables({ livrables: [SANS_DATE61], texte: avecLivre61(lie61(SANS_DATE61, "Rapport sans date")), racine: RACINE61, oracle: join(base, "oracle-absent.mjs") });
+    if (sansOracle.verdict !== "SANS_OBJET" || sansOracle.ecarts.length || !/non jugé/.test(sansOracle.motif || ""))
+      echecs.push(`61 TF-2768 (g) : un oracle de conformité introuvable → attendu SANS_OBJET qui dit « non jugé » et n'accuse personne, obtenu ${JSON.stringify(sansOracle)}`);
+    const rougeChemin = hook61("rouge-chemin", [ecr61(GUIDE)], BON).o;
+    if (!rougeChemin?.systemMessage?.includes(`(${GUIDE})`)) echecs.push(`61 septendecies : la ligne « Livré : » que le hook propose au tour sans lien → attendu qu'elle porte le chemin complet « (${GUIDE}) » après le lien, obtenu ${JSON.stringify(rougeChemin).slice(0, 400)}`);
   }
 
   // 62 — TF-1943 (29/10/2026, classe « hook-juge-le-sous-dossier ») : LE HOOK JUGE LE PROJET, PAS LE SOUS-DOSSIER OÙ LA SESSION S'EST DÉPLACÉE. Depuis que les hooks se
@@ -2371,7 +2426,7 @@ try {
       { seq: 2, type: "question_humain", ts: "2026-11-05T09:01:00.000Z", decisions_posees: { "D-1": "Publier maintenant la version corrigée du démarrage, ou attendre demain matin ?" } }].map((o) => JSON.stringify(o)).join("\n") + "\n", "utf8");
     const etude68 = (indice) => join(d68, "output", `Produit - Etude - 20261105${indice}.md`);
     const final68 = (indice) => (BON + "\n- Remontée à la factory : rien à remonter.\n").replace("\n## 1. En-tête",
-      `\n\nLivré : [L'étude remise](output/${encodeURIComponent(`Produit - Etude - 20261105${indice}.md`)})\n\n## 1. En-tête`);
+      `\n\nLivré : [L'étude remise](output/${encodeURIComponent(`Produit - Etude - 20261105${indice}.md`)}) (${etude68(indice)})\n\n## 1. En-tête`);   // TF-2782 : le chemin complet suit le lien
     const hook68 = (nom, indice, contenu) => {
       writeFileSync(etude68(indice), contenu, "utf8");
       const p = join(base, nom + ".jsonl");
@@ -2774,7 +2829,7 @@ try {
   // « rappelée en une ligne ». VERTS : le même message qui REPOSE D-1 en entier (le hook se tait : PASS), la décision que l'humain a nommée depuis (« 1a »), un point d'étape (rappel admis), aucune
   // décision posée plus tôt. Le contrôle est avertissant : le message reste une restitution conforme, rien n'est réécrit.
   if (veut(80)) {
-    const cwd80 = mkdtempSync(join(base, "hors-80-"));
+    const cwd80 = mkdtempSync(join(base, "hors-80-")), cwd80Defaut = cwd80;
     const RAPPEL80 = BON.replace(/- \*\*D-1 —\*\*[\s\S]*?  - si rien n'est décidé : \(a\) s'applique\./,
       "**D-1** : publication de la version corrigée du démarrage, posée le 20/08 à 21:40, inchangée.");
     if (RAPPEL80 === BON || !/posée le 20\/08 à 21:40, inchangée/.test(RAPPEL80)) echecs.push("80 : la fixture du rappel d'une ligne n'a pas été construite — le cas ne prouve plus rien");
@@ -2782,7 +2837,7 @@ try {
     const tour80 = (messages) => messages.map(([role, texte]) => JSON.stringify(role === "humain"
       ? { type: "user", message: { role: "user", content: texte } }
       : { type: "assistant", message: { role: "assistant", content: [{ type: "text", text: texte }] } })).join("\n") + "\n";
-    const hook80 = (nom, messages) => {
+    const hook80 = (nom, messages, cwd80 = cwd80Defaut) => {
       const p = join(base, `tour-80-${nom}.jsonl`); writeFileSync(p, tour80(messages), "utf8");
       const r = spawnSync(process.execPath, [HOOK], { encoding: "utf8", cwd: cwd80, env: ENV_SANS_SESSION, input: JSON.stringify({ session_id: `test-80-${nom}`, transcript_path: p, stop_hook_active: false, cwd: cwd80 }) });
       let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { o = { brut: r.stdout }; }
@@ -2830,6 +2885,30 @@ try {
     const c = (texte, opts = {}) => controlerReaffichage({ decisionsOuvertes: [{ n: "1" }, { n: "2" }], dernierTexte: texte, ...opts });
     if (c(BON).verdict !== "FAIL" || !/D-2 absente/.test(c(BON).ecarts[0]) || c(BON, { pointEtape: true }).verdict !== "SANS_OBJET" || controlerReaffichage({ decisionsOuvertes: [], dernierTexte: BON }).verdict !== "SANS_OBJET")
       echecs.push(`80 septies : le contrôle pur → attendu FAIL qui nomme D-2 absente quand seule D-1 est reposée, SANS_OBJET pour un point d'étape et sans décision ouverte, obtenu ${JSON.stringify(c(BON)).slice(0, 300)}`);
+    // 80 octies à duodecies — TF-2779 (RS-52 de Produit-12, 22/11/2026) : UNE DÉCISION RÉPONDUE AU LEDGER DU PRODUIT NE SE RÉCLAME PLUS. Le fait : D-83, répondue au ledger (seq 417), a été réclamée
+    // à chaque restitution de la session (6 fois), le porteur l'ayant tranchée par un message qui ne la nommait pas. ROUGE : D-1 posée, rappelée en une ligne, sans réponse au ledger → RÉAFFICHAGE (inchangé).
+    // VERTS : la même avec une `reponse_humain` qui nomme D-1 après sa `question_humain` → aucun avertissement ; reposée APRÈS sa réponse, elle est de nouveau réclamée.
+    const produit80 = (nom, entrees) => {
+      const d = mkdtempSync(join(base, `produit-80-${nom}-`)); mkdirSync(join(d, "forge", "retours"), { recursive: true });
+      writeFileSync(join(d, "forge", "ledger.jsonl"), entrees.map((e, i) => JSON.stringify({ seq: i + 1, ts: `2026-11-22T10:0${i}:00Z`, ...e })).join("\n") + "\n", "utf8");
+      return d;
+    };
+    const Q80 = { type: "question_humain", decisions_posees: { "D-1": "Publie-t-on la version corrigée du démarrage ?" } };
+    const R80 = { type: "reponse_humain", decision: "D-1", reponse: "oui, publier" };
+    const sansRep = produit80("sans-reponse", [Q80]), avecRep = produit80("avec-reponse", [Q80, R80]), reposee = produit80("reposee", [Q80, R80, Q80]);
+    const tour80l = [posee, posee80, suite, ["assistant", RAPPEL80]];
+    const aReaff = (o) => /RÉAFFICHAGE/.test(o?.systemMessage || "");
+    if (!aReaff(hook80("ledger-sans", tour80l, sansRep)))
+      echecs.push("80 octies : D-1 posée, rappelée en une ligne, SANS réponse au ledger du produit → attendu l'avertissement RÉAFFICHAGE (le comportement d'avant ne doit pas disparaître)");
+    const vertLedger = hook80("ledger-avec", tour80l, avecRep);
+    if (aReaff(vertLedger)) echecs.push(`80 nonies : D-1 répondue au ledger (reponse_humain après la question) → attendu aucun avertissement RÉAFFICHAGE, obtenu ${JSON.stringify(vertLedger).slice(0, 300)}`);
+    if (!aReaff(hook80("ledger-reposee", tour80l, reposee)))
+      echecs.push("80 decies : D-1 reposée APRÈS sa réponse (nouvelle question_humain) → attendu l'avertissement RÉAFFICHAGE : la réponse d'avant ne couvre pas la nouvelle question");
+    const rep = [numerosRepondus(sansRep), numerosRepondus(avecRep), numerosRepondus(reposee), numerosRepondus(cwd80)].map((s) => [...s].join(","));
+    if (rep.join("|") !== "|1||") echecs.push(`80 undecies : numerosRepondus → attendu « |1|| » (aucune réponse, D-1 répondue, reposée, dossier sans ledger), obtenu « ${rep.join("|")} »`);
+    const pur = controlerReaffichage({ decisionsOuvertes: [{ n: "1" }, { n: "2" }], dernierTexte: BON, repondues: new Set(["2"]) });
+    if (pur.verdict !== "PASS" || controlerReaffichage({ decisionsOuvertes: [{ n: "2" }], dernierTexte: BON, repondues: new Set(["2"]) }).verdict !== "SANS_OBJET")
+      echecs.push(`80 duodecies : le contrôle pur → attendu PASS quand la décision manquante (D-2) est répondue, SANS_OBJET quand toutes sont répondues, obtenu ${pur.verdict}`);
   }
 } catch (e) { echecs.push(`harnais : ${String(e).slice(0, 200)}`); }
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }

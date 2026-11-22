@@ -15,3 +15,4 @@ Chargées à chaque ouverture, au pilot et chez les produits (T1, TF-1946, D-68 
 - Une consigne du porteur s'applique telle quelle, citée mot pour mot, sans être posée en options ; une reformulation ne se demande que si 2 lectures changent le livrable (D-176 b, 05/11).
 - Seul le compte du porteur publie pour la Factory et les forges (D-175, 05/11).
 - Aucune personne nommée dans une réponse : on la désigne par son rôle, et on dit où la retrouver (09/11).
+- Bloc 0 : le chemin complet entre parenthèses après chaque fichier affiché (17/11).

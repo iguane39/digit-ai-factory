@@ -135,6 +135,9 @@
  *       à prénom de la liste fermée, civilité suivie d'un nom, adresse électronique nominative) est signalée hors des blocs de code, le rôle étant le remède ; numéro pris au suivant libre (S135) plus 10 ; avertissante ;
  *   S155 UNE ACTION `auto_ia` QUI ATTEND UN AUTRE AGENT PORTE SON MOYEN DE REPRISE (16/11, TF-2642, RP-220 de digit-ai-marketing, gabarit 2.70.0) : le motif ou l'événement de départ d'une action `auto_ia` qui attend la fin d'un agent
  *       (sous-agent, session Codex, constructeur) dit comment la session reprendra la main (surveillance du fichier de sortie, ticket, notification de fin), sinon l'action est `manuelle_utilisateur` ; numéro pris au suivant libre (S145) plus 10 ; avertissante ;
+ *   S165 UNE DÉCISION DE DÉPENSE D'IA SE CHIFFRE PAR MODÈLE, PRIX SOURCÉ ET DATÉ, VOLUME MESURÉ ET SCÉNARIOS (22/11, TF-2773, RS-44 de Produit-12, gabarit 2.71.0 et suivants) : une décision dont
+ *       « Pourquoi vous » porte `depense` et dont le texte parle d'IA et de coût nomme le modèle, son prix unitaire par million de tokens, la source et la date de ce prix, un volume mesuré par l'API
+ *       (count_tokens) et une table de scénarios ; avertissante. Le fait : « 2 $/mois, ce n'est pas suffisant comme estimation » (prix et ratio de caractères par token faux, 3 et 15 au lieu de 2 et 10).
  *   S11 étendue (16/11, TF-2610, TF-2614) : « programmée, départ : <événement> » est un motif ; `hors_mandat` seul est refusé sous un mandat cité « jusqu'à épuisement » quand aucune dépendance n'est dite ;
  *   S115 UNE ACTION MANUELLE NE DONNE PAS EN COMMANDE CE QUE LA SESSION JOUE AILLEURS (09/11, TF-2304, loi n° 5, gabarit 2.65.0) : une action `manuelle_dev` ou `manuelle_utilisateur` dont la raison n'est pas un arbitrage
  *       (decision, depense, irreversible) porte une commande d'un outil de plateforme distante que la session joue (az, gh, aws, gcloud, kubectl, terraform, cmdlets Az et Graph ; pas git, node ni npm, souvent demandés pour un autre poste), la même figure ailleurs dans le texte, et aucune ligne qui la porte ne montre un code de retour d'échec ;
@@ -981,6 +984,9 @@ const RE_ETIQUETTE_LIVRE = /^[ \t]*(?:[-*][ \t]+)?\**[ \t]*Livr[ée]s?[ \t]*\**[
 const RE_ETIQUETTE_OUVRIR = /^[ \t]*(?:[-*][ \t]+)?\**[ \t]*[ÀA][ \t]*ouvrir[ \t]*\**[ \t]*:[ \t]*\**/i;
 const RE_LIEN_MARKDOWN = /\[[^\]\n]*\]\((?:<[^>\n]*>|[^)\n]*)\)/g;
 const RE_PUCE_A_LIEN = /^[ \t]*(?:[-*]|\d+[.)])[ \t]+.*\]\(/;
+// TF-2782 (consigne du porteur du 17/11/2026) — le CHEMIN COMPLET du livrable suit chaque lien de la ligne « Livré : », entre parenthèses (« [nom](cible) (C:\dev\…\nom.md) ») : il se retire de la
+// lecture de S9 comme le lien. Seul un chemin COMPLET entre parenthèses (lecteur, chemin réseau, racine POSIX ou dossier personnel) est retiré : un commentaire entre parenthèses reste de la prose jugée.
+const RE_CHEMIN_COMPLET_ENTRE_PARENTHESES = /\((?:[A-Za-z]:[\\/]|\\\\|\/|~[\\/])(?:[^()\n]|\([^()\n]*\))*[\\/][^\\/()\n]+\)/g;
 function sansLigneLivre(ouverture) {
   const lignes = ouverture.split("\n"), sortie = [];
   for (let i = 0; i < lignes.length; i++) {
@@ -990,9 +996,9 @@ function sansLigneLivre(ouverture) {
     const puces = [];
     while (i + 1 < lignes.length && RE_PUCE_A_LIEN.test(lignes[i + 1])) puces.push(lignes[++i]);
     if (!puces.length && !(l.match(RE_LIEN_MARKDOWN) || []).length) { sortie.push(l); continue; }   // « Livré : » / « À ouvrir : » sans lien : de la prose
-    const reste = l.replace(etiq, "").replace(RE_LIEN_MARKDOWN, " ").replace(/[·\s,;]+/g, " ").trim();
+    const reste = l.replace(etiq, "").replace(RE_LIEN_MARKDOWN, " ").replace(RE_CHEMIN_COMPLET_ENTRE_PARENTHESES, " ").replace(/[·\s,;]+/g, " ").trim();
     if (reste) sortie.push(reste);
-    for (const p of puces) { const r = p.replace(/^[ \t]*(?:[-*]|\d+[.)])[ \t]+/, "").replace(RE_LIEN_MARKDOWN, " ").replace(/[·\s,;]+/g, " ").trim(); if (r) sortie.push(r); }
+    for (const p of puces) { const r = p.replace(/^[ \t]*(?:[-*]|\d+[.)])[ \t]+/, "").replace(RE_LIEN_MARKDOWN, " ").replace(RE_CHEMIN_COMPLET_ENTRE_PARENTHESES, " ").replace(/[·\s,;]+/g, " ").trim(); if (r) sortie.push(r); }
   }
   return sortie.join("\n");
 }
@@ -3644,6 +3650,37 @@ function juger(texte, cheminJuge = null) {
           + "prolongeait ce travail (« d'office », « sans GO ») ; une consigne du porteur est déjà une décision (R-58 point 5). Le 06/11/2026, D-480 posée pour des tests et un redéploiement local demandés d'office n'avait aucun motif humain (TF-2273). "
           + `Ex. : ${sans104[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
       else ok("S104", `${vues104.length} décision(s) dont « Pourquoi vous » nomme un motif de R-58 (${[...new Set(vues104.flatMap((x) => motifsR58De(x.motif)))].join(", ")})`);
+
+      // ---- S165 (22/11/2026, TF-2773, RS-44 de Produit-12) — UNE DÉCISION DE DÉPENSE D'IA SE CHIFFRE PAR MODÈLE, PRIX SOURCÉ ET DATÉ, VOLUME MESURÉ ET SCÉNARIOS.
+      //
+      // LE FAIT, retour humain du 22/11/2026 sur une décision de dépense (D-84) : « Tu devrais rappeler le modèle utilisé, le coût et fournir une estimation par rapport à des abaques, 2$/mois, ce n'est pas
+      // suffisant comme estimation ». Le prix repris d'un barème local était faux (3 et 15 au lieu de 2 et 10 USD par million de tokens) et le ratio de 4 caractères par token aussi (2,17 mesurés par count_tokens) :
+      // une estimation d'un seul chiffre cachait deux erreurs. LA RÈGLE : une décision dont « Pourquoi vous » porte le motif `depense` ET dont le texte parle d'IA (modèle, tokens, API) et de coût
+      // nomme (1) le MODÈLE, (2) son PRIX UNITAIRE en monnaie par million de tokens, (3) la SOURCE et la DATE de ce prix, (4) un volume MESURÉ, compté par l'API (count_tokens) et non par un ratio, et
+      // (5) une TABLE DE SCÉNARIOS (au moins deux volumes ou deux modèles) ; le texte nomme ce qui manque. AVERTISSANTE à son entrée (règle neuve).
+      // NON JUGÉ : la justesse du prix, de la source ou du comptage ; une décision de dépense qui ne parle ni d'IA ni de coût chiffré ; un chiffrage porté hors de la décision (annexe), que le message cite alors.
+      const IA165 = /(?<![\p{L}\p{N}])(?:tokens?|jetons|API|mod[èe]les?|Claude|Opus|Sonnet|Haiku|GPT|Gemini|LLM|Anthropic|OpenAI)(?![\p{L}\p{N}])/iu;
+      const COUT165 = /\$|USD|€|(?<![\p{L}])(?:co[ûu]ts?|d[ée]penses?|par mois|\/\s*mois)(?![\p{L}])/iu;
+      const concernees165 = vues104.filter((x) => motifsR58De(x.motif).includes("depense") && IA165.test(x.g.join("\n")) && COUT165.test(x.g.join("\n")));
+      const manques165 = (g) => {
+        const t = g.join("\n");
+        const m = [];
+        if (!/(?<![\p{L}])(?:opus|sonnet|haiku|gpt-?[\w.-]*|gemini|claude[- ][\w.-]+|mistral|llama)/iu.test(t)) m.push("le modèle utilisé");
+        if (!/\d[\d   .,]*\s*(?:\$|USD|€|dollars?|euros?)\s*(?:par|\/)\s*(?:million|M(?![\p{L}])|Mtok|1\s*M)/iu.test(t)) m.push("son prix unitaire par million de tokens");
+        if (!(/(?:source|tarif|grille|page\s+de\s+prix|documentation|consult[ée])/i.test(t) && /\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2}/.test(t))) m.push("la source et la date de ce prix");
+        if (!/count_tokens|compt[ée]s?\s+par\s+l['’]\s*API|mesur[ée]s?\s+par\s+l['’]\s*API/i.test(t) || !/mesur/i.test(t)) m.push("un volume mesuré, compté par l'API (count_tokens), et non estimé par un ratio");
+        // La table de scénarios n'est pas le tableau d'options du format B : son en-tête nomme un modèle, un volume ou un scénario, et une ligne porte un montant.
+        if (!(/sc[ée]narios?/i.test(t) && /^[ \t>]*\|[^\n]*(?:mod[èe]le|volume|sc[ée]nario)[^\n]*\|/im.test(t) && /\|[^\n]*\d[\d   .,]*\s*(?:\$|USD|€)[^\n]*\|/i.test(t))) m.push("une table de scénarios par modèle et par volume");
+        return m;
+      };
+      const faibles165 = concernees165.map((x) => ({ ...x, manque: manques165(x.g) })).filter((x) => x.manque.length);
+      if (!concernees165.length) findings.push({ regle: "S165", statut: "SANS_OBJET", message: "aucune décision de dépense qui parle d'IA et de coût chiffré — chiffrage non jugé" });
+      else if (faibles165.length)
+        ko("S165", `${faibles165.length} décision(s) de dépense d'IA sur ${concernees165.length} chiffrée(s) sans ce qui la rend vérifiable — manque : ${faibles165[0].manque.join(" ; ")}. `
+          + "Une décision de dépense d'IA nomme le modèle et son prix unitaire (source et date), part d'un volume mesuré par l'API et rend une table de scénarios par modèle et par volume ; « 2 $/mois » seul n'est pas une estimation. "
+          + "Le 22/11/2026, le prix repris d'un barème local était faux (3 et 15 au lieu de 2 et 10 USD par million de tokens) et le ratio de 4 caractères par token aussi (2,17 mesurés), ce que l'humain a relevé (TF-2773). "
+          + `Ex. : ${faibles165[0].g[0].replace(/\s+/g, " ").trim().slice(0, 110)}`);
+      else ok("S165", `${concernees165.length} décision(s) de dépense d'IA chiffrée(s) avec modèle, prix unitaire sourcé et daté, volume mesuré et table de scénarios`);
     }
 
     // ---- S125 (10/11/2026, TF-2332, gabarit 2.66.0) — DES DÉFAUTS SANS ARBITRAGE SE CORRIGENT DANS LE TOUR, ILS NE SE POSENT PAS EN DÉCISION.
@@ -7644,6 +7681,35 @@ Aucun écart : la demande a été suivie à la lettre.
     casse.push(`S104 (TF-2273) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S104").message || "sortie illisible").slice(0, 200));
   if (!/D-480|R-58/.test(String(constatDe(r104confort, "S104").message || "")) || !/pour information/.test(String(constatDe(r104confort, "S104").message || "")))
     casse.push("S104 : le constat doit nommer R-58 et le remède (exécuter, rendre pour information) : " + String(constatDe(r104confort, "S104").message || "").slice(0, 200));
+  // TF-2773 (22/11/2026) — S165 DANS SES SENS. Rouge : la décision du 22/11, « environ 2 $/mois » pour des appels d'API, sans modèle, prix sourcé ni scénarios. Vert : le remède joué (modèle, prix unitaire par million de
+  // tokens avec source et date, volume mesuré par count_tokens, table de scénarios). Bornes : une décision de dépense qui ne parle pas d'IA n'est pas jugée ; un motif autre que `depense` non plus ; chaque pièce
+  // retirée du remède fait rouge, et le constat nomme ce qui manque.
+  const DEPENSE_IA = "> - **Pourquoi vous** : c'est une dépense récurrente d'IA, qui vous revient.";
+  const ESTIMATION_COMPLETE = [
+    "> - **Estimation** : modèle Claude Sonnet 4.5, 2 USD par million de tokens en entrée et 10 en sortie (source : page de tarification de l'éditeur, consultée le 22/11/2026) ; volume mesuré par l'API count_tokens : 4 200 tokens par document sur 20 documents ; scénarios :",
+    "> | Modèle | 100 documents par mois | 1 000 documents par mois |",
+    "> |---|---|---|",
+    "> | Claude Sonnet 4.5 | 0,84 USD | 8,4 USD |"].join("\n");
+  const s165 = (...lignes) => enFormatB.replace(POURQUOI_VOUS, lignes.join("\n"));
+  if (s165(DEPENSE_IA) === enFormatB) casse.push("S165 : l'ancre « Pourquoi vous » du format B n'a pas été trouvée — le cas ne prouve plus rien");
+  const r165rouge = jouerPe("s165-rouge.md", s165(DEPENSE_IA, "> - **Coût** : environ 2 $/mois d'appels à l'API Claude."));
+  const r165vert = jouerPe("s165-vert.md", s165(DEPENSE_IA, ESTIMATION_COMPLETE));
+  const r165sansTable = jouerPe("s165-sans-table.md", s165(DEPENSE_IA, ESTIMATION_COMPLETE.split("\n")[0]));
+  const r165sansPrix = jouerPe("s165-sans-prix.md", s165(DEPENSE_IA, ESTIMATION_COMPLETE.replace("2 USD par million de tokens en entrée et 10 en sortie", "un tarif de l'éditeur")));
+  const r165horsIA = jouerPe("s165-hors-ia.md", s165("> - **Pourquoi vous** : c'est une dépense d'hébergement, qui vous revient.", "> - **Coût** : 12 € par mois pour le nom de domaine."));
+  const r165autreMotif = jouerPe("s165-autre-motif.md", s165("> - **Pourquoi vous** : c'est un arbitrage entre deux options.", "> - **Coût** : environ 2 $/mois d'appels à l'API Claude."));
+  for (const [r, statut, quoi] of [
+    [r165rouge, "FAIL", "« environ 2 $/mois d'appels à l'API Claude » (ni modèle, ni prix sourcé, ni scénarios) passe — c'est la décision du 22/11"],
+    [r165vert, "PASS", "le remède joué (modèle, prix unitaire sourcé et daté, volume mesuré, table de scénarios) est refusé"],
+    [r165sansTable, "FAIL", "une estimation sans table de scénarios passe"],
+    [r165sansPrix, "FAIL", "une estimation sans prix unitaire par million de tokens passe"],
+    [r165horsIA, "SANS_OBJET", "une dépense d'hébergement, hors IA, est jugée"],
+    [r165autreMotif, "SANS_OBJET", "une décision d'arbitrage qui parle d'IA est jugée comme une dépense"],
+    [rv, "SANS_OBJET", "la verte, sans décision en citation, devrait être déclarée hors de portée"],
+  ]) if (constatDe(r, "S165").statut !== statut)
+    casse.push(`S165 (TF-2773) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S165").message || "sortie illisible").slice(0, 200));
+  for (const [r, mot, quoi] of [[r165rouge, /le modèle utilisé/, "le modèle"], [r165rouge, /prix unitaire/, "le prix unitaire"], [r165rouge, /source et la date/, "la source et la date"], [r165rouge, /count_tokens/, "le comptage par l'API"], [r165rouge, /table de scénarios/, "la table de scénarios"], [r165sansTable, /table de scénarios/, "la table seule"]])
+    if (!mot.test(String(constatDe(r, "S165").message || ""))) casse.push(`S165 (TF-2773) : le constat doit nommer ${quoi} : ` + String(constatDe(r, "S165").message || "").slice(0, 200));
   // TF-2332 (10/11/2026) — S125 DANS SES SENS. Rouge : la décision D-179 du 09/11, « corriger tout, une partie, ou rien » sur des défauts sans arbitrage. Vert : la même décision sans
   // cette ligne (le remède : corriger dans le tour, ne poser que la publication) ; et une décision qui parle de défauts mais offre un VRAI choix entre deux corrections incompatibles.
   const LIGNE_DEFAUTS = "> - **Les défauts** : la revue a trouvé des solutions laissées dans le kit, des durées qui divergent et un pied de page ; corriger tout, corriger une partie, ou ne rien corriger.";
@@ -7902,8 +7968,18 @@ Aucun écart : la demande a été suivie à la lettre.
   const rLivreProse = jouerPe("s87-livre-et-prose-technique.md", avecLivre(`Livré : ${LIEN_GUIDE}`, " Le guide est le fichier Guide-Lot-0.md, rédigé hier."));
   const rLivreNu = jouerPe("s87-livre-chemin-nu.md", avecLivre("Livré : output/04-cadrages/Produit - Guide - Lot 0 - 20261029b.md"));
   const rLivreCode = jouerPe("s87-livre-et-code.md", avecLivre(`Livré : ${LIEN_GUIDE} — relancer \`node oracles/oracle-synthese.mjs\``));
+  // 17/11 (TF-2782, consigne du porteur) — LE CHEMIN COMPLET SUIT CHAQUE LIEN, ENTRE PARENTHÈSES : S9 l'exempte avec le lien (a) en ligne, avec un chemin Windows ou POSIX, (b) en puces ;
+  // mais (c) un commentaire entre parenthèses qui nomme un fichier reste jugé : l'exemption ne couvre qu'un chemin COMPLET.
+  const CHEMIN_GUIDE = "C:\\dev\\produit-essai\\output\\04-cadrages\\Produit - Guide - Lot 0 - 20261029b.md";
+  const CHEMIN_NOTE = "/home/u/produit-essai/output/03-etudes/2026-10/20261029-note-de-cadrage.md";
+  const rLivreChemin = jouerPe("s87-livre-chemin-complet.md", avecLivre(`Livré : ${LIEN_GUIDE} (${CHEMIN_GUIDE}) · ${LIEN_NOTE} (${CHEMIN_NOTE})`));
+  const rLivreCheminPuces = jouerPe("s87-livre-chemin-complet-puces.md", avecLivre(`Livré :\n- ${LIEN_GUIDE} (${CHEMIN_GUIDE})\n- ${LIEN_NOTE} (${CHEMIN_NOTE})`));
+  const rLivreCommentaire = jouerPe("s87-livre-commentaire-paren.md", avecLivre(`Livré : ${LIEN_GUIDE} (voir le fichier Guide-Lot-0.md)`));
   if (avecLivre(`Livré : ${LIEN_GUIDE}`) === verte) casse.push("S87 (exemption de S9) : une fixture n'a pas été modifiée — le cas ne prouve plus rien");
   for (const [r, statut, quoi] of [
+    [rLivreChemin, "PASS", "la ligne « Livré : [nom](cible) (chemin complet) » (Windows et POSIX, TF-2782) est accusée par S9"],
+    [rLivreCheminPuces, "PASS", "les puces « [nom](cible) (chemin complet) » sont accusées par S9"],
+    [rLivreCommentaire, "FAIL", "un commentaire entre parenthèses qui nomme un fichier passe S9 — l'exemption couvre autre chose qu'un chemin complet"],
     [rLivreLigne, "PASS", "la ligne « Livré : [nom](chemin%20relatif) » du cas réel (guide sous output/04-cadrages, date 20261029b) est accusée par S9"],
     [rLivrePuces, "PASS", "la ligne « Livré : » suivie de puces à lien est accusée par S9"],
     [rLivrePlusieurs, "PASS", "deux liens séparés par « · » sous « **Livré :** » sont accusés par S9"],
@@ -7912,7 +7988,7 @@ Aucun écart : la demande a été suivie à la lettre.
     [rLivreCode, "FAIL", "un span de code ajouté après les liens de la ligne « Livré : » passe S9 — le reste de la ligne n'est plus jugé"],
   ]) if (constatDe(r, "S9").statut !== statut)
     casse.push(`S9 (S87, 29/10) : ${quoi} — attendu ${statut} : ` + String(constatDe(r, "S9").message || "sortie illisible").slice(0, 200));
-  for (const [r, nom] of [[rLivreLigne, "la ligne"], [rLivrePuces, "les puces"], [rLivrePlusieurs, "les deux liens"]])
+  for (const [r, nom] of [[rLivreLigne, "la ligne"], [rLivrePuces, "les puces"], [rLivrePlusieurs, "les deux liens"], [rLivreChemin, "la ligne au chemin complet"], [rLivreCheminPuces, "les puces au chemin complet"]])
     if (r.status !== 0) casse.push(`S87 : la verte avec ${nom} « Livré : » n'est pas PASS en entier : ` + echecsDe(r));
   }
   // 03/11 — S92 (TF-2077, RT-32, gabarit 2.59.0) : L'ADRESSE D'UN SERVICE À OUVRIR, PENDANT DE « Livré : », DANS SES SENS. Quand une action

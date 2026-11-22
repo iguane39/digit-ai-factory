@@ -29,13 +29,13 @@
  * dépasse 250 mots (150 jusqu'à D-101 (b) du 29/10/2026), écriture ou pas (fonction `jugeable`) ; les exemptions — accusé de réception,
  * réponse courte, question rendue à l'humain — sont écrites au §Portée du gabarit.
  */
-import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, appendFileSync, existsSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { tmpdir, homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { controlerOuiDeCompletude, affirmationsDExhaustivite, lignesMesure, RAPPEL_MESURE } from "./lib-exhaustivite.mjs";
-import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion } from "./lib-decisions.mjs";
+import { REGISTRE_PILOT, lireRegistrePilot, lireRegistreCommun, estAuPilot, memeQuestion, numerosRepondus } from "./lib-decisions.mjs";
 import { racineDuProjet } from "./lib-racine-projet.mjs";
 import { estPointDeSuivi } from "./lib-suivi-agents.mjs";
 import { decouperCommande, resoudreTemporaires } from "./lib-decoupe-commande.mjs";
@@ -297,7 +297,9 @@ const VERBES_EFFET = new RegExp([
   String.raw`\bsed\s+-i\b`,
   String.raw`\b(?:npm|pnpm|yarn)\s+(?:install|i|ci|add|remove|update|publish)\b`,
   String.raw`\bgh\s+(?:pr\s+(?:create|merge|close|edit|comment)|release|issue\s+(?:create|close|edit|comment)|repo\s+(?:create|delete|edit))\b`,
-  String.raw`\b(?:curl|gh\s+api)\b[^|;&\n]*(?:-X\s*(?:POST|PUT|PATCH|DELETE)|--data\b|-d\s)`,
+  // TF-2688 (22/11/2026) : `-d` est l'option de données de curl seulement quand il COMMENCE un mot ; sans borne gauche, une adresse qui finit par `-d` suivie d'une espace
+  // (`…/page-d -o f`) se lisait comme un POST. `(?<![^\s])` : début de commande ou espace avant l'option.
+  String.raw`\b(?:curl|gh\s+api)\b[^|;&\n]*(?:-X\s*(?:POST|PUT|PATCH|DELETE)|--data\b|(?<![^\s])-d\s)`,
   String.raw`\b(?:deploy|publish)\b`,
 ].join("|"), "i");
 // Une redirection vers un fichier écrit ; vers le néant, un descripteur ou le dossier temporaire, non.
@@ -710,9 +712,28 @@ export function cibleDuLivrable(chemin, racine = "") {
 }
 const nomLisible = (chemin) => nomDe(chemin).replace(/\.[A-Za-z0-9]{1,5}$/, "");
 
+// TF-2782 (RT-152 de Produit-02, consigne du porteur du 17/11/2026, mot pour mot : « Lorsque tu affiches les fichiers dans le chapitre 0, ajoute le chemin complet entre parenthèses juste après,
+// tout le temps. Et remonte à la Factory. ») — le chat de VS Code n'affiche que le nom lisible d'un lien Markdown, le chemin reste invisible. Le CHEMIN COMPLET suit donc chaque lien, entre parenthèses, une espace après.
+/** Un chemin complet : une lettre de lecteur (`C:\` ou `C:/`), un chemin réseau (`\\`), une racine POSIX (`/`) ou le dossier personnel (`~/`), puis au moins un séparateur et un nom de fichier. */
+export const CHEMIN_COMPLET = /^(?:[A-Za-z]:[\\/]|\\\\|\/|~[\\/])[^\n]*[\\/][^\\/\n]+$/;
+/**
+ * Les noms de fichier (clé de comparaison de `nomDeCible`) dont le lien du texte est SUIVI, une espace au plus après, d'un chemin complet entre parenthèses qui désigne le MÊME fichier :
+ * « [nom](cible) (C:\dev\produit\output\…\nom.md) ». Une parenthèse interne est admise (un fichier « A (1) - … »), à un niveau. Un chemin relatif, ou d'un autre fichier, ne compte pas.
+ */
+export function cheminsCompletsApresLiens(texte) {
+  const complets = new Set();
+  for (const m of String(texte || "").matchAll(/\]\(\s*(?:<([^>\n]+)>|([^\s)]+))(?:\s+"[^"\n]*")?\s*\)[ \t]*\(((?:[^()\n]|\([^()\n]*\))+)\)/g)) {
+    const chemin = m[3].trim();
+    if (CHEMIN_COMPLET.test(chemin) && nomDeCible(chemin) === nomDeCible(m[1] || m[2])) complets.add(nomDeCible(m[1] || m[2]));
+  }
+  return complets;
+}
+/** Le chemin complet d'un livrable écrit par le tour : tel que Write l'a reçu quand il est complet, sinon rattaché à la racine du projet. */
+export const cheminCompletDuLivrable = (chemin, racine = "") => (CHEMIN_COMPLET.test(String(chemin)) ? String(chemin) : join(racine || process.cwd(), String(chemin)));
 export const RAPPEL_LIVRE = "Le bloc 0 se clôt, quand le tour a écrit un livrable destiné à l'utilisateur, par une ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, "
-  + "espaces en %20>) », un lien par livrable, séparés par « · » ou en puces sous la ligne (S87, gabarit 2.53.0) : l'humain l'ouvre d'un clic. C'est la seule ligne du bloc 0 qui porte un chemin. "
-  + "Le chemin relatif part de la racine du dépôt (pas d'un chemin absolu) ; les README, les sidecars et la synthèse elle-même n'en font pas partie.";
+  + "espaces en %20>) (<chemin complet du fichier>) », un lien par livrable, séparés par « · » ou en puces sous la ligne (S87, gabarit 2.53.0) : l'humain l'ouvre d'un clic. C'est la seule ligne du bloc 0 qui porte un chemin. "
+  + "Le chemin complet suit chaque lien entre parenthèses, une espace après, tout le temps : le chat n'affiche que le nom lisible, et le porteur veut voir où le fichier est (TF-2782, consigne du 17/11/2026). "
+  + "Le chemin de la cible part de la racine du dépôt ; les README, les sidecars et la synthèse elle-même n'en font pas partie.";
 
 /**
  * Le contrôle : chaque livrable écrit dans le tour (hors synthèse) est la cible d'un lien du bloc 0. `livrables` vient de `livrablesEcrits`, `synthese` est le
@@ -732,13 +753,63 @@ export function controlerLivre({ livrables = [], synthese = null, texte = "", ra
   if (!bloc0) return { ...sans, motif: "bloc 0 introuvable : S1 le dit" };
   const liees = new Set(ciblesDeLiens(bloc0).map(nomDeCible));
   const manquants = restants.filter((f) => !liees.has(cleDeChemin(nomDe(f))));
-  if (!manquants.length) return { applicable: true, verdict: "PASS", ecarts: [], livrables: restants, manquants: [] };
-  const montres = manquants.slice(0, 5);
-  const ligne = "Livré : " + montres.map((f) => `[${nomLisible(f)}](${cibleDuLivrable(f, racine)})`).join(" · ");
-  return { applicable: true, verdict: "FAIL", livrables: restants, manquants,
-    ecarts: [`le tour a écrit ${restants.length} livrable${restants.length > 1 ? "s" : ""} sous output/${restants.length > manquants.length ? `, dont ${manquants.length} que le bloc 0 ne lie pas` : " que le bloc 0 ne lie pas"} : ${montres.map((f) => nomDe(f)).join(" ; ")}`
-      + `${manquants.length > montres.length ? ` (+${manquants.length - montres.length})` : ""}. Écris en fin de bloc 0 : « ${ligne} »${manquants.length > montres.length ? " (+ un lien par fichier restant)" : ""}`] };
+  // TF-2782 : un livrable lié, dont le lien n'est pas suivi de son chemin complet entre parenthèses, est signalé à part.
+  const complets = cheminsCompletsApresLiens(bloc0);
+  const sansChemin = restants.filter((f) => liees.has(cleDeChemin(nomDe(f))) && !complets.has(cleDeChemin(nomDe(f))));
+  if (!manquants.length && !sansChemin.length) return { applicable: true, verdict: "PASS", ecarts: [], livrables: restants, manquants: [], sansChemin: [] };
+  const ecarts = [];
+  if (manquants.length) {
+    const montres = manquants.slice(0, 5);
+    const ligne = "Livré : " + montres.map((f) => `[${nomLisible(f)}](${cibleDuLivrable(f, racine)}) (${cheminCompletDuLivrable(f, racine)})`).join(" · ");
+    ecarts.push(`le tour a écrit ${restants.length} livrable${restants.length > 1 ? "s" : ""} sous output/${restants.length > manquants.length ? `, dont ${manquants.length} que le bloc 0 ne lie pas` : " que le bloc 0 ne lie pas"} : ${montres.map((f) => nomDe(f)).join(" ; ")}`
+      + `${manquants.length > montres.length ? ` (+${manquants.length - montres.length})` : ""}. Écris en fin de bloc 0 : « ${ligne} »${manquants.length > montres.length ? " (+ un lien par fichier restant)" : ""}`);
+  }
+  if (sansChemin.length) {
+    const montres = sansChemin.slice(0, 5);
+    ecarts.push(`le bloc 0 lie ${sansChemin.length} livrable${sansChemin.length > 1 ? "s" : ""} sans son chemin complet entre parenthèses juste après le lien (consigne du porteur du 17/11/2026, TF-2782) : ${montres.map((f) => nomDe(f)).join(" ; ")}`
+      + `${sansChemin.length > montres.length ? ` (+${sansChemin.length - montres.length})` : ""}. Ajoute après chaque lien : « ${montres.map((f) => `[${nomLisible(f)}](${cibleDuLivrable(f, racine)}) (${cheminCompletDuLivrable(f, racine)})`).join(" · ")} »`);
+  }
+  return { applicable: true, verdict: "FAIL", livrables: restants, manquants, sansChemin, ecarts };
 }
+
+// ---- TF-2768 (RS-39 de Produit-12, 22/11/2026) — LE NOMMAGE DU LIVRABLE LIÉ SE JUGE DANS LE TOUR QUI L'ÉCRIT, PAS À LA CONFORMITÉ DE CLÔTURE ----
+//
+// LE FAIT. Un statut remis le 22/11/2026 portait le type « Statut », absent du registre des types ; `oracle-conformite-projet --regles R-25` rendait FAIL. Dans le tour qui l'a écrit, l'oracle d'écriture,
+// le préjugement et le hook de fin de tour ont accepté la ligne « Livré » : aucun ne lisait R-25 (ni R-4). Un nom hors registre n'était vu qu'à la clôture du run, après la remise.
+//
+// LA RÈGLE. Chaque fichier que le bloc 0 lie par la ligne « Livré : » (les livrables de `controlerLivre`, liés) est jugé par l'oracle de conformité LUI-MÊME, sur R-4 (nommage daté) et R-25 (type au registre) :
+// une copie vide du seul chemin relatif est posée dans un projet jetable, avec `forge\NOMMAGE.json` du projet quand il existe (le nommage décidé du produit), et `oracle-conformite-projet --regles R-4,R-25` y est joué.
+// Aucune règle n'est recopiée ici : le verdict est celui de l'oracle. AVERTISSANT à son entrée (règle neuve), comme S87 ; le refus nomme le fichier et la règle.
+// NON JUGÉ, dit : un livrable non lié, hors `output\`, ou un poste sans le registre des types (R-25 rend alors SANS_OBJET et ne refuse rien) ; la collision d'indice avec les fichiers déjà présents (R-4 la juge à la clôture).
+const ORACLE_CONFORMITE = join(ICI, "oracle-conformite-projet.mjs");
+export function jugerNommageDesLivrables({ livrables = [], synthese = null, texte = "", racine = "", oracle = ORACLE_CONFORMITE } = {}) {
+  const sans = { applicable: false, verdict: "SANS_OBJET", ecarts: [], juges: [] };
+  const lu = controlerLivre({ livrables, synthese, texte, racine });
+  if (!lu.applicable) return sans;
+  const liees = new Set(ciblesDeLiens(bloc0De(texte)).map(nomDeCible));
+  const juges = lu.livrables.filter((f) => liees.has(cleDeChemin(nomDe(f))))
+    .map((f) => { let rel = cibleDuLivrable(f, racine); try { rel = decodeURIComponent(rel); } catch { /* cible mal encodée : lue telle quelle */ } return { f, rel }; })
+    .filter((x) => /^output\//i.test(x.rel));
+  if (!juges.length) return sans;
+  const projet = mkdtempSync(join(tmpdir(), "nommage-livre-"));
+  try {
+    for (const { rel } of juges) { const d = join(projet, ...rel.split("/")); mkdirSync(dirname(d), { recursive: true }); writeFileSync(d, ""); }
+    const nommage = racine ? join(racine, "forge", "NOMMAGE.json") : "";
+    if (nommage && existsSync(nommage)) { mkdirSync(join(projet, "forge"), { recursive: true }); writeFileSync(join(projet, "forge", "NOMMAGE.json"), readFileSync(nommage)); }
+    const r = spawnSync(process.execPath, [oracle, projet, "--regles", "R-4,R-25"], { encoding: "utf8", timeout: 30_000, env: process.env });
+    let o = null; try { o = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible : dite plus bas */ }
+    if (!o || !Array.isArray(o.findings)) return { ...sans, motif: `non jugé : l'oracle de conformité n'a pas rendu de verdict lisible (sortie ${r.status})` };
+    const ecarts = [];
+    for (const { f, rel } of juges) for (const x of o.findings) {
+      if (x.statut !== "FAIL" || (x.regle !== "R-4" && x.regle !== "R-25") || String(x.ou).replace(/\\/g, "/") !== rel) continue;
+      ecarts.push(`le livrable lié « ${nomDe(f)} » ne tient pas ${x.regle} : ${String(x.message).split(" — types admis")[0].split(" — vouliez-vous")[0].slice(0, 260)}`
+        + `${x.regle === "R-25" ? " (la liste des types admis : `node oracles\\oracle-conformite-projet.mjs <projet> --regles R-25`)" : ""}`);
+    }
+    return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", ecarts, juges: juges.map((x) => nomDe(x.f)) };
+  } finally { try { rmSync(projet, { recursive: true, force: true }); } catch { /* verrou toléré */ } }
+}
+export const RAPPEL_NOMMAGE = "Un livrable daté se nomme « <Projet> - <Type> <Objet> - AAAAMMJJ<indice>.<ext> » (R-4) et son <Type> figure au registre des types d'organization (R-25). "
+  + "Renomme le fichier, et son lien du bloc 0, avec un type admis ; un type qui manque au registre s'y propose chez organization (D-04), il ne s'improvise pas dans un nom (TF-2768).";
 
 // L'état du dépôt ouvert depuis le message humain : un commit plus récent, ou un fichier modifié
 // après lui. `depuis` est l'horodatage ISO du message humain lu au transcript.
@@ -1767,7 +1838,10 @@ export function numerosPosesAvant(entrees, { dernierEstJuge = true } = {}) {
   return [...numeros];
 }
 
-export function controlerReaffichage({ decisionsOuvertes = [], dernierTexte = "", pointEtape = estPointDEtape(dernierTexte) }) {
+// TF-2779 (22/11/2026) : `repondues` (numéros « 83 », lus par `numerosRepondus` au ledger du produit ou au registre du pilot) sort de la liste une décision que le porteur a
+// tranchée par un message qui ne la nomme pas : D-83, répondue au ledger (seq 417), était réclamée à chaque restitution de la session (6 fois, RS-52 de Produit-12).
+export function controlerReaffichage({ decisionsOuvertes: ouvertes = [], dernierTexte = "", pointEtape = estPointDEtape(dernierTexte), repondues = new Set() }) {
+  const decisionsOuvertes = ouvertes.filter((d) => !repondues.has(String(d.n)));
   if (!decisionsOuvertes.length || pointEtape) return { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
   const entieres = new Set(decisionsPosees(dernierTexte).filter((d) => d.options >= 2 && d.recommandee).map((d) => d.n));
   const manquantes = decisionsOuvertes.filter((d) => !entieres.has(String(d.n)));
@@ -1779,6 +1853,10 @@ export function controlerReaffichage({ decisionsOuvertes = [], dernierTexte = ""
     ecarts: [`le message final d'une demande repose en entier chaque décision restée ouverte et posée pendant la session : ${liste} (TF-2672, retour du porteur du 16/11/2026 : « je suis obligé de redemander à chaque fois le détail des décisions »)`] };
 }
 
+// TF-2690 (22/11/2026) — LA PÉRIODE DE MESURE ET LE CRITÈRE DE BASCULE DU CONTRÔLE, écrits ici une seule fois. Le contrôle reste avertissant : le passage en blocage (`BLOQUANTES_DATEES`) est une décision
+// de l'humain. `scripts\mesurer-reaffichage.mjs` rend, sur le journal du hook, ce qui l'éclaire : 14 jours depuis l'entrée du contrôle (16/11/2026), 20 tours où il s'applique au moins, et aucune décision
+// réclamée plus de 2 fois dans une même session (le signe d'un faux positif : D-83 réclamée 6 fois alors qu'elle était répondue au ledger, TF-2779). Revue de la mesure : le 30/11/2026.
+export const MESURE_REAFFICHAGE = Object.freeze({ depuis: "2026-11-16", jours: 14, tours_min: 20, repetitions_max: 2, revue: "2026-11-30" });
 const RAPPEL_REAFFICHAGE = "Au message final d'une demande, chaque décision restée ouverte se repose EN ENTIER au bloc 3 : sa tête « > **D-N — <la question exacte, avec son point d'interrogation>** », "
   + "ses options (a), (b), (c) avec ce qui se passe, le coût et le retour arrière de chacune, sa recommandation sourcée et la ligne « Sans réponse ». "
   + "Le rappel d'une ligne reste admis dans un point d'étape (mention « point d'étape » au bloc 1) et pour une décision d'une session antérieure.";
@@ -2332,9 +2410,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   const critiqueJ = controlerCritique({ critique: critiqueP });
   const critiqueBloque = critiqueJ.verdict === "FAIL" && estBloquante("CRITIQUE");
   // TF-2672 — le RÉAFFICHAGE, joué sur ce brouillon : les décisions posées plus tôt dans la session (le brouillon n'est pas encore au transcript) et restées ouvertes.
-  const reaffichageJ = tourP ? controlerReaffichage({ decisionsOuvertes: tourP.decisionsOuvertesAvantBrouillon || [], dernierTexte: brouillon }) : { verdict: "SANS_OBJET", ecarts: [] };
+  const reaffichageJ = tourP ? controlerReaffichage({ decisionsOuvertes: tourP.decisionsOuvertesAvantBrouillon || [], dernierTexte: brouillon, repondues: numerosRepondus(RACINE_P) }) : { verdict: "SANS_OBJET", ecarts: [] };
   // TF-1973 et TF-2016 (S87) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est-il lié au bloc 0 de ce brouillon ? Avertissante.
   const livreJ = controlerLivre({ livrables: livrablesP || [], synthese: syntheseDeposee, texte: brouillon, racine: RACINE_P });
+  // TF-2768 — le nommage (R-4, R-25) de chaque livrable lié à la ligne « Livré : », jugé par l'oracle de conformité. Avertissant.
+  const nommageJ = livrablesP ? jugerNommageDesLivrables({ livrables: livrablesP, synthese: syntheseDeposee, texte: brouillon, racine: RACINE_P }) : { applicable: false, verdict: "SANS_OBJET", ecarts: [], juges: [] };
   // TF-2078 (RT-33) — la REMONTÉE : un skill de la Factory a servi, un livrable a été écrit à la main, aucun retour au ledger. Avertissante.
   const remonteeJ = controlerRemontee({ releve: remonteeP, racine: RACINE_P, depuis: depuisP, estFactory: (nom) => nomsSkillsFactory(RACINE_P).has(nom) });
   // TF-2141 (D-172 (b)) — les FRICTIONS : une correction du porteur ou un refus de hook avant outil, « rien à remonter », aucun retour au ledger
@@ -2364,6 +2444,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     ...(reservation.verdict === "FAIL" && !reservationBloque ? [{ code: "RÉSERVATION", texte: `RÉSERVATION (bloquante dès le ${echeanceReservation(reservation)}) — ${reservation.ecarts[0]}. ${rappelReservation(reservation)}` }] : []),
     ...(critiqueJ.verdict === "FAIL" && !critiqueBloque ? [{ code: "CRITIQUE", texte: `CRITIQUE (bloquante dès le ${BLOQUANTES_DATEES.CRITIQUE}) — ${critiqueJ.ecarts[0]}. ${RAPPEL_CRITIQUE}` }] : []),
     ...(livreJ.verdict === "FAIL" ? livreJ.ecarts.map((e) => ({ code: "S87", texte: `S87 — ${e}. ${RAPPEL_LIVRE}` })) : []),
+    ...(nommageJ.verdict === "FAIL" ? nommageJ.ecarts.map((e) => ({ code: "NOMMAGE", texte: `NOMMAGE — ${e}. ${RAPPEL_NOMMAGE}` })) : []),
     ...(remonteeJ.verdict === "FAIL" ? remonteeJ.ecarts.map((e) => ({ code: "REMONTÉE", texte: `REMONTÉE — ${e}. ${RAPPEL_REMONTEE}` })) : []),
     ...(frictionsJ && frictionsJ.verdict === "FAIL" && !frictionsBloque ? frictionsJ.ecarts.map((e) => ({ code: "FRICTIONS", texte: `FRICTIONS — ${e}. ${RAPPEL_FRICTIONS}` })) : [])];
   const motifsDits = [];
@@ -2401,8 +2482,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     frictions: !frictionsJ ? "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)"
       : frictionsJ.applicable ? { verdict: frictionsJ.verdict, bloquant: frictionsJ.bloquant, relevees: frictionsP.length, retenues: frictionsJ.retenues.map((x) => x.type) }
         : `sans objet : ${frictionsJ.motif}`,
-    livre: livrablesP ? (livreJ.applicable ? { verdict: livreJ.verdict, livrables: livreJ.livrables.length, manquants: livreJ.manquants.map(nomDe) }
+    livre: livrablesP ? (livreJ.applicable ? { verdict: livreJ.verdict, livrables: livreJ.livrables.length, manquants: livreJ.manquants.map(nomDe), sans_chemin: (livreJ.sansChemin || []).map(nomDe) }
       : `sans objet : ${livreJ.motif || "aucun livrable écrit sous output/ dans le tour (hors synthèse, README et sidecars)"}`) : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
+    nommage: livrablesP ? (nommageJ.applicable ? { verdict: nommageJ.verdict, juges: nommageJ.juges } : `sans objet : ${nommageJ.motif || "aucun livrable lié par la ligne « Livré : » sous output/"}`) : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
     critique: critiqueP ? (critiqueJ.applicable ? { verdict: critiqueJ.verdict, servis: critiqueJ.servis.length, critiques: critiqueJ.critiques.length }
       : "sans objet : aucun fichier servi (HTML, CSS, JS) écrit dans le tour") : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
     reservation: reservation.applicable ? { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [] } : `sans objet : ${reservation.motif}`,
@@ -2562,10 +2644,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const critique = controlerCritique({ critique: critiqueTour });
   const critiqueBloque = critique.verdict === "FAIL" && estBloquante("CRITIQUE");
   // TF-2672 — le RÉAFFICHAGE : une décision posée plus tôt dans la session et restée ouverte se repose en entier au message final. Avertissant.
-  const reaffichage = controlerReaffichage({ decisionsOuvertes, dernierTexte });
+  const reaffichage = controlerReaffichage({ decisionsOuvertes, dernierTexte, repondues: numerosRepondus(RACINE_HOOK) });
   // TF-1973 et TF-2016 (S87, gabarit 2.53.0) — la ligne « Livré : » : chaque livrable écrit sous output/ dans le tour est la cible d'un lien du bloc 0.
   // Avertissante à son entrée (règle neuve) ; aucune échéance armée : pour en poser une, la mettre à `BLOQUANTES_DATEES` (clé S87) et reprendre la forme de `critiqueBloque`.
   const livre = controlerLivre({ livrables, synthese: fichierSynthese, texte: dernierTexte, racine: RACINE_HOOK });
+  // TF-2768 — le nommage (R-4, R-25) de chaque livrable lié à la ligne « Livré : », jugé par l'oracle de conformité dans le tour qui l'écrit. Avertissante à son entrée.
+  const nommage = jugerNommageDesLivrables({ livrables, synthese: fichierSynthese, texte: dernierTexte, racine: RACINE_HOOK });
   // TF-2078 (RT-33) — la REMONTÉE : un skill de la Factory a servi, un livrable a été écrit à la main, aucun retour n'est consigné au ledger. Avertissante, jamais bloquante.
   const remontee = controlerRemontee({ releve: remonteeTour, racine: RACINE_HOOK, depuis, estFactory: (nom) => nomsSkillsFactory(RACINE_HOOK).has(nom) });
   // TF-2141 (D-172 (b), RT-43) — les FRICTIONS : chez un produit, une correction du porteur ou un refus de hook avant outil dans le tour, « rien à
@@ -2587,12 +2671,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ? reservation.ecarts.map((e) => ({ regle: "RÉSERVATION", statut: "FAIL", message: `${e} — bloquante dès le ${echeanceReservation(reservation)}. ${rappelReservation(reservation)}` })) : []),
     ...(critique.verdict === "FAIL" && !critiqueBloque ? critique.ecarts.map((e) => ({ regle: "CRITIQUE", statut: "FAIL", message: `${e}. ${RAPPEL_CRITIQUE}` })) : []),
     ...(livre.verdict === "FAIL" ? livre.ecarts.map((e) => ({ regle: "S87", statut: "FAIL", message: `${e}. ${RAPPEL_LIVRE}` })) : []),
+    ...(nommage.verdict === "FAIL" ? nommage.ecarts.map((e) => ({ regle: "NOMMAGE", statut: "FAIL", message: `${e}. ${RAPPEL_NOMMAGE}` })) : []),
     ...(remontee.verdict === "FAIL" ? remontee.ecarts.map((e) => ({ regle: "REMONTÉE", statut: "FAIL", message: `${e}. ${RAPPEL_REMONTEE}` })) : []),
     ...(frictionsC.verdict === "FAIL" && !frictionsBloque ? frictionsC.ecarts.map((e) => ({ regle: "FRICTIONS", statut: "FAIL", message: `${e}. ${RAPPEL_FRICTIONS}` })) : [])];
   // TF-1081 — le sceau suit le PASS, et seulement sur la synthèse que le tour a ÉCRITE.
   const passe = code === 0 && !ecartsAffichage.length && geste.verdict !== "FAIL" && possession.verdict !== "FAIL"
     && explication.verdict !== "FAIL" && detail.verdict !== "FAIL" && reaffichage.verdict !== "FAIL" && reservation.verdict !== "FAIL" && completude.verdict !== "FAIL"
-    && critique.verdict !== "FAIL" && livre.verdict !== "FAIL" && remontee.verdict !== "FAIL" && frictionsC.verdict !== "FAIL" && !lotBloque;
+    && critique.verdict !== "FAIL" && livre.verdict !== "FAIL" && nommage.verdict !== "FAIL" && remontee.verdict !== "FAIL" && frictionsC.verdict !== "FAIL" && !lotBloque;
   const sceau = passe ? scellerSynthese(syntheseEcriteDuTour(fichiersMd)) : null;
   // TF-2191 — au PASS, les livrables écrits dans le tour et liés au bloc 0 reçoivent leur sceau ; le journal en garde la liste.
   const sceauxLivrables = passe && livre.applicable && livre.verdict === "PASS" ? livre.livrables.map((f) => scellerLivrable(f)).filter(Boolean) : [];
@@ -2621,7 +2706,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(critique.applicable ? { critique: { verdict: critique.verdict, bloquant: critiqueBloque, servis: critique.servis.map((s) => s.fichier),
         critiques_jouees: critique.critiques.filter((c) => c.jouee).length, sans_verdict: (critique.sans || []).map((s) => `${s.fichier} (${s.motif})`) } } : {}),
       // TF-1973 et TF-2016 — la mesure de la période d'avertissement de S87 : combien de livrables écrits, lesquels sans lien au bloc 0.
-      ...(livre.applicable ? { livre: { verdict: livre.verdict, livrables: livre.livrables.map(nomDe), sans_lien: livre.manquants.map(nomDe) } } : {}),
+      // TF-2768 — la mesure de la période d'avertissement du NOMMAGE : quels livrables liés ont été jugés, et quels écarts.
+      ...(nommage.applicable ? { nommage: { verdict: nommage.verdict, juges: nommage.juges, ecarts: nommage.ecarts.map((e) => e.slice(0, 200)) } } : {}),
+      ...(livre.applicable ? { livre: { verdict: livre.verdict, livrables: livre.livrables.map(nomDe), sans_lien: livre.manquants.map(nomDe), sans_chemin: (livre.sansChemin || []).map(nomDe) } } : {}),
       // TF-2078 — la mesure de la période d'avertissement de REMONTÉE : quels skills de la Factory, quels livrables écrits à la main, retour consigné ou non.
       ...(remontee.applicable ? { remontee: { verdict: remontee.verdict, skills: remontee.skills.map((s) => s.nom), livrables: remontee.livrables.map(nomDe) } } : {}),
       // TF-2329 — le lot dans le tour : les retours écrits dans le tour, cités ou non par un lot (`via` : la transcription les montrait-elle, ou le ledger seul ?).
