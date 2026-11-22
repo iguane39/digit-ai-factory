@@ -111,5 +111,57 @@ check("rouge (TF-2663) — le contrat privé de la section ne nomme plus les rub
   vrai(mutant !== CONTRAT && !RUBRIQUES_CONSIGNE.section.test(mutant) && !RUBRIQUES_CONSIGNE.exemption.test(mutant), "la chirurgie n'a pas retiré la section");
 });
 
+// ---- TF-2705, TF-2720 : FORGE_ROOT hérité, jugé avant la première recette -----------------------------------------------
+const RACINE_HERITEE = {
+  titre: /\*\*Variables héritées : `FORGE_ROOT` se juge avant la première recette \(TF-2705, TF-2720/,
+  commande: /node <pilot>\\oracles\\lib-racine-parc\.mjs --juger/,
+  contournement: /Une racine sans pilot se contourne par la valeur de ta consigne/,
+  refus: /`node oracles\\self-tests\.mjs` refuse de se jouer\*\* \(exit 3/,
+};
+check("vert (TF-2705, TF-2720) — le contrat prescrit de juger FORGE_ROOT avant la première recette, de poser la valeur de la consigne, et dit le refus de la recette agrégée", () => {
+  for (const [nom, motif] of Object.entries(RACINE_HERITEE)) vrai(motif.test(CONTRAT), `le contrat ne porte plus « ${nom} » (${motif})`);
+});
+check("vert (TF-2705, TF-2720) — les fichiers que le contrat nomme existent et portent la garde : la commande --juger et le refus d'exit 3", () => {
+  const lib = readFileSync(join(RACINE, "oracles", "lib-racine-parc.mjs"), "utf8");
+  vrai(/--juger/.test(lib) && /export function jugerForgeRoot/.test(lib), "lib-racine-parc.mjs ne porte plus --juger");
+  vrai(/process\.exit\(3\)/.test(readFileSync(join(RACINE, "oracles", "self-tests.mjs"), "utf8")), "self-tests.mjs ne refuse plus (exit 3) sous une racine sans pilot");
+});
+check("rouge (TF-2705, TF-2720) — le contrat privé du paragraphe ne prescrit plus de juger FORGE_ROOT : le contrôle voit la différence", () => {
+  const mutant = sansBloc(CONTRAT, /Variables héritées : `FORGE_ROOT` se juge/);
+  vrai(mutant !== CONTRAT && !RACINE_HERITEE.commande.test(mutant) && !RACINE_HERITEE.refus.test(mutant), "la chirurgie n'a pas retiré le paragraphe");
+});
+
+// ---- TF-2721, TF-2689, TF-2731, TF-2725, TF-2735, TF-2703, TF-2693 : les gestes que le contrat interdit ou prescrit, chacun avec le fichier qui l'exécute -----------------
+const GESTES = [
+  { tf: "TF-2721", titre: /Un relevé de l'environnement ne s'affiche jamais en entier \(TF-2721/, phrases: [/`env`, `printenv` sans nom, `set`, `export -p`, `Get-ChildItem env:`/, /node <pilot>\\scripts\\env-session\.mjs/, /--presente NOM/],
+    fichiers: ["scripts/env-session.mjs", "oracles/hook-gardes-commande.mjs"], motif: /Un relevé de l'environnement ne s'affiche jamais/ },
+  { tf: "TF-2689 et TF-2731", titre: /Un processus se vise par le PID noté à son lancement \(TF-2689, TF-2731/, phrases: [/\*\*Arrêt par PID seulement\*\*/, /processus-par-pid\.mjs lancer --fichier-pid/, /L'arrêt se vérifie par la liste des processus\*\*, jamais par le statut de la tâche/],
+    fichiers: ["scripts/processus-par-pid.mjs", "oracles/hook-gardes-commande.mjs"], motif: /Un processus se vise par le PID noté/ },
+  { tf: "TF-2725", titre: /Une table de noms ne se sonde pas \(TF-2725/, phrases: [/node <pilot>\\scripts\\structure-table-noms\.mjs --clients \| --produits \| <fichier>/, /jamais une clé ni une valeur de la table/],
+    fichiers: ["scripts/structure-table-noms.mjs"], motif: /Une table de noms ne se sonde pas/ },
+  { tf: "TF-2735", titre: /`ListAgents` est absent d'une session `claude -p` : le repli se prévoit \(TF-2735/, phrases: [/sessions-par-transcriptions\.mjs/, /mesuré par inférence sur les transcriptions/],
+    fichiers: ["scripts/sessions-par-transcriptions.mjs"], motif: /`ListAgents` est absent d'une session/ },
+  { tf: "TF-2703", titre: /Une consigne qui interdit des fichiers déclare les erreurs qu'ils portent déjà \(TF-2703/, phrases: [/« référence admise » \(fichier, règle, nombre\)/, /alerte quand elle ne le fait pas/],
+    fichiers: ["scripts/relecture-intention.mjs"], motif: /Une consigne qui interdit des fichiers déclare/ },
+  { tf: "TF-2693", titre: /La consigne d'un lot se relit comme une part de la demande \(TF-2693/, phrases: [/--repartition <répartition des lots\.md>/, /attribue à un autre lot/],
+    fichiers: ["scripts/relecture-intention.mjs"], motif: /La consigne d'un lot se relit comme une part/ },
+];
+for (const g of GESTES) {
+  check(`vert (${g.tf}) — le contrat porte la règle et ses phrases-clés, et les fichiers qu'il nomme existent`, () => {
+    vrai(g.titre.test(CONTRAT), `le contrat ne porte plus le titre (${g.titre})`);
+    for (const p of g.phrases) vrai(p.test(CONTRAT), `le contrat ne porte plus la phrase ${p}`);
+    for (const f of g.fichiers) vrai(existsSync(join(RACINE, f)), `${f} est nommé par le contrat et absent`);
+  });
+  check(`rouge (${g.tf}) — le contrat privé du paragraphe ne porte plus la règle : le contrôle voit la différence`, () => {
+    const mutant = sansBloc(CONTRAT, g.motif);
+    vrai(mutant !== CONTRAT && !g.titre.test(mutant), "la chirurgie n'a pas retiré le paragraphe");
+  });
+}
+check("vert (TF-2689, TF-2721) — le hook que le contrat nomme est câblé au PreToolUse du pilot, sur Bash et PowerShell", () => {
+  const reglages = JSON.parse(readFileSync(join(RACINE, ".claude", "settings.json"), "utf8"));
+  const groupe = (reglages.hooks?.PreToolUse || []).find((x) => (x.hooks || []).some((h) => /hook-gardes-commande\.mjs/.test(h.command || "")));
+  vrai(groupe && /Bash/.test(groupe.matcher) && /PowerShell/.test(groupe.matcher), "hook-gardes-commande.mjs n'est pas câblé sur Bash et PowerShell");
+});
+
 console.log(`\ncontrat-agent-campagne.test : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
