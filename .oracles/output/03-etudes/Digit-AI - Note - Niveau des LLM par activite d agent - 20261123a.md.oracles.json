@@ -1,0 +1,81 @@
+{
+  "cible": "output/03-etudes/Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+  "date_iso": "2026-11-23T09:02:52.330Z",
+  "registre_version": "2.66.0",
+  "profil": "digit-ai",
+  "niveau": "diffuse",
+  "verdict": "PASS",
+  "perimetre": "disque",
+  "perimetre_motif": null,
+  "resume": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 3,
+    "cache": 0
+  },
+  "bilan_fichiers": {
+    "jugé": [
+      "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md"
+    ],
+    "exempté": [],
+    "délégué": [],
+    "signalé": []
+  },
+  "bilan_complet": true,
+  "exemptions_actives": [],
+  "resultats": [
+    {
+      "domaine": "Lisibilité d'un document (Markdown)",
+      "file": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Format / livraison / versioning",
+      "file": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+      "verdict": "PASS",
+      "detail": ""
+    },
+    {
+      "domaine": "Sécurité / secrets",
+      "file": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · aucun secret détecté"
+    },
+    {
+      "domaine": "Calculs / chiffres",
+      "file": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+      "verdict": "SKIP",
+      "detail": "tables sans ligne de total de contrôle, aucun effectif annoncé ancré"
+    },
+    {
+      "domaine": "Traçabilité des affirmations chiffrées",
+      "file": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+      "verdict": "SKIP",
+      "detail": "aucune affirmation chiffrée hors table détectée"
+    },
+    {
+      "domaine": "Nommage / convention de livraison",
+      "file": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+      "verdict": "PASS",
+      "detail": "1 constat(s) · nom conforme à la convention du profil"
+    },
+    {
+      "domaine": "Cohérence inter-documents",
+      "file": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+      "verdict": "SKIP",
+      "detail": "rien de jugeable : aucune grandeur commune concordante entre fichiers, et aucun contrôle de fond vérifié"
+    }
+  ],
+  "actions_couverture": [],
+  "empreinte": {
+    "format": "forge-ops/empreinte@1",
+    "release": "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md",
+    "ts": "2026-11-23T09:02:52.329Z",
+    "fichiers": {
+      "output\\03-etudes\\Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md": "ef4c4b7d9c974ff7dcd5257dcf524d50fea74e309a39c6a6a960c262be19a6d1"
+    }
+  },
+  "empreinte_motif": null,
+  "verdict_oracles": "PASS"
+}
