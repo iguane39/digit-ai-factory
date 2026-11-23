@@ -23,6 +23,8 @@
  *      est dit par le juge du pilot atteint par le lanceur, parmi les avertissements non bloquants.
  *  17. Fichiers `.env` (D-106 (b), 29/10/2026) : `cat .env` et `Read` d'un `.env.local` refusés par le lanceur avec la voie
  *      permise du pilot ; `.env.example` et le script de masquage passent.
+ *  18. Renommage d'un livrable (TF-2737, D-236 (a), 23/11/2026) : `mv` et `Move-Item` d'un livrable sous output/ refusés par le lanceur avec la commande exacte du script
+ *      du pilot ; un `mv` hors output/ et le script lui-même passent.
  *  23. Registre des sessions (D-218 (b), 15/11/2026) : la commande `sessions` câblée sur six événements, un cas par entrée de hook
  *      joué par le lanceur (open et identité posée, objet, revendication, avertissement, état à deux, preuve de vie, clôture).
  *  24. Fiche d'exécution des agents (D-219 (e), TF-2563, 15/11/2026) : la commande `fiches`, jouée par le lanceur comme le SubagentStop
@@ -99,7 +101,9 @@ try {
   // D-224 (a) : le hook de reprise fusionne le coffre de secrets par `scripts/fusionner-env.mjs`, et résout le profil Claude de la mémoire par `scripts/lib-config-installee.mjs`.
   for (const f of ["scripts/verifier-droits-accordes.mjs", "references/PERMISSIONS-GRAPH.json", "scripts/lib-empreinte.mjs",
     "scripts/relecture-intention.mjs", "scripts/relever-contexte-sessions.mjs", "scripts/lib-config-installee.mjs", "todo/noms-de-personnes.mjs",
-    "todo/anonymiser-entrant.mjs", "scripts/lib-confidentiel.mjs", "scripts/lib-parc.mjs", "scripts/fusionner-env.mjs"]) {
+    "todo/anonymiser-entrant.mjs", "scripts/lib-confidentiel.mjs", "scripts/lib-parc.mjs", "scripts/fusionner-env.mjs",
+    // TF-2737 : le hook du renommage d'un livrable lit la découpe de `hook-gardes-commande.mjs`, qui importe `scripts/env-session.mjs`, et nomme `scripts/renommer-livrable.mjs`.
+    "scripts/env-session.mjs", "scripts/renommer-livrable.mjs"]) {
     mkdirSync(join(copie, dirname(f)), { recursive: true });
     copyFileSync(join(PILOT, f), join(copie, f));
   }
@@ -294,6 +298,16 @@ try {
   check("17 bis fichiers .env : `Read` d'un `.env.local` refusé par le lanceur", eRead.status === 2 && /D-106 \(b\)/.test(eRead.stderr), eRead.stdout + eRead.stderr);
   check("17 ter fichiers .env : le modèle `.env.example` et le script de masquage passent",
     eModele.status === 0 && eMasque.status === 0, `${eModele.stderr} ${eMasque.stderr}`);
+
+  // 18 — TF-2737 (23/11/2026, D-236 (a)), le renommage d'un livrable par le lanceur : `mv` et `Move-Item` d'un livrable sous output/ refusés (exit 2), la commande exacte du script du
+  // PILOT nommée ; un `mv` hors output/ et le script lui-même passent. Les chemins sont des noms fictifs : ni le hook ni cette recette n'ouvrent de fichier.
+  const renommage = (tool_name, command) => spawnSync(process.execPath, [lanceur, "renommage-livrable"], { encoding: "utf8", cwd: P, env: envG,
+    input: JSON.stringify({ tool_name, cwd: P, tool_input: { command } }) });
+  const rMv = renommage("Bash", "mv output/04-plans/a.md output/04-plans/old/"), rPs = renommage("PowerShell", "Move-Item output\\a.md output\\b.md");
+  const rHors = renommage("Bash", "mv src/a.md src/b.md"), rScript = renommage("Bash", "node scripts/renommer-livrable.mjs --de output/a.md --vers output/b.md");
+  check("18 renommage d'un livrable : `mv` et `Move-Item` sous output/ refusés par le lanceur, la commande exacte du script du pilot nommée (TF-2737)",
+    rMv.status === 2 && /TF-2737/.test(rMv.stderr) && /renommer-livrable\.mjs" --de "output\/04-plans\/a\.md" --vers "output\/04-plans\/old\/"/.test(rMv.stderr) && rPs.status === 2, rMv.stdout + rMv.stderr + rPs.stderr);
+  check("18 bis renommage d'un livrable : un `mv` hors output/ et le script lui-même passent par le lanceur", rHors.status === 0 && rScript.status === 0, `${rHors.stderr} ${rScript.stderr}`);
 
   // 15 — TF-1913 (26/10/2026, D-82 (a)), la critique d'implémentation exigée par le lanceur : le juge est celui du pilot, il agit chez le produit
   // sans recopie. Le produit jetable vit sous le dossier temporaire, où tout fichier est un brouillon : la page écrite porte donc le chemin d'un
@@ -572,4 +586,4 @@ try {
 finally { try { rmSync(base, { recursive: true, force: true }); } catch { /* toléré */ } }
 
 if (echecs.length) { console.error(`hooks-factory : FAIL (${pass} PASS)\n  - ` + echecs.join("\n  - ")); process.exit(1); }
-console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b)), registre des sessions joué par le lanceur sur ses six événements, avertissement d'un chemin tenu par une autre session et rien pour une session seule (D-218 (b)), fiche d'exécution d'un agent écrite par le lanceur sous forge/, projet en pseudonyme, et rien pour une entrée sans agent (D-219 (e))`);
+console.log(`hooks-factory : ${pass}/${pass} — niveaux vus depuis un produit : réponse Simple courte acceptée, y compris après 6 commandes de lecture (TF-1947), et refusée dès qu'un fichier est écrit, réponse Moyen acceptée et jugée Complexe dès un commit, pré-vol par le lanceur dans les deux sens, ligne de niveau du lexique suivant forge/NIVEAUX.md, identité sortante refusée par le lanceur et en-tête neutre admis (TF-1716), reprise restaurée depuis le canal déclaré, rien envoyé sans feu vert, muette sans manifeste (TF-1736), commande ancrée du gabarit jouée depuis un sous-dossier et commande relative refusée (TF-1903), critique d'implémentation exigée par le lanceur : page écrite sans critique nommée avant le 03/11/2026, refusée dès cette date, refus levé par la critique jouée (TF-1913), livrable écrit sous output/ et non lié au bloc 0 dit par le lanceur en avertissement S87 (TF-1973, TF-2016), commit refusé tant que le verrou de mutation existe et levé à son retrait (TF-2126), geste distant ouvert par une session et signalé à l'autre par le lanceur, levé par sa clôture (TF-2084), leçon rappelée au geste par le lanceur et barrière réduite à un avertissement chez un produit (TF-2150), session relevée à forge/couts-<poste>.jsonl par le lanceur, sans montant (TF-2181), contrôles propres du produit joués à l'écriture d'un run_open et d'un run_close, déclaration mal formée nommée et jamais jouée (TF-2211), journaux des hooks de la factory ignorés par git et déclarés au contrat d'héritage (TF-2213, TF-2215), lecture d'un .env refusée par le lanceur avec la voie permise du pilot, modèle .env.example et script de masquage admis (D-106 (b)), registre des sessions joué par le lanceur sur ses six événements, avertissement d'un chemin tenu par une autre session et rien pour une session seule (D-218 (b)), fiche d'exécution d'un agent écrite par le lanceur sous forge/, projet en pseudonyme, et rien pour une entrée sans agent (D-219 (e)), renommage d'un livrable sous output/ refusé par le lanceur avec la commande exacte du script du pilot, un mv hors output/ et le script admis (TF-2737)`);
