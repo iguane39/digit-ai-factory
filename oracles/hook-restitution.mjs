@@ -44,6 +44,7 @@ import { nombresDuTexte, chiffresDeGains } from "./lib-chiffres-releves.mjs";
 import { releveFrictions, tourDesFrictions, journaliserFrictions, controlerFrictions, RAPPEL_FRICTIONS } from "./lib-frictions.mjs";
 // TF-2329 (D-191 (a), 10/11/2026) — les retours écrits dans le tour et restés sans lot : la lecture du ledger est celle de l'alerte d'ouverture (TF-1988), réutilisée.
 import { retoursDuTourSansLot } from "./lib-retours-produit.mjs";
+import { suivreRenommage } from "./lib-renommages-livrables.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
 // de fin de tour, qui garde alors son propre relevé d'effets (`detecterEffets`) ; `ecrituresDuTour` le dit dans sa sortie.
@@ -742,6 +743,15 @@ export const RAPPEL_LIVRE = "Le bloc 0 se clôt, quand le tour a écrit un livra
 export function controlerLivre({ livrables = [], synthese = null, texte = "", racine = "" }) {
   const sans = { applicable: false, verdict: "SANS_OBJET", ecarts: [], livrables: [], manquants: [] };
   if (!livrables.length) return sans;
+  // TF-2737 (D-236 (a), 23/11/2026) — UN LIVRABLE ÉCRIT PUIS RENOMMÉ SE LIE SOUS SON NOM COURANT. Le chemin que Write a reçu a disparu quand `scripts\renommer-livrable.mjs` l'a renommé dans le
+  // tour : le renvoi qu'il a tracé (`oracles\lib-renommages-livrables.mjs`) mène de l'ancien chemin au nouveau, et c'est le nouveau que le bloc 0 doit lier. Seul un chemin qui n'existe plus est suivi.
+  const courant = (f) => {
+    if (!racine || !f || existsSync(cheminCompletDuLivrable(f, racine))) return f;
+    const s = suivreRenommage(racine, f);
+    return s && existsSync(s.complet) ? s.complet : f;
+  };
+  livrables = livrables.map(courant);
+  synthese = synthese ? courant(synthese) : synthese;
   const cleSynthese = synthese ? cleDeChemin(synthese) : null;
   // La synthèse du tour : le fichier que `syntheseDuTour` retient, et tout .md dont le nom dit « synthèse » ou « restitution » (`RESTITUTION.md`, « Où, et sous
   // quel nom » : le hook reconnaît la synthèse à ce mot). Le nom suffit aussi quand la synthèse a été déplacée après l'écriture (le marqueur ne se relit plus), ou
@@ -1309,15 +1319,21 @@ const replisDe = (t) => (bloc3De(t).match(/si rien n(?:'|’)est d[ée]cid|sans 
 // ou le même jeton `AAAAMMJJ<indice>` (le fichier a été renommé pour tenir S42 : R-4 rend ce jeton unique par jour dans un dossier, donc il désigne le même livrable). La date de
 // modification ne départage plus que des candidats qui correspondent déjà. Une synthèse récente d'une autre session, au jeton différent, n'est plus jugée à la place.
 const jetonDe = (c) => (/\b(\d{8}[a-z])\b/.exec(String(c).split(/[\\/]/).pop()) || [])[1] || null;
-function relusDuDisque(chemins) {
+function relusDuDisque(chemins, racine = "") {
   const dossiers = new Set();
   const disparus = chemins.filter((c) => c && !existsSync(c));
+  // TF-2737 (D-236 (a)) : un chemin disparu par `scripts\renommer-livrable.mjs` a un renvoi (trace de la racine) : le fichier courant est un candidat, même rangé dans un autre dossier (`old\`, un mois clos).
+  const parRenvoi = [];
+  if (racine) for (const c of disparus) {
+    const s = suivreRenommage(racine, c);
+    if (s && /\.md$/i.test(s.complet) && existsSync(s.complet) && !chemins.includes(s.complet)) { try { parRenvoi.push({ f: s.complet, t: statSync(s.complet).mtimeMs }); } catch { /* illisible : on passe */ } }
+  }
   const nomsDisparus = new Set(disparus.map((c) => String(c).split(/[\\/]/).pop()));
   const jetonsDisparus = new Set(disparus.map(jetonDe).filter(Boolean));
   for (const c of disparus) {
     try { dossiers.add(dirname(c)); } catch { /* chemin non résolu : rien à relire */ }
   }
-  const candidats = [];
+  const candidats = [...parRenvoi];
   for (const d of dossiers) {
     let noms = [];
     try { noms = readdirSync(d).filter((n) => /\.md$/i.test(n)); } catch { continue; }
@@ -1402,8 +1418,8 @@ export function transcriptDeSession(env = process.env, maison = homedir()) {
   return null;
 }
 
-export function syntheseDuTour(cheminsEcrits) {
-  return choisirParmi(cheminsEcrits) || choisirParmi(relusDuDisque(cheminsEcrits));
+export function syntheseDuTour(cheminsEcrits, racine = "") {
+  return choisirParmi(cheminsEcrits) || choisirParmi(relusDuDisque(cheminsEcrits, racine));
 }
 
 // TF-1081 (19/09/2026) — LE SCEAU SE POSE SANS GESTE HUMAIN, ET SUR CE QUE LE TOUR A ÉCRIT.
@@ -2362,7 +2378,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
       remonteeP = tour.remontee || null; depuisP = tour.depuis || null;
       frictionsP = tour.frictions || []; depuisFrictionsP = tour.depuisFrictions || null; retourFrictionsP = Boolean(tour.retourFrictions); travailP = Boolean(tour.travail);
       gainsP = fusionnerGains(tour.gainsLitteraux || [], tour.evenementsJournalises || [], racineDuProjet(process.cwd()));
-      syntheseDeposee = syntheseDuTour(tour.fichiersMd);
+      syntheseDeposee = syntheseDuTour(tour.fichiersMd, racineDuProjet(process.cwd()));
       if (syntheseDeposee) {
         ecartsAffichage.push(...comparerAffiche(brouillon, readFileSync(syntheseDeposee, "utf8")));
         affichage = ecartsAffichage.length ? "FAIL" : "PASS";
@@ -2613,7 +2629,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // L'AFFICHÉ DIT CE QUE LE JUGÉ DISAIT : quand une synthèse a été déposée dans le tour, ce qui se
   // TRANCHE doit se retrouver à l'écran. Bloquant, parce qu'une décision absente de l'écran ne peut
   // pas être prise — et la garde anti-boucle empêche qu'un faux positif coûte plus d'une relecture.
-  const fichierSynthese = syntheseDuTour(fichiersMd);
+  const fichierSynthese = syntheseDuTour(fichiersMd, RACINE_HOOK);
   let ecartsAffichage = [], texteSynthese = "";
   try {
     if (fichierSynthese) {

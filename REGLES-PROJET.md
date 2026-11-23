@@ -148,7 +148,7 @@ Une version est tenue ouverte quand son déplacement échoue pour cause de verro
 1. La nouvelle version sort quand même, à l'indice suivant (règle 5). L'ancienne n'est ni écrasée ni attendue.
 2. Le déplacement qui a échoué se consigne au ledger du produit : une entrée `deplacement_en_attente` qui porte `ancien` (chemin de la version restée en place, relatif à la racine du produit), `nouveau` (chemin de la nouvelle) et `motif`.
 3. La restitution informe l'utilisateur sans lui poser de question : l'ancienne version n'a pas pu être déplacée, elle le sera au tour suivant. Son libellé vit dans `gabarits\RESTITUTION.md`.
-4. À l'ouverture du tour suivant, la session rejoue le déplacement : `git mv` vers `old\` du même dossier, avec le sceau `.jugement.json` de la version quand il existe, puis une entrée `deplacement_effectue` au ledger. Si le verrou tient encore, l'attente reste consignée et la restitution le redit.
+4. À l'ouverture du tour suivant, la session rejoue le déplacement par `node <pilot>\scripts\renommer-livrable.mjs --de <ancien> --vers <dossier>\old\` (TF-2737, D-236 (a) du 23/11/2026 : le `git mv` nu est refusé sous `output\`), qui déplace le livrable avec son sceau `.jugement.json` quand il existe, écrit l'entrée `deplacement_effectue` au ledger et laisse le renvoi que la restitution suit. Si le verrou tient encore, l'attente reste consignée et la restitution le redit.
 
 La session ne pose aucune question sur le document ouvert et ne laisse aucune action à l'utilisateur, « fermer le document » comprise. Elle ne quitte ni ne tue l'application : elle ne l'a pas lancée, l'utilisateur en reste propriétaire.
 

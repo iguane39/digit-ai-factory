@@ -103,7 +103,7 @@ MEP — et le run Produit-10 a dû improviser ce que cette page encode désormai
    sans socle installé et avant la remise :
    `node <pilot>\oracles\oracle-conformite-projet.mjs <projet> --regles R-4`.
    **Un livrable remplacé migre dans `old\` du même dossier, versionné** (TF-0902 ;
-   REGLES-PROJET règle 7, C1 tranché le 13/08 par TF-0150) : `git mv`, une commande,
+   REGLES-PROJET règle 7, C1 tranché le 13/08 par TF-0150) : `node <pilot>\scripts\renommer-livrable.mjs --de <version> --vers <dossier>\old\` (le `git mv` nu est refusé sous `output\`, TF-2737), une commande,
    pas une question. *Mesuré le 07/09* : une synthèse a posé à l'humain la décision
    « garder ou supprimer la version remplacée ? » — la doctrine y répondait depuis
    trois semaines, et un tour humain y est passé. Tenu ouvert par une application, il attend

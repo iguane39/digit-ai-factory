@@ -97,7 +97,11 @@ const [nom, ...options] = process.argv.slice(2);
 // agent, sa fiche d'exécution s'ajoute à forge/fiches-agents.jsonl (oracles/lib-fiches-agents.mjs du pilot) : type, modèle et effort
 // servis, durée, jetons, appels d'outils, frictions, cause de fin et projet sous son pseudonyme Produit-NN ; ni nom réel, ni chemin,
 // ni contenu de consigne ou de livrable. Une transcription illisible donne une fiche partielle. Aucune décision, ne bloque jamais.
-const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents", "fichiers-env", "sessions", "fiches"]);
+// `renommage-livrable` (23/11/2026, TF-2737, décision humaine D-236 (a), HERITAGE 1.82.0) : hook PreToolUse sur Bash et PowerShell — un `mv`, un `git mv`, un `Move-Item` ou un
+// `Rename-Item` dont la source est un livrable sous output/ est refusé : un renommage sans trace casse le lien « Livré : » d'une restitution qui nomme l'ancien chemin. Le message de
+// refus nomme `scripts/renommer-livrable.mjs` du pilot avec la commande exacte ; le script renomme, trace au ledger du produit (`deplacement_effectue`) et laisse un renvoi que
+// `hook-restitution` suit. Bloque.
+const NOMS = new Set(["ouverture", "restitution", "page-html", "lexique", "ecriture", "publication-hebergee", "droits-accordes", "identite-sortante", "remisage", "reprise", "flotte", "gestes-distants", "mutation-en-cours", "lecons", "couts", "controles-produit", "suivi-agents", "fichiers-env", "sessions", "fiches", "renommage-livrable"]);
 if (!NOMS.has(nom)) { console.error(`[hooks-factory] hook inconnu : ${nom} (attendu : ${[...NOMS].join(" | ")})`); process.exit(0); }
 
 const candidats = [

@@ -620,8 +620,8 @@ if (iPilot < 0) {
         for (const { produit, enAttente } of attentesParProduit) {
           for (const d of enAttente) {
             lignes.push(`  - ${produit} : \`${d.ancien}\`${d.ts ? ` (en attente depuis le ${d.ts})` : ""}` +
-              `${d.motif ? ` — ${d.motif}` : ""} → rejouer : \`git mv "${d.ancien}" "${dirname(d.ancien)}/old/"\` chez le produit, ` +
-              "puis consigner `deplacement_effectue` à son ledger (`forge/ledger.jsonl`)");
+              `${d.motif ? ` — ${d.motif}` : ""} → rejouer : \`node scripts/renommer-livrable.mjs --de "${d.ancien}" --vers "${dirname(d.ancien)}/old/"\` du pilot chez le produit (le \`git mv\` nu est refusé sous output/, TF-2737), ` +
+              "qui consigne `deplacement_effectue` à son ledger (`forge/ledger.jsonl`)");
           }
         }
       }

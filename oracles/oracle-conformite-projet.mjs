@@ -956,17 +956,17 @@ const RADICAUX_LIVRABLES_DISTINCTS = new Set([
         `avec un déplacement EN ATTENTE consigné au ledger — ` +
         `${enAttente.map((x) => `${x.indice}${etat(x).ts ? ` (consigné le ${etat(x).ts})` : ""}${etat(x).motif ? ` : ${etat(x).motif}` : ""}`).join(" ; ")}. ` +
         `Toléré (règle 7, alinéa TF-1503, décision humaine du 30/09/2026) : l'ancienne version est tenue ouverte, la nouvelle est sortie quand même. ` +
-        `À l'ouverture du tour suivant : \`git mv\` vers \`${dossier}/old/\`, puis consigner \`deplacement_effectue\` au ledger. ` +
+        `À l'ouverture du tour suivant : déplacer vers \`${dossier}/old/\` par \`node scripts\\renommer-livrable.mjs --de <ancien> --vers ${dossier}/old/\` du pilot, qui consigne \`deplacement_effectue\` au ledger (le \`git mv\` nu est refusé sous output/, TF-2737). ` +
         "Ni question à l'humain, ni application de l'utilisateur fermée");
       continue;
     }
     ko("R-7 bis", `${dossier}/`, `« ${radical} » vit en ${tries.length} versions dans le MÊME dossier hors old\\ ` +
       `(${tries.join(", ")}) — règle 7 + C1 tranché le 13/08 (TF-0150) : la version remplacée migre par ` +
-      `\`git mv\` dans \`${dossier}/old/\`, versionnée. Ce n'est pas une question à poser à l'humain, la doctrine y répond. ` +
+      `\`node scripts\\renommer-livrable.mjs --de <version remplacée> --vers ${dossier}/old/\` du pilot dans \`${dossier}/old/\`, versionnée (le \`git mv\` nu est refusé sous output/, TF-2737). Ce n'est pas une question à poser à l'humain, la doctrine y répond. ` +
       `Sans déplacement en attente consigné : ${sansAttente.map((x) => `${x.indice} (${etat(x)
-        ? "consignation CLOSE par `deplacement_effectue`, et le fichier est encore là : refaire le `git mv`"
+        ? "consignation CLOSE par `deplacement_effectue`, et le fichier est encore là : refaire le déplacement par `scripts\\renommer-livrable.mjs` du pilot (le `git mv` nu est refusé sous output/)"
         : "aucune consignation"})`).join(", ")}. ` +
-      "Si le `git mv` échoue parce qu'une application tient l'ancienne version OUVERTE : ne rien demander, ne fermer ni tuer " +
+      "Si le déplacement échoue parce qu'une application tient l'ancienne version OUVERTE : ne rien demander, ne fermer ni tuer " +
       "l'application, consigner au ledger une entrée `deplacement_en_attente` (`ancien` = chemin de la version non déplacée, relatif " +
       "à la racine du produit, `nouveau`, `motif`) par version concernée — l'oracle tolère alors les deux versions jusqu'au tour suivant (règle 7, alinéa TF-1503)");
   }
@@ -3401,7 +3401,7 @@ const nonJuge = [
   ...antecedences,
   "D-192 (a) (TF-2341, TF-2347) : les deux déclarations sont lues pour leur FORME et leur DATE, jamais pour leur VÉRITÉ — un lot déclaré n'est pas vérifié comme étant réellement UN traitement, et la décision humaine citée dans `forge/NOMMAGE.json` n'est pas retrouvée dans une source : l'oracle refuse l'absence de citation, pas son inexactitude. Le garde-fou est la lisibilité (la déclaration est un fichier suivi, datée, relue au diff) et son périmètre étroit (un lot = un dossier + un indice ; le nommage ne déplace que la lecture du type, le type doit toujours figurer au registre)",
   "R-5 (pas d'écrasement de version) : invisible statiquement — jugé par revue de diff",
-  "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`git mv` vers `old\\` du même dossier), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
+  "R-7 bis (TF-0902) : LAQUELLE de deux versions cohabitantes est la courante n'est pas jugée — le constat nomme les fichiers et le geste (`scripts\\renommer-livrable.mjs` vers `old\\` du même dossier, TF-2737 ; le `git mv` nu est refusé sous output/), il ne choisit pas à la place de l'auteur ; deux formats d'un même livrable (`.html` et `.pdf` du même radical) ne sont pas deux versions, l'extension entre dans la clé",
   "R-7 bis (TF-1503) : l'oracle lit la CONSIGNATION d'un déplacement en attente au ledger, il n'ouvre ni ne teste le fichier — que l'ancienne version soit réellement tenue ouverte n'est pas jugé, et une attente consignée à tort tolère donc deux versions. La DURÉE de l'attente n'est pas bornée : le constat la dit par la date de consignation, aucun seuil n'étant fondé sur une mesure. Que la session n'ait posé aucune question ni fermé l'application de l'utilisateur n'est pas jugé non plus : seule la consignation l'est",
   "R-4 plafond de chemin (TF-1015, TF-1500) : seuls les fichiers réels d'`output\\` sont mesurés ici — un chemin sous `docs\\` ou sous le `forge\\` d'un produit ne l'est pas ; S42 d'`oracle-synthese` mesure les synthèses à leur écriture, sous `output\\` comme sous `forge\\` (01/10/2026). Le sidecar est compté par la CONSTANTE de 34 caractères (`.oracles/` + `.oracles-historique.jsonl`), pas lu sur le disque : un suffixe de sidecar plus long que `.oracles-historique.jsonl` ne serait pas vu — aucun n'existe parmi les 278 sidecars suivis à la racine `.oracles/` du pilot (le plus long suffixe est celui-là), mesuré le 01/10/2026",
   "R-2, R-4, R-7 bis et R-25 (TF-0853) : un chemin que  declare EXCLU du depot n est pas juge — le depot a ecrit que ce fichier n entrera jamais dans son histoire, donc ce n est pas un livrable mais un artefact d atelier. Mesure du 06/09 : 242 constats sur 247 portaient les fichiers d un seul dossier exclu, dont 41 dossiers au nom REEL d un tiers du client recopie dans le message. Hors depot git, aucune exclusion n est deduite",

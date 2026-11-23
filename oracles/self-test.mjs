@@ -119,7 +119,9 @@ writeFileSync(join(verte, ".claude", "settings.json"),
       // TF-1959 (HERITAGE 1.37.0, 26/10/2026) : les gestes destructifs distants se décident en un lot.
       { matcher: "Bash|PowerShell", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs gestes-distants" },
         // TF-2126 (HERITAGE 1.48.0, 04/11/2026) : pas de commit ni de déploiement pendant une campagne de mutation.
-        { type: "command", command: "node forge/hooks/factory.mjs mutation-en-cours" }] },
+        { type: "command", command: "node forge/hooks/factory.mjs mutation-en-cours" },
+        // TF-2737 (HERITAGE 1.82.0, 23/11/2026) : un livrable sous output/ ne se renomme pas par mv, le script renomme et trace.
+        { type: "command", command: "node forge/hooks/factory.mjs renommage-livrable" }] },
       // TF-2150 (HERITAGE 1.50.0, 04/11/2026) : la leçon rappelée au geste qui la déclenche.
       { matcher: "Bash|PowerShell|Write|Edit|MultiEdit", hooks: [{ type: "command", command: "node forge/hooks/factory.mjs lecons" }] },
       // D-19 (a) (HERITAGE 1.29.0, 18/10/2026) : la flotte d'agents rappelée à chaque délégation.
@@ -3138,7 +3140,7 @@ check("TF-1503 rouge : consignation déjà CLOSE (deplacement_effectue) alors qu
   try {
     const f = r7bis(d);
     if (!f || f.statut !== "FAIL") throw new Error(`une attente close tolère encore deux versions : ${JSON.stringify(f)}`);
-    if (!/CLOSE/.test(f.message) || !/refaire le `git mv`/.test(f.message)) throw new Error(`le constat ne dit pas que la clôture est contredite par le fichier : ${f.message}`);
+    if (!/CLOSE/.test(f.message) || !/refaire le déplacement/.test(f.message) || !/renommer-livrable\.mjs/.test(f.message)) throw new Error(`le constat ne dit pas que la clôture est contredite par le fichier : ${f.message}`);
   } finally { rmSync(d, { recursive: true, force: true }); }
 });
 check("TF-1503 rouge : une consignation qui nomme la version la plus RÉCENTE ne couvre pas l'ancienne → FAIL R-7 bis", () => {

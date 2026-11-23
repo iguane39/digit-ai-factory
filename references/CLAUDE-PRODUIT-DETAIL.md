@@ -202,7 +202,7 @@ décision, l'omettre est un oubli (loi n° 3).
   une entrée écrite à la main relève l'horloge au même instant, jamais une heure prévue ou
   reconstituée.
 - **Une version antérieure tenue ouverte ne bloque pas et ne se demande pas** (règle 7 du pilot,
-  alinéa TF-1503, décision humaine du 30/09/2026). Si le `git mv` vers `old\` échoue parce qu'une
+  alinéa TF-1503, décision humaine du 30/09/2026). Si le déplacement vers `old\` (par `node <pilot>\scripts\renommer-livrable.mjs`, le `git mv` nu étant refusé sous `output\` : TF-2737) échoue parce qu'une
   application tient l'ancienne version ouverte, la nouvelle version sort quand même à l'indice
   suivant. Le déplacement manquant se consigne au ledger (`type: deplacement_en_attente`, avec
   `ancien`, `nouveau`, `motif`). La restitution dit à l'utilisateur que l'ancienne version n'a pas
