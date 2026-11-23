@@ -1,0 +1,15 @@
+{
+  "_commentaire": "La moitié Drive de « synchro » (TF-2795) et l'organisation du Drive décidée par D-238 (a) du 23/11/2026. Une donnée, pas du code (loi 4) : un poste neuf ajoute l'emplacement de son dossier dev du Drive à « racines », sans toucher aux scripts. Ordre de résolution : l'option --drive-dev, puis la variable de poste nommée ci-dessous, puis les racines dans l'ordre ; le premier dossier qui existe est retenu. « ~ » désigne le dossier utilisateur du poste. Lu par scripts/synchro-drive.mjs et scripts/ranger-drive.mjs.",
+  "variable": "FACTORY_DRIVE_DEV",
+  "racines": ["~/Mon Drive/dev", "D:/10-Google Drive/dev"],
+  "miroir_output": "_factory/output",
+  "sous_dossiers": { "canal": "donnees", "coffre": "coffre", "memoire": "memoire-claude" },
+  "anciens_noms": {
+    "donnees": ["DONNEES-HORS-GIT", "hors-git"],
+    "coffre": ["SECRETS"],
+    "memoire-claude": ["MEMOIRE-CLAUDE"]
+  },
+  "suffixe_ancien": " - Reprise",
+  "a_retirer": { "fichiers": ["REPRISE.md"], "motif_cache": "\\.oracles(-cache|-historique)?\\.jsonl?$" },
+  "retrait": "_a-retirer"
+}

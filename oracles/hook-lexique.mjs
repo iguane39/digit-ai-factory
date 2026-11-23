@@ -149,7 +149,26 @@ export function questionDImitation(message) {
   return String(message || "").split(/[.!\n]/).some((p) => POSSIBILITE.test(p) && COMME_X.test(p));
 }
 
+/**
+ * « SYNCHRO » (TF-2795, D-238 (a) du 23/11/2026). Le fait : le 23/11/2026, « /synchro » a été rendu « à jour » sur les
+ * seuls dépôts git, la moitié Drive oubliée (8 fichiers du miroir d'output en retard). Le mot ouvre le message, ou
+ * « synchronise » porte GitHub ou le Drive dans la même phrase ; une question SUR la synchro ne déclenche rien.
+ */
+export function demandeSynchro(message) {
+  const m = String(message || "");
+  return /^\s*\/?synchro(?:nise[rz]?|nisation)?\b(?!\s*(?:de|du|des)\b[^?\n]*\?)/iu.test(m)
+    || /(?:^|[.!\n]\s*)synchronise[rz]?\b[^.?\n]{0,60}\b(?:github|drive)\b/iu.test(m);
+}
+
 export const CONSIGNES = [
+  { regle: "synchro", forme: "« synchro » : GitHub et Drive",
+    reconnait: demandeSynchro,
+    texte: "Ce message demande la SYNCHRO, GitHub ET Drive (TF-2795, D-238 (a) du 23/11/2026). Au pilot : " +
+      "`node scripts/synchroniser.mjs` (`--essai` pour prédire) — les dépôts du parc, puis la moitié Drive : le miroir " +
+      "d'output sous `<dev du Drive>/_factory/output`, l'envoi du canal de reprise de chaque produit qui déclare " +
+      "forge/REPRISE.json, une ligne par dossier du Drive. Chez un produit : l'envoi git sous le GO de la demande, puis " +
+      "`node forge/hooks/factory.mjs reprise --pousser`. Un compte rendu « à jour » sans la moitié Drive est faux " +
+      "(cas du 23/11/2026 : 8 fichiers du miroir en retard)." },
   { regle: "audit", forme: "demande d'audit du produit",
     reconnait: demandeAuditProduit,
     texte: "Ce message demande un AUDIT DU PRODUIT : la route par défaut est forge-audit, et la demande de l'humain " +
@@ -621,6 +640,15 @@ if (ESTLE_POINT_D_ENTREE && process.argv.includes("--self-test")) {
     ["Peut-on faire comme prévu demain ?", []],
     ["Demande à la Factory de le faire", []],
     ["Comme d'habitude, lance les tests", []],
+    // TF-2795 (23/11/2026) — « synchro » : le premier cas est le message humain, mot pour mot ; les rouges sont les
+    // questions et les constats SUR la synchro, dont la question humaine du même jour.
+    ["/synchro", ["synchro"]],
+    ["synchro", ["synchro"]],
+    ["Synchronise avec github & Drive", ["synchro"]],
+    ["Synchro GitHub et Drive stp", ["synchro"]],
+    ["Pour la synchro Github & Drive, j'utilise juste le mot-clé synchro ? Valable pour tous les produits ?", []],
+    ["La synchro de ce matin a oublié le Drive", []],
+    ["Synchro des dates : est-ce que ça marche ?", []],
   ];
   for (const [msg, attendu] of casConsignes) {
     const obtenu = reconnaitreConsignes(msg).map((c) => c.regle);

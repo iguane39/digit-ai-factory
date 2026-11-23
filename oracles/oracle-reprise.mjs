@@ -106,7 +106,7 @@ import { empreinteBinaire } from "../scripts/lib-empreinte.mjs";
 import { analyser, fusionner, clesPerdues, refusGit, dansLePilot } from "../scripts/fusionner-env.mjs";
 import { racineConfigInstallee } from "../scripts/lib-config-installee.mjs";
 
-export const VERSION = "1.6.0";
+export const VERSION = "1.7.0";
 export const MANIFESTE = join("forge", "REPRISE.json");
 
 // Un motif par ligne : `*` vaut n'importe quel nom sans séparateur, et un motif sans « / » juge le
@@ -253,8 +253,36 @@ export function goVersDossierSynchronise(racine) {
 }
 const listeSeq = (go) => go.map((g) => g.seq).join(", ");
 
+/**
+ * L'ORGANISATION DU DRIVE (D-238 (a) du 23/11/2026). Un dossier par produit sous `dev`, sans suffixe, aux sous-dossiers
+ * fixes : `donnees` (le canal), `coffre` (les secrets), `memoire-claude` (la mémoire Claude du projet). Le chemin se DÉRIVE
+ * des chemins déclarés au manifeste : l'ancêtre `dev` qu'ils nomment, le dossier du produit qu'ils nomment sous lui, privé
+ * de son suffixe « - Reprise ». Aucun emplacement de poste n'est écrit ici, et un manifeste écrit avant le rangement
+ * suit le dossier rangé sans être réécrit. Le chemin de la convention passe AVANT les chemins déclarés : un ancien dossier
+ * recréé par un poste resté en arrière ne reprend pas la main. Il est écarté s'il tombe dans un chemin déclaré (un canal
+ * déclaré à la racine du dossier du produit dont un élément s'appelle `donnees`).
+ */
+export const SOUS_DOSSIERS_DRIVE = { canal: "donnees", coffre: "coffre", memoire: "memoire-claude" };
+export function cheminsConvention(chemins, sous) {
+  const declares = (chemins || []).filter(Boolean).map((c) => resolve(developper(c)));
+  const vus = new Set(); const sortie = [];
+  for (const c of declares) {
+    const parts = c.split(/[\\/]+/);
+    const i = parts.map((p) => p.toLowerCase()).lastIndexOf("dev");
+    if (i < 0 || i + 1 >= parts.length) continue;
+    const produit = parts[i + 1].replace(/\s+-\s+Reprise$/i, "").trim();
+    if (!produit) continue;
+    const cible = resolve([...parts.slice(0, i + 1), produit, sous].join(sep));
+    if (declares.some((d) => cible === d || cible.toLowerCase().startsWith(d.toLowerCase() + sep))) continue;
+    if (!vus.has(cible.toLowerCase())) { vus.add(cible.toLowerCase()); sortie.push(cible); }
+  }
+  return sortie;
+}
+/** Les candidats d'un flux : la convention D-238 (a) d'abord, puis les chemins déclarés. */
+export const avecConvention = (chemins, sous) => [...cheminsConvention(chemins, sous), ...((chemins || []).filter(Boolean))];
+
 export function resoudreCanal(m) {
-  const candidats = [process.env.REPRISE_CANAL, ...((m?.canal?.chemins) || [])].filter(Boolean).map(developper);
+  const candidats = [process.env.REPRISE_CANAL, ...avecConvention(m?.canal?.chemins, SOUS_DOSSIERS_DRIVE.canal)].filter(Boolean).map(developper);
   return { canal: candidats.find((c) => { try { return statSync(c).isDirectory(); } catch { return false; } }) || null, candidats };
 }
 
@@ -612,7 +640,7 @@ function ecrireEnv(chemin, attendu, texte) {
 
 /** Le coffre : chaque fichier de `secrets.fichiers` fusionné clé par clé ; --restaurer n'écrit que le poste, --pousser que le coffre. */
 export function synchroniserSecrets(racine, sens, m, opt = {}) {
-  const { dossier: coffre, candidats } = resoudreDossier(m.secrets.chemins);
+  const { dossier: coffre, candidats } = resoudreDossier(avecConvention(m.secrets.chemins, SOUS_DOSSIERS_DRIVE.coffre));
   if (!coffre) return { erreur: `coffre introuvable sur ce poste (essayés : ${candidats.join(" ; ")}) — ajouter l'emplacement de ce poste à « secrets.chemins », ou installer le client de synchronisation` };
   const garde = gardeDossier(coffre, racine);
   if (garde) return { coffre, refus: `coffre refusé, ${garde} : rien n'est lu ni écrit — déclarer dans « secrets.chemins » un dossier du Drive, hors du produit et de tout dépôt` };
@@ -675,7 +703,7 @@ export function planifierMemoire(racine, distant, opt = {}, etat = lireEtatFlux(
 
 /** La mémoire Claude du projet : --restaurer écrit la mémoire de ce profil, --pousser le dossier MEMOIRE-CLAUDE. */
 export function synchroniserMemoire(racine, sens, m, opt = {}) {
-  const { dossier: distant, candidats } = resoudreDossier(m.memoire.chemins);
+  const { dossier: distant, candidats } = resoudreDossier(avecConvention(m.memoire.chemins, SOUS_DOSSIERS_DRIVE.memoire));
   if (!distant) return { erreur: `dossier de la mémoire introuvable sur ce poste (essayés : ${candidats.join(" ; ")}) — ajouter l'emplacement de ce poste à « memoire.chemins »` };
   const garde = gardeDossier(distant, racine);
   if (garde) return { dossier: distant, refus: `dossier de la mémoire refusé, ${garde} : rien n'est copié` };
@@ -804,7 +832,7 @@ const OUTIL = "node oracles/oracle-reprise.mjs";
 function jugerCoffre(racine, m, opt, findings) {
   const f = (regle, statut, message) => findings.push({ regle, statut, message: `coffre : ${message}`, flux: "coffre" });
   const s = m.secrets;
-  const { dossier: coffre, existe, candidats } = resoudreDossier(s.chemins);
+  const { dossier: coffre, existe, candidats } = resoudreDossier(avecConvention(s.chemins, SOUS_DOSSIERS_DRIVE.coffre));
   if (!coffre) f("RP3", "FAIL", `introuvable sur ce poste (essayés : ${candidats.join(" ; ")}) — installer le client de synchronisation, ou ajouter l'emplacement de ce poste à « secrets.chemins »`);
   else f("RP3", "PASS", `joignable : ${coffre}${existe ? "" : " (le dossier naît au premier envoi : son parent existe)"}`);
   const garde = coffre ? gardeDossier(coffre, racine) : null;
@@ -848,7 +876,7 @@ function jugerCoffre(racine, m, opt, findings) {
 
 function jugerMemoire(racine, m, opt, findings) {
   const f = (regle, statut, message) => findings.push({ regle, statut, message: `mémoire : ${message}`, flux: "memoire" });
-  const { dossier, existe, candidats } = resoudreDossier(m.memoire.chemins);
+  const { dossier, existe, candidats } = resoudreDossier(avecConvention(m.memoire.chemins, SOUS_DOSSIERS_DRIVE.memoire));
   if (!dossier) { f("RP3", "FAIL", `dossier introuvable sur ce poste (essayés : ${candidats.join(" ; ")}) — ajouter l'emplacement de ce poste à « memoire.chemins »`); return; }
   f("RP3", "PASS", `joignable : ${dossier}${existe ? "" : " (le dossier naît au premier envoi : son parent existe)"}`);
   const garde = gardeDossier(dossier, racine);
@@ -866,7 +894,7 @@ function jugerMemoire(racine, m, opt, findings) {
 // RP10 : le coffre et la mémoire vivent à côté du canal, jamais dans ce qu'il copie ; un dossier SECRETS du canal reste exclu par son nom.
 function jugerPerimetre(m, findings) {
   const { canal } = resoudreCanal(m);
-  const flux = [m.secrets ? ["le coffre", resoudreDossier(m.secrets.chemins).dossier] : null, m.memoire ? ["la mémoire", resoudreDossier(m.memoire.chemins).dossier] : null].filter(Boolean);
+  const flux = [m.secrets ? ["le coffre", resoudreDossier(avecConvention(m.secrets.chemins, SOUS_DOSSIERS_DRIVE.coffre)).dossier] : null, m.memoire ? ["la mémoire", resoudreDossier(avecConvention(m.memoire.chemins, SOUS_DOSSIERS_DRIVE.memoire)).dossier] : null].filter(Boolean);
   const absents = flux.filter(([, d]) => !d).map(([q]) => q);
   if (!canal || absents.length === flux.length) {
     findings.push({ regle: "RP10", statut: "AVERT", message: `non jugé sur ce poste : ${!canal ? "le canal est introuvable" : `${absents.join(" et ")} introuvable(s)`} (RP3)` });

@@ -15,10 +15,10 @@
  */
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, utimesSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { verifier, synchroniser, estExclu, goVersDossierSynchronise, dossierMemoireLocal } from "./oracle-reprise.mjs";
+import { verifier, synchroniser, estExclu, goVersDossierSynchronise, dossierMemoireLocal, resoudreCanal, resoudreDossier, cheminsConvention, avecConvention } from "./oracle-reprise.mjs";
 import { analyser } from "../scripts/fusionner-env.mjs";
 
 const HOOK = join(fileURLToPath(new URL(".", import.meta.url)), "hook-reprise.mjs");
@@ -771,6 +771,31 @@ check("TF-2697 — un fichier que git tient pour modifié (travail en cours) n'e
   const r = verifier(v.produit, v.opt);
   egal(statut(r, "RP11"), "AVERT", "RP11 sur un dépôt sans commit");
   egal(r.verdict, "PASS", "un essai non joué ne bloque pas");
+});
+
+check("D-238 (a) — un manifeste écrit avant le rangement suit le dossier rangé : dev/<Produit>/donnees, coffre, memoire-claude passent avant l'ancien chemin", () => {
+  const drive = mkdtempSync(join(tmpdir(), "d238-"));
+  const dev = join(drive, "dev");
+  const ancien = join(dev, "Prod - Reprise");
+  mkdirSync(join(ancien, "DONNEES-HORS-GIT"), { recursive: true });
+  const m = { canal: { chemins: [join(ancien, "DONNEES-HORS-GIT"), "Z:/absent/dev/Prod - Reprise/DONNEES-HORS-GIT"] } };
+  // avant le rangement : la convention n'existe pas, l'ancien chemin est retenu
+  egal(resoudreCanal(m).canal, join(ancien, "DONNEES-HORS-GIT"), "canal avant rangement");
+  // après : le dossier rangé passe devant, même si l'ancien a été recréé par un poste en arrière
+  mkdirSync(join(dev, "Prod", "donnees"), { recursive: true });
+  egal(resoudreCanal(m).canal, join(dev, "Prod", "donnees"), "canal après rangement");
+  const conv = cheminsConvention([join(ancien, "SECRETS")], "coffre");
+  egal(conv[0], join(dev, "Prod", "coffre"), "convention du coffre");
+  // le coffre naît dans le dossier rangé quand son parent existe
+  egal(resoudreDossier(avecConvention([join(ancien, "SECRETS")], "coffre")).dossier, join(dev, "Prod", "coffre"), "coffre né au dossier rangé");
+  // un canal déclaré à la racine du dossier du produit, dont un élément s'appelle donnees : la convention s'écarte
+  const racineDeclaree = join(dev, "Autre");
+  mkdirSync(join(racineDeclaree, "donnees"), { recursive: true });
+  egal(cheminsConvention([racineDeclaree], "donnees").length, 0, "convention écartée sous un chemin déclaré");
+  egal(resoudreCanal({ canal: { chemins: [racineDeclaree] } }).canal, resolve(racineDeclaree), "canal déclaré à la racine gardé");
+  // sans segment dev : aucune convention
+  egal(cheminsConvention(["Z:/ailleurs/Prod - Reprise"], "donnees").length, 0, "sans ancêtre dev");
+  rmSync(drive, { recursive: true, force: true });
 });
 
 console.log(`\noracle-reprise : ${pass} PASS, ${fail} FAIL — couverture à double sens : 9 cas rouges joués (RP1, RP2, RP3, RP4, RP5, RP6, RP7, RP8 et l'envoi refusé), chacun avec son remède vert ; D-224 (a), coffre et mémoire : 9 cas rouges de plus (conflit sans base, fichier non ignoré par git, RP9, RP10, RP1 des sections, garde du coffre, envoi sans feu vert, RP3 et RP4 du coffre et de la mémoire), chacun avec son remède joué, et aucune valeur de fixture dans aucune sortie ; TF-2697, l'essai du clone neuf : RP11 rouge sans .gitattributes puis vert après le socle, rouge avec un .gitattributes qui ne fixe rien, et les bornes (fichier modifié, hors git, sans commit)`);

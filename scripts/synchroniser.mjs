@@ -59,8 +59,15 @@
  * branche absente de l'origine n'est pas créée. Les non-suivis ne sont ni lus ni touchés (leur
  * nombre est dit). Les sous-modules.
  *
+ * LA MOITIÉ DRIVE (TF-2795, D-238 (a) du 23/11/2026). Après les dépôts, `scripts\synchro-drive.mjs` : le miroir
+ * d'`output\` sous `<dev du Drive>\_factory\output`, l'envoi du canal de reprise de chaque produit qui déclare
+ * `forge\REPRISE.json`, et une ligne par dossier du Drive (`drive` dans le compte rendu). Le 23/11/2026, une synchro
+ * rendue « à jour » sur les seuls dépôts avait laissé 8 fichiers du miroir en retard. Elle ne joue que sur le vrai
+ * pilot : avec `--pilot` (recette sur dépôts jetables), seulement si `--drive-dev` est donné.
+ *
  * Usage : node scripts\synchroniser.mjs [--essai] [--cible <nom>] [--racine <dossier>]
  *                                       [--sans-publier] [--go "<motif>"] [--pilot <dossier>]
+ *                                       [--sans-drive] [--drive-dev <dossier>]
  *   --essai         n'écrit rien : prédit, et dit ce qui serait fait
  *   --cible <nom>   n'en viser qu'un : `pilot`, `canal`, ou une forge (nom exact, ou son suffixe :
  *                   `tests` pour digit-ai-forge-tests)
@@ -68,6 +75,7 @@
  *   --sans-publier  récupère et intègre, ne publie pas
  *   --go <motif>    GO déclaré (prioritaire sur FORGE_PUSH_GO et sur le GO permanent de R-38 par. 6)
  *   --pilot         dossier du pilot (défaut : ce dépôt) — réservé aux recettes sur dépôts jetables
+ *   --cible drive   la seule moitié Drive · --sans-drive : les seuls dépôts · --drive-dev : le dossier dev du Drive
  * Sortie : JSON sur stdout, un compte rendu par dépôt (`depots[]`) ; avancement ligne à ligne sur
  * stderr. Le pre-push du pilot dure ~9 min et un process long muet est en défaut de contrat : l'envoi
  * relaie la sortie du pre-push en direct et émet un battement toutes les 3 min
@@ -81,6 +89,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { ACCES_REFUSE } from "./lib-parc.mjs";
+import { lireConfig as configDrive, resoudreDriveDev, synchroDrive } from "./synchro-drive.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 
@@ -572,27 +581,43 @@ export async function synchroniser(opts) {
   const ctx = { essai: !!opts.essai, publier: opts.publier !== false, go: opts.go || null };
   let parc = await chargerParc(pilot);
   let cibles = resoudreCibles(parc, { racine, pilot });
-  const unique = opts.cible ? choisirCible(cibles, opts.cible) : null;
-  if (opts.cible && !unique) {
+  const driveSeul = opts.cible === "drive";
+  const unique = opts.cible && !driveSeul ? choisirCible(cibles, opts.cible) : null;
+  if (opts.cible && !driveSeul && !unique) {
     const e = new Error(`--cible « ${opts.cible} » ne désigne aucun dépôt du parc. Valides : pilot, canal, ${cibles.filter((c) => c.type === "forge" || c.type === "depot-prive").map((c) => c.nom.replace(/^digit-ai-(forge-)?/, "")).join(", ")}`);
     e.code = "CIBLE_INCONNUE";
     throw e;
   }
   const depots = [];
   const faire = async (c) => { depots.push(await synchroniserDepot(c, ctx)); const d = depots[depots.length - 1]; dire(`${d.nom} — ${d.statut}${d.raisons.length ? " : " + d.raisons[0] : ""}`); };
-  if (unique) await faire(unique);
+  if (driveSeul) { /* la seule moitié Drive */ }
+  else if (unique) await faire(unique);
   else {
     await faire(cibles[0]); // le pilot d'abord : sa liste de forges a pu changer avec ce qu'il vient de récupérer
     parc = await chargerParc(pilot);
     cibles = resoudreCibles(parc, { racine, pilot });
     for (const c of cibles.slice(1)) await faire(c);
   }
+  // La moitié Drive : après les dépôts (le miroir suit la tête du pilot qu'on vient d'intégrer), sur le vrai pilot seulement.
+  let drive = null;
+  if (!opts.sansDrive && (!opts.cible || driveSeul) && (!opts.pilot || opts.driveDev)) {
+    const cfg = configDrive();
+    const { dossier, essais } = resoudreDriveDev(cfg, { option: opts.driveDev });
+    if (!dossier) drive = { verdict: "A_TRAITER", erreur: `dossier dev du Drive introuvable ; essayés : ${essais.join(" ; ")}` };
+    else {
+      dire(`Drive — ${dossier}`);
+      try { drive = synchroDrive({ pilot, racine, driveDev: dossier, essai: ctx.essai, cfg }); }
+      catch (e) { drive = { verdict: "A_TRAITER", erreur: String(e?.message || e).slice(0, 400) }; }
+      dire(`Drive — ${drive.verdict}${drive.resume ? " " + JSON.stringify(drive.resume) : ""}${drive.miroir ? ` ; miroir ${drive.miroir.statut}, ${drive.miroir.copies} copié(s)` : ""}`);
+    }
+  }
   const presents = depots.filter((d) => d.statut !== "absent" && d.statut !== "inaccessible");
-  const verdict = !presents.length ? "AUCUN_DEPOT" : depots.some((d) => BLOQUANTS.has(d.statut)) ? "A_TRAITER" : "OK";
+  const verdictDepots = driveSeul ? "OK" : !presents.length ? "AUCUN_DEPOT" : depots.some((d) => BLOQUANTS.has(d.statut)) ? "A_TRAITER" : "OK";
+  const verdict = verdictDepots === "OK" && drive && drive.verdict !== "OK" ? "A_TRAITER" : verdictDepots;
   return {
-    outil: "synchroniser", decision: "D-107 (a) du 29/10/2026", racine, pilot, essai: ctx.essai, publier: ctx.publier,
+    outil: "synchroniser", decision: "D-107 (a) du 29/10/2026 ; moitié Drive : D-238 (a) du 23/11/2026", racine, pilot, essai: ctx.essai, publier: ctx.publier,
     resume: Object.fromEntries([...new Set(depots.map((d) => d.statut))].map((s) => [s, depots.filter((d) => d.statut === s).length])),
-    verdict, depots,
+    verdict, depots, drive,
   };
 }
 
@@ -607,6 +632,8 @@ function lireArgs(argv) {
     else if (x === "--cible") a.cible = valeur(i++, "--cible");
     else if (x === "--racine") a.racine = valeur(i++, "--racine");
     else if (x === "--pilot") a.pilot = valeur(i++, "--pilot");
+    else if (x === "--sans-drive") a.sansDrive = true;
+    else if (x === "--drive-dev") a.driveDev = valeur(i++, "--drive-dev");
     else { const e = new Error(`argument inconnu : ${x}`); e.code = "ARG"; throw e; }
   }
   return a;
@@ -619,7 +646,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     process.exit(compte.verdict === "OK" ? 0 : 1);
   } catch (e) {
     if (e.code === "ARG" || e.code === "CIBLE_INCONNUE") {
-      process.stderr.write(`synchroniser : ${e.message}\nusage : node scripts\\synchroniser.mjs [--essai] [--cible <nom>] [--racine <dossier>] [--sans-publier] [--go "<motif>"]\n`);
+      process.stderr.write(`synchroniser : ${e.message}\nusage : node scripts\\synchroniser.mjs [--essai] [--cible <nom>] [--racine <dossier>] [--sans-publier] [--go "<motif>"] [--sans-drive] [--drive-dev <dossier>]\n`);
       process.exit(2);
     }
     throw e;
