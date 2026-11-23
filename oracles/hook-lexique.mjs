@@ -327,7 +327,7 @@ async function prevenirBoussole(geste) {
     const b = await import("../scripts/boussole.mjs");
     const dir = b.dossierUtilisateur();
     if (geste === "skill") b.noter(dir, "J-07", "hook-lexique");
-    if (geste === "contredire") { const e = b.calculer({ ecrire: false, dir }); b.contredire(dir, e.prouve); }
+    if (geste === "contredire") { const e = b.calculer({ ecrire: false, dir, transcripts: null }); b.contredire(dir, e.prouve); }
   } catch { /* la boussole se tait, le tour continue */ }
 }
 

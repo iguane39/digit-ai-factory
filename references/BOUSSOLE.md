@@ -8,10 +8,17 @@ Le relevé d'ouverture (`oracles/hook-ouverture.mjs`, au pilot comme chez les pr
 
 ```text
 Boussole — vous : niveau 4 · 57/100. Ce projet : neuf, aucun run ouvert.
-Dites par exemple : « Je veux créer un produit : … » · « Je veux concevoir pour un type de produit précis : … »
 Services utiles pour aller plus loin : Audit forge-tests (forge-tests) · Sécurité du livrable (forge-websec).
-Prochain jalon : première étape de mise en production close (+3).
+Prochain jalon : premier run complet (nouveau produit) (+3).
 ```
+
+Au niveau 5, la boussole tient en une ligne, sans mode d'emploi :
+
+```text
+Boussole — niveau 5 · 93/100 · reste : forge-data, forge-seo-geo.
+```
+
+Ce que la boussole dit dépend du niveau seul, jamais de la situation du projet : le 22/11/2026, un utilisateur au niveau 5 et à 87/100 recevait encore « Dites par exemple : … » dans un produit existant (synthèse `output/04-plans/Digit-AI - Synthese Conseil - Textes de la boussole selon le niveau - 20261122a.md`, GO « A1 » du porteur).
 
 Les phrases d'intention sont lues dans le tableau de routage de `references/ACCUEIL.md`, et les services dans `catalogues/catalogue.jsonl` (prouvés seulement, dans les forges que l'utilisateur n'a pas encore mobilisées) : rien n'est recopié dans le code.
 
@@ -28,11 +35,15 @@ Le tableau se lit du niveau 1 au niveau 5 : le niveau suivant s'atteint par le j
 
 | Niveau | Nom | Ce que la boussole ajoute | Passage au suivant |
 |---|---|---|---|
-| 1 | Découverte | 3 phrases d'intention | J-01 premier livrable vert |
-| 2 | Premiers résultats | lire les blocs 0 et 3, trouver ses livrables | J-02 première décision tranchée |
+| 1 | Découverte | 3 phrases d'intention, le prochain jalon avec ce qu'il apporte | J-01 premier livrable vert |
+| 2 | Premiers résultats | lire les blocs 0 et 3, trouver ses livrables, 3 phrases d'intention | J-02 première décision tranchée |
 | 3 | Décideur | trancher une décision par sa lettre | J-03 premier run clos |
 | 4 | Praticien | 5 services utiles | J-04 premier lot de retours, ou J-08 second run ouvert |
-| 5 | Autonome | le prochain jalon seulement | — |
+| 5 | Autonome | une seule ligne : la note et les jalons restants | — |
+
+**Le prochain jalon** se choisit par pertinence (`prochainJalon`). Jusqu'au niveau 3, c'est l'ordre de la liste : les gestes de base d'abord. À partir du niveau 4 : d'abord un jalon que le projet ouvert peut prouver (une étape en cours de run, un run de version ou un audit dans un produit existant, un run complet dans un projet neuf, un conseil au pilot), puis une forge jamais mobilisée, les gestes de débutant en dernier.
+
+**J-07 se prouve aussi par l'historique** (`skillDansHistorique`) : un appel du skill dans une transcription de session du poste (`~/.claude/projects`, `FORGE_TRANSCRIPTS_DIR` sous recette). La lecture va du plus ancien au plus récent, s'arrête au premier appel, ne dépasse pas 400 ms par ouverture et reprend après le dernier fichier lu (`historique_lu_le` dans la progression). Seule une date est gardée.
 
 La **note** vaut le nombre de jalons prouvés sur 30, ramené sur 100 et arrondi ; chaque jalon vaut donc environ 3 points. Les 30 jalons : 8 gestes (J-01 à J-08), 5 étapes closes (J-09 conception à J-13 mise en production), 4 types de run (J-14 complet, J-15 version, J-16 mandat, J-17 conseil), 13 forges mobilisées (J-18 à J-30). La liste fait foi dans `JALONS` de `scripts/boussole.mjs`.
 

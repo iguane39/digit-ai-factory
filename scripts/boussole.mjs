@@ -27,7 +27,8 @@
  *   node scripts/boussole.mjs --declarer-canal <dossier synchronisé> | --recuperer
  *   node scripts/boussole.mjs --noter <J-xx>  jalon prouvé par un autre hook (ex. J-07, skill appelé)
  * Options : --pilot <dossier> --cwd <dossier> --racine <dossier des projets> ; FORGE_UTILISATEUR_DIR remplace
- * `~/.digit-ai` (recettes) ; FORGE_SANS_OBSERVATION=1 n'écrit rien.
+ * `~/.digit-ai` (recettes) ; FORGE_TRANSCRIPTS_DIR remplace `~/.claude/projects`, où J-07 se prouve par un appel de
+ * skill passé (recettes) ; FORGE_SANS_OBSERVATION=1 n'écrit rien.
  */
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -47,17 +48,19 @@ export const TYPES_RUN = ["complet", "version", "mandat", "conseil"];
 
 /** Les 30 jalons, dans l'ordre où la boussole propose le suivant. */
 export const JALONS = [
-  { id: "J-01", libelle: "premier livrable vert", famille: "geste" },
-  { id: "J-02", libelle: "première décision tranchée", famille: "geste" },
-  { id: "J-03", libelle: "premier run clos", famille: "geste" },
-  { id: "J-04", libelle: "premier lot de retours remis", famille: "geste" },
-  { id: "J-05", libelle: "premier audit complet", famille: "geste" },
-  { id: "J-06", libelle: "première publication sur GO", famille: "geste" },
-  { id: "J-07", libelle: "premier skill appelé par sa formule", famille: "geste" },
-  { id: "J-08", libelle: "second run ouvert", famille: "geste" },
-  ...ETAPES.map((e, i) => ({ id: `J-${String(9 + i).padStart(2, "0")}`, libelle: `première étape ${e === "mep" ? "de mise en production" : e} close`, famille: "etape", cle: e })),
-  ...TYPES_RUN.map((t, i) => ({ id: `J-${14 + i}`, libelle: `premier run ${t === "complet" ? "complet (nouveau produit)" : `de ${t}`}`, famille: "type", cle: t })),
-  ...FORGES.map((f, i) => ({ id: `J-${18 + i}`, libelle: `forge-${f} mobilisée`, famille: "forge", cle: f })),
+  { id: "J-01", libelle: "premier livrable vert", famille: "geste", court: "un livrable vert", apport: "un livrable jugé conforme par ses oracles, prêt à être remis" },
+  { id: "J-02", libelle: "première décision tranchée", famille: "geste", court: "une décision tranchée", apport: "vous gardez la main sur ce que la Factory ne tranche jamais seule" },
+  { id: "J-03", libelle: "premier run clos", famille: "geste", court: "un run clos", apport: "un run mené jusqu'à sa synthèse, avec ses retours remontés" },
+  { id: "J-04", libelle: "premier lot de retours remis", famille: "geste", court: "un lot de retours", apport: "ce que votre projet a appris améliore la Factory pour les suivants" },
+  { id: "J-05", libelle: "premier audit complet", famille: "geste", court: "un audit complet", apport: "un état chiffré de votre produit et la liste de ses corrections" },
+  { id: "J-06", libelle: "première publication sur GO", famille: "geste", court: "une publication sur GO", apport: "un livrable mis en ligne sous votre accord explicite" },
+  { id: "J-07", libelle: "premier skill appelé par sa formule", famille: "geste", court: "un skill appelé par sa formule", apport: "une tâche courante lancée en une phrase, sans détailler la méthode" },
+  { id: "J-08", libelle: "second run ouvert", famille: "geste", court: "un second run", apport: "votre progression vous suit d'un projet à l'autre" },
+  ...ETAPES.map((e, i) => ({ id: `J-${String(9 + i).padStart(2, "0")}`, libelle: `première étape ${e === "mep" ? "de mise en production" : e} close`, famille: "etape", cle: e,
+    court: `l'étape ${e === "mep" ? "de mise en production" : e}`, apport: "une étape du parcours menée jusqu'à ses oracles verts" })),
+  ...TYPES_RUN.map((t, i) => ({ id: `J-${14 + i}`, libelle: `premier run ${t === "complet" ? "complet (nouveau produit)" : `de ${t}`}`, famille: "type", cle: t,
+    court: `un run ${t === "complet" ? "complet" : `de ${t}`}`, apport: "un autre usage de la Factory, avec sa propre séquence" })),
+  ...FORGES.map((f, i) => ({ id: `J-${18 + i}`, libelle: `forge-${f} mobilisée`, famille: "forge", cle: f, court: `forge-${f}`, apport: `les services de forge-${f} sur votre projet` })),
 ];
 export const POINTS_PAR_JALON = Math.round(100 / JALONS.length);
 const PAR_ID = new Map(JALONS.map((j) => [j.id, j]));
@@ -235,6 +238,8 @@ export function fusionner(a, b) {
   const questions = [a.question_posee_le, b.question_posee_le].filter(Boolean).sort();
   const r = { schema: SCHEMA, mise_a_jour: [a.mise_a_jour, b.mise_a_jour].filter(Boolean).sort().pop() || null,
     jalons: [...carte.values()].sort((x, y) => x.id.localeCompare(y.id)) };
+  const lus = [a.historique_lu_le, b.historique_lu_le].filter(Boolean).sort();
+  if (lus.length) r.historique_lu_le = lus.pop();
   if (annonces[0]) { r.niveau_annonce = annonces[0].niveau_annonce; r.annonce_le = annonces[0].annonce_le; }
   if (questions[0]) r.question_posee_le = questions[0];
   if (a.debutant || b.debutant) r.debutant = true;
@@ -249,6 +254,71 @@ function ecrireJson(chemin, objet) {
 export function lireCanal(dir) {
   try { const c = JSON.parse(readFileSync(join(dir, "canal.json"), "utf8")); return typeof c?.dossier === "string" && c.dossier.trim() ? c.dossier : null; }
   catch { return null; }
+}
+
+// ---------------------------------------------------------------------------------------------------------
+// J-07 prouvé par l'historique (GO du porteur « A1 » du 22/11/2026, synthèse 20261122a)
+// ---------------------------------------------------------------------------------------------------------
+/**
+ * LE FAIT. Le hook du lexique ne note J-07 que depuis le 21/11/2026 et ne tient aucun journal des appels plus anciens :
+ * un utilisateur qui appelle des skills chaque jour voyait « Prochain jalon : premier skill appelé par sa formule ».
+ * Un appel du skill (`"name":"Skill","input":{"skill":…`) dans une transcription de session du poste le prouve.
+ * Le poste en porte 1,2 Go (mesuré le 22/11/2026) : la lecture va du plus ancien au plus récent, s'arrête au premier
+ * appel, ne dépasse pas `budgetMs` par ouverture, et reprend la fois suivante après le dernier fichier lu en entier
+ * (`historique_lu_le`). Seuls une date et un nom de fichier anonyme sont gardés, jamais le contenu.
+ */
+export const dossierTranscripts = (env = process.env) => env.FORGE_TRANSCRIPTS_DIR || join(homedir(), ".claude", "projects");
+const MARQUE_SKILL = '"name":"Skill","input":{"skill":"';
+export function skillDansHistorique(dossier, depuis = null, budgetMs = 400) {
+  const fichiers = [];
+  try {
+    for (const d of readdirSync(dossier, { withFileTypes: true })) {
+      const sous = d.isDirectory() ? join(dossier, d.name) : null;
+      const noms = sous ? readdirSync(sous).map((n) => join(sous, n)) : [join(dossier, d.name)];
+      for (const f of noms) {
+        if (!f.endsWith(".jsonl")) continue;
+        try { const m = statSync(f).mtime.toISOString(); if (!depuis || m > depuis) fichiers.push({ f, m }); } catch { /* disparu */ }
+      }
+    }
+  } catch { return { trouve: null, lu_jusqu_au: depuis }; }
+  fichiers.sort((x, y) => x.m.localeCompare(y.m));
+  const debut = Date.now();
+  let lu = depuis;
+  for (const { f, m } of fichiers) {
+    if (Date.now() - debut > budgetMs) break;
+    let texte = "";
+    try { texte = readFileSync(f, "utf8"); } catch { continue; }
+    const i = texte.indexOf(MARQUE_SKILL);
+    if (i >= 0) {
+      const fin = texte.indexOf("\n", i);
+      const ligne = texte.slice(texte.lastIndexOf("\n", i) + 1, fin < 0 ? undefined : fin);
+      let le = null;
+      try { le = jour(JSON.parse(ligne).timestamp); } catch { /* ligne illisible */ }
+      return { trouve: { le: le || m.slice(0, 10) }, lu_jusqu_au: m };
+    }
+    lu = m;
+  }
+  return { trouve: null, lu_jusqu_au: lu };
+}
+
+/**
+ * Le prochain jalon, choisi par pertinence (synthèse 20261122a). Jusqu'au niveau 3, l'ordre de la liste : les gestes
+ * de base d'abord, c'est le vrai pas suivant d'un débutant. À partir du niveau 4 : d'abord un jalon que le projet
+ * ouvert peut prouver, puis une forge jamais mobilisée, puis le reste, les gestes de débutant en dernier.
+ */
+const PROUVABLES = {
+  run: ["J-09", "J-10", "J-11", "J-12", "J-13", "J-03"],
+  existant: ["J-15", "J-05", "J-16"],
+  neuf: ["J-14"],
+  pilot: ["J-17", "J-16"],
+};
+export function prochainJalon(manquants, niveau, situation) {
+  if (!manquants.length) return null;
+  if (niveau < 4) return manquants[0];
+  const ids = new Set(manquants.map((j) => j.id));
+  const ici = (PROUVABLES[situation] || []).find((id) => ids.has(id));
+  if (ici) return PAR_ID.get(ici);
+  return manquants.find((j) => j.famille === "forge") || manquants.find((j) => j.famille !== "geste") || manquants[0];
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -309,7 +379,7 @@ export function servicesUtiles(pilot, ids, n = 5) {
 // ---------------------------------------------------------------------------------------------------------
 // Calcul complet
 // ---------------------------------------------------------------------------------------------------------
-export function calculer({ pilot = PILOT_PAR_DEFAUT, cwd = process.cwd(), racine = null, dir = dossierUtilisateur(), ecrire = true } = {}) {
+export function calculer({ pilot = PILOT_PAR_DEFAUT, cwd = process.cwd(), racine = null, dir = dossierUtilisateur(), ecrire = true, transcripts = dossierTranscripts() } = {}) {
   const projets = projetsDuPoste(racine || dirname(resolve(pilot)), [cwd]);
   const carte = jalonsDuPoste(projets);
   const fichier = join(dir, "progression.json");
@@ -323,6 +393,12 @@ export function calculer({ pilot = PILOT_PAR_DEFAUT, cwd = process.cwd(), racine
   const duPoste = { ...vide(), jalons: [...carte].map(([id, v]) => ({ id, le: v.le, preuve: v.preuve })) };
   const avant = new Set((locale.jalons || []).map((j) => j.id));
   let p = fusionner(fusionner(locale, distante), duPoste);
+  const luAvant = p.historique_lu_le || null;
+  if (transcripts && !p.jalons.some((j) => j.id === "J-07")) {
+    const h = skillDansHistorique(transcripts, luAvant);
+    if (h.trouve) { carte.set("J-07", { le: h.trouve.le, preuve: "appel de skill (transcription de session)" }); p = fusionner(p, { jalons: [{ id: "J-07", le: h.trouve.le, preuve: "appel de skill (transcription de session)" }] }); }
+    if (h.lu_jusqu_au) p.historique_lu_le = h.lu_jusqu_au;
+  }
   const prouvesIci = new Set(carte.keys());
   const repris = p.jalons.filter((j) => !prouvesIci.has(j.id) && (distante.jalons || []).some((d) => d.id === j.id)).length;
   const ids = new Set(p.jalons.map((j) => j.id));
@@ -334,7 +410,8 @@ export function calculer({ pilot = PILOT_PAR_DEFAUT, cwd = process.cwd(), racine
   if (poserQuestion) p.question_posee_le = new Date().toISOString();
   p.niveau = niveau;
   p.note = noteSur100(ids.size);
-  const change = poserQuestion || p.jalons.some((j) => !avant.has(j.id)) || locale.niveau !== p.niveau || locale.note !== p.note;
+  const change = poserQuestion || p.jalons.some((j) => !avant.has(j.id)) || locale.niveau !== p.niveau || locale.note !== p.note
+    || (locale.historique_lu_le || null) !== (p.historique_lu_le || null);
   if (change) p.mise_a_jour = new Date().toISOString();
   let ecrit = false, envoye = false;
   if (ecrire && (change || !existsSync(fichier))) ecrit = ecrireJson(fichier, p);
@@ -342,7 +419,7 @@ export function calculer({ pilot = PILOT_PAR_DEFAUT, cwd = process.cwd(), racine
   const etat = etatProjet(cwd, pilot);
   const manquants = JALONS.filter((j) => !ids.has(j.id));
   return { pilot, projets: projets.length, progression: p, ids, niveau, prouve, statut, note: p.note, jalons_prouves: ids.size,
-    repris, canal, canal_etat: canalEtat, ecrit, envoye, poser_question: poserQuestion, etat, prochain: manquants[0] || null,
+    repris, canal, canal_etat: canalEtat, ecrit, envoye, poser_question: poserQuestion, etat, manquants, prochain: prochainJalon(manquants, niveau, etat.situation),
     phrases: phrasesIntention(pilot, etat.situation), services: servicesUtiles(pilot, ids) };
 }
 
@@ -350,16 +427,25 @@ export function calculer({ pilot = PILOT_PAR_DEFAUT, cwd = process.cwd(), racine
 // Rendus
 // ---------------------------------------------------------------------------------------------------------
 const enSlash = (p) => String(p).replace(/\\/g, "/");
+/**
+ * Ce que la boussole dit, selon le niveau (synthèse 20261122a, GO « A1 » du 22/11/2026). Le fait : au niveau 5 et à
+ * 87/100, la boussole expliquait encore comment formuler une demande, parce que les phrases d'exemple s'affichaient dans
+ * tout produit neuf ou existant, quel que soit le niveau. Désormais : niveaux 1 et 2, phrases d'exemple ; niveau 3, la
+ * façon de trancher ; niveau 4, les services des forges jamais mobilisées ; niveau 5, une seule ligne.
+ */
 export function ligneBoussole(e) {
-  const tete = `Boussole — vous : niveau ${e.niveau}${e.statut === "prouvé" ? "" : ` (${e.statut})`} · ${e.note}/100. Ce projet : ${e.etat.texte}.`;
-  const lignes = [tete];
-  if (e.niveau <= 1 || e.etat.situation === "neuf" || e.etat.situation === "existant") {
-    if (e.phrases.length) lignes.push(`Dites par exemple : ${e.phrases.join(" · ")}`);
+  const statut = e.statut === "prouvé" ? "" : ` (${e.statut})`;
+  if (e.niveau >= 5) {
+    const reste = e.manquants || [];
+    const liste = reste.length ? `reste : ${reste.slice(0, 3).map((j) => j.court || j.libelle).join(", ")}${reste.length > 3 ? ` et ${reste.length - 3} autres` : ""}` : "tous les jalons sont prouvés";
+    return [`Boussole — niveau 5${statut} · ${e.note}/100 · ${liste}.`];
   }
+  const lignes = [`Boussole — vous : niveau ${e.niveau}${statut} · ${e.note}/100. Ce projet : ${e.etat.texte}.`];
   if (e.niveau === 2) lignes.push("Dans chaque compte rendu, lisez d'abord le bloc 0 (ce qui a été fait) et le bloc 3 (ce que vous décidez) ; vos livrables sont dans output/.");
+  if (e.niveau <= 2 && e.phrases.length) lignes.push(`Dites par exemple : ${e.phrases.join(" · ")}`);
   if (e.niveau === 3) lignes.push("Une décision se tranche par sa lettre collée au numéro, par exemple « 3a ».");
   if (e.niveau === 4 && e.services.length) lignes.push(`Services utiles pour aller plus loin : ${e.services.map((s) => `${s.nom} (forge-${s.forge})`).join(" · ")}.`);
-  if (e.prochain) lignes.push(`Prochain jalon : ${e.prochain.libelle} (+${POINTS_PAR_JALON}).`);
+  if (e.prochain) lignes.push(`Prochain jalon : ${e.prochain.libelle} (+${POINTS_PAR_JALON})${e.niveau <= 1 && e.prochain.apport ? ` : ${e.prochain.apport}` : ""}.`);
   return lignes;
 }
 
@@ -381,9 +467,9 @@ export function detail(e) {
     `Ce projet : ${e.etat.texte}.`, "", "Jalons prouvés :"];
   for (const j of p.jalons) l.push(`  · ${j.id} ${PAR_ID.get(j.id).libelle} — le ${j.le} (${j.preuve})`);
   if (!p.jalons.length) l.push("  · aucun pour l'instant");
-  if (e.prochain) l.push("", `Prochain jalon : ${e.prochain.libelle} (+${POINTS_PAR_JALON}).`);
+  if (e.prochain) l.push("", `Prochain jalon : ${e.prochain.libelle} (+${POINTS_PAR_JALON})${e.prochain.apport ? ` : ${e.prochain.apport}` : ""}.`);
   if (e.services.length) l.push("", "Services utiles pour vos prochains jalons :", ...e.services.map((s) => `  · ${s.nom} (forge-${s.forge}) : ${s.intention}`));
-  if (e.phrases.length) l.push("", `Pour commencer sur ce projet, dites par exemple : ${e.phrases.join(" · ")}`);
+  if (e.niveau <= 2 && e.phrases.length) l.push("", `Pour commencer sur ce projet, dites par exemple : ${e.phrases.join(" · ")}`);
   l.push("", e.canal ? `Progression synchronisée avec : ${enSlash(e.canal)} (${e.canal_etat}).` : "Progression non synchronisée : dites « récupère ma progression depuis <dossier Drive> » pour la partager entre vos postes.");
   return l.join("\n");
 }
@@ -448,7 +534,7 @@ if (EST_CLI) {
     if (a.includes("--debutant")) debutant(dir);
     if (a.includes("--declarer-canal")) declarerCanal(dir, val("--declarer-canal"));
     if (a.includes("--noter")) noter(dir, val("--noter"), val("--preuve") || "hook");
-    if (a.includes("--contredire")) { const e0 = calculer({ pilot, cwd, racine, dir, ecrire: false }); contredire(dir, e0.prouve); }
+    if (a.includes("--contredire")) { const e0 = calculer({ pilot, cwd, racine, dir, ecrire: false, transcripts: null }); contredire(dir, e0.prouve); }
     const e = calculer({ pilot, cwd, racine, dir });
     if (a.includes("--json")) process.stdout.write(JSON.stringify({ ...e, ids: [...e.ids] }, null, 1) + "\n");
     else if (a.includes("--detail") || a.includes("--recuperer")) {

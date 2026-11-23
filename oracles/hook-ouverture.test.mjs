@@ -35,6 +35,7 @@ const hook = join(ICI, "hook-ouverture.mjs");
 const TABLES = mkdtempSync(join(tmpdir(), "hook-ouverture-tables-"));
 // Boussole (21/11/2026) : la progression de l'utilisateur ne s'écrit jamais dans le vrai `~/.digit-ai` sous recette.
 process.env.FORGE_UTILISATEUR_DIR = mkdtempSync(join(tmpdir(), "hook-ouverture-utilisateur-"));
+process.env.FORGE_TRANSCRIPTS_DIR = join(process.env.FORGE_UTILISATEUR_DIR, "transcripts"); // jamais les vraies transcriptions
 process.env.FORGE_NOMS_INTERDITS = join(TABLES, "_noms-interdits.json");
 process.env.FORGE_PRODUITS_PSEUDO = join(TABLES, "_produits-pseudonymes.json");
 const PILOT = join(ICI, "..");

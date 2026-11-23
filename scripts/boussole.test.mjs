@@ -4,18 +4,20 @@
  * Tout se joue dans un dossier jetable : un faux pilot, une fausse racine de projets, deux faux dossiers d'utilisateur
  * (deux postes) et un faux dossier synchronisé. Chaque contrôle a son cas rouge quand il en a un.
  */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, existsSync, utimesSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   calculer, normaliserEtape, typeDeRun, forgesNommees, niveauProuve, noteSur100, JALONS, fusionner,
   annoncer, contredire, debutant, noter, declarerCanal, ligneBoussole, lignesReleve, fichierPreferences, FICHIER_CANAL,
+  prochainJalon, skillDansHistorique,
 } from "./boussole.mjs";
 
 let pass = 0, fail = 0;
 const ok = (c, glose) => { console.log(`  [${c ? "PASS" : "FAIL"}] ${glose}`); c ? pass++ : fail++; };
 
 const base = mkdtempSync(join(tmpdir(), "boussole-"));
+process.env.FORGE_TRANSCRIPTS_DIR = join(base, "transcripts-vides"); // jamais les vraies transcriptions du poste
 const racine = join(base, "dev");
 const pilot = join(racine, "digit-ai-factory");
 mkdirSync(join(pilot, "references"), { recursive: true });
@@ -132,6 +134,48 @@ writeFileSync(join(base, "poste-pref", "PREFERENCES-UTILISATEUR.md"), "# Mes pr�
 const prefPerso = fichierPreferences(pilot, join(base, "poste-pref"));
 ok(prefPorteur && !prefPorteur.utilisateur && /PREFERENCES-PORTEUR/.test(prefPorteur.chemin) && prefPerso.utilisateur && /PREFERENCES-UTILISATEUR/.test(prefPerso.chemin),
   "L-06 — le fichier de l'utilisateur remplace celui du porteur quand il existe ; sans lui, rien ne change");
+
+// Textes selon le niveau (synthèse 20261122a, GO « A1 » du 22/11/2026)
+const J = (id) => JALONS.find((j) => j.id === id);
+const fauxEtat = (niveau, manquants = ["J-07", "J-23", "J-26"]) => ({ niveau, statut: "prouvé", note: 90, etat: { situation: "existant", texte: "produit existant, aucun run ouvert" },
+  phrases: ["« Je veux faire évoluer : … »"], services: [{ nom: "Profiler", forge: "data" }], manquants: manquants.map(J), prochain: J(manquants[0]) });
+const n5 = ligneBoussole(fauxEtat(5));
+ok(n5.length === 1 && n5[0] === "Boussole — niveau 5 · 90/100 · reste : un skill appelé par sa formule, forge-data, forge-seo-geo.",
+  `niveau 5 : une seule ligne, sans mode d'emploi (« ${n5.join(" / ")} »)`);
+ok(/et 2 autres\.$/.test(ligneBoussole(fauxEtat(5, ["J-07", "J-23", "J-26", "J-27", "J-28"]))[0]) && /tous les jalons sont prouvés/.test(ligneBoussole(fauxEtat(5, []))[0]),
+  "niveau 5 : trois jalons restants nommés au plus, puis leur nombre ; aucun restant le dit");
+const n4 = ligneBoussole(fauxEtat(4)), n3 = ligneBoussole(fauxEtat(3)), n2 = ligneBoussole(fauxEtat(2)), n1 = ligneBoussole(fauxEtat(1));
+ok(!n4.some((l) => /Dites par exemple/.test(l)) && n4.some((l) => /Services utiles/.test(l)) && !n3.some((l) => /Dites par exemple/.test(l)) && n3.some((l) => /« 3a »/.test(l)),
+  "rouge levé : aux niveaux 3 et 4, un produit existant n'affiche plus de phrases d'exemple ; le niveau 3 dit comment trancher, le 4 les services");
+ok(n2.some((l) => /bloc 0/.test(l)) && n2.some((l) => /Dites par exemple/.test(l)) && n1.some((l) => /Dites par exemple/.test(l)) && n1.some((l) => /^Prochain jalon : .+ : .+\.$/.test(l)) && !n2.some((l) => /^Prochain jalon : .+\(\+\d+\) : /.test(l)),
+  "niveaux 1 et 2 : phrases d'exemple ; au niveau 1 seulement, le prochain jalon dit ce qu'il apporte");
+
+// Prochain jalon par pertinence
+const m = (ids) => ids.map(J);
+ok(prochainJalon(m(["J-07", "J-23", "J-26"]), 5, "pilot").id === "J-23" && prochainJalon(m(["J-07", "J-15", "J-23"]), 4, "existant").id === "J-15"
+  && prochainJalon(m(["J-07", "J-23"]), 2, "existant").id === "J-07" && prochainJalon(m(["J-07"]), 5, "pilot").id === "J-07" && prochainJalon([], 5, "pilot") === null,
+  "prochain jalon : dès le niveau 4, d'abord ce que le projet peut prouver, puis une forge, les gestes de débutant en dernier ; avant le niveau 4, l'ordre de la liste");
+
+// J-07 prouvé par l'historique
+const tr = join(base, "transcripts"), trSession = join(tr, "c--dev-produit");
+mkdirSync(trSession, { recursive: true });
+const tA = join(trSession, "a.jsonl"), tB = join(trSession, "b.jsonl");
+writeFileSync(tA, JSON.stringify({ type: "user", timestamp: "2026-09-01T08:00:00Z", tools: [{ name: "Skill", description: "Invoke a skill." }] }) + "\n", "utf8");
+writeFileSync(tB, JSON.stringify({ type: "user" }) + "\n" + '{"type":"assistant","timestamp":"2026-10-05T09:30:00Z","message":{"content":[{"type":"tool_use","id":"x","name":"Skill","input":{"skill":"prompt-analyzer-l99"}}]}}' + "\n", "utf8");
+utimesSync(tA, new Date("2026-09-01T08:00:00Z"), new Date("2026-09-01T08:00:00Z"));
+utimesSync(tB, new Date("2026-10-05T10:00:00Z"), new Date("2026-10-05T10:00:00Z"));
+const h1 = skillDansHistorique(tr);
+ok(h1.trouve?.le === "2026-10-05", `J-07 : un appel du skill dans une transcription le prouve, daté par sa ligne (${h1.trouve?.le})`);
+ok(skillDansHistorique(tr, "2026-11-01T00:00:00.000Z").trouve === null && skillDansHistorique(join(base, "nulle-part")).trouve === null,
+  "J-07, rouge : la seule description de l'outil ne prouve rien, et les fichiers déjà lus ne se relisent pas");
+const posteH = join(base, "poste-historique");
+const eH = calculer({ pilot, cwd: neuf, racine, dir: posteH, transcripts: tr });
+ok(eH.ids.has("J-07") && eH.progression.jalons.find((j) => j.id === "J-07").preuve === "appel de skill (transcription de session)",
+  "J-07 : calculer() le reprend de l'historique et le garde dans la progression");
+const posteH2 = join(base, "poste-historique-2"), trVide = join(base, "transcripts-sans-skill");
+mkdirSync(join(trVide, "p"), { recursive: true }); writeFileSync(join(trVide, "p", "a.jsonl"), '{"type":"user"}\n', "utf8");
+const eH2 = calculer({ pilot, cwd: neuf, racine, dir: posteH2, transcripts: trVide });
+ok(!eH2.ids.has("J-07") && Boolean(eH2.progression.historique_lu_le), "J-07, rouge : sans appel de skill, rien n'est prouvé, et le repère de lecture avance");
 
 // Aucune écriture sous recette
 process.env.FORGE_SANS_OBSERVATION = "1";
