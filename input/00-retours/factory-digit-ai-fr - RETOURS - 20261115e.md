@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261115e
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (la ligne du sidecar portait une famille du référentiel au lieu d'une clé de classe). Clé choisie à la lecture du retour : RP-44 devient `perimetre-de-session-confondu` (famille `hook-ou-gate`). Reportée au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : run `forge-digit-ai-fr-20261114a`. Deux sessions travaillent sur le même produit, et le contrôle de lot du hook de fin de tour bloque une session sur le retour de l'autre.
 - **Références ledger** : forge/ledger.jsonl seq 223 ; la seq 218 est citée pour mémoire. C'est un retour de l'autre session, dont le lot revient à cette session-là : il n'est pas repris ici comme candidat.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -27,7 +29,7 @@ Le tableau se lit ligne par ligne : une ligne est un retour, avec sa gravité, s
 
 ## La règle qui aurait évité le retour
 
-RP-44 : le contrôle suppose une seule session par produit. Classe : `hook-ou-gate`.
+RP-44 : le contrôle suppose une seule session par produit. Classe : `perimetre-de-session-confondu` (famille `hook-ou-gate`).
 
 ## Remarques restées au produit
 

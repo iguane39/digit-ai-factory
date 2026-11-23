@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261115d
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (la ligne du sidecar portait une famille du référentiel au lieu d'une clé de classe). Clé choisie à la lecture du retour : RP-43 devient `lot-remis-ecrasable` (famille `lot-forme`). Reportée au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : run `forge-digit-ai-fr-20261114a`. Deux sessions écrivent des lots de retours sur le même produit, le même jour.
 - **Références ledger** : forge/ledger.jsonl seq 222.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -27,7 +29,7 @@ Le tableau se lit ligne par ligne : une ligne est un retour, avec sa gravité, s
 
 ## La règle qui aurait évité le retour
 
-RP-43 : R-49 protège le sas, pas la copie locale du produit, et rien ne réserve un indice. Classe : `lot-forme`.
+RP-43 : R-49 protège le sas, pas la copie locale du produit, et rien ne réserve un indice. Classe : `lot-remis-ecrasable` (famille `lot-forme`).
 
 ## Remarques restées au produit
 

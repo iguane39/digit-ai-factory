@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261114t
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (la ligne du sidecar portait une famille du référentiel au lieu d'une clé de classe). Clé choisie à la lecture du retour : RP-23 devient `oracle-perimetre-de-non-mesure-non-publie` (famille `regle-morte`), la même que RP-22 du lot 20261114s, comme le dit la section « La règle qui aurait évité le retour ». Reportée au sidecar et à cette section. Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : étape `animation-forge-tests` du run `forge-digit-ai-fr-20261114a`, critique d'implémentation de forge-design jouée sur le banc de l'animation. Ce lot complète le lot 20261114s, déjà remis, qui porte les entrées 148 et 149 du ledger.
 - **Références ledger** : forge/ledger.jsonl seq 155 ; les seq 148 et 149 sont portées par le lot 20261114s.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -27,7 +29,7 @@ Le tableau se lit ligne par ligne : une ligne est un retour, avec sa gravité, s
 
 ## La règle qui aurait évité le retour
 
-RP-23 : un oracle qui ne lit pas sa cible doit dire qu'il ne l'a pas mesurée. Classe : `skill-ou-oracle-non-invoque`, la même que RP-22 du lot 20261114s.
+RP-23 : un oracle qui ne lit pas sa cible doit dire qu'il ne l'a pas mesurée. Classe : `oracle-perimetre-de-non-mesure-non-publie` (famille `regle-morte`), la même que RP-22 du lot 20261114s.
 
 ## Remarques restées au produit
 

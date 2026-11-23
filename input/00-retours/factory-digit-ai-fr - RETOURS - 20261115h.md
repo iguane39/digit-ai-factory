@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261115h
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (la ligne du sidecar portait une famille du référentiel au lieu d'une clé de classe). Clé choisie à la lecture du retour : RP-47 devient `action-sans-objet` (famille `restitution-forme`), la classe voisine du tableau des actions du bloc 8 dont le gabarit n'a pas la colonne qui dirait l'état de l'action. Reportée au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : run `forge-digit-ai-fr-20261114a`. Le créateur a lu deux actions en cours chez un agent comme des tâches en attente de son accord, et demande un statut dans le tableau des actions.
 - **Références ledger** : forge/ledger.jsonl seq 252.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -27,7 +29,7 @@ Le tableau se lit ligne par ligne : une ligne est un retour, avec sa gravité, s
 
 ## La règle qui aurait évité le retour
 
-RP-47 : le gabarit nomme qui fait l'action et pourquoi elle n'est pas faite, mais pas si elle est déjà partie. Classe : `restitution-forme`.
+RP-47 : le gabarit nomme qui fait l'action et pourquoi elle n'est pas faite, mais pas si elle est déjà partie. Classe : `action-sans-objet` (famille `restitution-forme`).
 
 ## Remarques restées au produit
 

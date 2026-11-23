@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261115j
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (les deux lignes du sidecar portaient une famille du référentiel au lieu d'une clé de classe). Clés choisies à la lecture des retours : RP-52 devient `livrable-derive-non-regenere` (famille `versionnement-livrable`) ; RP-53 devient `oracle-faux-positif` (famille `regle-morte`). Reportées au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : run `forge-digit-ai-fr-20261114a`, page complète de la forge des tests construite par un agent `constructeur` avec le texte refait.
 - **Références ledger** : forge/ledger.jsonl seq 258, 259.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -37,8 +39,8 @@ Le tableau se lit comme le précédent.
 
 ## La règle qui aurait évité le retour
 
-- RP-52 : le contrôle d'héritage ne compare pas la copie embarquée du catalogue à sa source. Classe : `heritage-produit`.
-- RP-53 : des règles écrites pour les documents s'appliquent à une page de site. Classe : `page-html-socle`.
+- RP-52 : le contrôle d'héritage ne compare pas la copie embarquée du catalogue à sa source. Classe : `livrable-derive-non-regenere` (famille `versionnement-livrable`).
+- RP-53 : des règles écrites pour les documents s'appliquent à une page de site. Classe : `oracle-faux-positif` (famille `regle-morte`).
 
 ## Remarques restées au produit
 

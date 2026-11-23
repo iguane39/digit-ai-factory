@@ -17,7 +17,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | Élément | Type | Taille | Titre / nature |
 |---|---|---|---|
 | `_arrivee\` | dossier ignoré par git (absent d'un clone) | — | Sas d'arrivée des lots, IGNORÉ par git (absent d'un clone frais) : le producteur y dépose son lot tel qu'il est, nom réel compris ; `node todo\accueillir-lot.mj… |
-| [`old\`](old/README.md) | dossier (682 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
+| [`old\`](old/README.md) | dossier (684 fichiers) | — | Lots de retours déjà ingérés au registre TODO (ids TF frappés). Conservés figés : l'empreinte du lot garantit l'idempotence d'ingestion, et l'histoire ne se réé… |
 | `digit-ai-marketing - RETOURS - 20261109a.md` | fichier | 5,8 Ko | Retours forges — digit-ai-marketing — 20261109a |
 | `digit-ai-marketing - RETOURS - 20261109a.tf.jsonl` | fichier | 2,7 Ko | 3 ligne(s) JSONL |
 | `digit-ai-marketing - RETOURS - 20261109b.md` | fichier | 25,0 Ko | Retours forges — digit-ai-marketing — 20261109b |
@@ -56,8 +56,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `digit-ai-marketing - RETOURS - 20261113a.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
 | `digit-ai-marketing - RETOURS - 20261122a.md` | fichier | 3,1 Ko | Retours forges — digit-ai-marketing — 20261122a |
 | `digit-ai-marketing - RETOURS - 20261122a.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
-| `digit-ai-marketing - RETOURS - 20261122b.md` | fichier | 4,7 Ko | Retours forges — digit-ai-marketing — 20261122b |
-| `digit-ai-marketing - RETOURS - 20261122b.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
+| `digit-ai-marketing - RETOURS - 20261122b.md` | fichier | 5,8 Ko | Retours forges — digit-ai-marketing — 20261122b |
+| `digit-ai-marketing - RETOURS - 20261122b.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114a.md` | fichier | 2,9 Ko | Retours forges — factory-digit-ai-fr — 20261114a |
 | `factory-digit-ai-fr - RETOURS - 20261114a.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114b.md` | fichier | 3,4 Ko | Retours forges — factory-digit-ai-fr — 20261114b |
@@ -88,19 +88,17 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `factory-digit-ai-fr - RETOURS - 20261114o.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114p.md` | fichier | 3,3 Ko | Retours forges — factory-digit-ai-fr — 20261114p |
 | `factory-digit-ai-fr - RETOURS - 20261114p.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261114q.md` | fichier | 3,2 Ko | Retours forges — factory-digit-ai-fr — 20261114q |
-| `factory-digit-ai-fr - RETOURS - 20261114q.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114r.md` | fichier | 3,3 Ko | Retours forges — factory-digit-ai-fr — 20261114r |
 | `factory-digit-ai-fr - RETOURS - 20261114r.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261114s.md` | fichier | 3,8 Ko | Retours forges — factory-digit-ai-fr — 20261114s |
+| `factory-digit-ai-fr - RETOURS - 20261114s.md` | fichier | 4,4 Ko | Retours forges — factory-digit-ai-fr — 20261114s |
 | `factory-digit-ai-fr - RETOURS - 20261114s.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261114t.md` | fichier | 2,6 Ko | Retours forges — factory-digit-ai-fr — 20261114t |
-| `factory-digit-ai-fr - RETOURS - 20261114t.tf.jsonl` | fichier | 895 o | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114t.md` | fichier | 3,2 Ko | Retours forges — factory-digit-ai-fr — 20261114t |
+| `factory-digit-ai-fr - RETOURS - 20261114t.tf.jsonl` | fichier | 909 o | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114u.md` | fichier | 4,2 Ko | Retours forges — factory-digit-ai-fr — 20261114u |
 | `factory-digit-ai-fr - RETOURS - 20261114u.tf.jsonl` | fichier | 3,5 Ko | 3 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114v.md` | fichier | 2,3 Ko | Retours forges — factory-digit-ai-fr — 20261114v |
 | `factory-digit-ai-fr - RETOURS - 20261114v.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261114w.md` | fichier | 5,4 Ko | Retours forges — factory-digit-ai-fr — 20261114w |
+| `factory-digit-ai-fr - RETOURS - 20261114w.md` | fichier | 6,1 Ko | Retours forges — factory-digit-ai-fr — 20261114w |
 | `factory-digit-ai-fr - RETOURS - 20261114w.tf.jsonl` | fichier | 3,2 Ko | 3 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114x.md` | fichier | 2,6 Ko | Retours forges — factory-digit-ai-fr — 20261114x |
 | `factory-digit-ai-fr - RETOURS - 20261114x.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
@@ -110,27 +108,27 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `factory-digit-ai-fr - RETOURS - 20261114z.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261114za.md` | fichier | 3,3 Ko | Retours forges — factory-digit-ai-fr — 20261114za |
 | `factory-digit-ai-fr - RETOURS - 20261114za.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261114zb.md` | fichier | 5,7 Ko | Retours forges — factory-digit-ai-fr — 20261114zb |
-| `factory-digit-ai-fr - RETOURS - 20261114zb.tf.jsonl` | fichier | 3,9 Ko | 5 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114zb.md` | fichier | 6,6 Ko | Retours forges — factory-digit-ai-fr — 20261114zb |
+| `factory-digit-ai-fr - RETOURS - 20261114zb.tf.jsonl` | fichier | 4,0 Ko | 5 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261115a.md` | fichier | 2,9 Ko | Retours forges — factory-digit-ai-fr — 20261115a |
 | `factory-digit-ai-fr - RETOURS - 20261115a.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261115b.md` | fichier | 3,3 Ko | Retours forges — factory-digit-ai-fr — 20261115b |
 | `factory-digit-ai-fr - RETOURS - 20261115b.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261115c.md` | fichier | 2,8 Ko | Retours forges — factory-digit-ai-fr — 20261115c |
-| `factory-digit-ai-fr - RETOURS - 20261115c.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261115d.md` | fichier | 2,5 Ko | Retours forges — factory-digit-ai-fr — 20261115d |
-| `factory-digit-ai-fr - RETOURS - 20261115d.tf.jsonl` | fichier | 881 o | 1 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261115e.md` | fichier | 2,4 Ko | Retours forges — factory-digit-ai-fr — 20261115e |
-| `factory-digit-ai-fr - RETOURS - 20261115e.tf.jsonl` | fichier | 893 o | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261115c.md` | fichier | 3,3 Ko | Retours forges — factory-digit-ai-fr — 20261115c |
+| `factory-digit-ai-fr - RETOURS - 20261115c.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261115d.md` | fichier | 2,9 Ko | Retours forges — factory-digit-ai-fr — 20261115d |
+| `factory-digit-ai-fr - RETOURS - 20261115d.tf.jsonl` | fichier | 891 o | 1 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261115e.md` | fichier | 2,9 Ko | Retours forges — factory-digit-ai-fr — 20261115e |
+| `factory-digit-ai-fr - RETOURS - 20261115e.tf.jsonl` | fichier | 910 o | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261115f.md` | fichier | 2,4 Ko | Retours forges — factory-digit-ai-fr — 20261115f |
 | `factory-digit-ai-fr - RETOURS - 20261115f.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261115g.md` | fichier | 2,3 Ko | Retours forges — factory-digit-ai-fr — 20261115g |
 | `factory-digit-ai-fr - RETOURS - 20261115g.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261115h.md` | fichier | 2,7 Ko | Retours forges — factory-digit-ai-fr — 20261115h |
+| `factory-digit-ai-fr - RETOURS - 20261115h.md` | fichier | 3,3 Ko | Retours forges — factory-digit-ai-fr — 20261115h |
 | `factory-digit-ai-fr - RETOURS - 20261115h.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261115i.md` | fichier | 4,3 Ko | Retours forges — factory-digit-ai-fr — 20261115i |
 | `factory-digit-ai-fr - RETOURS - 20261115i.tf.jsonl` | fichier | 4,2 Ko | 4 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261115j.md` | fichier | 3,7 Ko | Retours forges — factory-digit-ai-fr — 20261115j |
+| `factory-digit-ai-fr - RETOURS - 20261115j.md` | fichier | 4,2 Ko | Retours forges — factory-digit-ai-fr — 20261115j |
 | `factory-digit-ai-fr - RETOURS - 20261115j.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261115k.md` | fichier | 3,9 Ko | Retours forges — factory-digit-ai-fr — 20261115k |
 | `factory-digit-ai-fr - RETOURS - 20261115k.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
@@ -168,7 +166,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `factory-digit-ai-fr - RETOURS - 20261115za.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261115zb.md` | fichier | 9,1 Ko | Retours forges — factory-digit-ai-fr — 20261115zb |
 | `factory-digit-ai-fr - RETOURS - 20261115zb.tf.jsonl` | fichier | 6,1 Ko | 5 ligne(s) JSONL |
-| `factory-digit-ai-fr - RETOURS - 20261115zc.md` | fichier | 5,7 Ko | Retours forges — factory-digit-ai-fr — 20261115zc |
+| `factory-digit-ai-fr - RETOURS - 20261115zc.md` | fichier | 6,3 Ko | Retours forges — factory-digit-ai-fr — 20261115zc |
 | `factory-digit-ai-fr - RETOURS - 20261115zc.tf.jsonl` | fichier | 4,7 Ko | 4 ligne(s) JSONL |
 | `factory-digit-ai-fr - RETOURS - 20261116b.md` | fichier | 2,8 Ko | Retours forges — factory-digit-ai-fr — 20261116b |
 | `factory-digit-ai-fr - RETOURS - 20261116b.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
@@ -242,6 +240,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-12 - RETOURS - 20261122f.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261122g.md` | fichier | 6,2 Ko | Retours forges — Produit-12 — 20261122g |
 | `Produit-12 - RETOURS - 20261122g.tf.jsonl` | fichier | 3,7 Ko | 5 ligne(s) JSONL |
+| `Produit-61 - RETOURS - 20261123a.md` | fichier | 4,6 Ko | Retours forges — Produit-61 — 20261123a |
+| `Produit-61 - RETOURS - 20261123a.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20261020a.md` | fichier | 5,9 Ko | Lot de retours — Produit-64 → digit-ai-factory (garde R-62, `oracles/hook-identite-sortant |
 | `Produit-64 - RETOURS - 20261020a.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20261020b.md` | fichier | 6,8 Ko | Lot de retours — Produit-64 → digit-ai-factory (restitution, bloc 3, format B S78) — 2026- |
@@ -258,6 +258,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-64 - RETOURS - 20261105c.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20261110a.md` | fichier | 5,0 Ko | Lot de retours — Produit-64 → digit-ai-factory (une lecture `git merge-base` comptée comme |
 | `Produit-64 - RETOURS - 20261110a.tf.jsonl` | fichier | 1,4 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261123a.md` | fichier | 6,0 Ko | Lot de retours — Produit-64 → digit-ai-factory (un geste confié à un tiers sans lire son d |
+| `Produit-64 - RETOURS - 20261123a.tf.jsonl` | fichier | 1,5 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261123b.md` | fichier | 5,7 Ko | Lot de retours — Produit-64 → digit-ai-factory (un déplacement déjà tracé, reproduit dans  |
+| `Produit-64 - RETOURS - 20261123b.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-64 - RETOURS - 20261123c.md` | fichier | 7,3 Ko | Lot de retours — Produit-64 → digit-ai-factory (une contrainte de forme non transposée au  |
+| `Produit-64 - RETOURS - 20261123c.tf.jsonl` | fichier | 2,7 Ko | 2 ligne(s) JSONL |
 | `Produit-73 - RETOURS - 20261019a.md` | fichier | 5,6 Ko | Retours forges — Produit-73 — 20261019a |
 | `Produit-73 - RETOURS - 20261019a.tf.jsonl` | fichier | 2,4 Ko | 2 ligne(s) JSONL |
 | `Produit-73 - RETOURS - 20261026a.md` | fichier | 8,2 Ko | Retours forges — Produit-73 — 20261026a |
@@ -332,6 +338,16 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-81 - RETOURS - 20261113c.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `Produit-81 - RETOURS - 20261113d.md` | fichier | 2,6 Ko | Retours forges — Produit-81 — 20261113d |
 | `Produit-81 - RETOURS - 20261113d.tf.jsonl` | fichier | 962 o | 1 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261123a.md` | fichier | 3,2 Ko | Retours forges — Produit-81 — 20261123a |
+| `Produit-81 - RETOURS - 20261123a.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261123b.md` | fichier | 3,1 Ko | Retours forges — Produit-81 — 20261123b |
+| `Produit-81 - RETOURS - 20261123b.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261123c.md` | fichier | 4,6 Ko | Retours forges — Produit-81 — 20261123c |
+| `Produit-81 - RETOURS - 20261123c.tf.jsonl` | fichier | 1,9 Ko | 2 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261123d.md` | fichier | 2,9 Ko | Retours forges — Produit-81 — 20261123d |
+| `Produit-81 - RETOURS - 20261123d.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
+| `Produit-81 - RETOURS - 20261123e.md` | fichier | 4,6 Ko | Retours forges — Produit-81 — 20261123e |
+| `Produit-81 - RETOURS - 20261123e.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
 | `Produit-82 - RETOURS - 20261110a.md` | fichier | 6,6 Ko | Retours forges — Produit-82 — 20261110a |
 | `Produit-82 - RETOURS - 20261110a.tf.jsonl` | fichier | 7,2 Ko | 8 ligne(s) JSONL |
 | `Produit-82 - RETOURS - 20261110b.md` | fichier | 2,8 Ko | Retours forges — Produit-82 — 20261110b |
@@ -558,5 +574,9 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261112h.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261113a.md` | fichier | 4,1 Ko | Retours forges — Produit-86 — 20261113a |
 | `Produit-86 - RETOURS - 20261113a.tf.jsonl` | fichier | 1015 o | 1 ligne(s) JSONL |
+| `Produit-87 - RETOURS - 20261123a.md` | fichier | 8,9 Ko | Retours forges — Produit-87 — 20261123a |
+| `Produit-87 - RETOURS - 20261123a.tf.jsonl` | fichier | 5,4 Ko | 4 ligne(s) JSONL |
+| `Produit-87 - RETOURS - 20261123b.md` | fichier | 4,5 Ko | Retours forges — Produit-87 — 20261123b |
+| `Produit-87 - RETOURS - 20261123b.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 
-_540 fichier(s), 2 sous-dossier(s)_
+_560 fichier(s), 2 sous-dossier(s)_

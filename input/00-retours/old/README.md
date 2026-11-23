@@ -60,8 +60,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | [`produits-anciens\`](produits-anciens/README.md) | dossier (2 fichiers) | — | Lots de retours ingérés de l'émetteur « produits-anciens » (lot `.md`, sidecar `.tf.jsonl`, pièces jointes et caches d'oracles), classés par `node scripts\range… |
 | `factory-digit-ai-fr - RETOURS - 20261114i.md` | fichier | 4,3 Ko | Retours forges — factory-digit-ai-fr — 20261114i |
 | `factory-digit-ai-fr - RETOURS - 20261114i.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
+| `factory-digit-ai-fr - RETOURS - 20261114q.md` | fichier | 3,2 Ko | Retours forges — factory-digit-ai-fr — 20261114q |
+| `factory-digit-ai-fr - RETOURS - 20261114q.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
 | `Produit-61 - Étude - 20260909b.md` | fichier | 8,1 Ko | Pourquoi la construction a laissé passer ce que l'audit trouve |
 | `Produit-82 - RETOURS - 20261113f.md` | fichier | 3,7 Ko | Retours forges — Produit-82 — 20261113f |
 | `Produit-82 - RETOURS - 20261113f.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 
-_5 fichier(s), 42 sous-dossier(s)_
+_7 fichier(s), 42 sous-dossier(s)_

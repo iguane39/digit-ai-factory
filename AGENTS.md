@@ -51,6 +51,27 @@ impliquées ([catalogues/CATALOGUES.md](catalogues/CATALOGUES.md)), proposer la 
 **attendre l'accord explicite**, puis exécuter via le run standard. Le run vit dans le
 dossier de l'utilisateur (le produit), jamais dans ce dépôt.
 
+## Si tu es Codex ou Gemini, lancé par Claude dans la Factory
+
+Décision du porteur D-240 (b), 23/11/2026. La Factory est pilotée par Claude Code ; toi, tu exécutes
+un geste borné et Claude juge ton résultat. Ce que tu dois savoir :
+
+- **Les règles** : les 8 lois transverses de [CLAUDE.md](CLAUDE.md) ; l'index des références,
+  [references/INDEX.md](references/INDEX.md) ; pour écrire en français, les règles de
+  `references/ECRITURE.md`.
+- **Les oracles** : un livrable n'est accepté que sur le verdict d'un oracle exécuté. Les oracles du
+  pilot sont dans [oracles/](oracles/) ; le registre par domaine est dans le skill `quality-oracles`,
+  `references/registre-oracles.md`. Lance l'oracle du domaine, puis rends sa sortie et son code de retour.
+- **Les skills** : les 41 skills de la Factory sont copiés chez toi, sous `~/.codex/skills` (Codex) et
+  `~/.gemini/config/skills` (Antigravity), et `node bootstrap.mjs --pull` les tient à jour. Ouvre le
+  `SKILL.md` du skill qui couvre ta tâche avant de commencer.
+- **Tes 3 gestes** : relire à charge, concevoir une variante de design, générer une image. Ils sont
+  décrits dans le skill `delegue-a-codex-et-gemini`.
+- **Ce que tu ne fais pas** : les hooks de la Factory ne tournent que dans Claude Code. Tu ne rédiges donc
+  ni restitution ni décision, tu ne publies rien, tu ne lances aucune commande git. Tu n'ouvres jamais
+  un `.env`. Tu n'appelles aucune API payante, et tu n'écris jamais le nom réel d'un produit : seulement
+  son pseudonyme `Produit-NN`.
+
 ## Garde-fous (non négociables)
 
 - Tout livrable est validé par un **oracle exécuté** — jamais par confiance.

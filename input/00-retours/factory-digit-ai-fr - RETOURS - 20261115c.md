@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261115c
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (la ligne du sidecar portait une famille du référentiel au lieu d'une clé de classe). Clé choisie à la lecture du retour : RP-42 devient `livrable-derive-non-regenere` (famille `versionnement-livrable`). Reportée au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : run `forge-digit-ai-fr-20261114a`, refonte du texte de la page de la forge des tests. Le rédacteur relève un écart entre les services affichés par la page et le catalogue de la Factory.
 - **Références ledger** : forge/ledger.jsonl seq 221.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -27,7 +29,7 @@ Le tableau se lit ligne par ligne : une ligne est un retour, avec sa gravité, s
 
 ## La règle qui aurait évité le retour
 
-RP-42 : une copie générée du catalogue n'est jamais comparée à sa source. Classe : `heritage-produit`.
+RP-42 : une copie générée du catalogue n'est jamais comparée à sa source. Classe : `livrable-derive-non-regenere` (famille `versionnement-livrable`).
 
 ## Remarques restées au produit
 

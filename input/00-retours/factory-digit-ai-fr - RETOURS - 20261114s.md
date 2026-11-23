@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261114s
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (les deux lignes du sidecar portaient une famille du référentiel au lieu d'une clé de classe). Clés choisies à la lecture des retours : RP-21 devient `oracle-faux-positif` (famille `regle-morte`) ; RP-22 devient `oracle-perimetre-de-non-mesure-non-publie` (famille `regle-morte`). Reportées au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : étape `animation-forge-tests` du run `forge-digit-ai-fr-20261114a`. Un agent `constructeur` a dessiné l'animation légendée de la page de la forge des tests et son banc, puis les a jugés par les oracles de forme et de mouvement.
 - **Références ledger** : forge/ledger.jsonl, les deux entrées `retour` de l'étape `animation-forge-tests` (destinataires `forge-design` et `forge-agents`).
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -40,8 +42,8 @@ Le tableau se lit comme le précédent.
 
 ## La règle qui aurait évité le retour
 
-- RP-21 : un oracle de rendu ne juge que ce qui est visible à l'écran ; ici, il n'applique pas la règle à l'opacité héritée. Classe : `regle-morte`.
-- RP-22 : un oracle qui ne lit pas sa cible doit dire qu'il ne l'a pas mesurée. Classe : `skill-ou-oracle-non-invoque`.
+- RP-21 : un oracle de rendu ne juge que ce qui est visible à l'écran ; ici, il n'applique pas la règle à l'opacité héritée. Classe : `oracle-faux-positif` (famille `regle-morte`).
+- RP-22 : un oracle qui ne lit pas sa cible doit dire qu'il ne l'a pas mesurée. Classe : `oracle-perimetre-de-non-mesure-non-publie` (famille `regle-morte`).
 
 ## Remarques restées au produit
 

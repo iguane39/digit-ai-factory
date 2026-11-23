@@ -771,6 +771,23 @@ else {
     }
   }
 
+  // D-240 (b) du 23/11/2026 — LES SKILLS DE LA FACTORY CHEZ CODEX ET ANTIGRAVITY. Le 2e banc
+  // multi-agents a mesuré qu'aucun des deux ne chargeait un skill de la Factory. La copie est tenue
+  // à jour ici, sous --pull seulement, et jamais quand une recette désigne ses propres skills
+  // (FORGE_SKILLS_INSTALLES) : un banc sur dépôts factices n'écrit pas chez les agents du poste.
+  if (!sansSkills && !process.env.FORGE_SKILLS_INSTALLES) {
+    const propagateur = join(ICI, "scripts", "propager-skills-agents.mjs");
+    if (existsSync(propagateur)) {
+      const r = run(process.execPath, [propagateur, ...(pull ? [] : ["--verifier"])], ICI);
+      let j = {};
+      try { j = JSON.parse(r.stdout); } catch { /* jugé par le code de retour */ }
+      const agents = (j.cibles || []).map((c) => c.agent).join(" et ");
+      if (r.status === 2) ligne("ok", "skills des agents tiers : ni Codex ni Antigravity installés, rien à copier");
+      else if (r.status === 0) ligne("ok", `skills de la Factory copiés chez ${agents} (${j.skills} skills, D-240 (b))`);
+      else ligne("avert", `skills de la Factory en écart chez ${agents || "les agents tiers"} — node scripts/propager-skills-agents.mjs`);
+    }
+  }
+
   // TF-1285 (22/09/2026, décision humaine D-2 (b)) — L'ENTRÉE DU DISPOSITIF EST POSÉE AU POSTE,
   // et pas seulement dans le produit. Le 22/09 à 10:16, un projet neuf dont le premier message
   // citait le dépôt du dispositif n'a rien enclenché : le hameçon `UserPromptSubmit` de la bonne

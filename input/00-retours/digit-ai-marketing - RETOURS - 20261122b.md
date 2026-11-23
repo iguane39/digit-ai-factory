@@ -1,5 +1,7 @@
 # Retours forges — digit-ai-marketing — 20261122b
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (les deux lignes « classe-a-creer » du sidecar n'avaient pas de libellé, et leurs familles « prompt » et « relecture » ne sont pas au référentiel). RA-233 prend la classe existante `livrable-exige-hors-perimetre-de-la-demande` (famille `hook-ou-gate`) : la ligne ne porte plus de classe proposée. RP-224 reste « classe-a-creer », avec la clé, le libellé et la famille nommés dans la section « La règle qui aurait évité le retour » ; sa famille « relecture », absente du référentiel, est rattachée à `hook-ou-gate`. Le tableau ci-dessous garde les mots du produit. Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : correction du porteur — la page de formation à Claude, produite le 22/11/2026 à partir du prompt réécrit par une revue L99, a été rejetée en entier : trop de théorie sur les modèles de langage, pas assez de pratique, forme pauvre et sans menu.
 - **Références ledger** : `forge\ledger.jsonl` seq 817 et 818 (entrées `type: retour`), correction du porteur seq 816, livrable seq 819.
 - **Remise au pilot** : copie de ce fichier et de son sidecar dans le SAS `<pilot>\input\00-retours\_arrivee\`.
@@ -62,3 +64,6 @@ Aucun garde-fou de plateforme relevé sur ce lot.
 ## La règle qui aurait évité le retour
 
 Un contenu visible ajouté sans demande se pose au porteur avant d'être produit ; la relecture d'intention lit la demande telle que le porteur l'a écrite, fichiers cités compris.
+
+- RA-233 : classe existante `livrable-exige-hors-perimetre-de-la-demande` (famille `hook-ou-gate`) : une exigence que la demande ne porte pas est imposée au livrable.
+- RP-224 : classe à créer `relecture-intention-sur-demande-par-renvoi`, famille `hook-ou-gate`, libellé « La relecture d'intention ne lit pas le fichier qu'une demande par renvoi cite et juge sur la seule phrase de renvoi ».

@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261114zb
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (les cinq lignes du sidecar portaient une famille du référentiel au lieu d'une clé de classe). Clés choisies à la lecture des retours : RP-35 devient `nommage-lot-sans-issue` (famille `versionnement-livrable`) ; RP-36 devient `oracle-faux-positif` (famille `regle-morte`) ; RP-37 devient `oracle-faux-positif` (même règle que RP-21) ; RP-38 devient `recette-verdict-non-prononcable` (famille `regle-morte`) ; RP-39 devient `perimetre-de-session-confondu` (famille `hook-ou-gate`). Reportées au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : run `forge-digit-ai-fr-20261114a`. La maquette de la page de la forge des tests a été construite et vérifiée par un agent `constructeur`. Le 27e lot de retours de la journée a été refusé par le hook de nommage.
 - **Références ledger** : forge/ledger.jsonl seq 192, 193, 194, 195, 196.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -49,11 +51,11 @@ Le tableau se lit comme le précédent.
 
 ## La règle qui aurait évité le retour
 
-- RP-35 : la règle R-4 fixe un indice sans en borner le nombre, alors que l'oracle qui la juge le borne à 26. Classe : `regle-morte`.
-- RP-36 : le socle juge une page par son seul HTML, alors que la direction B centralise ses jetons dans une feuille. Classe : `page-html-socle`.
-- RP-37 : même règle que RP-21. Classe : `regle-morte`.
-- RP-38 : un verdict sans la version de son juge. Classe : `hook-ou-gate`.
-- RP-39 : une trace qui ne dit pas qui l'a produite. Classe : `tracabilite-ledger`.
+- RP-35 : la règle R-4 fixe un indice sans en borner le nombre, alors que l'oracle qui la juge le borne à 26. Classe : `nommage-lot-sans-issue` (famille `versionnement-livrable`).
+- RP-36 : le socle juge une page par son seul HTML, alors que la direction B centralise ses jetons dans une feuille. Classe : `oracle-faux-positif` (famille `regle-morte`).
+- RP-37 : même règle que RP-21. Classe : `oracle-faux-positif` (famille `regle-morte`).
+- RP-38 : un verdict sans la version de son juge. Classe : `recette-verdict-non-prononcable` (famille `regle-morte`).
+- RP-39 : une trace qui ne dit pas qui l'a produite. Classe : `perimetre-de-session-confondu` (famille `hook-ou-gate`).
 
 ## Remarques restées au produit
 

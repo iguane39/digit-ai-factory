@@ -1,5 +1,7 @@
 # Retours forges — factory-digit-ai-fr — 20261114w
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte le 23/11/2026 (les trois lignes du sidecar portaient une famille du référentiel au lieu d'une clé de classe). Clés choisies à la lecture des retours : RP-28 devient `texte-long-non-structure` (famille `hook-ou-gate`) ; RP-29 devient `contenu-d-auteur-livre-au-lecteur` (famille `gabarit-document`) ; RP-30 devient `oracle-faux-positif` (famille `regle-morte`). Reportées au sidecar et à la section « La règle qui aurait évité le retour ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : run `forge-digit-ai-fr-20261114a`, page de la forge des tests. Le créateur a rejeté la longueur du texte et ses phrases méta, et demande que le problème remonte à la Factory pour qu'il ne se répète pas.
 - **Références ledger** : forge/ledger.jsonl seq 171, 175, 176, 177.
 - **Remise au pilot** : copié dans `digit-ai-factory\input\00-retours\` par `oracle-lot.mjs --remettre`.
@@ -44,9 +46,9 @@ Le tableau se lit comme le précédent.
 
 ## La règle qui aurait évité le retour
 
-- RP-28 : la règle EC-1 du plancher d'écriture existe, mais sa liste ne couvre pas ces tournures, et EC-14 ne juge pas un texte de site. Classe : `regle-morte`.
-- RP-29 : un critère de prompt qui demande de définir un mot dans le texte publié, et un gabarit de page sans budget de longueur. Classe : `gabarit-document`.
-- RP-30 : une règle écrite pour les documents internes, appliquée à du contenu publié. Classe : `page-html-socle`.
+- RP-28 : la règle EC-1 du plancher d'écriture existe, mais sa liste ne couvre pas ces tournures, et EC-14 ne juge pas un texte de site. Classe : `texte-long-non-structure` (famille `hook-ou-gate`).
+- RP-29 : un critère de prompt qui demande de définir un mot dans le texte publié, et un gabarit de page sans budget de longueur. Classe : `contenu-d-auteur-livre-au-lecteur` (famille `gabarit-document`).
+- RP-30 : une règle écrite pour les documents internes, appliquée à du contenu publié. Classe : `oracle-faux-positif` (famille `regle-morte`).
 
 ## Remarques restées au produit
 
