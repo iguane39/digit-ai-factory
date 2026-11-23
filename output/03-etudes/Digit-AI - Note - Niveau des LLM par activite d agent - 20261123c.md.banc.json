@@ -1,0 +1,24 @@
+{
+  "schema": "banc-multi-agents@1",
+  "banc": 2,
+  "date": "2026-11-23",
+  "poste": "Dell-XPS-16",
+  "autorisation": "consigne permanente du porteur du 21/11/2026 à 17:23 (230a) ; demande du 23/11 : « Pour Codex, utilise GPT-6.2-Sol ; relance les tests »",
+  "reglage": "~/.codex/config.toml : model gpt-5.6-sol remplacé par gpt-6.2-sol le 23/11 à 11:14, sauvegarde config.toml.bak-20261123-avant-gpt-6.2-sol",
+  "oracles_prouves": "oracle2.py T4 à T9 : référence exit 0, sortie fausse exit 1, 12 essais sur 12 ; T1 à T3 : oracles du 1er banc",
+  "appels": {
+    "claude": {"modele": "claude-sonnet-5-5, effort high", "T4": {"duree_s": 332, "jetons": 103166, "oracle": 0, "moyen": "programme Python de dessin"}, "T5": {"duree_s": 40, "jetons": 65032, "oracle": 0}, "T6": {"duree_s": 207, "jetons": 94165, "oracle": 0}, "T7": {"duree_s": 60, "jetons": 44169, "oracle": 0, "agent": "redacteur"}, "T8": {"duree_s": 32, "jetons": 64438, "oracle": 0}, "T9": {"duree_s": 28, "jetons": 63898, "oracle": 0}},
+    "codex": {"modele": "gpt-6.2-sol, effort high, --search", "T1": {"duree_s": 39, "entree": 106978, "cache": 77312, "sortie": 1133, "oracle": 0}, "T2": {"duree_s": 73, "entree": 175743, "cache": 159616, "sortie": 2716, "oracle": 0}, "T3": {"duree_s": 69, "entree": 175984, "cache": 165632, "sortie": 2214, "oracle": 0}, "T4": {"duree_s": 75, "entree": 149427, "cache": 121856, "sortie": 1149, "oracle": 0, "moyen": "ImageGen, outil natif"}, "T5": {"duree_s": 75, "entree": 132950, "cache": 113152, "sortie": 2695, "oracle": 0}, "T6": {"duree_s": 302, "entree": 264487, "cache": 227712, "sortie": 13380, "oracle": 0}, "T7": {"duree_s": 88, "entree": 367348, "cache": 318592, "sortie": 2692, "oracle": 0}, "T8": {"duree_s": 52, "entree": 140369, "cache": 117248, "sortie": 1732, "oracle": 0}, "T9": {"duree_s": 90, "entree": 157855, "cache": 138880, "sortie": 3209, "oracle": 0}},
+    "gemini": {"modele": "gemini-4-neon-high par Antigravity 1.5.14", "T4": {"duree_s": 148, "jetons": 40015, "oracle": 0, "moyen": "génération native"}, "T5": {"duree_s": 173, "jetons": 53838, "oracle": 0}, "T6": {"duree_s": 402, "jetons": 73833, "oracle": 0, "statut": "ERROR, délai de 400 s atteint, fichier écrit"}, "T7": {"duree_s": 402, "jetons": 118126, "oracle": 0, "statut": "ERROR, délai de 400 s atteint, fichier écrit"}, "T8": {"duree_s": 100, "jetons": 33616, "oracle": 0}, "T9": {"duree_s": 136, "jetons": 45416, "oracle": 0}}
+  },
+  "relecture_aveugle": {
+    "visuels": {"agent": "relecteur, claude-opus-5-5", "notes": {"claude-T4": 5, "codex-T4": 9, "gemini-T4": 9, "claude-T5": 7, "codex-T5": 8, "gemini-T5": 7, "claude-T6": 8, "codex-T6": 8, "gemini-T6": 9}, "dementi": "bloquant de taille sur l'image de Claude : le relecteur voyait un aperçu réduit, l'oracle mesure 1600 x 1100"},
+    "textes": {"agent": "relecteur, claude-opus-5-5", "notes": {"codex-T1": 9, "codex-T2": 9, "codex-T3": 9, "claude-T7": 6, "codex-T7": 5, "gemini-T7": 7, "claude-T8": 10, "codex-T8": 10, "gemini-T8": 10, "claude-T9": 9, "codex-T9": 8, "gemini-T9": 9}}
+  },
+  "factory": {
+    "codex": {"duree_s": 49, "consignes_chargees": ["AGENTS.md"], "skills": "les siens (imagegen, figma, google-drive, …), aucun de la Factory", "oracle_ecriture": "code 0, PASS", "loi_5": "citée sur demande"},
+    "gemini": {"duree_s": 27, "consignes_chargees": ["AGENTS.md"], "skills": ["agy-customizations", "antigravity-guide", "run-workflow", "swarm_monitor", "swarm_pane"], "oracle_ecriture": "code 0, PASS", "loi_5": "citée sur demande"}
+  },
+  "quota_codex": {"relu": "2026-11-23T11:41+01:00", "offre": "plus", "fenetre_5h_utilisee_pct": 9, "fenetre_7j_utilisee_pct": 3, "appels_du_jour": 10},
+  "temoin": "intact après chaque série"
+}

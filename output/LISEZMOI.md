@@ -74,7 +74,7 @@ Ce fichier-ci n'a pas d'espace dans son nom : il s'ouvre. Les chemins ci-dessous
 à **copier-coller** — c'est ce qui marche aujourd'hui, et le dire vaut mieux que laisser
 essayer. *Le nom daté n'est pas le problème : il porte la version et la traçabilité.*
 
-**État** : 757 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
+**État** : 759 livrable(s) courant(s), 8 archivé(s), 7 famille(s).
 
 ### 01-revues-et-propositions
 
@@ -299,6 +299,8 @@ essayer. *Le nom daté n'est pas le problème : il porte la version et la traça
 | Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md | 20261102q | 8.3 Ko | `03-etudes/Digit-AI - Note - Harvey compare a digit-ai-prospection - 20261102q.md` |
 | Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md | 20261123a | 4 Ko | `03-etudes/Digit-AI - Note - Niveau des LLM par activite d agent - 20261123a.md` |
 | Digit-AI - Note - Niveau des LLM par activite d agent - 20261123b.md | 20261123b | 5.8 Ko | `03-etudes/Digit-AI - Note - Niveau des LLM par activite d agent - 20261123b.md` |
+| Digit-AI - Note - Niveau des LLM par activite d agent - 20261123c.md | 20261123c | 8 Ko | `03-etudes/Digit-AI - Note - Niveau des LLM par activite d agent - 20261123c.md` |
+| Digit-AI - Note - Niveau des LLM par activite d agent - 20261123c.md.banc.json | — | 3.6 Ko | `03-etudes/Digit-AI - Note - Niveau des LLM par activite d agent - 20261123c.md.banc.json` |
 | Digit-AI - Note - Recompte des graves par angle des relecteurs - 20261123a.md | 20261123a | 14.7 Ko | `03-etudes/Digit-AI - Note - Recompte des graves par angle des relecteurs - 20261123a.md` |
 | Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md | 20261102r | 9.1 Ko | `03-etudes/Digit-AI - Note - Refine de Prime Agent compare a oeil-critique - 20261102r.md` |
 | Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121o.md | 20261121o | 4.9 Ko | `03-etudes/Digit-AI - Note - Relais de Claude, Codex et Antigravity - 20261121o.md` |
