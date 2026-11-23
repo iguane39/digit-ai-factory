@@ -206,8 +206,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-02 - RETOURS - 20261019d.tf.jsonl` | fichier | 1,7 Ko | 1 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261030a.md` | fichier | 6,7 Ko | Retours forges — Produit-02 — 20261030a |
 | `Produit-02 - RETOURS - 20261030a.tf.jsonl` | fichier | 2,6 Ko | 2 ligne(s) JSONL |
-| `Produit-02 - RETOURS - 20261102a.md` | fichier | 2,0 Ko | Retours forges — Produit-02 — 20261102a |
-| `Produit-02 - RETOURS - 20261102a.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
+| `Produit-02 - RETOURS - 20261102a.md` | fichier | 2,5 Ko | Retours forges — Produit-02 — 20261102a |
+| `Produit-02 - RETOURS - 20261102a.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261103a.md` | fichier | 18,6 Ko | Retours forges — Produit-02 — 20261103a |
 | `Produit-02 - RETOURS - 20261103a.tf.jsonl` | fichier | 4,8 Ko | 3 ligne(s) JSONL |
 | `Produit-02 - RETOURS - 20261105a.md` | fichier | 5,3 Ko | Retours forges — Produit-02 — 20261105a |

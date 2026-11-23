@@ -1,5 +1,7 @@
 # Retours forges — Produit-02 — 20261102a
 
+> **Annoté à la réception le 23/11/2026** : ce lot a été refusé à la porte (famille « oracle » inconnue du référentiel, sections R-45, R-46, R-57 et GFP-LOT absentes). Il entre par dérogation sur D-241 (a) du porteur. Classes choisies à la lecture du retour : RT-143 devient `oracle-faux-positif` (famille `regle-morte`) au lieu de « oracle-format-multipage » ; RT-144 devient `verdict-de-porte-perime-au-lancement` (famille `hook-ou-gate`) au lieu de « verrou-preuve-sans-lien ». Aucun autre mot du lot n'a changé ; l'original reste chez le produit.
+
 - **Contexte** : autre — affiche A4 d'accueil à 4 QR-codes, hors run de version, 02/11/2026.
 - **Références ledger** : `forge\ledger.jsonl` seq 632, 633 (entrées `type: retour`).
 - **Remise au pilot** : copier ce fichier (et son sidecar) dans le SAS

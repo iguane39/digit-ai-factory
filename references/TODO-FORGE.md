@@ -220,6 +220,19 @@ ne voyage donc pas, et un clone frais n'a pas le dossier : la règle vit ici.
   (TF-1568 à TF-1570) : deux produits ont remis le 01/10 sous un contrôle en 1.0.0 et en 1.1.0,
   antérieur à R-57, qui rendait PASS honnêtement ; les copies à jour ne sont arrivées sur leur disque
   qu'après la remise.
+- **Un lot refusé pour sa FORME se traite d'office, sans question (D-241 (a) du 23/11/2026, consigne
+  permanente).** Mot pour mot : « Ne plus me poser la question, doit être la réponse standard à
+  traiter ». Quand l'ingestion refuse un lot pour une section exigée absente (R-45, R-46, R-57,
+  GFP-LOT), une famille ou une clé de classe hors du référentiel, ou un identifiant déjà pris, la
+  session ne pose plus de décision. Elle enchaîne 4 gestes. (1) Elle annote le lot à la réception
+  (R-49) : la clé de classe existante la plus proche, un identifiant renuméroté, la ligne « Annoté à
+  la réception ». (2) Elle l'ingère par `--derogation-fichier`, en citant D-241 (a). (3) Elle mesure
+  la cause chez le produit, en lecture seule, comme ci-dessus. (4) Elle remonte le constat par un
+  item `destinataire_produit` (classe `remise-sans-verdict`), puis `todo\emettre-travaux.mjs
+  --produit <dossier>`, le dossier se lisant dans la table des pseudonymes du canal confidentiel. La
+  restitution le dit au bloc 4, pas au bloc 3. Restent des décisions : un lot dont le CONTENU est en
+  cause (doublon, sujet hors périmètre, nom réel opposé à un pseudonyme), et un lot qu'aucune
+  dérogation ne fait passer.
 - Un sas **vide est l'état normal**. Un lot DÉJÀ suivi sous un nom réel ne relève pas du sas mais
   de `todo\anonymiser-suivis.mjs`.
 - **Un produit privé déclaré de l'écosystème garde son nom** (règle humaine du 01/10/2026, mot pour
