@@ -8103,7 +8103,9 @@ Aucun écart : la demande a été suivie à la lettre.
       const rPiloteRappel = jouerPilote("s93-pilot-rappelee.md", rappel93);
       ecrireReg(entreeReg(90, 0.01), JSON.stringify({ type: "reponse", n: 90, lettres: ["a"], date: il93(0).slice(0, 10), ts: il93(0), origine: "hook-lexique" }));
       const rPiloteRepondue = jouerPilote("s93-pilot-repondue.md", verte);
-      ecrireReg(entreeReg(90, 5));
+      // TF-2883 (25/11/2026) : « il y a 5 jours » tombait avant le 16/11 le jour où le cas est né, et après depuis le 21/11 : le cas échouait sur l'horloge,
+      // pas sur le code. La date est ABSOLUE, la veille de l'entrée en service de l'écrivain.
+      ecrireReg(JSON.stringify({ type: "decision", n: 90, question: "Supprime-t-on le réseau vide créé en Europe du Nord ?", date: "2026-11-15", ts: "2026-11-15T12:00:00.000Z", origine: "reservation" }));
       const rPiloteAvantEcrivain = jouerPilote("s93-pilot-avant-ecrivain.md", verte);
       for (const [r, statut, quoi] of [
         [rPiloteRouge, "FAIL", "une décision réservée au registre du pilot, sans réponse consignée, absente du bloc 3 (le cas D-48 du 03/11, au pilot) passe"],
