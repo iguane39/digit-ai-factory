@@ -686,9 +686,13 @@ function jugerAz(args) {
   if (AZ_LOCAL.has(pos[0]) || (pos[0] === "account" && pos[1] !== "management-group")) return null;
   const chemin = pos.join(" ");
   if (pos.slice(1).some((v) => VERBE_SUPPRESSION.test(v))) return { categorie: "suppression", raison: `\`az ${chemin}\` supprime ou purge une ressource distante` };
+  // D-245 (a) du 25/11/2026 (TF-2878) : CRÉER une politique de branche TYPÉE ajoute une protection et se défait par `az repos policy delete`
+  // (gardé) ; elle n'est plus prise pour une attribution de droits. `update`, `delete` et la politique générique `create --config` restent refusées.
+  if (pos.length === 4 && pos[0] === "repos" && pos[1] === "policy" && POLITIQUES_TYPEES.has(pos[2]) && pos[3] === "create") return null;
   if (AZ_DROITS.some((re) => re.test(chemin))) return { categorie: "droits", raison: `\`az ${chemin}\` attribue ou modifie des droits` };
   return null;
 }
+const POLITIQUES_TYPEES = new Set(["build", "approver-count", "required-reviewer", "comment-required", "merge-strategy", "work-item-linking"]);
 
 function jugerTerraform(outil, args) {
   const pos = positionnels(args);

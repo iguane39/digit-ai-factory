@@ -324,6 +324,9 @@ try {
   const VERTS_196 = [
     ["droits", "Bash", "az role assignment list --assignee x"],
     ["droits", "Bash", "az repos policy list --repository-id r"],
+    // D-245 (a), TF-2878 : la création d'une politique typée ajoute une protection (le cas du 23/11 : validation de build sur env/dev).
+    ["droits", "Bash", "az repos policy build create --blocking true --branch env/dev --build-definition-id 12 --enabled true --manual-queue-only false --queue-on-source-update-only true --repository-id r --valid-duration 720"],
+    ["droits", "Bash", "az repos policy approver-count create --branch main --minimum-approver-count 2 --blocking true --enabled true --repository-id r --creator-vote-counts false --allow-downvotes false --reset-on-source-push true"],
     ["droits", "Bash", "gh api repos/o/r/collaborators"],
     ["droits", "Bash", "gh api repos/o/r/branches/main/protection"],
     ["droits", "Bash", 'curl -s "https://dev.azure.com/o/p/_apis/policy/configurations?api-version=7.1"'],

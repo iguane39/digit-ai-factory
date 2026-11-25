@@ -240,6 +240,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Retours et TODOs du 14-11 - 20261114a.md` | fichier | 16,0 Ko | Synthèse Mandat — 45 sujets du registre clos, 4 lots ingérés ou refusés, une variable de p |
 | `Digit-AI - Synthese Mandat - Retours et TODOs du 16-11 - 20261116a.md` | fichier | 16,7 Ko | Synthèse Mandat — 79 lots accueillis, 85 sujets corrigés et publiés dans 9 dépôts (16/11/2 |
 | `Digit-AI - Synthese Mandat - Retours et TODOs du 22-11 - 20261122a.md` | fichier | 19,2 Ko | Synthèse Mandat — 19 lots accueillis, 88 sujets corrigés et publiés dans 8 dépôts (22/11/2 |
+| `Digit-AI - Synthese Mandat - Retours et TODOs du 25-11 - 20261125a.md` | fichier | 11,2 Ko | Synthèse Mandat — retours du 25/11, lot de tests d'intrusion d'abord (25/11/2026) |
 | `Digit-AI - Synthese Mandat - Retours et TODOs traites - 20261029g.md` | fichier | 10,3 Ko | Synthèse Mandat — retours du jour ingérés, 19 sujets du registre clos (29/10/2026) |
 | `Digit-AI - Synthese Mandat - Revue D-114 a D-119 et restes de campagne - 20261102b.md` | fichier | 16,6 Ko | Synthèse Mandat — revue des 6 décisions posée, 6 restes de la campagne clos (02/11/2026) |
 | `Digit-AI - Synthese Mandat - Revue de code proposee a la mise en production - 20261103p.md` | fichier | 8,3 Ko | Synthèse Mandat — revue de code proposée à la mise en production (03/11/2026) |
@@ -271,4 +272,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Digit-AI - Synthese Mandat - Trois chantiers fusionnes sur quatre - 20261026o.md` | fichier | 4,4 Ko | Synthèse Mandat — trois chantiers fusionnés sur quatre : écrits à un tiers rejoués au lieu |
 | `Digit-AI - Synthese Mandat - Troisieme campagne et alertes des fixtures closes - 20261115b.md` | fichier | 7,8 Ko | Synthèse Mandat — troisième campagne et alertes des fixtures closes (15/11/2026) |
 
-_250 fichier(s), 4 sous-dossier(s)_
+_251 fichier(s), 4 sous-dossier(s)_
