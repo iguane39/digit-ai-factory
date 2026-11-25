@@ -2660,6 +2660,14 @@ try {
       // Un tour qui n'a RIEN écrit n'a pas écrit de retour : celui que le ledger date de ce tour vient d'une autre session du produit (deux sessions vivantes, TF-2329 non jugé (1)).
       const lu = controlerLotDansLeTour({ racine: dProd, depuis: DEBUT72, tourEcrit: false });
       if (lu.verdict !== "SANS_OBJET" || !/rien écrit/.test(lu.motif || "")) echecs.push(`75 septies : un tour qui n'a rien écrit ne doit pas être accusé du retour d'une autre session, obtenu ${JSON.stringify(lu).slice(0, 220)}`);
+      // TF-2855 (RT-49, 25/11/2026) : un retour SIGNÉ d'une autre session vivante du produit, écrit pendant un tour qui a écrit, n'accuse pas ce tour ;
+      // le même retour signé de la session du tour, ou non signé, reste accusé (témoins rouges).
+      const autre = controlerLotDansLeTour({ racine: produit72({ ledger: [retour72(3, PENDANT72, { session: "autre123" })] }), depuis: DEBUT72, tourEcrit: true, session: "moi45678-aaaa" });
+      if (autre.verdict !== "PASS") echecs.push(`75 undecies : un retour signé d'une autre session ne doit pas accuser le tour, obtenu ${JSON.stringify(autre).slice(0, 220)}`);
+      const mien = controlerLotDansLeTour({ racine: produit72({ ledger: [retour72(3, PENDANT72, { session: "moi45678" })] }), depuis: DEBUT72, tourEcrit: true, session: "moi45678-aaaa" });
+      if (mien.verdict !== "FAIL") echecs.push(`75 duodecies : un retour signé de la session du tour reste accusé, obtenu ${JSON.stringify(mien).slice(0, 220)}`);
+      const nonSigne = controlerLotDansLeTour({ racine: produit72({ ledger: [retour72(3, PENDANT72)] }), depuis: DEBUT72, tourEcrit: true, session: "moi45678-aaaa" });
+      if (nonSigne.verdict !== "FAIL") echecs.push(`75 terdecies : un retour non signé reste accusé (on ne peut pas dire qu'il vient d'ailleurs), obtenu ${JSON.stringify(nonSigne).slice(0, 220)}`);
       // TF-2652 (RU-24, 16/11/2026) : la remise d'un lot consignée au ledger (`type: lot_remis`, admis par ledger.py) n'est PAS un retour que le hook exige de remettre
       // en lot ; consignée en `retour` (seq 300 le 10/11, seq 311 le 13/11), elle l'était. Même entrée, deux types : seul le second est accusé.
       const remise = { lot: "Produit - RETOURS - 20261110a.md", sas: "input/00-retours/_arrivee" };

@@ -1964,16 +1964,20 @@ else {
         }
       } else anteriorites++;
       if (i > 0 && !o.run_precedent) {
-        // Rectification par ajout, même contrat que pour versions_forges : `champ` distingue le
+        // Rectification par ajout, même contrat que pour versions_forges : `champ_vise` distingue le
         // champ rectifié (`rectification_run_open` peut un jour en porter d'autres que celui-ci).
-        const rectRO = rectifsRO.find((x) => x.seq_vise === o.seq && x.champ === "run_precedent" && String(x.cause || "").trim().length >= 20);
+        // TF-2852 (RP-73 de Produit-86, 25/11/2026) : le message prescrivait `champ`, nom que
+        // l'écrivain du ledger refuse d'écrire depuis TF-2630 — aucun remède n'était jouable. Le nom
+        // prescrit est désormais `champ_vise` ; `champ` reste lu pour les ledgers déjà écrits.
+        const rectRO = rectifsRO.find((x) => x.seq_vise === o.seq && (x.champ_vise === "run_precedent" || x.champ === "run_precedent") && String(x.cause || "").trim().length >= 20);
         if (rectRO) {
           rectifies.push(`run_open #${i + 1} (seq ${o.seq}) — run_precedent omis, déclaré par ajout` +
             (rectRO.valeur ? ` (« ${rectRO.valeur} »)` : "") + ` : ${String(rectRO.cause).slice(0, 90)}`);
         } else {
           ko("R-19", `forge/ledger.jsonl (run_open #${i + 1})`, "run de version sans run_precedent — les runs se chaînent. " +
             "Si le chaînage n'a pas été noté à l'ouverture (R-42 interdit de réécrire l'entrée), déclarer l'écart PAR AJOUT : " +
-            `{type: "rectification_run_open", seq_vise: ${o.seq ?? "<seq>"}, champ: "run_precedent", valeur: "<run précédent>", cause: "…"} (TF-1454)`); r19 = false;
+            `{type: "rectification_run_open", seq_vise: ${o.seq ?? "<seq>"}, champ_vise: "run_precedent", valeur: "<run précédent>", cause: "…"}, ` +
+            `écrite par \`python forge/ledger.py rectification_run_open --seq_vise ${o.seq ?? "<seq>"} --champ_vise run_precedent --valeur "<run précédent>" --cause "<cause, 20 caractères au moins>"\` (TF-1454, TF-2852)`); r19 = false;
         }
       }
     });

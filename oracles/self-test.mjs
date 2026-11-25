@@ -1732,7 +1732,7 @@ check("TF-1454 rouge : run_precedent omis, SANS rectification → FAIL, et le me
   if (exit !== 1) throw new Error(`exit ${exit} attendu 1`);
   const f = rapport.findings.find((x) => x.regle === "R-19" && x.statut === "FAIL" && /sans run_precedent/.test(x.message));
   if (!f) throw new Error("l'omission n'est plus dénoncée");
-  if (!/rectification_run_open/.test(f.message) || !/champ: "run_precedent"/.test(f.message))
+  if (!/rectification_run_open/.test(f.message) || !/champ_vise: "run_precedent"/.test(f.message) || !/--champ_vise run_precedent/.test(f.message))
     throw new Error(`le message ne dit pas la voie par ajout ni le champ à rectifier : ${f.message}`);
 });
 const rectifieOmisR19 = mkdtempSync(join(tmpdir(), "conf-rectifie-run-precedent-r19-"));
@@ -1748,6 +1748,19 @@ check("TF-1454 vert : run_precedent omis, rectifié PAR AJOUT (seq_vise + champ 
   if (r19.some((f) => f.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r19.filter((f) => f.statut === "FAIL").map((f) => f.message))}`);
   const f = r19.find((x) => x.statut === "PASS" && /run_precedent omis, déclaré par ajout/.test(x.message));
   if (!f) throw new Error("la rectification de run_precedent n'est pas imprimée au verdict PASS");
+});
+// TF-2852 : la forme que l'écrivain du ledger admet (`champ_vise`) couvre l'omission.
+const rectifieChampViseR19 = mkdtempSync(join(tmpdir(), "conf-rectifie-champ-vise-r19-"));
+ecrireDans(rectifieChampViseR19, "forge/ledger.jsonl", [
+  JSON.stringify({ seq: 1, type: "run_open", ts: "2026-09-01T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0001" } }),
+  JSON.stringify({ seq: 2, type: "run_open", ts: "2026-09-05T08:00:00Z", versions_forges: { "digit-ai-factory": "sha0002" } }),
+  JSON.stringify({ seq: 3, type: "rectification_run_open", ts: "2026-11-25T08:00:00Z", seq_vise: 2, champ_vise: "run_precedent", valeur: "run-20260901",
+    cause: "run_precedent omis à l'ouverture, chaînage retrouvé par lecture du ledger précédent" }),
+].join("\n") + "\n");
+check("TF-2852 vert : run_precedent omis, rectifié sous champ_vise (le nom que l'écrivain admet) → PASS", () => {
+  const r19 = lance(rectifieChampViseR19).rapport.findings.filter((f) => f.regle === "R-19");
+  if (r19.some((f) => f.statut === "FAIL")) throw new Error(`FAIL inattendu : ${JSON.stringify(r19.filter((f) => f.statut === "FAIL").map((f) => f.message))}`);
+  if (!r19.some((x) => x.statut === "PASS" && /run_precedent omis, déclaré par ajout/.test(x.message))) throw new Error("rectification sous champ_vise non lue");
 });
 
 // ---- fixtures R-42 INTÉGRITÉ du ledger (TF-0411, 20/08) : le contrôle existait dans

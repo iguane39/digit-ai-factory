@@ -218,6 +218,7 @@ export function retoursSansLot(produit, pilot, { maintenant = Date.now(), seuilH
     const classe = typeof e.classe === "string" && e.classe.trim() ? e.classe.trim() : null;
     sortie.push({
       seq: e.seq, ts: typeof e.ts === "string" ? e.ts : null, jours: Number.isFinite(age) ? Math.floor(age / 24) : null, classe, horsRun: hr,
+      session: typeof e.session === "string" && e.session.trim() ? e.session.trim() : null,
       classeInconnue: classe && classes ? (classe !== "classe-a-creer" && !classes.has(classe)) : null,
     });
   }
@@ -237,12 +238,16 @@ export function retoursSansLot(produit, pilot, { maintenant = Date.now(), seuilH
  * tolère 999 ms. Rend `null` quand le début du tour est illisible ou que le produit n'a ni ledger ni journal hors run : ce n'est pas « zéro », c'est
  * « non relevé », et le contrôle n'accuse alors personne.
  */
-export function retoursDuTourSansLot(produit, pilot, { depuis = null } = {}) {
+// TF-2855 (RT-49 de Produit-82, 25/11/2026) : `session` (8 premiers caractères de la session du tour) écarte un retour SIGNÉ d'une autre
+// session vivante du même produit, que la datation seule accusait (limite (1) de TF-2329). Un retour sans signature (écrit avant D-218 (b),
+// ou par un écrivain qui ne signe pas) reste accusé : on ne peut pas dire qu'il vient d'ailleurs.
+export function retoursDuTourSansLot(produit, pilot, { depuis = null, session = null } = {}) {
   const t0 = Date.parse(depuis);
   if (!Number.isFinite(t0)) return null;
   const sans = retoursSansLot(produit, pilot, { seuilH: -Infinity });
   if (sans === null) return null;
-  return sans.filter((r) => { const t = Date.parse(r.ts); return Number.isFinite(t) && t + 999 >= t0; });
+  const moi = typeof session === "string" && session.trim() ? session.trim().slice(0, 8) : null;
+  return sans.filter((r) => { const t = Date.parse(r.ts); return Number.isFinite(t) && t + 999 >= t0 && !(moi && r.session && r.session.slice(0, 8) !== moi); });
 }
 
 /**

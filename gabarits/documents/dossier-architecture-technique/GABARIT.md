@@ -19,6 +19,16 @@
 > par section : la section 7 était la seule sans source, et plutôt que de la garder sur la
 > foi d'un raisonnement d'expert, le corpus a été rebalayé. `DAT-complements.md` la couvre.
 
+## 1.2.0 (25/11/2026) — quand une source de vérité n'existe pas
+
+Deux produits repris du même client (TF-2871, TF-2879, lots de Produit-81 et Produit-87 du
+24/11/2026) n'avaient ni `docs\projet\ARCHITECTURE.md` ni `docs\projet\COMPOSANTS-OPS.md`. Le
+gabarit renvoyait à ces deux fichiers et refusait une vue logique recopiée : chaque session a
+inventé sa propre mention transitoire, et la matrice des flux de l'un avait 3 flux de retard sur
+le code. La section « Source de vérité absente » dit désormais la voie : contenu porté par le
+DAT, absence déclarée dans l'en-tête, sources réellement lues listées, renvoi dès que le
+document existe.
+
 ## 1.1.1 (21/09/2026) — la largeur de page se déclare
 
 Le squelette et l'instance portent `<body data-largeur="lecture">` (règle D10, TF-1038) : leurs
@@ -56,8 +66,9 @@ role_destinataire: comité d'architecture / client / repreneur
 sources_de_verite: ["docs\projet\ARCHITECTURE.md", "docs\projet\COMPOSANTS-OPS.md", "{registre ADR}"]
 verifie_le: {AAAA-MM-JJ}
 gabarit: gd-dossier-architecture
-version_du_gabarit: 1.1.1
+version_du_gabarit: 1.2.0
 etat_decrit: {existant | cible | existant et cible}
+sources_absentes: [] # ex. ["docs\projet\ARCHITECTURE.md"] — voir « Source de vérité absente »
 ---
 
 # Dossier d'architecture technique — {Produit} — {AAAAMMJJ}{indice}
@@ -171,6 +182,25 @@ Ce tableau dit ce qu'un projet peut adapter et ce qu'il ne touche pas. Il se lit
 | renseigner `etat_decrit` | adapter le vocabulaire à son comité | l'en-tête et ses cinq champs |
 | chiffrer chaque exigence non fonctionnelle et dire comment elle se mesure | retirer une section optionnelle **en le déclarant** | les renvois aux documents vivants — jamais de copie |
 | porter `version_du_gabarit` de l'instance | | l'interdit de noter : le DAT décrit, il ne juge pas |
+
+## Source de vérité absente
+
+Un produit repris n'a souvent ni `ARCHITECTURE.md` ni `COMPOSANTS-OPS.md`. Le renvoi est alors
+impossible, et une mention transitoire inventée à la main diverge d'une session à l'autre. Dans
+ce cas, et dans ce cas seulement :
+
+1. **L'absence se déclare** dans l'en-tête (`sources_absentes`) et en tête de la section qui
+   aurait renvoyé : « `docs\projet\ARCHITECTURE.md` n'existe pas au {AAAA-MM-JJ} ; cette section
+   porte la vue logique jusqu'à sa création. »
+2. **Le DAT porte le contenu** de la section 2 ou 3, et un tableau « Sources lues » dit d'où vient
+   chaque élément : document, fichier de code, configuration, avec sa date de lecture.
+3. **La matrice des flux se vérifie contre le code** au jour de la remise, flux par flux : appel
+   sortant, file, base. Un flux du code absent de la matrice est un défaut de remise.
+4. **Le renvoi reprend sa place** dès que le document existe : la version suivante du DAT retire
+   le contenu porté et remet le renvoi. Écrire `ARCHITECTURE.md` depuis ce contenu est la suite
+   naturelle, proposée au produit.
+
+L'interdit de recopier ne vaut que pour une source qui existe.
 
 ## Ce que le gabarit refuse
 

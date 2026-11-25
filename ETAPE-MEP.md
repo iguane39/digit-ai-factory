@@ -1229,6 +1229,20 @@ poste. Quatre faits, une cause : le principe vivait dans la mémoire des session
   d'approbation de l'environnement de production ou la poussée d'un commit nommé. Le repli sur le
   jeton du poste décrit ci-dessus sert les lectures et le diagnostic, jamais un déploiement : un
   environnement Railway, recette comprise, est un environnement géré.
+- **L'arbre envoyé par `railway up` se réduit à ce que le build lit** (TF-2864, RS-58 de Produit-12,
+  23/11/2026). `railway up` sur l'arbre de `git archive <commit>` envoie tout le dépôt suivi :
+  1,5 Go chez un produit, presque tout sous `output/`, refusé à l'envoi par une page d'erreur de
+  l'hébergeur, sans déploiement créé ; réduit à 2,5 Mo, l'envoi suivant est passé. Le produit tient
+  un `.railwayignore` aligné sur son `.dockerignore`, ou retire de l'arbre archivé les dossiers que
+  le build exclut. Un refus d'envoi (page d'erreur, aucun identifiant de déploiement rendu) se
+  consigne comme tel au dossier de MEP, jamais comme un échec de build.
+- **Sous Git Bash, `docker run` et `docker exec` se préfixent par `MSYS_NO_PATHCONV=1`** (TF-2865,
+  RS-59 de Produit-12, 24/11/2026). La conversion de chemins de MSYS a réécrit
+  `-e ASDMM_DB=/data/asdmm.db` en `C:/Program Files/Git/data/asdmm.db` : la base du banc s'est
+  écrite hors du volume `/data`, et le retour arrière M-4 aurait rejoué sur une base vide. Le
+  contrôle M-5 vérifie aussi que chaque base vit sous le point de montage de son volume
+  (`docker exec <conteneur> ls <point de montage>`), et qu'aucun dossier `C:` n'est apparu sous
+  le répertoire de l'application.
 - **Le CLI ne sert qu'à téléverser** (TF-0704). `railway service` ne sait ni renommer un
   service ni corriger un domaine ; tout le reste passe par l'API GraphQL —
   `https://backboard.railway.com/graphql/v2`, en-tête `Authorization: Bearer <jeton>` :

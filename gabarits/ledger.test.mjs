@@ -345,6 +345,36 @@ try {
     const r = spawnSync(PYTHON, [script, "anteriorite_ledger", "--avant", "2026-09-01T00:00:00Z", "--cause", "lacune du 02/08 antérieure à la session"], { encoding: "utf8", env: CONSOLE });
     att(r.status !== 0 && /type inconnu/.test(r.stderr || ""), `le mutant écrit : exit ${r.status} ${r.stderr}`);
   });
+  // TF-2852 (RP-73 de Produit-86, 25/11/2026) : le message de R-19 prescrivait `champ: "run_precedent"`, que l'écrivain refuse
+  // depuis TF-2630 ; aucun remède n'était jouable. Test croisé : la COMMANDE que le message de FAIL imprime est jouée telle
+  // quelle à travers ce gabarit, placeholders remplis, et R-19 passe ensuite.
+  const r19 = (d) => {
+    const r = spawnSync(process.execPath, [ORACLE_CONFORMITE, d], { encoding: "utf8" });
+    return (JSON.parse(r.stdout || "{}").findings || []).filter((f) => f.regle === "R-19");
+  };
+  const produitSansChainage = () => {
+    const d = mkdtempSync(join(tmpdir(), "ledger-r19-")); dossiers.push(d);
+    mkdirSync(join(d, "forge"));
+    writeFileSync(join(d, "forge", "ledger.py"), GABARIT, "utf8");
+    writeFileSync(join(d, "forge", "ledger.jsonl"), [
+      { seq: 1, ts: "2026-11-01T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "sha0001" } },
+      { seq: 2, ts: "2026-11-05T08:00:00Z", type: "run_open", versions_forges: { "digit-ai-factory": "sha0002" } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n", "utf8");
+    return { d, script: join(d, "forge", "ledger.py") };
+  };
+  check("TF-2852 rouge → vert — la commande que R-19 imprime s'écrit par l'écrivain, et R-19 passe ensuite", () => {
+    const { d, script } = produitSansChainage();
+    const f = r19(d).find((x) => x.statut === "FAIL" && /sans run_precedent/.test(x.message));
+    att(f, `R-19 ne dénonce pas l'omission : ${JSON.stringify(r19(d))}`);
+    const m = f.message.match(/`python forge\/ledger\.py ([^`]+)`/);
+    att(m, `le message n'imprime pas de commande jouable : ${f.message}`);
+    const args = [...m[1].matchAll(/"([^"]*)"|(\S+)/g)].map((x) => x[1] ?? x[2])
+      .map((a) => a === "<run précédent>" ? "run-20261101" : /^<cause/.test(a) ? "chaînage omis à l'ouverture, retrouvé par lecture du ledger" : a);
+    const r = spawnSync(PYTHON, [script, ...args], { encoding: "utf8", env: CONSOLE });
+    att(r.status === 0, `l'écrivain refuse la commande prescrite : exit ${r.status} ${r.stderr}`);
+    const apres = r19(d);
+    att(!apres.some((x) => x.statut === "FAIL") && apres.some((x) => /run_precedent omis, déclaré par ajout/.test(x.message)), `R-19 après remède : ${JSON.stringify(apres)}`);
+  });
   /** Un produit dont le ledger porte un saut de seq EN AVANT (3 puis 7), écrit à la main comme le ferait un second écrivain perdu. */
   const produitAvecSaut = () => {
     const d = mkdtempSync(join(tmpdir(), "ledger-saut-")); dossiers.push(d);

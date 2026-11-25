@@ -272,6 +272,9 @@ const _releves = (nom) => { const v = _option(nom); if (v === null) return null;
 const RELEVES_TOUR = _releves("--releves-tour");
 const RELEVES_SESSION = _releves("--releves-session");
 // --nombres-tour <fichier.json> (D-100 (a), 29/10/2026) : les nombres que le tour a pu lire. Seul le hook de fin de tour les connaît ; sans eux, S90 rend SANS_OBJET.
+// --ecritures-tour <fichier.json> (TF-2869, 25/11/2026) : les écritures du tour relevées par le hook (une ligne par écriture, outil ou commande).
+// Données, S36 ne compte plus qu'une page citée que le tour a écrite ; sans elles (jugement d'un fichier hors hook), S36 juge le texte seul.
+const ECRITURES_TOUR = (() => { const f = _option("--ecritures-tour"); if (!f) return null; try { const v = JSON.parse(readFileSync(f, "utf8")); return Array.isArray(v) ? v.map(String) : null; } catch { return null; } })();
 const NOMBRES_TOUR = (() => { const f = _option("--nombres-tour"); if (!f) return null; try { return JSON.parse(readFileSync(f, "utf8")); } catch { return null; } })();
 // Mise en service du verrou « livré » (S85, S86 ; T4, TF-1949) : une restitution datée d'avant au bloc 1 n'est pas jugée (non rétroactif).
 const VERROU_LIVRE_DEPUIS = "2026-10-26";
@@ -1841,7 +1844,13 @@ function juger(texte, cheminJuge = null) {
     const horsSources = (z) => z.replace(/```[\s\S]*?```/g, "").split("\n")
       .filter((l) => !/^\s*>/.test(l) && (!SOURCE36.test(l) || LIVRE36.test(l))).join("\n");
     const zones = horsSources([bloc(texte, BLOCS[3][0]) || "", bloc(texte, /(^|\n)#{1,4}\s*9[.)]?\s*traces?/i) || ""].join("\n"));
-    const pagesLivrees = (zones.match(/[\w\-. \/\\]+\.html?\b/gi) || []).filter((p) => !/fixture|gabarit|boilerplate|template|temoin|\.oracles/i.test(p));
+    const pagesCitees = (zones.match(/[\w\-. \/\\]+\.html?\b/gi) || []).filter((p) => !/fixture|gabarit|boilerplate|template|temoin|\.oracles/i.test(p));
+    // TF-2869 (RT-41 de Produit-81, 25/11/2026) : « index.html », cité comme source dans un tour qui n'avait écrit aucun fichier servi, était compté
+    // comme page livrée ; l'auteur l'a réécrit « la page d'accueil » pour passer. Quand le hook passe les écritures du tour, seule une page que le tour
+    // a écrite (son nom de fichier figure dans une écriture relevée) est livrée.
+    const ecritsTour = ECRITURES_TOUR ? ECRITURES_TOUR.join("\n").toLowerCase() : null;
+    const nomDe = (p) => p.trim().split(/[\\/]/).pop().toLowerCase();
+    const pagesLivrees = ecritsTour === null ? pagesCitees : pagesCitees.filter((p) => nomDe(p) && ecritsTour.includes(nomDe(p)));
     // TF-1981 (29/10/2026, récidive de TF-0775) — LE VERDICT SE LIT HORS DES BLOCS QUI PROMETTENT. Le 26/10/2026, une page HTML citée comme livrée laissait la critique
     // forge-design en A-1 `auto_ia` `hors_mandat` : le mot « critique d'implémentation » y figurait, S36 le prenait pour un verdict, et --prejuger rendait la restitution
     // affichable. Jouée sur demande de l'humain, la critique a trouvé 4 bloquants et 19 majeurs. Les blocs 3 (décisions : une option « faire juger… » propose) et 8
@@ -2248,7 +2257,12 @@ function juger(texte, cheminJuge = null) {
   {
     const phrases = texte.split(/(?<=[.!?;])\s+|\n/).map((x) => x.trim()).filter(Boolean);
     const risquees = phrases.filter((x) => CONFIRME_UNE_ECRITURE.test(x));
-    const nues = risquees.filter((x) => !CHEMIN_ABSOLU.test(x));
+    // TF-2869 (RT-41 de Produit-81, 25/11/2026) : le bloc 0 n'admet aucun chemin hors de la ligne « Livré : » (S9, S87). Une confirmation qu'il
+    // porte est couverte quand une confirmation d'écriture HORS du bloc 0 cite le chemin absolu ; sinon elle reste accusée.
+    const ouv0 = (() => { try { return lireOuverture(texte).brute || ""; } catch { return ""; } })();
+    const auBloc0 = (x) => ouv0 && ouv0.includes(x);
+    const absoluAilleurs = risquees.some((x) => !auBloc0(x) && CHEMIN_ABSOLU.test(x));
+    const nues = risquees.filter((x) => !CHEMIN_ABSOLU.test(x) && !(auBloc0(x) && absoluAilleurs));
     if (!risquees.length) ok("S26", "aucune écriture confirmée — rien à localiser");
     else if (nues.length) ko("S26", `${nues.length} confirmation(s) d'écriture sur ${risquees.length} sans le chemin ABSOLU vérifié : ` +
       "un chemin relatif désigne autre chose selon d'où on parle, et un contrôle qui se trompe d'objet PRODUIT de la confiance " +
@@ -6523,6 +6537,28 @@ Aucun écart : la demande a été suivie à la lettre.
       (/"S36"[\s\S]{0,200}/.exec(r36src.stdout) || [""])[0].replace(/\s+/g, " "));
   if (!/"S36"[^}]*FAIL/.test(r36liv.stdout))
     casse.push("S36 (TF-1653) : la MÊME page présentée comme LIVRÉE sans critique d'implémentation passe — l'exclusion des sources aurait désarmé la règle");
+  // TF-2869 : écritures du tour passées par le hook. La même page « livrée », que le tour n'a PAS écrite : PASS ; que le tour a écrite : FAIL (témoin).
+  const fe36 = join(dir, "s36-ecritures.json");
+  writeFileSync(fe36, JSON.stringify(["Write c:/x/forge/ledger.jsonl"]), "utf8");
+  const r36non = spawnSync(process.execPath, [moi, f36liv, "--ecritures-tour", fe36], { encoding: "utf8" });
+  if (!/"S36"[^}]*PASS/.test(r36non.stdout))
+    casse.push("S36 (TF-2869) : une page citée que le tour n'a pas écrite (écritures passées par le hook) reste accusée d'être livrée");
+  writeFileSync(fe36, JSON.stringify(["Write c:/x/output/Client-A - Schema Run apres MEP - 20261013a.html"]), "utf8");
+  const r36oui = spawnSync(process.execPath, [moi, f36liv, "--ecritures-tour", fe36], { encoding: "utf8" });
+  if (!/"S36"[^}]*FAIL/.test(r36oui.stdout))
+    casse.push("S36 (TF-2869) : une page que le tour a écrite, livrée sans critique, passe — le filtre des écritures aurait désarmé la règle");
+  }
+  // TF-2869 — S26 : une confirmation d'écriture au bloc 0, couverte par la même confirmation au chemin absolu ailleurs, passe ; seule au bloc 0, elle reste accusée.
+  if (veut(26, 2869)) {
+    const AILLEURS26 = "\n- Le fichier `.gitignore` a été créé dans c:\\dev\\produit\\.gitignore — preuve : git check-ignore rend le chemin.\n";
+    const ouv26 = (t) => t.replace("ce qui prouve que la surveillance fonctionne.", "ce qui prouve que la surveillance fonctionne. Le fichier .gitignore a bien été créé.");
+    const f26a = join(dir, "s26-bloc0-couvert.md"), f26b = join(dir, "s26-bloc0-seul.md");
+    writeFileSync(f26a, ouv26(verte).replace("## 4. Traité\n", "## 4. Traité\n" + AILLEURS26), "utf8");
+    writeFileSync(f26b, ouv26(verte), "utf8");
+    const a26 = spawnSync(process.execPath, [moi, f26a], { encoding: "utf8" }).stdout, b26 = spawnSync(process.execPath, [moi, f26b], { encoding: "utf8" }).stdout;
+    if (ouv26(verte) === verte) casse.push("S26 (TF-2869) : chirurgie sans effet sur l'ouverture de la verte, le cas ne se joue pas");
+    if (!/"S26"[^}]*PASS/.test(a26)) casse.push("S26 (TF-2869) : une confirmation au bloc 0, couverte par son chemin absolu au bloc 4, reste accusée : " + ((/"S26"[\s\S]{0,200}/.exec(a26) || [""])[0]).replace(/\s+/g, " "));
+    if (!/"S26"[^}]*FAIL/.test(b26)) casse.push("S26 (TF-2869) : une confirmation seule au bloc 0, sans chemin absolu nulle part, passe — l'exemption serait trop large");
   }
   // 14/10 — S69 DANS SES DEUX SENS (TF-1646). La MÊME verte, dont l'en-tête porte « 2026-08-14 à
   // 15h48 », jugée à deux horloges : à 13:00 ce jour-là, l'heure est composée (2 h 48 dans le futur)

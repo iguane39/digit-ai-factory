@@ -44,6 +44,7 @@ import { nombresDuTexte, chiffresDeGains } from "./lib-chiffres-releves.mjs";
 import { releveFrictions, tourDesFrictions, journaliserFrictions, controlerFrictions, RAPPEL_FRICTIONS } from "./lib-frictions.mjs";
 // TF-2329 (D-191 (a), 10/11/2026) — les retours écrits dans le tour et restés sans lot : la lecture du ledger est celle de l'alerte d'ouverture (TF-1988), réutilisée.
 import { retoursDuTourSansLot } from "./lib-retours-produit.mjs";
+import { sessionCourante } from "./lib-session.mjs";
 import { suivreRenommage } from "./lib-renommages-livrables.mjs";
 // TF-1947 (26/10/2026) — LA LECTURE DES ÉCRITURES PAR COMMANDE EST CELLE DE LA RELECTURE D'INTENTION (TF-1941),
 // réutilisée et non recopiée. Import dynamique : une copie partielle du pilot sans `scripts\` ne fait pas tomber le juge
@@ -1195,8 +1196,8 @@ export function controlerRemontee({ releve = null, racine = "", depuis = null, e
 // (la transcription montre une commande ou une écriture qui consigne un retour) ne change pas le verdict, il est journalisé : il dit si la datation du ledger
 // est seule à accuser (`via: "ledger"`), ce qui sert à mesurer le faux positif ci-dessous.
 //
-// CE QUE CE CONTRÔLE NE VOIT PAS, dit plutôt que promis : (1) une AUTRE session du même produit qui écrit un retour pendant ce tour est accusée aussi — la
-// datation ne distingue pas les écrivains ; la garde anti-boucle laisse alors finir au second passage, avec l'écart affiché ; (2) un lot qui cite un retour
+// CE QUE CE CONTRÔLE NE VOIT PAS, dit plutôt que promis : (1) une AUTRE session du même produit qui écrit un retour pendant ce tour n'est plus accusée quand
+// l'entrée porte sa signature `session` (D-218 (b), TF-2855) ; une entrée NON signée reste accusée, la datation seule ne distinguant pas les écrivains ; (2) un lot qui cite un retour
 // autrement que par « seq n » (ce que `seqCites` ne lit pas) laisse le retour sans lot ; (3) que le lot soit REMIS au sas du pilot : c'est l'alerte
 // d'ouverture des lots `a_remettre` (TF-1758) ; (4) une transcription sans message humain réel (début du tour inconnu) : personne n'est accusé.
 export const RAPPEL_LOT = "D-191 (a), TF-2329 : un retour part en lot dans le tour où il est écrit, pas à la clôture du run. Compile le lot `forge/retours/<projet> - RETOURS - AAAAMMJJx.md` "
@@ -1208,14 +1209,16 @@ export const RAPPEL_LOT = "D-191 (a), TF-2329 : un retour part en lot dans le to
  * FAIL — bloquant — sinon. `depuis` : horodatage du dernier message humain réel ; `tourEcrit` : le tour a écrit (`travail` de la transcription) ; `retourCommande` : la
  * transcription montre une consignation de retour (elle suffit seule à tenir le tour pour écrivant, et dit au journal `via`).
  */
-export function controlerLotDansLeTour({ racine = "", depuis = null, retourCommande = false, tourEcrit = false, pilot = join(ICI, "..") } = {}) {
+export function controlerLotDansLeTour({ racine = "", depuis = null, retourCommande = false, tourEcrit = false, pilot = join(ICI, ".."), session = null } = {}) {
   const sans = { applicable: false, verdict: "SANS_OBJET", bloquant: false, ecarts: [], retours: [] };
   // Un tour qui n'a rien écrit (question, lecture) n'a pas écrit de retour : celui que le ledger daterait de ce tour vient d'une AUTRE session du produit.
   if (!tourEcrit && !retourCommande) return { ...sans, motif: "le tour n'a rien écrit (aucune écriture ni consignation de retour dans la transcription) : un retour daté de ce tour vient d'une autre session" };
   const produit = produitDe(racine);
   if (!produit) return { ...sans, motif: "ni un produit (aucun forge/retours/ en remontant depuis le dossier de la session) : le pilot et les forges n'ont pas de lot de retours à compiler dans le tour" };
   let retours = null;
-  try { retours = retoursDuTourSansLot(produit, pilot, { depuis }); } catch { retours = null; }
+  // TF-2855 : la session du tour (hook : `session_id` de l'entrée ; pré-jugement : FORGE_SESSION_ID puis CLAUDE_CODE_SESSION_ID) écarte les retours signés d'une autre.
+  const moi = session || sessionCourante().court;
+  try { retours = retoursDuTourSansLot(produit, pilot, { depuis, session: moi }); } catch { retours = null; }
   if (retours === null) return { ...sans, motif: "début du tour ou ledger du produit illisible : aucun retour du tour relevé" };
   if (!retours.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], retours: [], via: null };
   const duRun = retours.filter((r) => !r.horsRun).map((r) => r.seq), horsRun = retours.filter((r) => r.horsRun).map((r) => r.seq);
@@ -1234,13 +1237,16 @@ export function controlerLotDansLeTour({ racine = "", depuis = null, retourComma
 // `nombres` (D-100 (a), 29/10/2026) : les nombres du tour, passés à S90 par un fichier ; absents, S90 rend SANS_OBJET.
 // `session` (TF-2045, 02/11/2026) : la session qui restitue, passée à S85 et S86 pour qu'elles jugent sa dernière ligne de
 // `forge/mobilisation.jsonl`, pas celle de l'autre session du produit ; absente, l'oracle lit CLAUDE_CODE_SESSION_ID.
-export function juger(texte, racine = process.cwd(), releves = null, nombres = null, session = null) {
+// `ecritures` (TF-2869, 25/11/2026) : les écritures du tour (`ecrituresDuTour`), passées à S36 pour qu'une page citée sans être écrite ne soit pas « livrée ».
+export function juger(texte, racine = process.cwd(), releves = null, nombres = null, session = null, ecritures = null) {
   const dir = mkdtempSync(join(tmpdir(), "restitution-"));
   const f = join(dir, "message.md");
   writeFileSync(f, texte, "utf8");
   const fn = join(dir, "nombres.json");
   if (nombres) writeFileSync(fn, JSON.stringify(nombres), "utf8");
-  const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : []), ...(session ? ["--session", String(session)] : []), ...argsReleves(releves), ...(nombres ? ["--nombres-tour", fn] : [])], { encoding: "utf8" });
+  const fe = join(dir, "ecritures.json");
+  if (Array.isArray(ecritures)) writeFileSync(fe, JSON.stringify(ecritures), "utf8");
+  const r = spawnSync(process.execPath, [ORACLE, f, ...(racine ? ["--racine", racine] : []), ...(session ? ["--session", String(session)] : []), ...argsReleves(releves), ...(nombres ? ["--nombres-tour", fn] : []), ...(Array.isArray(ecritures) ? ["--ecritures-tour", fe] : [])], { encoding: "utf8" });
   let rapport = {};
   try { rapport = JSON.parse(r.stdout); } catch { /* jugé par le code */ }
   return { code: r.status, fails: (rapport.findings || []).filter((x) => x.statut === "FAIL"),
@@ -2368,12 +2374,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   let syntheseDeposee = null, affichage = "non joué : transcript de la session introuvable (--transcript <chemin.jsonl>)";
   const ecartsAffichage = [];
   let detail = { applicable: false, verdict: "SANS_OBJET", ecarts: [] };
+  let ecrituresP = null; // TF-2869 : les écritures du tour, pour S36
   let dernierHumainP = "", textePrecedentP = "", relevesP = null, nombresP = null, critiqueP = null, livrablesP = null, gainsP = [], remonteeP = null, depuisP = null;
   let frictionsP = null, depuisFrictionsP = null, retourFrictionsP = false, travailP = false, tourP = null;
   try {
     if (cheminT && existsSync(cheminT)) {
       const tour = analyserTranscript(readFileSync(cheminT, "utf8")); tourP = tour;
-      dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; nombresP = tour.nombresTour || null; critiqueP = tour.critique || null;
+      dernierHumainP = tour.dernierHumain || ""; textePrecedentP = tour.textePrecedent || ""; relevesP = tour.releves || null; nombresP = tour.nombresTour || null; critiqueP = tour.critique || null; ecrituresP = Array.isArray(tour.ecrituresDuTour) ? tour.ecrituresDuTour : null;
       livrablesP = tour.livrables || [];
       remonteeP = tour.remontee || null; depuisP = tour.depuis || null;
       frictionsP = tour.frictions || []; depuisFrictionsP = tour.depuisFrictions || null; retourFrictionsP = Boolean(tour.retourFrictions); travailP = Boolean(tour.travail);
@@ -2411,7 +2418,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   // TF-1938 — S84 reçoit les relevés d'horloge du tour quand la transcription est retrouvée ; sinon elle rend SANS_OBJET.
   // TF-1943 : le projet, pas le sous-dossier où la session a fait un `cd`.
   const RACINE_P = racineDuProjet(process.cwd());
-  const { fails, averts: avertsSynthese } = juger(brouillon, RACINE_P, relevesP, nombresP);
+  const { fails, averts: avertsSynthese } = juger(brouillon, RACINE_P, relevesP, nombresP, null, ecrituresP);
   // D-131 (a), TF-2056 — les chiffres des gains écrits au registre dans le tour, absents des sorties du tour : avertissement, jamais un refus.
   const gainsSans = nombresP ? gainsSansReleve(gainsP, nombresP) : [];
   const avertsOracle = [...avertsSynthese, ...avertsDeGains(gainsSans)];
@@ -2568,7 +2575,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const journalFrictions = journaliserFrictions({ racine: RACINE_HOOK, session: entree.session_id || null, frictions: frictionsTour });
   // TF-2329 (D-191 (a), 10/11/2026) — LE LOT DANS LE TOUR : un retour écrit au ledger depuis le message humain, sans lot qui le cite, REFUSE le tour. Joué AVANT les portées :
   // un tour qui a écrit un retour est un tour de travail, quelle que soit la forme de son dernier message (Moyen, relais, réponse courte).
-  const lotC = controlerLotDansLeTour({ racine: RACINE_HOOK, depuis: depuisFrictions, retourCommande: Boolean(retourFrictions), tourEcrit: Boolean(travail) });
+  const lotC = controlerLotDansLeTour({ racine: RACINE_HOOK, depuis: depuisFrictions, retourCommande: Boolean(retourFrictions), tourEcrit: Boolean(travail), session: entree.session_id || null });
   const lotBloque = lotC.verdict === "FAIL" && lotC.bloquant;
   const lotMotif = lotBloque ? lotC.ecarts.map((e) => `LOT — ${e}. ${RAPPEL_LOT}`) : [];
   const lotJournal = lotC.applicable ? { lot_dans_le_tour: { verdict: lotC.verdict, retours: lotC.retours.map((r) => `${r.horsRun ? "hors-run " : ""}seq ${r.seq}`), via: lotC.via } } : {};
@@ -2621,7 +2628,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       + (court.verdict === "FAIL" ? `\n\n${RAPPEL_REPONSE_COURTE}\n${RAPPEL_MESURE}` : "") }));
     process.exit(0);
   }
-  const { code, fails, averts: avertsSynthese } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour, entree.session_id);
+  const { code, fails, averts: avertsSynthese } = juger(dernierTexte, RACINE_HOOK, releves, nombresTour, entree.session_id, Array.isArray(ecrit) ? ecrit : null);
   // D-131 (a), TF-2056 — un chiffre d'un gain écrit au registre dans ce tour et qu'aucune sortie du tour ne montre rejoint les avertissements (jamais un refus).
   const gainsEcrits = fusionnerGains(gainsLitteraux, evenementsJournalises, RACINE_HOOK);
   const gainsSans = gainsSansReleve(gainsEcrits, nombresTour);
