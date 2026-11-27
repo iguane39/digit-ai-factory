@@ -1,6 +1,6 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.76.0",
+ "version": "1.77.0",
  "date": "2026-11-27",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
@@ -4380,6 +4380,70 @@
    "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture du sujet fondateur — comparaison des jetons de la maquette à ceux de l'application servie",
    "voisines": [
     "source-de-charte-en-retard-sur-la-decision"
+   ]
+  },
+  {
+   "cle": "exemple-de-journal-sans-cle-jugee",
+   "famille": "heritage-produit",
+   "libelle": "L'exemple d'un journal prescrit par un skill ne montre pas une clé que son oracle juge, ni son type : le producteur qui suit l'exemple écrit une forme que l'oracle refuse.",
+   "creee_le": "2026-11-27",
+   "fondee_par": [
+    "TF-2912"
+   ],
+   "regle": "Ingestion du 27/11/2026 : Produit-12 - RETOURS - 20261127c RS-60 ; oracle-boucle-l99 B10 exige des nombres que l'exemple de journal ne montre pas.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — oracle-boucle-l99.mjs B10 joué sur l'exemple du skill"
+  },
+  {
+   "cle": "retour-de-ledger-sans-rectification-par-ajout",
+   "famille": "tracabilite-ledger",
+   "libelle": "Un champ faux d'une entrée « retour » du ledger d'un produit ne se rectifie par aucun type d'ajout : il ne se corrige que par un second retour, qui double le premier.",
+   "creee_le": "2026-11-27",
+   "fondee_par": [
+    "TF-2913"
+   ],
+   "regle": "Ingestion du 27/11/2026 : Produit-12 - RETOURS - 20261127e RS-61 ; l'heure fausse du retour seq 562 corrigée par un nouveau retour seq 565.",
+   "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — gabarits/ledger.py, type de rectification d'un retour",
+   "voisines": [
+    "declaration-de-run-sans-rectification"
+   ]
+  },
+  {
+   "cle": "relecteur-tiers-sans-consigne-d-outil",
+   "famille": "contrat-interface-forge",
+   "libelle": "Un geste confié à un agent tiers en mode sans interaction échoue quand le modèle tente une commande que ce mode ne peut pas autoriser : la consigne ne lui interdit pas les commandes, et l'échec se lit « json illisible ».",
+   "creee_le": "2026-11-27",
+   "fondee_par": [
+    "TF-2915"
+   ],
+   "regle": "Ingestion du 27/11/2026 : Produit-79 - RETOURS - 20261127a, ledger seq 1278 ; relire vers Antigravity en échec en 16 s, réussi en 537 s avec la ligne d'interdiction en tête.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — delegue-a-codex-et-gemini scripts/self-test.mjs"
+  },
+  {
+   "cle": "livrable-tiers-juge-sur-sa-presence",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Le lanceur d'un agent tiers rend PASS parce que les fichiers attendus existent et ne sont pas vides, sans juger qu'ils sont remplis et se chargent : une maquette restée en gabarit passe.",
+   "creee_le": "2026-11-27",
+   "fondee_par": [
+    "TF-2916"
+   ],
+   "regle": "Ingestion du 27/11/2026 : Produit-82 - RETOURS - 20261127g RT-72 ; 3 maquettes portaient encore leurs emplacements de gabarit et plantaient au chargement.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — agent-tiers.mjs, contrôle avant PASS du geste concevoir",
+   "voisines": [
+    "oracle-faux-negatif-sur-rendu"
+   ]
+  },
+  {
+   "cle": "surlignage-qui-change-la-mise-en-page",
+   "famille": "page-html-socle",
+   "libelle": "Le surlignage de la recherche dans la page change le type de boîte d'un contrôle : un libellé de bouton devient insécable et un tableau déborde de la fenêtre.",
+   "creee_le": "2026-11-27",
+   "fondee_par": [
+    "TF-2919"
+   ],
+   "regle": "Ingestion du 27/11/2026 : Produit-82 - RETOURS - 20261127h RT-75 ; un tableau de 1027 px dans une fenêtre de 1024.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-agents) à la clôture du sujet fondateur — find-in-page.js du socle digit-ai-page-html et sa recette",
+   "voisines": [
+    "surlignage-html-pose-dans-un-schema-svg"
    ]
   }
  ],

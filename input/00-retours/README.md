@@ -282,6 +282,12 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-12 - RETOURS - 20261127a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261127b.md` | fichier | 3,1 Ko | Retours forges — Produit-12 — 20261127b |
 | `Produit-12 - RETOURS - 20261127b.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261127c.md` | fichier | 3,3 Ko | Retours forges — Produit-12 — 20261127c |
+| `Produit-12 - RETOURS - 20261127c.tf.jsonl` | fichier | 1000 o | 1 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261127d.md` | fichier | 2,8 Ko | Retours forges — Produit-12 — 20261127d |
+| `Produit-12 - RETOURS - 20261127d.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
+| `Produit-12 - RETOURS - 20261127e.md` | fichier | 5,2 Ko | Retours forges — Produit-12 — 20261127e |
+| `Produit-12 - RETOURS - 20261127e.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
 | `Produit-61 - RETOURS - 20261123a.md` | fichier | 4,6 Ko | Retours forges — Produit-61 — 20261123a |
 | `Produit-61 - RETOURS - 20261123a.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
 | `Produit-64 - RETOURS - 20261020a.md` | fichier | 5,9 Ko | Lot de retours — Produit-64 → digit-ai-factory (garde R-62, `oracles/hook-identite-sortant |
@@ -358,6 +364,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-79 - RETOURS - 20261120a.tf.jsonl` | fichier | 2,7 Ko | 3 ligne(s) JSONL |
 | `Produit-79 - RETOURS - 20261120b.md` | fichier | 3,8 Ko | Retours forges — Produit-79 — 20261120b |
 | `Produit-79 - RETOURS - 20261120b.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
+| `Produit-79 - RETOURS - 20261127a.md` | fichier | 6,1 Ko | Retours forges — Produit-79 — 20261127a |
+| `Produit-79 - RETOURS - 20261127a.tf.jsonl` | fichier | 2,0 Ko | 2 ligne(s) JSONL |
 | `Produit-81 - RETOURS - 20261105a.md` | fichier | 4,6 Ko | Retours forges — Produit-81 — 20261105a |
 | `Produit-81 - RETOURS - 20261105a.tf.jsonl` | fichier | 1,7 Ko | 2 ligne(s) JSONL |
 | `Produit-81 - RETOURS - 20261106a.md` | fichier | 5,7 Ko | Retours forges — Produit-81 — 20261106a |
@@ -500,6 +508,10 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-82 - RETOURS - 20261127e.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
 | `Produit-82 - RETOURS - 20261127f.md` | fichier | 3,6 Ko | Retours forges — Produit-82 — 20261127f |
 | `Produit-82 - RETOURS - 20261127f.tf.jsonl` | fichier | 1,9 Ko | 2 ligne(s) JSONL |
+| `Produit-82 - RETOURS - 20261127g.md` | fichier | 2,8 Ko | Retours forges — Produit-82 — 20261127g |
+| `Produit-82 - RETOURS - 20261127g.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
+| `Produit-82 - RETOURS - 20261127h.md` | fichier | 4,4 Ko | Retours forges — Produit-82 — 20261127h |
+| `Produit-82 - RETOURS - 20261127h.tf.jsonl` | fichier | 2,6 Ko | 3 ligne(s) JSONL |
 | `Produit-84 - RETOURS - 20261016a - PJ - oracle-format-a4.py` | fichier | 2,4 Ko | PY |
 | `Produit-84 - RETOURS - 20261016a.md` | fichier | 6,3 Ko | Retours forges — Produit-84 — 20261016a |
 | `Produit-84 - RETOURS - 20261016a.tf.jsonl` | fichier | 2,3 Ko | 2 ligne(s) JSONL |
@@ -678,6 +690,8 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-86 - RETOURS - 20261126a.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
 | `Produit-86 - RETOURS - 20261126b.md` | fichier | 2,5 Ko | Retours forges — Produit-86 — 20261126b |
 | `Produit-86 - RETOURS - 20261126b.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
+| `Produit-86 - RETOURS - 20261127a.md` | fichier | 5,3 Ko | Retours forges — Produit-86 — 20261127a |
+| `Produit-86 - RETOURS - 20261127a.tf.jsonl` | fichier | 1,9 Ko | 2 ligne(s) JSONL |
 | `Produit-87 - RETOURS - 20261123a.md` | fichier | 8,9 Ko | Retours forges — Produit-87 — 20261123a |
 | `Produit-87 - RETOURS - 20261123a.tf.jsonl` | fichier | 5,4 Ko | 4 ligne(s) JSONL |
 | `Produit-87 - RETOURS - 20261123b.md` | fichier | 4,5 Ko | Retours forges — Produit-87 — 20261123b |
@@ -693,4 +707,4 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-87 - RETOURS - 20261124b.md` | fichier | 4,7 Ko | Retours forges — Produit-87 — 20261124b |
 | `Produit-87 - RETOURS - 20261124b.tf.jsonl` | fichier | 1,6 Ko | 1 ligne(s) JSONL |
 
-_674 fichier(s), 2 sous-dossier(s)_
+_688 fichier(s), 2 sous-dossier(s)_
