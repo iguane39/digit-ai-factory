@@ -20,7 +20,7 @@ import { spawnSync } from "node:child_process";
 import { creerFiltre, conclureFiltre } from "./lib-filtre-cas.mjs";
 import { retirer } from "./hook-ecriture.mjs";
 import {
-  SEUIL_ECHECS, seriesEnEchec, slugGithub, aDesWorkflows, releverProduit, decisionReleve, lancerReleve, lignesOuverture, executer, lireTrace,
+  SEUIL_ECHECS, seriesEnEchec, slugGithub, aDesWorkflows, releverProduit, decisionReleve, lancerReleve, lignesOuverture, lignesOuvertureProduit, executer, lireTrace,
 } from "./releve-workflows-heberges.mjs";
 
 const filtre = creerFiltre("FORGE_CAS_WORKFLOWS");
@@ -178,6 +178,28 @@ try {
   check(20, "un relevé de plus de 48 h est dit ANCIEN ; un produit non relevé est nommé « NON relevé (≠ sain) » avec la cause", () => {
     const l = lignesOuverture(trT([{ produit: "p1", workflows_vus: 1, en_echec: [] }, { produit: "p2", non_releve: "gh auth login" }], "2026-11-09T10:00:00Z"), { maintenant }).join("\n");
     vrai(/ANCIEN/.test(l) && /NON relevé \(≠ sain\) : p2 \(gh auth login\)/.test(l), `ligne : ${l}`);
+  });
+  // ---- TF-2899 (27/11/2026, RU-26 de Produit-84) : la même trace, lue à l'ouverture d'un PRODUIT et filtrée sur lui seul ----
+  check(25, "ROUGE chez le produit — TF-2899 : ses 3 workflows planifiés en échec depuis 13 jours sont NOMMÉS à son ouverture ; ceux d'un autre produit ne le sont pas", () => {
+    const tr = trT([{ produit: "_Client/Produit-x", slug: "o/x", workflows_vus: 3, en_echec: [
+      { workflow: "Sonde", consecutifs: 26, depuis: j(13), dernier: j(26), url: "https://exemple.invalid/runs/1" },
+      { workflow: "Derive nocturne", consecutifs: 13, depuis: j(13), dernier: j(26) }, { workflow: "Sauvegarde", consecutifs: 13, depuis: j(13), dernier: j(26) }] },
+      { produit: "autre", workflows_vus: 1, en_echec: [{ workflow: "publier", consecutifs: 4, depuis: j(1), dernier: j(4) }] }], "2026-11-26T09:00:00Z");
+    const l = lignesOuvertureProduit(tr, "_Client\\Produit-x", { maintenant: new Date("2026-11-26T10:00:00Z") }).join("\n");
+    vrai(/Workflows hébergés de ce produit/.test(l) && /3 workflow\(s\) en échec/.test(l) && /`Sonde` en échec 26 fois de suite, depuis le 2026-11-13/.test(l) && /Derive nocturne/.test(l) && /Sauvegarde/.test(l), `ligne : ${l}`);
+    vrai(!/publier/.test(l) && !/autre/.test(l), `un autre produit est nommé : ${l}`);
+  });
+  check(26, "chez le produit — TF-2899 : NON relevé dit avec sa cause (≠ sain) ; absent du relevé ou sans trace, dit (≠ sain) ; sans workflow, rien ; sain, une ligne ; relance annoncée", () => {
+    const m = new Date("2026-11-26T10:00:00Z");
+    const nr = lignesOuvertureProduit(trT([{ produit: "p", slug: "o/p", non_releve: "HTTP 404: Not Found" }], "2026-11-26T09:00:00Z"), "p", { maintenant: m }).join("\n");
+    vrai(/NON relevé \(≠ sain\)/.test(nr) && /HTTP 404/.test(nr) && /gh run list --repo o\/p/.test(nr), `non relevé : ${nr}`);
+    const abs = lignesOuvertureProduit(trT([{ produit: "autre", workflows_vus: 1, en_echec: [] }], "2026-11-26T09:00:00Z"), "p", { maintenant: m }).join("\n");
+    vrai(/pas dans le relevé/.test(abs) && /≠ sain/.test(abs), `absent : ${abs}`);
+    egal(lignesOuvertureProduit(trace, "p", { maintenant: m, aDesWorkflowsIci: false }), [], "sans workflow hébergé");
+    const sain = lignesOuvertureProduit(trT([{ produit: "P", workflows_vus: 2, en_echec: [] }], "2026-11-26T09:00:00Z"), "p", { maintenant: m, lancer: () => ({ lance: true, pid: 7 }) }).join("\n");
+    vrai(/2 workflow\(s\) vu\(s\), aucun en échec/.test(sain) && /relevé relancé en arrière-plan \(pid 7/.test(sain), `sain : ${sain}`);
+    retirer(trace);
+    vrai(/aucun relevé encore sur ce poste \(≠ sain\)/.test(lignesOuvertureProduit(trace, "p", { maintenant: m }).join(" ")), "sans trace");
   });
   check(21, "sans trace : le premier relevé est annoncé s'il est lancé ; sans lancement possible (drapeau), rien n'est dit", () => {
     retirer(trace);

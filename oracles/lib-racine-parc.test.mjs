@@ -84,6 +84,13 @@ try {
     att(/PRÉREQUIS ABSENT \(TF-2720\)/.test(r.stderr) && /poser FORGE_ROOT=/.test(r.stderr), `refus sans remède : ${r.stderr.slice(0, 300)}`);
     att(!/\[OK\]|PASS/.test(r.stdout), "des recettes ont été jouées malgré le refus");
   });
+  check("rouge — TF-2895 : la recette agrégée REFUSE une option inconnue (exit 2, rien n'est joué) et `--aide` imprime l'usage (exit 0) sans jouer", () => {
+    const agregat = join(dirname(fileURLToPath(import.meta.url)), "self-tests.mjs");
+    const inconnue = spawnSync(process.execPath, [agregat, "--option-inconnue"], { encoding: "utf8", timeout: 60000 });
+    att(inconnue.status === 2 && /option\(s\) inconnue\(s\)/.test(inconnue.stderr) && !/\[OK\]|PASS/.test(inconnue.stdout), `option inconnue : exit ${inconnue.status} ${String(inconnue.stdout).slice(0, 200)}${String(inconnue.stderr).slice(0, 200)}`);
+    const aide = spawnSync(process.execPath, [agregat, "--aide"], { encoding: "utf8", timeout: 60000 });
+    att(aide.status === 0 && /^usage : /.test(aide.stdout) && !/\[OK\]|PASS/.test(aide.stdout), `--aide : exit ${aide.status} ${String(aide.stdout).slice(0, 200)}`);
+  });
   check("--juger (la commande que le contrat d'agent prescrit) : exit 0 sous un parc qui porte le pilot, exit 3 et remède sous une racine sans pilot, aucune autre variable affichée", () => {
     const juger = (forgeRoot) => spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), "lib-racine-parc.mjs"), "--juger"], { encoding: "utf8", env: { ...process.env, FORGE_ROOT: forgeRoot, JETON_ESSAI_TF2721: "valeur-secrete-factice" } });
     const bon = juger(parc), mauvais = juger(join(pilot, ".claude", "worktrees"));

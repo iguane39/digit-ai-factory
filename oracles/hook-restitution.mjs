@@ -2504,8 +2504,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   // un brouillon qui se déclare « Niveau : Moyen » garde `--pre-vol`, qui juge sa forme.
   if (tourP && !declareMoyen(brouillon)) {
     // TF-2887 : le relais d'un agent qui tourne encore s'y juge comme au hook de fin de tour (tâches du tour réel, écritures, mode de la session).
+    // TF-2897 (27/11/2026) : les tâches d'arrière-plan du tour non revenues (`enAttente`) aussi, pour que l'exemption du message d'attente (TF-1649) s'y joue comme au hook.
     const exempt = jugeable({ travail: tourP.travail, ecritures: tourP.ecritures, commandes: tourP.commandes, dernierTexte: brouillon, ecrituresDuTour: tourP.ecrituresDuTour,
-      enAttenteTour: tourP.enAttenteTour, ecrituresTourReel: tourP.ecrituresTourReel, nonInteractif: tourP.nonInteractif });
+      enAttente: tourP.enAttente || [], enAttenteTour: tourP.enAttenteTour, ecrituresTourReel: tourP.ecrituresTourReel, nonInteractif: tourP.nonInteractif });
     if (!exempt.juge) {
       const court = controlerReponseCourte({ dernierHumain: tourP.dernierHumain || "", dernierTexte: brouillon });
       const lotC = controlerLotDansLeTour({ racine: racineDuProjet(process.cwd()), depuis: tourP.depuisFrictions, retourCommande: Boolean(tourP.retourFrictions), tourEcrit: Boolean(tourP.travail) });
@@ -2644,8 +2645,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   try { if (cheminT && existsSync(cheminT)) tour = analyserTranscript(readFileSync(cheminT, "utf8")); } catch { tour = null; }
   const r = jugeable({ travail: tour ? tour.travail : false, ecritures: tour ? tour.ecritures : 0, commandes: tour ? tour.commandes : 0,
     dernierTexte: texte, ecrituresDuTour: tour ? tour.ecrituresDuTour : [],
-    // TF-2887 : le relais d'un agent qui tourne encore, jugé comme au hook de fin de tour.
-    enAttenteTour: tour ? tour.enAttenteTour : [], ecrituresTourReel: tour ? tour.ecrituresTourReel : null, nonInteractif: tour ? tour.nonInteractif : false });
+    // TF-2887 : le relais d'un agent qui tourne encore, jugé comme au hook de fin de tour ; TF-2897 : le message d'attente d'une tâche non revenue aussi (TF-1649).
+    enAttente: tour ? tour.enAttente || [] : [], enAttenteTour: tour ? tour.enAttenteTour : [], ecrituresTourReel: tour ? tour.ecrituresTourReel : null, nonInteractif: tour ? tour.nonInteractif : false });
   const court = r.juge ? null : controlerReponseCourte({ dernierHumain: tour ? tour.dernierHumain : "", dernierTexte: texte });
   // TF-2329 (D-191 (a)) — un retour écrit dans le tour sans lot refuse AUSSI la réponse courte : le pré-vol le dit avant l'affichage, au lieu du refus après.
   const lotV = tour ? controlerLotDansLeTour({ racine: racineDuProjet(process.cwd()), depuis: tour.depuisFrictions, retourCommande: Boolean(tour.retourFrictions), tourEcrit: Boolean(tour.travail) }) : null;

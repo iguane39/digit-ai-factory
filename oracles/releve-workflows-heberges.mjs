@@ -174,6 +174,37 @@ export function lignesOuverture(trace, { maintenant = new Date(), lancer = null 
   return out.length ? ["", "## Workflows hébergés des produits (TF-2442, RP-26 — relevé en lecture seule, oracles/releve-workflows-heberges.mjs)", ...out] : [];
 }
 
+/**
+ * TF-2899 (27/11/2026, RU-26 de Produit-84) — CE QUE LE RELEVÉ DIT À L'OUVERTURE D'UN PRODUIT. Le fait : la sonde, la dérive nocturne et la sauvegarde
+ * d'un produit ont échoué à chaque passage du 13 au 26/11/2026 (jeton de gestion expiré, 401) ; les ouvertures de session du produit des 25 et 26/11 n'en
+ * ont rien dit, parce que le relevé ne s'affichait qu'à l'ouverture du PILOT, et le pilot ne s'ouvrait pas sur le poste du produit. La même trace se lit
+ * donc chez le produit, filtrée sur lui seul, et le relevé détaché se relance d'ici quand elle est périmée. `produit` est son chemin relatif à la racine
+ * du parc, comme la trace l'écrit (comparé sans la casse : Windows). Rend [] quand le produit n'a aucun workflow hébergé.
+ * NON JUGÉ : un produit dont le dépôt n'est pas lisible par le `gh` du poste se dit « NON relevé », avec la cause rendue par `gh`, jamais « sain ».
+ */
+export function lignesOuvertureProduit(trace, produit, { maintenant = new Date(), lancer = null, aDesWorkflowsIci = true } = {}) {
+  if (!aDesWorkflowsIci) return [];
+  const t = lireTrace(trace);
+  const cle = String(produit || "").replaceAll("\\", "/").toLowerCase();
+  const p = t && Array.isArray(t.produits) ? t.produits.find((x) => String(x.produit || "").toLowerCase() === cle) : null;
+  const jour = (ts) => String(ts || "?").slice(0, 10);
+  const out = [];
+  if (p) {
+    const age_h = Math.round((maintenant - Date.parse(t.fin)) / 3600000);
+    const quand = `relevé du ${jour(t.fin)} (il y a ${Number.isFinite(age_h) ? age_h : "?"} h${age_h > PERIME_H ? ` — ANCIEN, plus de ${PERIME_H} h` : ""})`;
+    if (p.non_releve) out.push(`- **NON relevé (≠ sain)** au ${quand} : ${p.non_releve} — lire soi-même \`gh run list --repo ${p.slug || "<dépôt>"} --limit 10\``);
+    else if ((p.en_echec || []).length) {
+      out.push(`- **${p.en_echec.length} workflow(s) en échec ${SEUIL_ECHECS} fois de suite ou plus** (${quand}, ${p.workflows_vus || 0} workflow(s) vu(s)) :`);
+      for (const e of p.en_echec.slice(0, 8)) out.push(`  - \`${e.workflow}\` en échec ${e.consecutifs} fois de suite, depuis le ${jour(e.depuis)} (dernière exécution le ${jour(e.dernier)})${e.url ? ` — ${e.url}` : ""}`);
+    } else out.push(`- ${quand} : ${p.workflows_vus || 0} workflow(s) vu(s), aucun en échec ${SEUIL_ECHECS} fois de suite`);
+  } else out.push(t ? `- ce produit n'est pas dans le relevé du ${jour(t.fin)} : ses workflows hébergés n'ont pas encore été lus sur ce poste (≠ sain)`
+    : "- aucun relevé encore sur ce poste (≠ sain) : ses workflows hébergés n'ont pas été lus");
+  const l = lancer ? lancer() : null;
+  if (l?.lance) out.push(`- relevé relancé en arrière-plan (pid ${l.pid}, sans attente) : résultat à l'ouverture suivante.`);
+  else if (l?.erreur) out.push(`- relevé NON lancé (${l.erreur}) : les workflows hébergés ne sont pas relevés cette fois.`);
+  return ["", "## Workflows hébergés de ce produit (TF-2442, TF-2899 — relevé en lecture seule du pilot, oracles/releve-workflows-heberges.mjs)", ...out];
+}
+
 /** Le relevé détaché : pose son verrou, relève le parc, écrit la trace, retire le verrou. */
 export async function executer({ trace, base, gh = lanceurGh, git = lanceurGit, produits = null } = {}) {
   const verrou = cheminVerrou(trace);

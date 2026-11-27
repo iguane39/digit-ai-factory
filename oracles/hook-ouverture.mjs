@@ -17,7 +17,7 @@
  */
 import { existsSync, readFileSync, readdirSync, copyFileSync, mkdirSync, appendFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir, hostname } from "node:os";
-import { join, dirname, sep, isAbsolute } from "node:path";
+import { join, dirname, sep, isAbsolute, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { passerOuvertureEnAsync, fusionnerHooksDuGabarit, ancrerCommandesFactory } from "./lib-ouverture-async.mjs";
@@ -27,7 +27,7 @@ import { constatR47 } from "./lib-resume-r47.mjs";
 import { lancerRejeuHebdomadaire, lignesOuverture as lignesConsommateursRouges, lignesRejeuOuverture, traceRouges } from "./consommateurs-skills.mjs";
 import { skillsInstalles } from "../scripts/lib-config-installee.mjs";
 import { LECTEUR_MINUSCULE } from "./hook-flotte.mjs";
-import { cheminTrace as cheminTraceWorkflows, lancerReleve as lancerReleveWorkflows, lignesOuverture as lignesWorkflowsHeberges } from "./releve-workflows-heberges.mjs";
+import { cheminTrace as cheminTraceWorkflows, lancerReleve as lancerReleveWorkflows, lignesOuverture as lignesWorkflowsHeberges, lignesOuvertureProduit as lignesWorkflowsProduit, aDesWorkflows as aDesWorkflowsHeberges } from "./releve-workflows-heberges.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -640,6 +640,17 @@ if (iPilot < 0) {
     const lancer = process.env.FORGE_SANS_RELEVE_WORKFLOWS === "1" ? null : () => lancerReleveWorkflows({ trace, pilot: PILOT });
     lignes.push(...lignesWorkflowsHeberges(trace, { lancer }));
   } catch (e) { lignes.push("", `## Workflows hébergés des produits : NON jugés (${String(e.message).slice(0, 120)}) — TF-2442`); }
+}
+// TF-2899 (27/11/2026, RU-26 de Produit-84) : chez un produit, la même trace filtrée sur lui seul ; le relevé détaché du parc se relance d'ici quand elle est
+// périmée (le pilot ne s'ouvre pas toujours sur le poste du produit : 13 jours d'échecs sont passés sous 2 ouvertures du produit sans un mot).
+if (iPilot >= 0 && existsSync(join(process.cwd(), "forge"))) {
+  try {
+    const trace = cheminTraceWorkflows(PILOT);
+    const base = process.env.FORGE_ROOT || join(PILOT, "..");
+    const produitRel = relative(base, process.cwd());
+    const lancer = process.env.FORGE_SANS_RELEVE_WORKFLOWS === "1" ? null : () => lancerReleveWorkflows({ trace, pilot: PILOT });
+    lignes.push(...lignesWorkflowsProduit(trace, produitRel, { lancer, aDesWorkflowsIci: aDesWorkflowsHeberges(process.cwd()) }));
+  } catch (e) { lignes.push("", `## Workflows hébergés de ce produit : NON jugés (${String(e.message).slice(0, 120)}) — TF-2899`); }
 }
 
 // TF-0788 (décision D-3 (a), 03/09/2026) — UNE MONTÉE DE VERSION D'UN SKILL SE LIT CHEZ QUI LE

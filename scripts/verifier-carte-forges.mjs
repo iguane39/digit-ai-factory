@@ -36,13 +36,13 @@ function selfTest() {
   const echoue = (carte, regle) => validerCarte(carte).some((f) => f.regle === regle && f.statut === "FAIL");
   const copie = () => JSON.parse(JSON.stringify(reelle.carte));
 
-  // Sens vert : la carte réelle passe, porte les 13 forges et les 10 types de la carte (consigne de TF-1949, D-99 (b)).
+  // Sens vert : la carte réelle passe, porte les 13 forges et les 11 types de la carte (consigne de TF-1949, D-99 (b) ; « maquette » : TF-2906).
   const constats = validerCarte(reelle.carte);
   attendre(!constats.some((f) => f.statut === "FAIL"),
     `la carte réelle échoue : ${constats.filter((f) => f.statut === "FAIL").map((f) => `${f.regle} ${f.message}`).join(" | ")}`);
-  const ATTENDUS = ["produit-neuf", "evolution", "audit-complet", "site-web", "donnees", "agent", "document", "mise-en-production", "securite", "donnees-personnelles"];
+  const ATTENDUS = ["produit-neuf", "evolution", "audit-complet", "site-web", "donnees", "agent", "document", "mise-en-production", "securite", "donnees-personnelles", "maquette"];
   const ids = (reelle.carte.types || []).map((t) => t.id);
-  attendre(ATTENDUS.every((t) => ids.includes(t)) && ids.length === 10, `les 10 types de la carte ne sont pas tous là : ${ids.join(", ")}`);
+  attendre(ATTENDUS.every((t) => ids.includes(t)) && ids.length === 11, `les 11 types de la carte ne sont pas tous là : ${ids.join(", ")}`);
   attendre(FORGES.every((f) => f in (reelle.carte.forges || {})), "la carte réelle ne porte pas les 13 forges");
 
   // Sens rouge, une altération par règle.
@@ -84,7 +84,7 @@ function selfTest() {
   } finally { rmSync(dir, { recursive: true, force: true }); }
 
   console.log(casse.length ? `SELF-TEST FAIL : ${casse.join(" · ")}`
-    : `Self-test verifier-carte-forges : ${cas}/${cas} PASS (la carte réelle PASS, avec ses 13 forges et ses 10 types ; cas rouges : 12 forges, 14 forges, forge privilégiée inconnue, `
+    : `Self-test verifier-carte-forges : ${cas}/${cas} PASS (la carte réelle PASS, avec ses 13 forges et ses 11 types ; cas rouges : 12 forges, 14 forges, forge privilégiée inconnue, `
       + "livrable exigé hors des forges privilégiées, chemin absolu, livrable orphelin, carte non datée, signal inconnu, question de forge vide ou à chevrons : FAIL sur leur règle ; "
       + "la question de design atteint le motif du squelette, et seulement quand la carte la pose ; carte absente ou illisible : exit 2)");
   process.exit(casse.length ? 1 : 0);

@@ -25,6 +25,8 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const attendre = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+/** Relectures de la liste au moins, avant de conclure qu'un arrêt n'est pas vérifié, quel que soit le délai (TF-2900). */
+export const MIN_LECTURES = 3;
 
 /** La liste des processus du poste : Map pid → { ppid, debut }. `debut` est une chaîne comparable (date de création Windows, ou rien sous POSIX). */
 export function listerProcessus() {
@@ -79,15 +81,23 @@ export function arreter(pid, { arbre = false, attenteS = 10, debut = null, liste
     // Ses descendants éventuels sont orphelins : sans --arbre on ne les touche pas, avec --arbre on les arrête (collectés avant).
   }
   for (const p of [...cibles].reverse()) if (present(avant, p, p === pid ? debut : null)) tuerPid(p);
-  const limite = Date.now() + attenteS * 1000;
-  let restants = cibles;
+  // TF-2900 (27/11/2026) : une lecture de la liste par PowerShell peut prendre plusieurs secondes sous charge (banc Lighthouse) ; le délai seul laissait
+  // alors UNE relecture, faite trop tôt, et un arrêt réussi était dit non vérifié. Le délai ne coupe donc qu'après MIN_LECTURES relectures au moins.
+  const t0 = Date.now(), limite = t0 + attenteS * 1000;
+  let restants = cibles, lectures = 0;
   for (;;) {
     const apres = lister();
+    lectures++;
     restants = cibles.filter((p) => present(apres, p, p === pid ? debut : null));
-    if (!restants.length || Date.now() >= limite) break;
+    if (!restants.length || (lectures >= MIN_LECTURES && Date.now() >= limite)) break;
     attendre(500);
   }
-  if (restants.length) { dits.push(`ENCORE DANS LA LISTE DES PROCESSUS après ${attenteS} s : ${restants.join(", ")} — l'arrêt n'est PAS vérifié`); return { code: 1, dits, cibles, restants }; }
+  const duree = ((Date.now() - t0) / 1000).toFixed(1);
+  if (restants.length) {
+    const qui = restants.map((p) => (p === pid ? `${p} (le processus visé)` : `${p} (descendant)`)).join(", ");
+    dits.push(`ENCORE DANS LA LISTE DES PROCESSUS après ${lectures} relecture(s) en ${duree} s (attente demandée : ${attenteS} s) : ${qui} — l'arrêt n'est PAS vérifié ; relancer \`verifier\` pour relire la liste`);
+    return { code: 1, dits, cibles, restants, lectures };
+  }
   dits.push(`arrêt vérifié par la liste des processus : ${cibles.join(", ")} absent(s)${arbre ? ` (le processus et ${cibles.length - 1} descendant(s))` : ""}`);
   return { code: 0, dits, cibles, restants };
 }

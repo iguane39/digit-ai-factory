@@ -58,6 +58,17 @@ try {
     att(r.code === 1 && r.restants.includes(pid) && /ENCORE DANS LA LISTE DES PROCESSUS/.test(r.dits.join("\n")) && /n'est PAS vérifié/.test(r.dits.join("\n")), `${r.code} ${r.dits.join(" | ")}`);
     att(present(listerProcessus(), pid), "le banc a tué le processus alors que l'arrêt était un faux");
   });
+  check("vert — TF-2900 : une liste qui se met à jour avec retard (présent aux 2 premières relectures, absent à la 3e) rend l'arrêt vérifié, même sans délai d'attente", () => {
+    let n = 0;
+    const lister = () => { n++; return n <= 3 ? new Map([[4242, { ppid: 1, debut: "" }]]) : new Map(); };   // 1 lecture avant l'arrêt, puis 2 relectures en retard
+    const r = arreter(4242, { attenteS: 0, lister, tuerPid: () => {} });
+    att(r.code === 0 && /arrêt vérifié/.test(r.dits.join("\n")), `${r.code} ${r.dits.join(" | ")} (lectures : ${n})`);
+  });
+  check("rouge — TF-2900 : un processus qui reste rend exit 1 après au moins 3 relectures, et le message dit le nombre de relectures et qui reste", () => {
+    const lister = () => new Map([[4243, { ppid: 1, debut: "" }]]);
+    const r = arreter(4243, { attenteS: 0, lister, tuerPid: () => {} });
+    att(r.code === 1 && r.lectures >= 3 && /3 relecture\(s\)/.test(r.dits.join("\n")) && /le processus visé/.test(r.dits.join("\n")), `${r.code} ${r.dits.join(" | ")}`);
+  });
   check("vert — `arreter --pid <n> --arbre` arrête l'enfant ET le petit-enfant, puis le vérifie par la liste (exit 0) ; le remède se joue sur de vrais processus", () => {
     const r = jouer("arreter", "--fichier-pid", fichierPid, "--arbre", "--attente-s", "20");
     att(r.code === 0 && /arrêt vérifié par la liste des processus/.test(r.out), `exit ${r.code} : ${r.out}${r.err}`);

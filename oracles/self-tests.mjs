@@ -65,6 +65,16 @@ import { creerGarde } from "./lib-garde-arbre-suivi.mjs";
 import { jugerForgeRoot, remedeForgeRoot } from "./lib-racine-parc.mjs";
 
 const ICI = dirname(fileURLToPath(import.meta.url));
+// TF-2895 (27/11/2026) — UNE OPTION INCONNUE NE LANCE PAS LA RECETTE ENTIÈRE. Le 26/11/2026, `--aide` a lancé l'agrégat complet deux fois dans la même
+// session (plusieurs minutes chacune). `--aide` et `--help` impriment l'usage (exit 0) ; toute autre option inconnue le refuse (exit 2, rien n'est joué).
+{
+  const OPTIONS = { "--appliquer": "accepte au cliquet les baisses et disparitions de cas relevées (geste écrit, TF-0681)", "--ecrire-baseline": "inscrit les hausses dans un arbre de campagne lié (TF-2480)" };
+  const usage = `usage : node oracles/self-tests.mjs [${Object.keys(OPTIONS).join("] [")}]\n${Object.entries(OPTIONS).map(([o, d]) => `  ${o.padEnd(18)} ${d}`).join("\n")}\n  sans option        joue toutes les recettes du pilot (I1 à I7)`;
+  const demandes = process.argv.slice(2);
+  if (demandes.some((x) => x === "--aide" || x === "--help" || x === "-h")) { console.log(usage); process.exit(0); }
+  const inconnues = demandes.filter((x) => !(x in OPTIONS));
+  if (inconnues.length) { console.error(`self-tests : option(s) inconnue(s) : ${inconnues.join(", ")} — rien n'est joué (TF-2895)\n${usage}`); process.exit(2); }
+}
 // TF-2256 (06/11/2026) : les recettes qui filtrent leurs cas par une variable `FORGE_CAS_*` (lib-filtre-cas.mjs) se jouent ICI en entier. Une variable
 // restée dans l'environnement de la session rendrait chacune PARTIELLE sans que ce total le dise : le total d'un dépôt ne se mesure jamais sur une sélection.
 for (const k of Object.keys(process.env)) if (k.startsWith("FORGE_CAS_")) delete process.env[k];

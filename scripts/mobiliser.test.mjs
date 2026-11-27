@@ -243,6 +243,15 @@ try {
     const r = lancer(d, ["--verifier"]);
     att(r.code === 0 && r.sortie.exiges[0].trouve === recent, `le rapport du 05/11 doit compter : exit ${r.code} ${r.brut.slice(0, 400)}`);
   });
+  check("vert — TF-2906 : le type « maquette » est connu, design mobilisée, development et ops écartées, et --verifier n'exige ni DESIGN.md ni jetons", () => {
+    const d = produit("maquette");
+    const v = verdictsSansRien(); v.design = { verdict: "mobilisee", motif: "3 maquettes de tableau de bord à concevoir et à juger par la critique d'implémentation" };
+    const r = lancer(d, ["--type", "maquette", "--demande", "3 maquettes de tableau de bord", "--verdicts", ecrireVerdicts(d, v)]);
+    att(r.code === 0, `type maquette : exit ${r.code} ${r.brut.slice(0, 300)}`);
+    const w = lancer(d, ["--verifier"]);
+    att(w.code === 0 && w.sortie && !w.sortie.manquants.length, `--verifier : exit ${w.code} ${JSON.stringify(w.sortie && w.sortie.manquants)}`);
+  });
+
   check("vert — TF-2188 : un motif à `**` (verdict de format sous output/) retient aussi le fichier le plus récent", () => {
     const d = produit("double-etoile");
     const v = verdictsSansRien(); v.design = { verdict: "mobilisee", motif: "document à la marque, verdict de format attendu (1 note)" };
