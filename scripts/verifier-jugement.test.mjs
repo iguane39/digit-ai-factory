@@ -13,7 +13,7 @@
  *
  * Joué par `oracles\self-tests.mjs` (I2).
  */
-import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -348,6 +348,66 @@ check("un sceau ILLISIBLE est signalé, pas ignoré", () => {
   rmSync(P, { recursive: true, force: true });
 }
 
+// TF-2870 (lot Produit-81 20261124a) — une page HTML livrée ne se scelle que sur le PASS du lanceur
+// complet de quality-oracles, rendu sur son contenu présent. Le 24/11/2026, un DAT scellé sur les
+// seuls oracles de son skill a montré 10 oracles en échec au lanceur complet, après publication.
+{
+  const R = mkdtempSync(join(tmpdir(), "jugement-lanceur-"));
+  const DOSSIER = join(R, "output", "03-etudes");
+  mkdirSync(DOSSIER, { recursive: true });
+  const PAGE = join(DOSSIER, "Produit - DAT - 20261124a.html");
+  const COMP = join(R, ".oracles", "output", "03-etudes", "Produit - DAT - 20261124a.html.oracles.json");
+  const hashBrut = (s) => createHash("sha256").update(s).digest("hex");
+  const compagnon = (verdict, contenu) => {
+    mkdirSync(dirname(COMP), { recursive: true });
+    writeFileSync(COMP, JSON.stringify({ cible: PAGE, date_iso: new Date().toISOString(), verdict,
+      empreinte: { format: "forge-ops/empreinte@1", fichiers: { [PAGE]: hashBrut(contenu) } } }));
+  };
+  const sceller = (...a) => {
+    const r = spawnSync(process.execPath, [OUTIL, PAGE, "--sceller", ...a], { encoding: "utf8" });
+    let j = null;
+    try { j = JSON.parse(r.stdout || "null"); } catch { /* sortie illisible */ }
+    return { code: r.status, j, scelle: existsSync(PAGE + ".jugement.json") };
+  };
+  const nettoyer = () => { rmSync(PAGE + ".jugement.json", { force: true }); rmSync(COMP, { force: true }); };
+  writeFileSync(PAGE, page("dat"));
+
+  check("ROUGE TF-2870 — page livrée sans compagnon du lanceur complet : REFUSE, rien n'est scellé", () => {
+    nettoyer();
+    const r = sceller();
+    if (r.code !== 2 || r.j.verdict !== "REFUSE" || r.scelle) throw new Error(`code ${r.code}, verdict ${r.j && r.j.verdict}, scellé ${r.scelle}`);
+    if (!/run-oracles/.test(r.j.message)) throw new Error("le refus ne donne pas le remède");
+  });
+  check("ROUGE TF-2870 — compagnon en FAIL (le cas du 24/11 : 10 oracles en échec) : REFUSE", () => {
+    nettoyer(); compagnon("FAIL", page("dat"));
+    const r = sceller();
+    if (r.code !== 2 || r.scelle) throw new Error(`code ${r.code}, scellé ${r.scelle}`);
+  });
+  check("ROUGE TF-2870 — PASS rendu sur un autre contenu que la page présente : REFUSE", () => {
+    nettoyer(); compagnon("PASS", page("ancienne version"));
+    const r = sceller();
+    if (r.code !== 2 || r.scelle || !/autre contenu/.test(JSON.stringify(r.j))) throw new Error(`code ${r.code}, scellé ${r.scelle}`);
+  });
+  check("VERT TF-2870 — PASS du lanceur complet sur le contenu présent : scellé", () => {
+    nettoyer(); compagnon("PASS", page("dat"));
+    const r = sceller();
+    if (r.code !== 0 || r.j.verdict !== "SCELLE" || !r.scelle) throw new Error(`code ${r.code}, verdict ${r.j && r.j.verdict}`);
+  });
+  check("VERT TF-2870 — sans compagnon mais déclaré par --sans-compagnon et son motif : scellé, motif écrit au sceau", () => {
+    nettoyer();
+    const r = sceller("--sans-compagnon", "page de démonstration jamais diffusée au client");
+    if (r.code !== 0 || !r.scelle) throw new Error(`code ${r.code}`);
+    const s = JSON.parse(readFileSync(PAGE + ".jugement.json", "utf8"));
+    if (!/démonstration/.test(s.sans_compagnon || "")) throw new Error("motif absent du sceau");
+  });
+  check("BORNE TF-2870 — motif trop court : ERREUR, rien n'est scellé", () => {
+    nettoyer();
+    const r = sceller("--sans-compagnon", "court");
+    if (r.code !== 2 || r.scelle) throw new Error(`code ${r.code}`);
+  });
+  rmSync(R, { recursive: true, force: true });
+}
+
 rmSync(T, { recursive: true, force: true });
-console.log(`\nverifier-jugement (TF-0523, TF-0692, TF-1303, TF-1306, TF-1312, TF-1745) : ${pass} PASS, ${fail} FAIL`);
+console.log(`\nverifier-jugement (TF-0523, TF-0692, TF-1303, TF-1306, TF-1312, TF-1745, TF-2870) : ${pass} PASS, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

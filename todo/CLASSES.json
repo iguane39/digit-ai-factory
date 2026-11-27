@@ -1,7 +1,7 @@
 {
  "schema": "pilot/classes@1",
- "version": "1.74.0",
- "date": "2026-11-16",
+ "version": "1.75.0",
+ "date": "2026-11-26",
  "regle": "Tout retour remis dans un lot daté du 03/09/2026 ou après porte une `classe` prise dans ce référentiel. Une classe est UN DÉFAUT GÉNÉRALISÉ — la règle qui aurait évité le retour — jamais une famille. Une clé absente d'ici refuse le lot à l'ingestion, avec les clés proches ; une clé nouvelle se crée ICI, datée, sourcée, rattachée à sa famille, jamais dans un sidecar.",
  "pourquoi": "Mesure du 03/09/2026 (mandat d'amélioration continue, pas 0) sur les 788 items du registre. Cinquante items déclarent en toutes lettres une récidive (« déjà corrigé », « reproduit », « récidive ») — 6 % du registre, en hausse chaque semaine d'août (1, 11, 15, 19 par semaine). Aucun champ ne permettait de les compter : le mot était dans la prose. Et un classement AUTOMATIQUE par famille de mots-clés a été essayé avant celui-ci : il rendait 94 % de « récidives » sur les grandes familles, 321 items dans plusieurs familles à la fois, 196 dans aucune — inexploitable, parce qu'une famille (« page HTML ») n'est pas un défaut (« polices distantes chargées »). D'où les deux niveaux : la FAMILLE sert à lire, la CLASSE sert à compter. Et d'où l'obligation que le producteur DÉCLARE la classe : personne ne la devine à sa place.",
  "modele": {
@@ -4292,6 +4292,28 @@
    ],
    "regle": "Ingestion du 21/11/2026 : 2 lots (Produit-02, Produit-85) refusés au motif de ces 2 sections absentes, en attente depuis 19 et 24 jours.",
    "oracle": "à porter par la forge cible (digit-ai-factory) à la clôture du sujet fondateur — oracle-lot côté produit, avant la remise"
+  },
+  {
+   "cle": "source-de-charte-en-retard-sur-la-decision",
+   "famille": "page-html-socle",
+   "libelle": "Une source déclarée de la charte (jetons d'un dossier de marque) n'a pas suivi une décision de charte, et aucun contrôle ne compare les sources entre elles : la critique d'implémentation rend PASS sur la charte périmée.",
+   "creee_le": "2026-11-26",
+   "fondee_par": [
+    "TF-2889"
+   ],
+   "regle": "Ingestion du 26/11/2026 : Produit-82 - RETOURS - 20261126b RT-58 ; le tokens.css « pages HTML » du dossier de marque Digit-AI porte Roboto et DM Sans, le socle digit-ai-page-html Montserrat et Inter depuis D-5 (a) du 23/09/2026.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture du sujet fondateur — comparaison des polices du dossier de marque aux règles C1-C2 du socle"
+  },
+  {
+   "cle": "page-portee-sans-controle-de-fidelite-a-sa-maquette",
+   "famille": "skill-ou-oracle-non-invoque",
+   "libelle": "Une page qui se réclame d'une maquette est jugée par des règles générales (rendu, critique d'implémentation, relecture d'intention), jamais contre la maquette elle-même : structure et composants absents passent.",
+   "creee_le": "2026-11-26",
+   "fondee_par": [
+    "TF-2890"
+   ],
+   "regle": "Ingestion du 26/11/2026 : Produit-82 - RETOURS - 20261126c RT-60 ; le porteur a vu l'écart sur 2 captures côte à côte, après 3 juges verts.",
+   "oracle": "à porter par la forge cible (digit-ai-forge-design) à la clôture du sujet fondateur — oracle de fidélité à la maquette"
   }
  ],
  "cliquet_porteur": {

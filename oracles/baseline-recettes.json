@@ -47,12 +47,12 @@
   "vu_le": "2026-10-13"
  },
  "gabarits/hooks-factory.test.mjs": {
-  "cas": 64,
-  "vu_le": "2026-11-15"
+  "cas": 66,
+  "vu_le": "2026-11-26"
  },
  "gabarits/ledger.test.mjs": {
-  "cas": 88,
-  "vu_le": "2026-11-22"
+  "cas": 89,
+  "vu_le": "2026-11-26"
  },
  "gabarits/oracle-demande-produit.test.mjs": {
   "cas": 14,
@@ -83,8 +83,8 @@
   "vu_le": "2026-09-16"
  },
  "hook-lexique.mjs": {
-  "cas": 97,
-  "vu_le": "2026-11-22"
+  "cas": 104,
+  "vu_le": "2026-11-26"
  },
  "hook-page-html.mjs": {
   "cas": 17,
@@ -148,8 +148,8 @@
   "vu_le": "2026-10-02"
  },
  "oracle-conformite-projet.mjs": {
-  "cas": 309,
-  "vu_le": "2026-11-22"
+  "cas": 310,
+  "vu_le": "2026-11-26"
  },
  "oracle-constantes-externes.mjs": {
   "cas": 12,
@@ -329,8 +329,8 @@
   "vu_le": "2026-09-22"
  },
  "oracle-reprise.mjs": {
-  "cas": 38,
-  "vu_le": "2026-11-22"
+  "cas": 39,
+  "vu_le": "2026-11-26"
  },
  "oracle-run-reseau.mjs": {
   "cas": 54,
@@ -371,8 +371,8 @@
   "vu_le": "2026-11-22"
  },
  "oracle-synthese.mjs": {
-  "cas": 395,
-  "vu_le": "2026-11-16"
+  "cas": 406,
+  "vu_le": "2026-11-26"
  },
  "oracle-tableau-de-bord-pilotage.mjs": {
   "cas": 31,
@@ -447,8 +447,8 @@
   "vu_le": "2026-11-22"
  },
  "oracles/hook-gestes-distants.test.mjs": {
-  "cas": 231,
-  "vu_le": "2026-11-16"
+  "cas": 233,
+  "vu_le": "2026-11-26"
  },
  "oracles/hook-gestes-en-cours.test.mjs": {
   "cas": 25,
@@ -490,6 +490,10 @@
   "cas": 18,
   "vu_le": "2026-11-16"
  },
+ "oracles/hook-renommage-livrable.test.mjs": {
+  "cas": 95,
+  "vu_le": "2026-11-26"
+ },
  "oracles/hook-restitution-frictions.test.mjs": {
   "cas": 41,
   "vu_le": "2026-11-09"
@@ -503,8 +507,8 @@
   "vu_le": "2026-10-15"
  },
  "oracles/hook-restitution.test.mjs": {
-  "cas": 80,
-  "vu_le": "2026-11-16"
+  "cas": 83,
+  "vu_le": "2026-11-26"
  },
  "oracles/hook-sessions.test.mjs": {
   "cas": 26,
@@ -635,8 +639,8 @@
   "vu_le": "2026-09-22"
  },
  "oracles/oracle-reprise.test.mjs": {
-  "cas": 38,
-  "vu_le": "2026-11-22"
+  "cas": 39,
+  "vu_le": "2026-11-26"
  },
  "oracles/oracle-source-contenu.test.mjs": {
   "cas": 12,
@@ -687,8 +691,8 @@
   "vu_le": "2026-08-26"
  },
  "scripts/boussole.test.mjs": {
-  "cas": 27,
-  "vu_le": "2026-11-22"
+  "cas": 36,
+  "vu_le": "2026-11-26"
  },
  "scripts/compiler-flotte.test.mjs": {
   "cas": 42,
@@ -858,6 +862,10 @@
   "cas": 6,
   "vu_le": "2026-11-14"
  },
+ "scripts/propager-skills-agents.test.mjs": {
+  "cas": 7,
+  "vu_le": "2026-11-26"
+ },
  "scripts/ranger-secret.test.mjs": {
   "cas": 62,
   "vu_le": "2026-11-16"
@@ -917,6 +925,10 @@
  "scripts/relever-heritage.test.mjs": {
   "cas": 55,
   "vu_le": "2026-11-16"
+ },
+ "scripts/renommer-livrable.test.mjs": {
+  "cas": 22,
+  "vu_le": "2026-11-26"
  },
  "scripts/reserver-decision.test.mjs": {
   "cas": 130,
@@ -995,8 +1007,8 @@
   "vu_le": "2026-08-31"
  },
  "scripts/verifier-jugement.test.mjs": {
-  "cas": 24,
-  "vu_le": "2026-10-15"
+  "cas": 30,
+  "vu_le": "2026-11-26"
  },
  "scripts/verifier-ooxml.test.mjs": {
   "cas": 3,

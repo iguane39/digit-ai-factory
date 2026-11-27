@@ -1,6 +1,6 @@
 # Retours forges — Produit-86 — 20261110b
 
-- **Contexte** : clôture du run `20261110b-approbateur-en-terminal`. La commande `approbateur` permet à l'approbateur de signer et de décider en terminal ; le mandat v4 de la mission « Produit-86 CostControl » a été signé ainsi, et la campagne du lot 1 est lancée.
+- **Contexte** : clôture du run `20261110b-approbateur-en-terminal`. La commande `approbateur` permet à l'approbateur de signer et de décider en terminal ; le mandat v4 de la mission « Produit-86 Produit-88 » a été signé ainsi, et la campagne du lot 1 est lancée.
 - **Références ledger** : `forge\ledger.jsonl` seq 874 (entrée `type: retour`).
 - **Remise au pilot** : copier ce fichier (et son sidecar) dans le SAS
   `<pilot>\input\00-retours\_arrivee\` (ignoré par git), jamais à la racine de `input\00-retours\`.

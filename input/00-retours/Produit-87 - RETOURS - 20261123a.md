@@ -66,7 +66,7 @@ Aucun garde-fou de plateforme relevé sur ce lot. L'audit est resté en lecture 
 
 ## Confirmations positives
 
-- La porte du client (`verifier-rapport-audit.mjs`, commit 386f14b) rend CONFORME sur un rapport rendu par `build-rapport` au gabarit POC-to-Prod, avec 93 contraintes du pack client. Le défaut D14 relevé le 10/11 chez CostControl n'a pas réapparu : D14 et D17 sont marquées « sans objet » avec leur motif.
+- La porte du client (`verifier-rapport-audit.mjs`, commit 386f14b) rend CONFORME sur un rapport rendu par `build-rapport` au gabarit POC-to-Prod, avec 93 contraintes du pack client. Le défaut D14 relevé le 10/11 chez Produit-88 n'a pas réapparu : D14 et D17 sont marquées « sans objet » avec leur motif.
 - `build-rapport --copie-output` range les indices précédents sous `old/` et ne remplace aucun fichier.
 - `verifier-chaine-terraform.mjs` et `verifier-posture-azure.mjs` ont tourné en lecture seule sur une session `az`, et leurs constats portent tous un `fichier:ligne` ou une commande de preuve.
 

@@ -1068,6 +1068,10 @@ export function analyserTranscript(texte) {
   const tourF = tourDesFrictions(entrees);
   return { travail: ecrit.length > 0, ecrituresDuTour: ecrit, ...m, dernierHumain, textePrecedent, depuis, textesHumains,
     frictions: releveFrictions(tourF.segment), depuisFrictions: tourF.depuis, retourFrictions: releveRemontee(tourF.segment).retourCommande,
+    // TF-2887 — le tour RÉEL, depuis le dernier message humain réel (une notification de tâche, qui ouvre ici un segment, ne le coupe pas) : ses tâches d'arrière-plan
+    // non revenues, et ses écritures hors lancement d'agent, pour le relais d'un agent qui tourne encore (`jugeable`).
+    enAttenteTour: tachesEnAttente(entrees.slice(tourF.debut + 1)),
+    ecrituresTourReel: ecrituresDuTour(entrees.slice(tourF.debut + 1)).filter((x) => !/^(?:Agent|Workflow) lancé(?![\p{L}\p{N}_])/u.test(x)),
     // TF-2193 — la session est non interactive (`claude -p`, SDK) : la transcription date alors chaque message humain de `entrypoint: "sdk-cli"` (mesuré le 06/11/2026 sur 146 entrées de ce poste ; une session interactive porte "cli" ou "claude-vscode").
     // TF-2280 — lancée depuis l'extension VS Code, la session `-p` hérite de CLAUDE_CODE_ENTRYPOINT=claude-vscode : on lit alors le `turnOrigin` des messages humains (voir sessionProgrammatique).
     nonInteractif: debut >= 0 && (entrees[debut].entrypoint === "sdk-cli" || sessionProgrammatique(entrees, humains)),
@@ -1464,7 +1468,16 @@ export function scellerSynthese(fichier) {
   const outil = join(ICI, "..", "scripts", "verifier-jugement.mjs");
   if (!existsSync(outil)) return null;
   try {
-    const r = spawnSync(process.execPath, [outil, fichier, "--sceller"], { encoding: "utf8" });
+    let r = spawnSync(process.execPath, [outil, fichier, "--sceller"], { encoding: "utf8" });
+    // TF-2870 : une page HTML livrée sans PASS du lanceur complet n'est pas « réputée bonne », mais
+    // le sceau de S94 garde aussi contre la réécriture en place. Il se pose donc quand même, en le
+    // déclarant dans le sceau : il n'atteste pas le lanceur, il fige le contenu livré.
+    let sortie = null;
+    try { sortie = JSON.parse(r.stdout); } catch { /* sortie illisible */ }
+    if (r.status !== 0 && sortie?.sans_lanceur_complet?.length) {
+      r = spawnSync(process.execPath, [outil, fichier, "--sceller", "--sans-compagnon",
+        "sceau anti-écrasement du hook de fin de tour (S94), posé sans PASS du lanceur complet"], { encoding: "utf8" });
+    }
     if (r.status !== 0) return null;
     return JSON.parse(r.stdout).mesure?.scelles ? fichier : null;
   } catch { return null; /* le sceau est un bonus, jamais un motif de refus */ }
@@ -1782,6 +1795,74 @@ function decisionsPosees(texte) {
   });
 }
 
+// ---- TF-2891 (26/11/2026, RP-75 de Produit-86) — UNE DÉCISION TITRÉE « DÉCISION N » ÉCHAPPE AU REGISTRE DES D-N ------------------------------------------
+//
+// LE FAIT. Le 25/11/2026 vers 16:34, chez un produit, `factory.mjs restitution --prejuger` a rendu `affichable: true` une restitution dont le bloc 3 posait
+// « **Décision 1 — …** » en prose, options (a), (b), (c) en ligne, sans D-N réservée ni tableau du format B ; elle rappelait en une ligne 4 décisions posées plus tôt
+// dans la session sous « Décision 1 » à « Décision 4 » : le même numéro désignait deux questions. Le porteur l'a refusée le 26/11/2026, mot pour mot : « Le format de
+// la restitution ne respecte pas l'attendu. » S30 lit « Décision 1 » comme un numéro ; S78, RÉSERVATION et RÉAFFICHAGE s'ancrent sur la forme D-N et ne l'ont pas vue.
+// LA RÈGLE, la voie la plus simple qui refuse ce cas. Au bloc 3, une tête qui s'ouvre par « Décision » sans la forme D-N (« Décision 1 — », « **Décision 1** : »,
+// « Décision : »), en gras, en puce, en citation ou en titre, et dont la décision porte deux options étiquetées au moins ou une question, est une décision posée hors
+// de tout registre. RÉSERVATION la refuse, au pilot comme chez un produit, à la même échéance qu'une D-N absente du registre, avec son remède : réserver le numéro par
+// `reserver-decision.mjs`, puis écrire la décision au format B. Elle n'est jamais « déjà à l'écran » : aucun registre ne réserve un numéro « Décision N », c'est le défaut.
+// MESURE D'ENTRÉE (26/11/2026, lecture seule) : sur les 481 synthèses d'`output\04-plans\` (427 avec un bloc 3), 12 têtes de cette forme, toutes des décisions à
+// options, dans 4 fichiers du 30/08/2026 ; aucune depuis le format B (17/10/2026), et aucune tête « Décision D-N ». `oracle-synthese` ne change pas de verdict.
+// NON JUGÉ : une phrase qui cite « la décision du 25/11 » (pas une tête) ; « Décisions attendues », « Décision humaine », « Décision D-12 » (un pluriel, un mot ou un
+// sélecteur suivent le mot) ; un rappel d'une ligne sans option ni question ; une tête hors du bloc 3 ; un dossier ni produit ni pilot (une forge n'a pas de registre).
+
+/** Le bloc 3 en entier, ses sous-titres compris : `bloc3De` s'arrête au premier titre, et une décision titrée « ### Décision 2 — » en serait coupée. */
+function bloc3Complet(texte) {
+  const t = String(texte || "");
+  const m = /(^|\n)(#{1,4})\s*\**\s*3[.)]?\s*\**\s*D[ée]cisions?[^\n]*/i.exec(t);
+  if (!m) return "";
+  const reste = t.slice(m.index + m[0].length);
+  // La fin : le titre suivant de même niveau ou plus haut, ou un titre de bloc numéroté (« ### 4. Traité »).
+  const fin = reste.search(new RegExp(`\\n(?:#{1,${m[2].length}}\\s|#{1,6}\\s*\\**\\s*\\d{1,2}\\s*[.)\\-–—:·]?\\s)`));
+  return fin === -1 ? reste : reste.slice(0, fin);
+}
+const OUVERTURE_HORS_SELECTEUR = /^[ \t]*((?:>[ \t]*)*)((?:(?:[-*+•]|\d{1,2}[.)])[ \t]+)?)((?:#{1,6}[ \t]+)?)((?:\*\*|__)?)[ \t]*D[ée]cision(?![\p{L}\p{N}_])/u;
+const TETE_HORS_SELECTEUR_VIDE = /^(?:[ \t]*(?:\*\*|__))?[ \t]*(?:[—–:]|-)?[ \t]*(?:\*\*|__)?[ \t]*(?:aucun|rien|n[ée]ant|sans objet|non concern)/i;
+const TETE_SELECTEUR_DN = /^[ \t]*(?:>[ \t]*)*(?:(?:[-*+•]|\d{1,2}[.)])[ \t]+)?(?:#{1,6}[ \t]+)?(?:\*\*|__)?[ \t]*D[ \t]*-?[ \t]*\d{1,3}(?![\p{N}])/u;
+/** La ligne est-elle une tête « Décision » hors sélecteur ? Le mot suivi d'un numéro, d'un séparateur ou du gras qui se ferme ; jamais d'un mot ni d'un sélecteur D-N. */
+function teteHorsSelecteur(ligne) {
+  const l = String(ligne || "");
+  const m = OUVERTURE_HORS_SELECTEUR.exec(l);
+  if (!m) return null;
+  let reste = l.slice(m[0].length);
+  const num = /^[ \t]*(?:n[°ºo][ \t]*)?(\d{1,3})(?![\p{N}])/u.exec(reste);
+  if (num) reste = reste.slice(num[0].length);
+  const fermeGras = /^[ \t]*(?:\*\*|__)/.test(reste);
+  const separateur = /^(?:[—–:]|-(?=[ \t])|$)/.test(reste.replace(/^[ \t]*(?:\*\*|__)?[ \t]*/, ""));
+  if (!(separateur || (fermeGras && (num || m[4])))) return null;
+  if (TETE_HORS_SELECTEUR_VIDE.test(reste)) return null;   // « Décision : aucune… » déclare une absence
+  return { numero: num ? num[1] : null };
+}
+/** Les décisions du bloc 3 posées sous une tête « Décision N » ou « Décision : » : la tête, son numéro, ses options étiquetées, une question. Pur. */
+export function tetesHorsSelecteur(texte) {
+  const lignes = bloc3Complet(texte).split(/\r?\n/);
+  const borne = (l) => Boolean(teteHorsSelecteur(l)) || TETE_SELECTEUR_DN.test(l);
+  const sortie = [];
+  lignes.forEach((l, i) => {
+    const t = teteHorsSelecteur(l);
+    if (!t) return;
+    let j = i + 1;
+    while (j < lignes.length && !borne(lignes[j])) j++;
+    const segment = lignes.slice(i, j).join("\n");
+    const lettres = new Set([...segment.matchAll(/\(([a-e])\)/g)].map((x) => x[1]));
+    for (const x of segment.matchAll(/(?:^|\n)[ \t]*(?:>[ \t]*)*(?:[-*+][ \t]+|\|[ \t]*)?\**\(?([a-e])\)/g)) lettres.add(x[1]);   // « a) », « **a)** » en tête de ligne
+    for (const x of segment.matchAll(/(?:^|\n)[ \t]*(?:>[ \t]*)*[-*+][ \t]*\*\*\(?([a-e])\)?\*\*/g)) lettres.add(x[1]);            // « - **a** » en tête de puce
+    // La question se lit sur la tête seule, ses spans de code et ses adresses retirés : un « ? » de la prose qui suit un rappel, ou d'une adresse, n'en pose aucune.
+    const question = /\?/.test(l.replace(/`[^`\n]*`/g, " ").replace(/https?:\/\/\S+/g, " "));
+    if (lettres.size >= 2 || question) sortie.push({ tete: l.trim(), numero: t.numero, options: lettres.size, question });
+  });
+  return sortie;
+}
+/** L'écart RÉSERVATION d'une tête hors sélecteur, avec la commande de réservation du lieu (pilot ou produit). */
+const ecartHorsSelecteur = (d, commande) => `« ${d.tete.replace(/\s+/g, " ").slice(0, 110)} » pose une décision au bloc 3 sans sélecteur D-N`
+  + (d.numero ? ` : aucun registre ne réserve « Décision ${d.numero} », et le même numéro peut désigner deux questions dans la session` : ", ni numéro qui la désigne")
+  + ` ; réserve son numéro par \`${commande} --question "<la question posée ?>"\`, puis écris-la au format B, « > **D-N — <la question ?>** » suivi du tableau `
+  + "« | Option | Ce qui se passe | Coût | Retour arrière | » (TF-2891, RP-75 de Produit-86 : « Décision 1 » posée de nouveau le 25/11/2026 après quatre décisions « Décision 1 » à « Décision 4 », restitution refusée par le porteur)";
+
 export function controlerDetail({ dernierHumain = "", dernierTexte = "", textePrecedent = "", texteSynthese = "" }) {
   const demandees = demandesDetail(dernierHumain);
   if (!demandees.length) return { applicable: false, decision: null, verdict: "SANS_OBJET", ecarts: [] };
@@ -1972,7 +2053,9 @@ export function controlerReservation({ dernierTexte = "", dernierHumain = "", te
   // Une D-N que l'humain NOMME (« D-51 », « 51a », « 51 détaille ») ou que le message précédent affichait n'est pas nouvelle.
   const nommees = new Set([...selecteursDecision(dernierHumain).map((s) => s.n), ...demandesDetail(dernierHumain), ...posesSession.map(String)]);
   const nouvelles = decisionsPosees(dernierTexte).filter((d) => !nommees.has(d.n) && !citeD(d.n, deja));
-  if (!nouvelles.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit, nouvelles: [] };
+  // TF-2891 — une tête « Décision N » ou « Décision : » à options : hors de tout registre, jamais « déjà à l'écran ».
+  const horsSelecteur = tetesHorsSelecteur(dernierTexte);
+  if (!nouvelles.length && !horsSelecteur.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit, nouvelles: [] };
   const registre = registreDesDecisions(produit);
   // TF-1911 (D-83 (a), 26/10/2026) : le registre COMMUN du poste, partagé par tous les arbres de travail du même dépôt. Un numéro qu'il porte pour une AUTRE
   // question est déjà pris, même si le ledger de CET arbre l'ignore ou le nomme ; indisponible (pas un dépôt git), il se tait et le contrôle d'avant joue seul.
@@ -1983,7 +2066,8 @@ export function controlerReservation({ dernierTexte = "", dernierHumain = "", te
   });
   const absentes = nouvelles.filter((d) => !registre.numeros.has(d.n) && !prises.includes(d)).map((d) => "D-" + d.n);
   const bloquant = !!RESERVATION_BLOQUANTE_DES && maintenant >= new Date(RESERVATION_BLOQUANTE_DES);
-  const ecarts = [...(absentes.length ? [`${absentes.join(", ")} posée${absentes.length > 1 ? "s" : ""} au bloc 3 sans entrée \`question_humain\` au registre du produit `
+  const ecarts = [...horsSelecteur.map((d) => ecartHorsSelecteur(d, "node <pilot>/scripts/reserver-decision.mjs")),
+    ...(absentes.length ? [`${absentes.join(", ")} posée${absentes.length > 1 ? "s" : ""} au bloc 3 sans entrée \`question_humain\` au registre du produit `
     + `(${registre.existe ? `${registre.fichier}, ${registre.entrees} entrée(s) question_humain` : `${registre.fichier} introuvable`}) : un numéro de décision ne se réserve nulle part ailleurs, `
     + "et deux sessions du même produit peuvent le prendre toutes deux (TF-1849, retour Produit-79 RP-12 : D-37 posée deux fois à 8 minutes d'intervalle)"] : []),
     ...prises.map((d) => {
@@ -1992,9 +2076,9 @@ export function controlerReservation({ dernierTexte = "", dernierHumain = "", te
         + `et tu poses « ${questionDeTete(d.segment).slice(0, 110)} » : une réponse « ${d.n}a » ne dirait plus à laquelle des deux elle répond (TF-1911, D-83 (a) : D-155, D-156 et D-159 prises deux fois les 18 et 19/10/2026 entre arbres de travail d'un même dépôt)`;
     })];
   // Un numéro pris pour une autre question est une collision CERTAINE (le registre commun ne contient que des réservations faites par l'outil) : elle bloque tout de suite,
-  // alors qu'un numéro absent reste avertissant jusqu'à l'échéance de TF-1849 (la mesure d'entrée de cette échéance ne porte que sur les absents).
-  return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", bloquant: ecarts.length ? (bloquant && absentes.length > 0) || prises.length > 0 : false, ecarts, produit,
-    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes, prises: prises.map((d) => "D-" + d.n) };
+  // alors qu'un numéro absent reste avertissant jusqu'à l'échéance de TF-1849 (la mesure d'entrée de cette échéance ne porte que sur les absents). TF-2891 : une tête hors sélecteur suit l'échéance d'un absent.
+  return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", bloquant: ecarts.length ? (bloquant && (absentes.length > 0 || horsSelecteur.length > 0)) || prises.length > 0 : false, ecarts, produit,
+    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes, prises: prises.map((d) => "D-" + d.n), horsSelecteur: horsSelecteur.map((d) => d.tete) };
 }
 
 // ---- TF-1872 (18/10/2026, D-32 (a), « valable tous produits ») — LE MÊME CONTRÔLE AU PILOT --------------------------------
@@ -2016,12 +2100,14 @@ export function controlerReservationPilot({ dernierTexte = "", dernierHumain = "
   const deja = [dernierHumain, textePrecedent].join("\n");
   const nommees = new Set([...selecteursDecision(dernierHumain).map((s) => s.n), ...demandesDetail(dernierHumain), ...posesSession.map(String)]);
   const nouvelles = decisionsPosees(dernierTexte).filter((d) => !nommees.has(d.n) && !citeD(d.n, deja));
-  if (!nouvelles.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit: null, cible: "pilot", nouvelles: [], absentes: [], prises: [] };
+  // TF-2891 — une tête « Décision N » ou « Décision : » à options : hors de tout registre, jamais « déjà à l'écran » ; elle se juge sans lire le registre.
+  const horsSelecteur = tetesHorsSelecteur(dernierTexte);
+  if (!nouvelles.length && !horsSelecteur.length) return { applicable: true, verdict: "PASS", bloquant: false, ecarts: [], produit: null, cible: "pilot", nouvelles: [], absentes: [], prises: [] };
   const registre = lireRegistrePilot(fichier);
-  if (!registre.existe) return { applicable: false, verdict: "SANS_OBJET", bloquant: false, ecarts: [], motif: `registre des D-N du pilot introuvable (${fichier}) : un clone antérieur au 18/10/2026 — node bootstrap.mjs --pull` };
+  if (!registre.existe && !horsSelecteur.length) return { applicable: false, verdict: "SANS_OBJET", bloquant: false, ecarts: [], motif: `registre des D-N du pilot introuvable (${fichier}) : un clone antérieur au 18/10/2026 — node bootstrap.mjs --pull` };
   const bloquant = !!RESERVATION_PILOT_BLOQUANTE_DES && maintenant >= new Date(RESERVATION_PILOT_BLOQUANTE_DES);
-  const ecarts = [], absentes = [], prises = [];
-  for (const d of nouvelles) {
+  const ecarts = horsSelecteur.map((d) => ecartHorsSelecteur(d, "node scripts/reserver-decision.mjs")), absentes = [], prises = [];
+  for (const d of registre.existe ? nouvelles : []) {
     const posee = questionDeTete(d.segment);
     const inscrites = registre.entrees.filter((e) => String(e.n) === d.n);
     if (!inscrites.length) {
@@ -2035,7 +2121,7 @@ export function controlerReservationPilot({ dernierTexte = "", dernierHumain = "
     }
   }
   return { applicable: true, verdict: ecarts.length ? "FAIL" : "PASS", bloquant: ecarts.length ? bloquant : false, ecarts, produit: null, cible: "pilot",
-    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes, prises };
+    nouvelles: nouvelles.map((d) => "D-" + d.n), absentes, prises, horsSelecteur: horsSelecteur.map((d) => d.tete) };
 }
 
 const RAPPEL_RESERVATION_PILOT = "Au PILOT, une D-N NOUVELLE s'inscrit au registre des décisions AVANT d'être affichée : `node scripts/reserver-decision.mjs --question \"<la question posée ?>\"` "
@@ -2143,7 +2229,8 @@ const SEUIL_ATTENTE = 60;
 // TF-2193 — nombre de refus consécutifs d'une même session non interactive au-delà duquel on la laisse finir : sans borne, des tâches qui ne reviennent jamais bouclent sans fin.
 const BORNE_ATTENTE_NON_INTERACTIVE = 30;
 const ATTENTE = /\b(?:attends?|attente|en cours|tourne(?:nt)?|arri[èe]re-plan|reviens|reprends|reprendrai|d[èe]s (?:qu|la fin|son|leur)|notifi|en t[âa]che de fond)/i;
-export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null, enAttente = [], ecrituresDuTour = [], nonInteractif = false }) {
+export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, depuisDernierAffichage = null, enAttente = [], ecrituresDuTour = [], nonInteractif = false,
+  enAttenteTour = [], ecrituresTourReel = null }) {
   if (!dernierTexte) return { juge: false, motif: "aucun texte final dans le transcript" };
   const mots = dernierTexte.trim().split(/\s+/).filter(Boolean).length;
   // ---- S116 (12/11/2026, D-209 (a), prompt 20261112g ÉTAPE 3.5) — LE POINT DE SUIVI DES AGENTS EST UN RELAIS, PAS UN RENDU ----------
@@ -2205,6 +2292,20 @@ export function jugeable({ travail, ecritures = 0, commandes = 0, dernierTexte, 
     && !VERDICT.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
     return { juge: false, motif: `message d'attente de ${mots} mots : ${enAttente.length} tâche(s) d'arrière-plan lancée(s) dans le tour et `
       + "non revenue(s), aucun verdict, aucune D-N ni A-N — la restitution vient avec son résultat (TF-1649)" };
+  // ---- TF-2887 (26/11/2026, RT-56 de Produit-82) — LE RELAIS D'UN AGENT QUI TOURNE ENCORE, DANS UN TOUR QUI N'A RIEN ÉCRIT, EST UN POINT DE SUIVI ----------
+  //
+  // LE FAIT : le 26/11/2026, 6 gestes `concevoir` tournaient en arrière-plan ; « Gemini 1 a fini : verdict PASS en 662 secondes. J'attends les cinq autres. » (14 mots)
+  // a été refusé comme « message portant un VERDICT » (S1, S4), une seconde ligne d'attente de 94 mots aussi. Deux causes : la notification de fin d'une tâche ouvre un
+  // segment, et les tâches lancées avant elle n'y sont plus vues (`enAttente` vide) ; TF-1649, juste au-dessus, exclut tout verdict, même celui d'un agent qu'on relaie.
+  // LA RÈGLE : un message de 3 lignes et 60 mots au plus, qui dit attendre, sans D-N ni A-N, n'est pas jugé tant qu'une tâche d'arrière-plan lancée depuis le dernier
+  // message humain réel n'est pas revenue (`enAttenteTour`, notifications traversées) et que ce tour n'a rien écrit (`ecrituresTourReel`, hors lancement d'agent : un agent
+  // lancé n'est pas un livrable écrit, il rendra le sien). Le verdict d'un agent relayé n'est pas une fin de traitement : la restitution vient avec le retour des tâches.
+  // Un tour qui a écrit un livrable reste jugé ; en session non interactive, TF-2193 garde la main (clore le tour couperait les tâches).
+  // NON JUGÉ : qu'une tâche en attente revienne un jour (un serveur lancé en fond ne revient pas) ; un relais de plus de 60 mots reste jugé, la forme « Suivi agents » (S116) le porte.
+  const tourReelSansEcriture = Array.isArray(ecrituresTourReel) ? ecrituresTourReel.length === 0 : !travail;
+  if (!nonInteractif && tourReelSansEcriture && enAttenteTour.length && mots <= SEUIL_ATTENTE && lignes <= 3 && ATTENTE.test(dernierTexte) && !POSE_UN_GESTE.test(dernierTexte))
+    return { juge: false, motif: `point de suivi de ${mots} mots : ${enAttenteTour.length} tâche(s) d'arrière-plan lancée(s) depuis le dernier message humain et non revenue(s), `
+      + "rien d'écrit dans le tour, aucune D-N ni A-N — le verdict d'un agent relayé n'est pas une fin de traitement, la restitution vient avec le retour des tâches (TF-2887)" };
   // TF-1947 — `travail` vaut « le tour a écrit » (`ecrituresDuTour`) ; le motif nomme les premières écritures relevées.
   // D-101 (b) : le compte est celui des écritures relevées, commandes comprises ; le 29/10, des refus annonçaient « 0 écriture(s) » après un `git mv`.
   if (travail) return { juge: true, motif: `tour de travail (${ecrituresDuTour.length || ecritures} écriture(s), ${commandes} commande(s))`
@@ -2343,7 +2444,7 @@ const avecEcheance = (f) => (BLOQUANTES_DATEES[f.regle] && !estBloquante(f.regle
 // se mettent à jour ENSEMBLE ou la doctrine ne s'applique pas. Le même défaut vaut pour la ligne
 // des gates de `hook-ouverture.mjs`, corrigée le même jour et pour la même raison.
 
-const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.71.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), clos, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, espaces en %20>) », un lien par livrable (S87, avertissante : seule exception à l'interdit de chemin), et, quand une action manuelle_utilisateur du bloc 8 porte une adresse http(s) hors plateforme tierce, par la ligne « À ouvrir : [<nom>](<adresse>) » (S92, avertissante), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : à quoi sert l'objet, puis son nom interne entre accents graves, plus de trois objets en liste (S88) », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, action (ce qu'elle fait, une phrase en mots du lecteur, S91), identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis ; après une correction du porteur ou le refus d'un hook avant outil dans le tour, « rien à remonter », « rien de neuf » et « reste au produit, parce que <motif> » supposent un retour consigné au ledger du produit (FRICTIONS, avertissante, TF-2141, TF-2156), et un motif « reste au produit » qui nomme un retour le dit déjà écrit (S48, TF-2137). · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande de la session (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; un livrable déjà lié « Livré » puis réécrit en place, au lieu de prendre l'indice suivant (S94, TF-2191) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée (RÉSERVATION) ; un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0 : il suppose aussi chaque avertissement corrigé, ou motivé à l'appel par `--motif <CODE>=\"<raison>\"` (TF-2171).";
+const RAPPEL = "Réécris ta réponse finale au format gabarits\\RESTITUTION.md (v2.71.0), le compte rendu complet allégé (T2, TF-1947) et son verrou « livré » (T4, TF-1949). Le bloc 0, une synthèse d'ouverture en langage commanditaire (l'état, ce que ça change, ce qui est attendu du lecteur, sans identifiant, chemin ni sha), clos, quand le tour a écrit un livrable sous output/, par la ligne « Livré : [<nom lisible>](<chemin relatif depuis la racine du dépôt, espaces en %20>) », un lien par livrable (S87, avertissante : seule exception à l'interdit de chemin), et, quand une action manuelle_utilisateur du bloc 8 porte une adresse http(s) hors plateforme tierce, par la ligne « À ouvrir : [<nom>](<adresse>) » (S92, avertissante), puis les blocs numérotés de 1 à 9. Les blocs 0, 1, 3, 4, 5, 8 et 9 sont TOUJOURS présents ; un bloc toujours présent sans contenu se dit en une ligne (« Aucune décision ne vous revient. »). Les blocs 2, 6 et 7 ne viennent que s'ils ont un contenu. · 1 En-tête : quoi, sur quoi, date et heure relevées par `date` dans le tour, qui avec sa version ; l'intention de la demande et son test rétro. · 2 Verdict, s'il y en a un : un fait mesuré, un chiffre ou un compteur. · 3 Décisions : chaque D-N réservée avant l'affichage (au pilot `node scripts/reserver-decision.mjs --question \"<la question ?>\"`, chez un produit l'entrée question_humain du ledger), en bloc de citation « > **D-N — <la question ?>** », puis « > - **De quoi s'agit-il** : à quoi sert l'objet, puis son nom interne entre accents graves, plus de trois objets en liste (S88) », « > - **Le problème** : … », « > - **Pourquoi vous** : … », « > - **Recommandation : (a)** — <pourquoi>. Source consultée : <le document> » ; hors citation, le tableau « | Option | Ce qui se passe | Coût | Retour arrière | », une ligne par option (a), (b), (c) ; puis « > **Sans réponse** : … ». Une décision déjà posée et inchangée se rappelle en une ligne ; si rien n'attend l'humain, le bloc le dit en une ligne. · 4 Traité : chaque puce avec sa preuve exécutée, et la ligne « Relecture d'intention : <sert | sert après N passe(s) | dérive | sans objet, motif> ». · 5 Non traité : chaque puce avec son motif. · 6 Écarts à la lettre, s'il y en a : « vous avez demandé → j'ai fait → pourquoi ». · 7 Risques, s'il y en a : énoncé, signal, parade. · 8 Prochaines actions en UN tableau : sélecteur A-N, action (ce qu'elle fait, une phrase en mots du lecteur, S91), identifiant TF-#### ou `neuve`, acteur (auto_ia | manuelle_dev | manuelle_utilisateur), motif de non-exécution ou raison d'impossibilité IA, chemin ou commande, coût de ne pas la faire. · 9 Traces : chemins relatifs vérifiables ; chez un produit, la ligne « Remontée à la factory : rien à remonter. » ou le lot remis ; après une correction du porteur ou le refus d'un hook avant outil dans le tour, « rien à remonter », « rien de neuf » et « reste au produit, parce que <motif> » supposent un retour consigné au ledger du produit (FRICTIONS, avertissante, TF-2141, TF-2156), et un motif « reste au produit » qui nomme un retour le dit déjà écrit (S48, TF-2137). · CE QUI BLOQUE, et rien d'autre : un bloc toujours présent absent (S1) ; une décision sans ses options (S4 : au moins deux options étiquetées, et au format B son tableau) ; chez un produit, une livraison, un produit complet ou une clôture déclarés sans les livrables des forges mobilisées à la dernière demande de la session (S85, le verrou « livré » : `forge/mobilisation.jsonl` contre `references/CARTE-FORGES.json` du pilot ; `node <pilot>/scripts/mobiliser.mjs --verifier` liste ce qui manque), ou sans cette trace à partir du 2026-11-02 (S86) ; un verdict sans fait mesuré (S3) ; un livrable déjà lié « Livré » puis réécrit en place, au lieu de prendre l'indice suivant (S94, TF-2191) ; une exhaustivité sans « Mesuré sur : <source de vérité>, relue à HH:MM, périmètre <n éléments> » (S82, COMPLÉTUDE) ; un écran qui ne reprend pas les blocs 3 et 8 de la synthèse déposée (AFFICHAGE) ; une D-N nouvelle non réservée, ou une décision titrée « Décision N » ou « Décision : » hors du sélecteur D-N (RÉSERVATION, TF-2891) ;un fichier servi (HTML, CSS, JS) écrit dans le tour sans verdict de la critique d'implémentation (`run-oracles-design`) daté après sa dernière écriture (CRITIQUE, TF-1913 : avertie jusqu'au 02/11/2026, refusée dès le 03/11/2026 ; tu la joues toi-même, tu ne la proposes jamais à l'humain). Toutes les autres règles du gabarit avertissent sous la réponse, sans réécriture. Un tour qui n'a rien écrit rend une réponse courte, sans restitution (references\\NIVEAUX.md). Préjuge avant d'afficher : `node oracles/hook-restitution.mjs --prejuger <fichier>` (chez un produit : `node forge/hooks/factory.mjs restitution --prejuger <fichier>`), jusqu'à l'exit 0 : il suppose aussi chaque avertissement corrigé, ou motivé à l'appel par `--motif <CODE>=\"<raison>\"` (TF-2171).";
 
 // 01/10/2026 — LE CONTRÔLE AVANT AFFICHAGE. Un hook `Stop` juge APRÈS l'affichage : tout refus
 // laisse la version rejetée à l'écran, et la réécriture s'affiche dessous — l'humain lit sa
@@ -2402,7 +2503,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   // (COMPLÉTUDE, S82) et le contrôle LOT, comme le hook de fin de tour. Borne dite : sans transcript, le tour est inconnu et le brouillon reste jugé en restitution complète (comportement d'avant) ;
   // un brouillon qui se déclare « Niveau : Moyen » garde `--pre-vol`, qui juge sa forme.
   if (tourP && !declareMoyen(brouillon)) {
-    const exempt = jugeable({ travail: tourP.travail, ecritures: tourP.ecritures, commandes: tourP.commandes, dernierTexte: brouillon, ecrituresDuTour: tourP.ecrituresDuTour });
+    // TF-2887 : le relais d'un agent qui tourne encore s'y juge comme au hook de fin de tour (tâches du tour réel, écritures, mode de la session).
+    const exempt = jugeable({ travail: tourP.travail, ecritures: tourP.ecritures, commandes: tourP.commandes, dernierTexte: brouillon, ecrituresDuTour: tourP.ecrituresDuTour,
+      enAttenteTour: tourP.enAttenteTour, ecrituresTourReel: tourP.ecrituresTourReel, nonInteractif: tourP.nonInteractif });
     if (!exempt.juge) {
       const court = controlerReponseCourte({ dernierHumain: tourP.dernierHumain || "", dernierTexte: brouillon });
       const lotC = controlerLotDansLeTour({ racine: racineDuProjet(process.cwd()), depuis: tourP.depuisFrictions, retourCommande: Boolean(tourP.retourFrictions), tourEcrit: Boolean(tourP.travail) });
@@ -2510,7 +2613,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
     nommage: livrablesP ? (nommageJ.applicable ? { verdict: nommageJ.verdict, juges: nommageJ.juges } : `sans objet : ${nommageJ.motif || "aucun livrable lié par la ligne « Livré : » sous output/"}`) : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
     critique: critiqueP ? (critiqueJ.applicable ? { verdict: critiqueJ.verdict, servis: critiqueJ.servis.length, critiques: critiqueJ.critiques.length }
       : "sans objet : aucun fichier servi (HTML, CSS, JS) écrit dans le tour") : "non jouée : transcript de la session introuvable (--transcript <chemin.jsonl>)",
-    reservation: reservation.applicable ? { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [] } : `sans objet : ${reservation.motif}`,
+    reservation: reservation.applicable ? { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [], hors_selecteur: reservation.horsSelecteur || [] } : `sans objet : ${reservation.motif}`,
     completude: completude.applicable ? completude.verdict : "sans objet : le dernier message humain ne pose pas de question de complétude, ou la réponse ne s'ouvre pas sur un « oui » (ou transcript introuvable)",
     synthese_deposee: syntheseDeposee, affichage,
     detail: detail.applicable ? detail.verdict : "sans objet : le dernier message humain ne demande le détail d'aucune décision connue (ou transcript introuvable)",
@@ -2540,7 +2643,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   let tour = null;
   try { if (cheminT && existsSync(cheminT)) tour = analyserTranscript(readFileSync(cheminT, "utf8")); } catch { tour = null; }
   const r = jugeable({ travail: tour ? tour.travail : false, ecritures: tour ? tour.ecritures : 0, commandes: tour ? tour.commandes : 0,
-    dernierTexte: texte, ecrituresDuTour: tour ? tour.ecrituresDuTour : [] });
+    dernierTexte: texte, ecrituresDuTour: tour ? tour.ecrituresDuTour : [],
+    // TF-2887 : le relais d'un agent qui tourne encore, jugé comme au hook de fin de tour.
+    enAttenteTour: tour ? tour.enAttenteTour : [], ecrituresTourReel: tour ? tour.ecrituresTourReel : null, nonInteractif: tour ? tour.nonInteractif : false });
   const court = r.juge ? null : controlerReponseCourte({ dernierHumain: tour ? tour.dernierHumain : "", dernierTexte: texte });
   // TF-2329 (D-191 (a)) — un retour écrit dans le tour sans lot refuse AUSSI la réponse courte : le pré-vol le dit avant l'affichage, au lieu du refus après.
   const lotV = tour ? controlerLotDansLeTour({ racine: racineDuProjet(process.cwd()), depuis: tour.depuisFrictions, retourCommande: Boolean(tour.retourFrictions), tourEcrit: Boolean(tour.travail) }) : null;
@@ -2564,7 +2669,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const RACINE_HOOK = racineDuProjet(entree.cwd);
   const { travail, ecritures, commandes, dernierTexte, textes, fichiersMd, dernierHumain, textePrecedent,
     depuisDernierAffichage, effets, depuis, textesHumains, prejuge, enAttente, nonInteractif, releves, nombresTour, gainsLitteraux, evenementsJournalises, ecrituresDuTour: ecrit, critique: critiqueTour, livrables, remontee: remonteeTour,
-    frictions: frictionsTour, depuisFrictions, retourFrictions, decisionsOuvertes, posesSession } = analyserTranscript(readFileSync(chemin, "utf8"));
+    frictions: frictionsTour, depuisFrictions, retourFrictions, decisionsOuvertes, posesSession, enAttenteTour, ecrituresTourReel } = analyserTranscript(readFileSync(chemin, "utf8"));
   // TF-2257 (06/11/2026) : `FORGE_HOOKS_JOURNAL` dérive le journal ailleurs que sous `.claude\` du dépôt — la recette du hook s'en sert pour que ses
   // sessions fictives (« test-66-borne-… ») n'entrent jamais au journal réel. Absente, le chemin est celui d'avant.
   const journal = process.env.FORGE_HOOKS_JOURNAL || join(ICI, "..", ".claude", "hooks-journal.jsonl");
@@ -2601,7 +2706,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
   }
   const portee = escaladeMoyen ? { juge: true, motif: escaladeMoyen }
-    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage, enAttente, ecrituresDuTour: ecrit, nonInteractif });
+    : jugeable({ travail, ecritures, commandes, dernierTexte, depuisDernierAffichage, enAttente, ecrituresDuTour: ecrit, nonInteractif, enAttenteTour, ecrituresTourReel });
   // TF-2193 — le message d'attente d'une session non interactive qui a des tâches d'arrière-plan en route : refus dédié, qui dit d'attendre au premier plan. La garde anti-boucle ne le couvre pas
   // (le second passage laisserait finir la session, donc couper les tâches) ; elle est remplacée par une borne comptée au journal, et le refus cesse dès que les tâches sont revenues.
   if (portee.attenteArrierePlan) {
@@ -2721,7 +2826,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       ...(procedure.applicable ? { procedure: { verdict: procedure.verdict, ecarts: procedure.ecarts } } : {}),
       ...(detail.applicable ? { detail: { decision: detail.decision, verdict: detail.verdict, ecarts: detail.ecarts } } : {}),
       ...(reaffichage.applicable ? { reaffichage: { verdict: reaffichage.verdict, ouvertes: reaffichage.ouvertes, manquantes: reaffichage.manquantes || [] } } : {}),
-      ...(reservation.applicable ? { reservation: { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [] } } : {}),
+      ...(reservation.applicable ? { reservation: { verdict: reservation.verdict, bloquant: reservation.bloquant, cible: reservation.cible || "produit", nouvelles: reservation.nouvelles, absentes: reservation.absentes || [], prises: reservation.prises || [], hors_selecteur: reservation.horsSelecteur || [] } } : {}),
       ...(completude.applicable ? { completude: { verdict: completude.verdict, ecarts: completude.ecarts } } : {}),
       ...(possession.applicable ? { possession: { verdict: possession.verdict } } : {}),
       ...(explication.applicable ? { explication: { verdict: explication.verdict } } : {}),

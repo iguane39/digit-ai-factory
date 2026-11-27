@@ -30,7 +30,7 @@
  * se fait désactiver le jour de son arrivée.
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
-import { join, extname, basename, dirname } from "node:path";
+import { join, extname, basename, dirname, resolve, sep } from "node:path";
 import { createHash } from "node:crypto";
 // TF-1266 (D-15 (a), 17/09/2026) — le perimetre se LIT dans references\EXTENSIONS-JUGEES.json,
 // il ne se recopie pas : quatre controles enumeraient chacun le leur et les listes divergeaient.
@@ -57,7 +57,8 @@ const EN_MASSE = args.includes("--en-masse");
  * fois se nomme au singulier ; celui qui porte sur un dossier entier se declare.
  */
 const SEUIL_DE_MASSE = 1;
-const cibles = args.filter((a) => !a.startsWith("--"));
+// Le motif de `--sans-compagnon` (TF-2870) est la valeur de l'option, jamais une cible.
+const cibles = args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--sans-compagnon");
 // TF-0692 (31/08/2026) — LE PDF ENTRE DANS LE CHAMP DU SCEAU.
 //
 // LE FAIT : des familles de livrables declarent DEUX formats, html et pdf. Le controle n'en jugeait
@@ -239,8 +240,53 @@ function lireJournalR32(f) {
   }
 }
 
+// TF-2870 (lot Produit-81 20261124a, 26/11/2026) — UN SCEAU SUR UNE PAGE LIVRÉE EXIGE LE LANCEUR
+// COMPLET. Le 24/11/2026, un DAT HTML a passé les oracles de son skill, puis a été scellé et publié ;
+// le verrou « livré » exigeait le compagnon `.oracles.json` du lanceur complet de quality-oracles, qui
+// a relevé 10 oracles en échec APRÈS la publication. Sceller dit « ce livrable est réputé bon » : pour
+// une page HTML sous un dossier de livraison, ce jugement est celui du lanceur complet, et le sceau
+// le lit au lieu de le supposer. Le compagnon se trouve où run-oracles l'écrit (TF-0501) : sous
+// `.oracles/`, au-dessus du premier segment de livraison, l'arborescence rejouée. Il doit rendre PASS
+// et son empreinte (forge-ops/empreinte@1) doit être celle du fichier présent ; sans empreinte, sa
+// date doit suivre la dernière écriture du fichier. Hors d'un dossier de livraison, rien ne change.
+// Sortie déclarée : `--sans-compagnon "<motif de 20 caractères au moins>"`, écrit dans le sceau.
+const SEGMENTS_LIVRAISON = new Set(["output", "old", "Old", "dist", "build"]);
+const iSans = args.indexOf("--sans-compagnon");
+const MOTIF_SANS_COMPAGNON = iSans >= 0 ? (args[iSans + 1] || "") : null;
+if (MOTIF_SANS_COMPAGNON !== null && MOTIF_SANS_COMPAGNON.trim().length < 20) {
+  process.stdout.write(JSON.stringify({
+    outil: "verifier-jugement", verdict: "ERREUR",
+    message: "`--sans-compagnon` exige un motif de 20 caractères au moins, écrit dans le sceau : sceller une page sans le lanceur complet se déclare (TF-2870)",
+  }, null, 1) + "\n");
+  process.exit(2);
+}
+const cheminCompagnon = (f) => {
+  const parts = resolve(f).split(/[\\/]/);
+  const i = parts.findIndex((x) => SEGMENTS_LIVRAISON.has(x));
+  if (i < 1) return null;
+  return join(parts.slice(0, i).join(sep), ".oracles", ...parts.slice(i, -1), basename(f) + ".oracles.json");
+};
+function manqueDuLanceur(f) {
+  if (![".html", ".htm"].includes(extname(f).toLowerCase())) return null;
+  const c = cheminCompagnon(f);
+  if (!c) return null;
+  if (!existsSync(c)) return { fichier: f, compagnon: c, cause: "aucun compagnon .oracles.json : le lanceur complet n'a jamais jugé cette page" };
+  let j = null;
+  try { j = JSON.parse(readFileSync(c, "utf8")); } catch { return { fichier: f, compagnon: c, cause: "compagnon illisible" }; }
+  if (!j || j.verdict !== "PASS") return { fichier: f, compagnon: c, cause: `le lanceur complet rend ${j && j.verdict ? j.verdict : "un verdict absent"}` };
+  const brut = sha(readFileSync(f));
+  const valeurs = j.empreinte && j.empreinte.fichiers ? Object.values(j.empreinte.fichiers) : [];
+  if (valeurs.length) {
+    if (!valeurs.includes(brut)) return { fichier: f, compagnon: c, cause: "le PASS porte sur un autre contenu : la page a changé depuis le passage du lanceur complet" };
+    return null;
+  }
+  const date = Date.parse(j.date_iso || "");
+  if (!(date >= statSync(f).mtimeMs - 2000)) return { fichier: f, compagnon: c, cause: "le PASS, sans empreinte, précède la dernière écriture de la page" };
+  return null;
+}
+
 let scelles = 0, verifies = 0, nonScelles = 0;
-const aSceller = [], ecrases = [];
+const aSceller = [], ecrases = [], sansLanceur = [];
 for (const cible of cibles) {
   for (const f of fichiers(cible)) {
     if (!NOMME_LIVRABLE.test(basename(f))) continue;
@@ -261,6 +307,8 @@ for (const cible of cibles) {
       // et un refus qui arrive après l'écriture n'est pas un refus — mesuré le 22/09/2026 :
       // 169 sceaux posés malgré un verdict REFUSE.
       aSceller.push({ fichier: f, sceau, empreinte });
+      const manque = MOTIF_SANS_COMPAGNON === null ? manqueDuLanceur(f) : null;
+      if (manque) sansLanceur.push(manque);
       continue;
     }
     lireJournalR32(f);
@@ -315,6 +363,21 @@ if (SCELLER && !ESSAI && !EN_MASSE && aSceller.length > SEUIL_DE_MASSE) {
   process.exit(2);
 }
 
+// LE REFUS D UN SCEAU SANS LE LANCEUR COMPLET (TF-2870) : il tombe avant toute écriture, et
+// l'essai le montre sans refuser.
+if (SCELLER && !ESSAI && sansLanceur.length) {
+  process.stdout.write(JSON.stringify({
+    outil: "verifier-jugement", version: "1.1.0", cibles, verdict: "REFUSE",
+    mesure: { a_sceller: aSceller.length, sans_lanceur_complet: sansLanceur.length },
+    message:
+      `${sansLanceur.length} page(s) HTML livrée(s) n'ont pas de PASS du lanceur complet de quality-oracles sur leur contenu présent : ` +
+      "rien n'est scellé. Remède : jouer le lanceur complet sur chaque page (`node <skills>/quality-oracles/scripts/run-oracles.mjs \"<fichier>\"`), " +
+      "corriger jusqu'au PASS, puis rejouer `--sceller`. Sceller quand même se déclare : `--sans-compagnon \"<motif>\"` (TF-2870).",
+    sans_lanceur_complet: sansLanceur,
+  }, null, 1) + "\n");
+  process.exit(2);
+}
+
 // SECONDE PASSE : l'écriture, une fois le garde franchi. `--essai` s'arrête ici, et c'est tout
 // ce qui le distingue d'un scellement réel : il a vu exactement la même liste.
 if (SCELLER && !ESSAI) {
@@ -323,6 +386,7 @@ if (SCELLER && !ESSAI) {
       format: "pilot/jugement@1", fichier: basename(fichier), empreinte, methode: METHODE,
       scelle_le: new Date().toISOString(),
       regle: "règle 5 — une nouvelle version = un nouveau fichier daté, JAMAIS d'écrasement (TF-0523)",
+      ...(MOTIF_SANS_COMPAGNON !== null ? { sans_compagnon: MOTIF_SANS_COMPAGNON.trim() } : {}),
     }, null, 1) + "\n", "utf8");
   }
 }
@@ -336,7 +400,7 @@ process.stdout.write(JSON.stringify({
   // L ESSAI REND LA LISTE A NOMMER. Depuis D-29 un scellement reel refuse un dossier : l essai
   // est donc la voie par laquelle on obtient les chemins a passer en clair. Une voie prescrite
   // qui ne rend pas ce qu elle prescrit de reutiliser n est pas une voie.
-  ...(SCELLER && ESSAI ? { a_sceller: aSceller.map((x) => x.fichier), ecraserait: ecrases } : {}),
+  ...(SCELLER && ESSAI ? { a_sceller: aSceller.map((x) => x.fichier), ecraserait: ecrases, refuserait_sans_lanceur: sansLanceur } : {}),
   findings: findings.length ? findings : [{
     regle: "J-1", severite: "info", ou: cibles.join(" "),
     message: SCELLER ? `${scelles} livrable(s) scellé(s)` :

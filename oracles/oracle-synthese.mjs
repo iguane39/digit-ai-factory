@@ -3453,7 +3453,8 @@ function juger(texte, cheminJuge = null) {
     if (sansNumero) {
       ko("S30", `${sansNumero} décision(s) sur ${groupesDecisions.length} SANS NUMÉRO — une décision se désigne pour se trancher. ` +
         "Le destinataire a répondu « 1b, 2a, 3a » à un bloc non numéroté avant de dire « je ne peux pas les sélectionner » : " +
-        "il inventait la numérotation. Formes admises : « **Décision 1 —** », « D1 — », « D-1 — » — le numéro NU (« 1. », « 1) ») ne dit pas à laquelle des deux listes du message il appartient (S33).");
+        "il inventait la numérotation. Forme prescrite : « > **D-1 — <la question ?>** », son numéro réservé avant l'affichage ; « D1 — » se lit aussi, mais « **Décision 1 —** », "
+        + "qu'aucun registre ne réserve, est refusée au hook de fin de tour (RÉSERVATION, TF-2891) — le numéro NU (« 1. », « 1) ») ne dit pas à laquelle des deux listes du message il appartient (S33).");
     } else if (doublons.length) {
       ko("S30", `numéro(s) de décision en DOUBLE : ${[...new Set(doublons)].join(", ")} — deux décisions portant le même numéro ` +
         "ne se sélectionnent pas mieux qu'aucune.");
