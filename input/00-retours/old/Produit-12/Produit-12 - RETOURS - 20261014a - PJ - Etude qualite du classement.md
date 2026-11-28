@@ -7,6 +7,8 @@ sources: forge/ledger.jsonl (seq 176 à 312) ; output/06-dossiers-dropbox/<slug>
 
 # Qualité du classement : ce que mesure un échantillon de référence
 
+> Annoté par le pilot le 28/11/2026 (D-247 (a)) : les noms de 2 correspondants des clients du produit, en titre de documents d'exemple, sont remplacés par « Correspondant-A » et « Correspondant-B » ; le dépôt du pilot est public.
+
 Le classement des 9 662 fichiers des six propriétaires range juste environ deux fichiers sur trois, et non 97 % comme le laissait croire la part de fichiers rangés. Cette mesure vient d'un échantillon de 150 fichiers, tiré au hasard et étiqueté par trois agents qui ne voyaient pas le résultat de l'outil. Quatre versions ont été construites et mesurées sur ce même échantillon. Deux ont été retenues ; deux ont été rejetées, l'une parce que la mesure baissait, l'autre parce que le contrôle de ses changements sur toute la population montrait des erreurs que l'échantillon ne voyait pas. La boucle s'arrête à 66,0 % de justesse du dossier. Ce qui reste demande des réponses du cabinet, pas une règle de plus. La mesure est provisoire tant que le cabinet n'a pas tranché les 65 désaccords.
 
 ## 1. Les process, de la norme v2 à la 2.14
@@ -15,7 +17,7 @@ Ce chapitre retrace ce que chaque version a décidé, et sur quelle preuve. Mode
 
 | Version | Date | Ce qu'elle ajoute | Mesure à l'époque |
 |---|---|---|---|
-| v2 | 28/09 | grammaire des dossiers (propriétaire, biens, locataires datés) et des noms TYPE_Libellé | part rangée (BERNARD 410 sur 416), ledger seq 178 |
+| v2 | 28/09 | grammaire des dossiers (propriétaire, biens, locataires datés) et des noms TYPE_Libellé | part rangée (Correspondant-A 410 sur 416), ledger seq 178 |
 | 2.1 | 29/09 | niveau immeuble chez un propriétaire à plusieurs immeubles | part rangée (5 462 sur 7 764), seq 182 |
 | 2.2 | 01/10 | contenu lu : texte, OCR des scans (`lecture.py`), type, dates et personnes (`faits.py`) ; dates d'entrée lues dans le bail | dates fausses 113 sur 161 avant, 0 tirée d'un fichier après, seq 195 et 210 |
 | 2.3 | 02/10 | noms sans date, période des quittances | grammaire, seq 224 et 226 |

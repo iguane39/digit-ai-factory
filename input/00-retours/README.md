@@ -234,49 +234,49 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-03 - RETOURS - 20261019a.tf.jsonl` | fichier | 1017 o | 1 ligne(s) JSONL |
 | `Produit-03 - RETOURS - 20261020a.md` | fichier | 5,2 Ko | Retours forges — Produit-03 — 20261020a |
 | `Produit-03 - RETOURS - 20261020a.tf.jsonl` | fichier | 1,4 Ko | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261018a.md` | fichier | 6,6 Ko | Retours forges — Produit-12 — 20261018a |
+| `Produit-12 - RETOURS - 20261018a.md` | fichier | 6,8 Ko | Retours forges — Produit-12 — 20261018a |
 | `Produit-12 - RETOURS - 20261018a.tf.jsonl` | fichier | 2,8 Ko | 3 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261122a.md` | fichier | 5,7 Ko | Retours forges — Produit-12 — 20261122a |
+| `Produit-12 - RETOURS - 20261122a.md` | fichier | 6,0 Ko | Retours forges — Produit-12 — 20261122a |
 | `Produit-12 - RETOURS - 20261122a.tf.jsonl` | fichier | 2,1 Ko | 2 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261122b.md` | fichier | 3,4 Ko | Retours forges — Produit-12 — 20261122b |
+| `Produit-12 - RETOURS - 20261122b.md` | fichier | 3,6 Ko | Retours forges — Produit-12 — 20261122b |
 | `Produit-12 - RETOURS - 20261122b.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261122c.md` | fichier | 6,8 Ko | Retours forges — Produit-12 — 20261122c |
+| `Produit-12 - RETOURS - 20261122c.md` | fichier | 7,1 Ko | Retours forges — Produit-12 — 20261122c |
 | `Produit-12 - RETOURS - 20261122c.tf.jsonl` | fichier | 4,0 Ko | 4 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261122d.md` | fichier | 5,3 Ko | Retours forges — Produit-12 — 20261122d |
+| `Produit-12 - RETOURS - 20261122d.md` | fichier | 5,6 Ko | Retours forges — Produit-12 — 20261122d |
 | `Produit-12 - RETOURS - 20261122d.tf.jsonl` | fichier | 2,6 Ko | 2 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261122e.md` | fichier | 4,0 Ko | Retours forges — Produit-12 — 20261122e |
+| `Produit-12 - RETOURS - 20261122e.md` | fichier | 4,3 Ko | Retours forges — Produit-12 — 20261122e |
 | `Produit-12 - RETOURS - 20261122e.tf.jsonl` | fichier | 1,2 Ko | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261122f.md` | fichier | 3,6 Ko | Retours forges — Produit-12 — 20261122f |
+| `Produit-12 - RETOURS - 20261122f.md` | fichier | 3,8 Ko | Retours forges — Produit-12 — 20261122f |
 | `Produit-12 - RETOURS - 20261122f.tf.jsonl` | fichier | 1,1 Ko | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261122g.md` | fichier | 6,2 Ko | Retours forges — Produit-12 — 20261122g |
+| `Produit-12 - RETOURS - 20261122g.md` | fichier | 6,5 Ko | Retours forges — Produit-12 — 20261122g |
 | `Produit-12 - RETOURS - 20261122g.tf.jsonl` | fichier | 3,7 Ko | 5 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261123a.md` | fichier | 3,2 Ko | Retours forges — Produit-12 — 20261123a |
+| `Produit-12 - RETOURS - 20261123a.md` | fichier | 3,5 Ko | Retours forges — Produit-12 — 20261123a |
 | `Produit-12 - RETOURS - 20261123a.tf.jsonl` | fichier | 869 o | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261123b.md` | fichier | 3,9 Ko | Retours forges — Produit-12 — 20261123b |
+| `Produit-12 - RETOURS - 20261123b.md` | fichier | 4,2 Ko | Retours forges — Produit-12 — 20261123b |
 | `Produit-12 - RETOURS - 20261123b.tf.jsonl` | fichier | 1,4 Ko | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261123c.md` | fichier | 5,9 Ko | Retours forges — Produit-12 — 20261123c |
+| `Produit-12 - RETOURS - 20261123c.md` | fichier | 6,1 Ko | Retours forges — Produit-12 — 20261123c |
 | `Produit-12 - RETOURS - 20261123c.tf.jsonl` | fichier | 3,1 Ko | 3 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261123d.md` | fichier | 3,1 Ko | Retours forges — Produit-12 — 20261123d |
+| `Produit-12 - RETOURS - 20261123d.md` | fichier | 3,4 Ko | Retours forges — Produit-12 — 20261123d |
 | `Produit-12 - RETOURS - 20261123d.tf.jsonl` | fichier | 991 o | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261124a.md` | fichier | 2,8 Ko | Retours forges — Produit-12 — 20261124a |
+| `Produit-12 - RETOURS - 20261124a.md` | fichier | 3,0 Ko | Retours forges — Produit-12 — 20261124a |
 | `Produit-12 - RETOURS - 20261124a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261124b.md` | fichier | 2,5 Ko | Retours forges — Produit-12 — 20261124b |
+| `Produit-12 - RETOURS - 20261124b.md` | fichier | 2,7 Ko | Retours forges — Produit-12 — 20261124b |
 | `Produit-12 - RETOURS - 20261124b.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261124c.md` | fichier | 2,8 Ko | Retours forges — Produit-12 — 20261124c |
+| `Produit-12 - RETOURS - 20261124c.md` | fichier | 3,1 Ko | Retours forges — Produit-12 — 20261124c |
 | `Produit-12 - RETOURS - 20261124c.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261124d.md` | fichier | 3,5 Ko | Retours forges — Produit-12 — 20261124d |
+| `Produit-12 - RETOURS - 20261124d.md` | fichier | 3,7 Ko | Retours forges — Produit-12 — 20261124d |
 | `Produit-12 - RETOURS - 20261124d.tf.jsonl` | fichier | 1,0 Ko | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261125a.md` | fichier | 2,5 Ko | Retours forges — Produit-12 — 20261125a |
+| `Produit-12 - RETOURS - 20261125a.md` | fichier | 2,8 Ko | Retours forges — Produit-12 — 20261125a |
 | `Produit-12 - RETOURS - 20261125a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261125b.md` | fichier | 3,0 Ko | Retours forges — Produit-12 — 20261125b |
+| `Produit-12 - RETOURS - 20261125b.md` | fichier | 3,2 Ko | Retours forges — Produit-12 — 20261125b |
 | `Produit-12 - RETOURS - 20261125b.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261125c.md` | fichier | 3,2 Ko | Retours forges — Produit-12 — 20261125c |
+| `Produit-12 - RETOURS - 20261125c.md` | fichier | 3,4 Ko | Retours forges — Produit-12 — 20261125c |
 | `Produit-12 - RETOURS - 20261125c.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261125d.md` | fichier | 2,5 Ko | Retours forges — Produit-12 — 20261125d |
+| `Produit-12 - RETOURS - 20261125d.md` | fichier | 2,8 Ko | Retours forges — Produit-12 — 20261125d |
 | `Produit-12 - RETOURS - 20261125d.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261125e.md` | fichier | 2,8 Ko | Retours forges — Produit-12 — 20261125e |
+| `Produit-12 - RETOURS - 20261125e.md` | fichier | 3,0 Ko | Retours forges — Produit-12 — 20261125e |
 | `Produit-12 - RETOURS - 20261125e.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261126a.md` | fichier | 3,4 Ko | Retours forges — Produit-12 — 20261126a |
+| `Produit-12 - RETOURS - 20261126a.md` | fichier | 3,7 Ko | Retours forges — Produit-12 — 20261126a |
 | `Produit-12 - RETOURS - 20261126a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261127a.md` | fichier | 3,4 Ko | Retours forges — Produit-12 — 20261127a |
 | `Produit-12 - RETOURS - 20261127a.tf.jsonl` | fichier | 0 o | 0 ligne(s) JSONL |

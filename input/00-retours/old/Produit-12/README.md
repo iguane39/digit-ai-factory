@@ -40,7 +40,7 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-12 - RETOURS - 20260901c.tf.jsonl` | fichier | 1,8 Ko | 2 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20260902a.md` | fichier | 4,3 Ko | Retours forges — Produit-12 — 20260902a |
 | `Produit-12 - RETOURS - 20260902a.tf.jsonl` | fichier | 1003 o | 1 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20260906a.md` | fichier | 5,7 Ko | Retours forges — Produit-12 — 20260906a |
+| `Produit-12 - RETOURS - 20260906a.md` | fichier | 6,0 Ko | Retours forges — Produit-12 — 20260906a |
 | `Produit-12 - RETOURS - 20260906a.tf.jsonl` | fichier | 1,3 Ko | 1 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20260906b.md` | fichier | 24,5 Ko | Retours forges — Produit-12 — 20260906b |
 | `Produit-12 - RETOURS - 20260906b.tf.jsonl` | fichier | 9,0 Ko | 3 ligne(s) JSONL |
@@ -50,9 +50,9 @@ Contenu du dossier à la dernière régénération : chaque élément avec son t
 | `Produit-12 - RETOURS - 20261001b.tf.jsonl` | fichier | 2,7 Ko | 2 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261002a.md` | fichier | 9,3 Ko | Retours forges — Produit-12 — 20261002a |
 | `Produit-12 - RETOURS - 20261002a.tf.jsonl` | fichier | 4,6 Ko | 3 ligne(s) JSONL |
-| `Produit-12 - RETOURS - 20261014a - PJ - Etude qualite du classement.md` | fichier | 11,7 Ko | Qualité du classement : ce que mesure un échantillon de référence |
+| `Produit-12 - RETOURS - 20261014a - PJ - Etude qualite du classement.md` | fichier | 12,0 Ko | Qualité du classement : ce que mesure un échantillon de référence |
 | `Produit-12 - RETOURS - 20261014a - PJ - Principe d'analyse critique.md` | fichier | 5,9 Ko | Principe d'analyse critique des sorties automatisées — proposition du 14/10/2026 |
-| `Produit-12 - RETOURS - 20261014a.md` | fichier | 5,7 Ko | Retours forges — Produit-12 — 20261014a |
+| `Produit-12 - RETOURS - 20261014a.md` | fichier | 6,0 Ko | Retours forges — Produit-12 — 20261014a |
 | `Produit-12 - RETOURS - 20261014a.tf.jsonl` | fichier | 2,3 Ko | 2 ligne(s) JSONL |
 | `Produit-12 - RETOURS - 20261014b.md` | fichier | 7,6 Ko | Retours forges — Produit-12 — 20261014b |
 | `Produit-12 - RETOURS - 20261014b.tf.jsonl` | fichier | 2,4 Ko | 1 ligne(s) JSONL |

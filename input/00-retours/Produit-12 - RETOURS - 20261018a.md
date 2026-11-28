@@ -1,5 +1,7 @@
 # Retours forges — Produit-12 — 20261018a
 
+> Annoté par le pilot le 28/11/2026 (D-247 (a)) : les noms de 2 correspondants des clients du produit, en titre de documents d'exemple, sont remplacés par « Correspondant-A » et « Correspondant-B » ; le dépôt du pilot est public.
+
 - **Contexte** : autre — réorganisation sur place d'un dossier Dropbox de 81 414 fichiers à la norme de rangement (versions 2.16 à 2.18, 17 et 18/10/2026), remontée sur décision humaine D-62 (a) et action A-1 du 18/10/2026
 - **Références ledger** : `forge\ledger.jsonl` seq 319, 332, 335, 336 (entrées `type: retour` et `oracles_verdict`)
 - **Remise au pilot** : copier ce fichier et son sidecar dans le SAS `<pilot>\input\00-retours\_arrivee\`.
@@ -37,10 +39,10 @@ Aucun document produit depuis un gabarit sur ce lot : l'analyse critique du 18/1
 | Document | Versions datées | Verdict |
 |---|---|---|
 | Restitutions de la réorganisation (20261017a à 20261018e) | 7 | reste au produit, parce que ce sont des synthèses de tour au gabarit RESTITUTION, déjà outillé |
-| Exemple avant apres BERNARD | 7 | reste au produit, parce que sa matière est le courrier d'un cabinet et que sa forme suit déjà le socle `digit-ai-page-html` |
-| Exemple avant apres SAS CREER PROMOTION | 7 | reste au produit, pour la même raison |
-| Exemple reponses contextualisees BERNARD | 5 | reste au produit, parce que sa forme (mail reçu, brouillon, règles appliquées) est propre au produit de rédaction de réponses |
-| Exemple reponses contextualisees SAS CREER PROMOTION | 5 | reste au produit, pour la même raison |
+| Exemple avant apres Correspondant-A | 7 | reste au produit, parce que sa matière est le courrier d'un cabinet et que sa forme suit déjà le socle `digit-ai-page-html` |
+| Exemple avant apres Correspondant-B | 7 | reste au produit, pour la même raison |
+| Exemple reponses contextualisees Correspondant-A | 5 | reste au produit, parce que sa forme (mail reçu, brouillon, règles appliquées) est propre au produit de rédaction de réponses |
+| Exemple reponses contextualisees Correspondant-B | 5 | reste au produit, pour la même raison |
 
 ## Garde-fou de plateforme relevé
 

@@ -1,5 +1,7 @@
 # Retours forges — Produit-12 — 20261122c
 
+> Annoté par le pilot le 28/11/2026 (D-247 (a)) : les noms de 2 correspondants des clients du produit, en titre de documents d'exemple, sont remplacés par « Correspondant-A » et « Correspondant-B » ; le dépôt du pilot est public.
+
 - **Contexte** : inspection production v0.9.0 — diagnostic de la rédaction des brouillons sans IA et plan de la version corrective 0.9.1, 22/11/2026 (décision D-83 (a))
 - **Références ledger** : `forge\ledger.jsonl` seq 421, 422, 423, 424 (entrées `type: retour`)
 - **Remise au pilot** : copier ce fichier et son sidecar dans le SAS `<pilot>\input\00-retours\_arrivee\`.
@@ -48,10 +50,10 @@ Aucun document produit depuis un gabarit de forge sur ce lot : le plan 20261122a
 
 | Document | Versions datées | Verdict |
 |---|---|---|
-| Exemple avant apres BERNARD | 7 | reste au produit, parce que sa matière est le courrier d'un cabinet et que sa forme suit déjà le socle `digit-ai-page-html` |
-| Exemple avant apres SAS CREER PROMOTION | 7 | reste au produit, pour la même raison |
-| Exemple reponses contextualisees BERNARD | 5 | reste au produit, parce que sa forme (mail reçu, brouillon, règles appliquées) est propre au produit de rédaction de réponses |
-| Exemple reponses contextualisees SAS CREER PROMOTION | 5 | reste au produit, pour la même raison |
+| Exemple avant apres Correspondant-A | 7 | reste au produit, parce que sa matière est le courrier d'un cabinet et que sa forme suit déjà le socle `digit-ai-page-html` |
+| Exemple avant apres Correspondant-B | 7 | reste au produit, pour la même raison |
+| Exemple reponses contextualisees Correspondant-A | 5 | reste au produit, parce que sa forme (mail reçu, brouillon, règles appliquées) est propre au produit de rédaction de réponses |
+| Exemple reponses contextualisees Correspondant-B | 5 | reste au produit, pour la même raison |
 
 ## Garde-fou de plateforme relevé
 

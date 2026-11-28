@@ -75,6 +75,15 @@ const NON_NOMS = new Set(["Code", "Desktop", "Opus", "Sonnet", "Haiku", "Fable",
 export const MOTIF_PRENOM_NOM_COURANT = new RegExp(`(?<![\\p{L}\\d-])([${MAJ}][${MIN}]+(?:-[${MAJ}][${MIN}]+)?)\\s+([${MAJ}][${MIN}]{2,}(?:-[${MAJ}][${MIN}]+)?)(?![\\p{L}\\d])`, "gu");
 export const MOTIF_CIVILITE = new RegExp(`(?<![\\p{L}])(M\\.|Mme|Mlle|Monsieur|Madame|Mademoiselle|Me|Maître|Dr\\.?|Docteur)\\s+([${MAJ}][\\p{L}'-]+)`, "gu");
 export const MOTIF_COURRIEL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+// D-247 (a) du 27/11/2026, TF-2911 — DEUX FORMES QUE LE RELEVÉ NE VOYAIT PAS. Le fait : 25 lots publiés depuis le 15/10/2026 nommaient en titre
+// de documents d'exemple une personne (« … avant apres <NOM> ») et une société (« SAS <RAISON SOCIALE> ») clientes d'un produit ; aucune des
+// trois formes ci-dessus ne les relevait. (1) Un mot tout en capitales, SEUL, qui est un prénom de la liste fermée en capitales : la plupart
+// des noms de famille français courants sont aussi des prénoms (la liste est fermée, le bruit borné). (2) Une forme juridique de société
+// suivie d'un à quatre mots en capitales : la raison sociale. La substitution par la table des noms ignore la casse, et un prénom de la liste
+// y aurait été réécrit partout : c'est pourquoi la personne se RELÈVE ici, à qualifier, au lieu d'être inscrite à la table.
+const PRENOMS_EN_CAPITALES = () => new Set([...PRENOMS].map((p) => p.toLocaleUpperCase("fr")));
+export const MOTIF_NOM_EN_CAPITALES = new RegExp(`(?<![\\p{L}\\d'-])([${MAJ}]{4,})(?![\\p{L}\\d'-])`, "gu");
+export const MOTIF_SOCIETE = new RegExp(`(?<![\\p{L}\\d])(SAS|SASU|SARL|EURL|SCI|SNC|SELARL)\\s+([${MAJ}][${MAJ}&'-]+(?:\\s+[${MAJ}][${MAJ}&'-]+){0,3})(?![\\p{L}\\d])`, "gu");
 // Les sigles en capitales qu'un mot capitalisé précède sans nommer personne. Liste FERMÉE, tirée du
 // vocabulaire du parc (restitutions, lots, oracles) et des faux positifs MESURÉS le 26/09 sur les 162
 // lots de la boîte : l'élargir se fait sur un faux positif mesuré, jamais par précaution.
@@ -111,6 +120,11 @@ export function relever(texte) {
   }
   for (const m of t.matchAll(MOTIF_CIVILITE)) if (!MOTS_OUTILS.has(m[2])) vues.add(m[0]);
   for (const m of t.matchAll(MOTIF_COURRIEL)) if (!DOMAINE_DE_DOC.test(m[0]) && !SERVICE.test(m[0])) vues.add(m[0]);
+  // D-247 (a) : un nom de famille en capitales seul, quand il est un prénom de la liste fermée ; une société nommée par sa forme juridique.
+  const enCapitales = PRENOMS_EN_CAPITALES();
+  const dejaVus = new Set([...vues].flatMap((v) => v.split(/\s+/)));
+  for (const m of t.matchAll(MOTIF_NOM_EN_CAPITALES)) if (enCapitales.has(m[1]) && !SIGLES.has(m[1]) && !dejaVus.has(m[1])) vues.add(m[1]);
+  for (const m of t.matchAll(MOTIF_SOCIETE)) vues.add(`${m[1]} ${m[2]}`);
   return [...vues];
 }
 

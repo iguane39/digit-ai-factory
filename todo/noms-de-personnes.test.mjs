@@ -16,6 +16,9 @@ check("rouge — « Prénom NOM » d'un tiers est relevé (le cas du 24/09)", ()
 check("rouge — prénom composé et nom composé", () => attend("Relu par Jean-Luc LE-BIHAN.", ["Jean-Luc LE-BIHAN"]));
 check("rouge — une civilité suivie d'un nom", () => attend("Mme Tartempion a validé ; M. Bidule aussi.", ["Mme Tartempion", "M. Bidule"]));
 check("rouge — une adresse électronique personnelle", () => attend("Écrire à maelle.kerguelen@entreprise-fictive.fr pour relire.", ["maelle.kerguelen@entreprise-fictive.fr"]));
+check("rouge — D-247 (a) : un nom de famille en capitales seul, prénom de la liste fermée, est relevé (« Exemple avant apres VINCENT »)", () => attend("Documents mûrs : Exemple avant apres VINCENT, 7 versions.", ["VINCENT"]));
+check("rouge — D-247 (a) : une société nommée par sa forme juridique est relevée (« SAS TARTEMPION FICTIVE »)", () => attend("Exemple reponses contextualisees SAS TARTEMPION FICTIVE | 5", ["SAS TARTEMPION FICTIVE"]));
+check("vert — D-247 (a) : l'emphase et les sigles en capitales ne sont pas des noms (« AVANT », « PASS », « BLOQUANT »), ni le nom déjà relevé avec son prénom", () => attend("AVANT la remise, statut PASS, constat BLOQUANT ; relu par Vincent ROBERT.", ["Vincent ROBERT"]));
 check("vert — les sigles du parc ne sont pas des noms (« voir README », « statut PASS », « format JSON »)", () => attend("Voir README, statut PASS, format JSON, balises HTML et Google Ads.", []));
 check("vert — un sigle de deux lettres n'est pas un nom (« Entra ID »)", () => attend("L'annuaire Microsoft Entra ID répond.", []));
 check("vert — adresses de documentation et de service ignorées", () => attend("recette@exemple.invalid, a@example.com, noreply@anthropic.com", []));
